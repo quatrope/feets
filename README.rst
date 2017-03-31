@@ -1,15 +1,16 @@
 feets: Feature Extractor for Time Series
 ========================================
 
-Summary: Compilation of some of the existing light-curve features.
+Compilation of some of the existing light-curve features.
+
 
 Based on FATS:
 
-- Authors: Isadora Nun and Pavlos Protopapas
-- Contributors: Karim Pichara, Rahul Dave, Daniel Acuña, Nicolás Castro,
+- **Authors:** Isadora Nun and Pavlos Protopapas
+- **Contributors:** Karim Pichara, Rahul Dave, Daniel Acuña, Nicolás Castro,
   Cristobal Mackenzie, Andrés Riveros and Ming Zhu
 
-The main difference with FATS:
+Main difference with FATS:
 
 - Removed licurve retrieval from public surveys (we only do one thing here)
 - Removed all the ``sys.exit()`` calls and replaced with Exceptions
@@ -20,13 +21,16 @@ The main difference with FATS:
 - Posibility of register more FeaturesExtractors.
 
 
------------------------------------------------------
+Installation
+------------
 
-Installation: Clone this repository and do `pip install -e`.
+Clone this repository and do ``pip install -e``.
 
-Or `pip install feets` for the latest stable version.
+Or ``pip install feets`` for the latest stable version.
 
------------------------------------------------------
+
+Description
+-----------
 
 In time-domain astronomy, data gathered from the telescopes is usually
 represented in the form of light-curves. These are time series that show the
