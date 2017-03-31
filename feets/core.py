@@ -167,11 +167,11 @@ class FeatureSpace(object):
     def selected_kwargs(self):
         return dict(self._selected_kwargs)
 
-    def calculateFeature(self, data):
+    def extract(self, data):
         data, features = np.asarray(data), {}
         for fname in self._execution_plan:
             fextractor = self._features_extractors[fname]
             features[fname] = fextractor.extract(data, features)
         fvalues = np.array([
-            result[fname] for fname in self._features_as_array])
+            features[fname] for fname in self._features_as_array])
         return self._features_as_array, fvalues

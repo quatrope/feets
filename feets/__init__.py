@@ -38,8 +38,36 @@ __doc__ = """Compilation of some of the existing light-curve features."""
 
 
 # =============================================================================
+# CONSTANTS
+# =============================================================================
+
+__version__ = ("0", "4")
+
+NAME = "feets"
+
+DOC = __doc__
+
+VERSION = ".".join(__version__)
+
+AUTHORS = "JuanBC"
+
+EMAIL = "jbc.develop@gmail.com"
+
+URL = "http://scikit-criteria.org/"
+
+LICENSE = "MIT"
+
+KEYWORDS = "light curve feature analysis".split()
+
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .core import FeatureSpace
-from .extractors import register_extractor
+import os
+
+if os.getenv("FEETS_IN_SETUP") != "True":
+    from .core import FeatureSpace
+    from .extractors import register_extractor
+
+del os

@@ -157,7 +157,7 @@ class Extractor(object):
     def fit(self):
         raise NotImplementedError()
 
-    def tearDown(self):
+    def teardown(self):
         pass
 
     def extract(self, data, features):
@@ -167,7 +167,7 @@ class Extractor(object):
             kwargs[d] = data[idx]
         try:
             self.setup()
-            self.fit(**kwargs)
+            return self.fit(**kwargs)
         finally:
             self.teardown()
 
@@ -221,5 +221,36 @@ class StetsonK(Extractor):
              np.sum(np.abs(sigmap)) / np.sqrt(np.sum(sigmap ** 2)))
 
         return K
+
+
+@register_extractor
+class Meanvariance(Extractor):
+    """variability index"""
+
+    data = ['magnitude']
+
+    def fit(self, magnitude):
+        return np.std(magnitude) / np.mean(magnitude)
+
+
+@register_extractor
+class Autocor_length(Extractor):
+    data = ['magnitude']
+
+    def __init__(self, lags=100):
+        self.nlags = lags
+
+    def fit(self, magnitude):
+        AC = stattools.acf(magnitude, nlags=self.nlags)
+        k = next((index for index, value in
+                 enumerate(AC) if value < np.exp(-1)), None)
+
+        while k is None:
+            self.nlags = self.nlags + 100
+            AC = stattools.acf(magnitude, nlags=self.nlags)
+            k = next((index for index, value in
+                      enumerate(AC) if value < np.exp(-1)), None)
+
+        return k
 
 
