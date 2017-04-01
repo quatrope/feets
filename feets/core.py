@@ -91,45 +91,46 @@ class FeatureSpace(object):
     print a.result(method='dict')
 
     """
-    def __init__(self, data=None, features=None, exclude=None, **kwargs):
+    def __init__(self, data=None, only=None, exclude=None, **kwargs):
+        # retrieve all the extractors
+        exts = extractors.registered()
 
+        # store all the parameters for the extractors
         self._kwargs = kwargs
 
         # get all posible features by data
         if data:
             fbdata = []
-            for fname, f in extractors.extractors.items():
+            for fname, f in exts.items():
                 if not f.data.difference(data):
                     fbdata.append(fname)
         else:
-            fbdata = extractors.extractors.keys()
-        self.features_by_data = frozenset(fbdata)
-
-        self.data = frozenset(data or extractors.DATAS)
-
+            fbdata = exts.keys()
+        self._data = frozenset(data or extractors.DATAS)
+        self._features_by_data = frozenset(fbdata)
 
         # validate the list of features or select all of them
-        if features:
-            for f in features:
-                if f not in extractors.extractors:
+        if only:
+            for f in only:
+                if f not in exts:
                     raise FeatureNotFound(f)
-        self.features = frozenset(features or extractors.extractors.keys())
+        self._only = frozenset(only or exts.keys())
 
         # select the features to exclude or not exclude anything
         if exclude:
             for f in exclude:
-                if f not in extractors.extractors:
+                if f not in exts:
                     raise FeatureNotFound(f)
-        self.exclude = frozenset(exclude or ())
+        self._exclude = frozenset(exclude or ())
 
         # TODO: remove by dependencies
 
         # final list of features
-        self.selected_features = self.features_by_data.intersection(
-                self.features).difference(self.exclude)
+        self._features = self._features_by_data.intersection(
+            self._only).difference(self._exclude)
 
         # create a ndarray for all the results
-        self._features_as_array = np.array(sorted(self.selected_features))
+        self._features_as_array = np.array(sorted(self._features))
 
         # TODO: excecution_order by dependencies
         self._execution_plan = tuple(self._features_as_array)
@@ -137,12 +138,12 @@ class FeatureSpace(object):
         # retrieve only the relevant kwargs
         self._selected_kwargs = {
             fname: params for fname, params in kwargs.items()
-            if fname in self.selected_features}
+            if fname in self._features}
 
         # initialize the extractors
         self._features_extractors = {}
-        for fname in self.selected_features:
-            Extractor = extractors.extractors[fname]
+        for fname in self._features:
+            Extractor = exts[fname]
             params = self._selected_kwargs.get(fname, {})
             self._features_extractors[fname] = Extractor(**params)
 
@@ -150,22 +151,16 @@ class FeatureSpace(object):
         return str(self)
 
     def __str__(self):
-        extractors = []
-        for fname in self._features_as_array:
-            fparams = ", ".join([
-                "{}={}".format(k, v)
-                for k, v in self._selected_kwargs.get(fname, {}).items()])
-            extractors.append("{}({})".format(fname, fparams))
-        space = ", ".join(extractors)
-        return "<FeatureSpace: {}>".format(space)
-
-    @property
-    def kwargs(self):
-        return dict(self._kwargs)
-
-    @property
-    def selected_kwargs(self):
-        return dict(self._selected_kwargs)
+        if not hasattr(self, "__str"):
+            extractors = []
+            for fname in self._features_as_array:
+                fparams = ", ".join([
+                    "{}={}".format(k, v)
+                    for k, v in self._selected_kwargs.get(fname, {}).items()])
+                extractors.append("{}({})".format(fname, fparams))
+            space = ", ".join(extractors)
+            self.__str = "<FeatureSpace: {}>".format(space)
+        return __str
 
     def extract(self, data):
         data, features = np.asarray(data), {}
@@ -175,3 +170,43 @@ class FeatureSpace(object):
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
         return self._features_as_array, fvalues
+
+    @property
+    def kwargs(self):
+        return dict(self._kwargs)
+
+    @property
+    def selected_kwargs(self):
+        return dict(self._selected_kwargs)
+
+    @property
+    def data(self):
+        return self._data
+
+    @property
+    def only(self):
+        return self._only
+
+    @property
+    def exclude(self):
+        return self._exclude
+
+    @property
+    def features_by_data_(self):
+        return self._features_by_data
+
+    @property
+    def features_(self):
+        return self._features
+
+    @property
+    def features_extractors_(self):
+        return dict(self._features_extractors)
+
+    @property
+    def features_as_array_(self):
+        return self._features_as_array
+
+    @property
+    def excecution_plan_(self):
+        return self._execution_plan

@@ -82,18 +82,22 @@ DATAS = tuple([d[0] for d in sorted(DATA_IDXS.items(), key=lambda di: di[1])])
 # REGISTER UTILITY
 # =============================================================================
 
-extractors = {}
+_extractors = {}
 
 
-def register_extractor(cls):
+def register_extractor(cls, name=None):
 
-    name = cls.__name__
+    name = name or cls.__name__
 
     if not inspect.isclass(cls) or not issubclass(cls, Extractor):
         msg = "'cls' must be a subclass of Extractor. Found: {}"
         raise TypeError(msg.format(cls))
 
-    extractors[name] = cls
+    _extractors[name] = cls
+
+
+def registered():
+    return dict(_extractors)
 
 
 # =============================================================================
@@ -114,8 +118,9 @@ class ExtractorMeta(type):
             check = cls != Extractor
         except NameError:
             pass
+
         if check:
-            if cls.data is Extractor.data:
+            if not hasattr(cls, "data"):
                 msg = "'{}' must redefine {}"
                 raise ExtractorError(msg.format(cls, "data attribute"))
             if not cls.data:
@@ -148,7 +153,6 @@ class ExtractorMeta(type):
 @six.add_metaclass(ExtractorMeta)
 class Extractor(object):
 
-    data = []
     dependencies = []
 
     def setup(self):
@@ -176,7 +180,6 @@ class Extractor(object):
 # EXTRACTORS
 # =============================================================================
 
-@register_extractor
 class Amplitude(Extractor):
     """Half the difference between the maximum and the minimum magnitude"""
 
@@ -190,7 +193,6 @@ class Amplitude(Extractor):
                 np.median(sorted_mag[0:math.ceil(0.05 * N)])) / 2.0
 
 
-@register_extractor
 class Rcs(Extractor):
     """Range of cumulative sum"""
 
@@ -205,7 +207,6 @@ class Rcs(Extractor):
         return R
 
 
-@register_extractor
 class StetsonK(Extractor):
     data = ['magnitude', 'error']
 
@@ -223,7 +224,6 @@ class StetsonK(Extractor):
         return K
 
 
-@register_extractor
 class Meanvariance(Extractor):
     """variability index"""
 
@@ -233,7 +233,6 @@ class Meanvariance(Extractor):
         return np.std(magnitude) / np.mean(magnitude)
 
 
-@register_extractor
 class Autocor_length(Extractor):
     data = ['magnitude']
 
@@ -254,3 +253,10 @@ class Autocor_length(Extractor):
         return k
 
 
+# =============================================================================
+# REGISTERS
+# =============================================================================
+
+for cls in Extractor.__subclasses__():
+    register_extractor(cls)
+del cls
