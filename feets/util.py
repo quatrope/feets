@@ -27,48 +27,28 @@
 # FUTURE
 # =============================================================================
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 
 
 # =============================================================================
 # DOCS
 # =============================================================================
 
-__doc__ = """Compilation of some of the existing light-curve features."""
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-__version__ = ("0", "4")
-
-NAME = "feets"
-
-DOC = __doc__
-
-VERSION = ".".join(__version__)
-
-AUTHORS = "JuanBC"
-
-EMAIL = "jbc.develop@gmail.com"
-
-URL = "http://scikit-criteria.org/"
-
-LICENSE = "MIT"
-
-KEYWORDS = "light curve feature analysis".split()
+__doc__ = """Utilities"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-import os
+from collections import namedtuple
 
-if os.getenv("FEETS_IN_SETUP") != "True":
-    from .core import FeatureSpace
-    from .extractors import (
-        Extractor, register_extractor, registered_extractors, is_registered)
 
-del os
+# =============================================================================
+# FUNCTIONS
+# =============================================================================
+
+def dict2nt(name, d):
+    "Convet a dict to a named tuple"
+    nt = namedtuple(name, list(d.keys()))
+    return nt(**d)

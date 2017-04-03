@@ -93,7 +93,7 @@ class FeatureSpace(object):
     """
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
         # retrieve all the extractors
-        exts = extractors.registered()
+        exts = extractors.registered_extractors()
 
         # store all the parameters for the extractors
         self._kwargs = kwargs
@@ -102,7 +102,7 @@ class FeatureSpace(object):
         if data:
             fbdata = []
             for fname, f in exts.items():
-                if not f.data.difference(data):
+                if not f._conf.data.difference(data):
                     fbdata.append(fname)
         else:
             fbdata = exts.keys()
@@ -135,17 +135,11 @@ class FeatureSpace(object):
         # TODO: excecution_order by dependencies
         self._execution_plan = tuple(self._features_as_array)
 
-        # retrieve only the relevant kwargs
-        self._selected_kwargs = {
-            fname: params for fname, params in kwargs.items()
-            if fname in self._features}
-
         # initialize the extractors
         self._features_extractors = {}
         for fname in self._features:
             Extractor = exts[fname]
-            params = self._selected_kwargs.get(fname, {})
-            self._features_extractors[fname] = Extractor(**params)
+            self._features_extractors[fname] = Extractor(self)
 
     def __repr__(self):
         return str(self)
@@ -154,13 +148,11 @@ class FeatureSpace(object):
         if not hasattr(self, "__str"):
             extractors = []
             for fname in self._features_as_array:
-                fparams = ", ".join([
-                    "{}={}".format(k, v)
-                    for k, v in self._selected_kwargs.get(fname, {}).items()])
-                extractors.append("{}({})".format(fname, fparams))
+                extractor = self._features_extractors[fname]
+                extractors.append(str(extractor))
             space = ", ".join(extractors)
             self.__str = "<FeatureSpace: {}>".format(space)
-        return __str
+        return self.__str
 
     def extract(self, data):
         data, features = np.asarray(data), {}
@@ -174,10 +166,6 @@ class FeatureSpace(object):
     @property
     def kwargs(self):
         return dict(self._kwargs)
-
-    @property
-    def selected_kwargs(self):
-        return dict(self._selected_kwargs)
 
     @property
     def data(self):
