@@ -1,4 +1,4 @@
-feets: Feature Extractor for Time Series
+feets: feATURE eXTRACTOR FOR tIME sERIES
 ========================================
 
 Compilation of some of the existing light-curve features.

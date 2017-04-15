@@ -102,35 +102,34 @@ _extractors = {}
 
 def register_extractor(cls):
 
-    name = cls.__name__
-
     if not inspect.isclass(cls) or not issubclass(cls, Extractor):
         msg = "'cls' must be a subclass of Extractor. Found: {}"
         raise TypeError(msg.format(cls))
 
-    _extractors[name] = cls
+    _extractors.update((f, cls) for f in cls._conf.features)
 
 
 def registered_extractors():
     return dict(_extractors)
 
 
-def is_registered(cls):
-    if isinstance(cls, six.string_types):
-        name = cls
+def is_registered(obj):
+    if isinstance(obj, six.string_types):
+        features = [obj]
     elif not inspect.isclass(cls) or not issubclass(cls, Extractor):
         msg = "'cls' must be a subclass of Extractor. Found: {}"
         raise TypeError(msg.format(cls))
     else:
-        name = cls.__name__
-    return name in _extractors
+        features = cls._conf.features
+    return {f: (f in _extractors) for f in features}
 
 
 # =============================================================================
 # BASE CLASS
 # =============================================================================
 
-ExtractorConf = namedtuple("ExtractorConf", ["data", "dependencies", "params"])
+ExtractorConf = namedtuple(
+    "ExtractorConf", ["data", "dependencies", "params", "features"])
 
 
 class ExtractorError(Exception):
@@ -142,52 +141,71 @@ class ExtractorMeta(type):
     def __new__(mcls, name, bases, namespace):
         cls = super(ExtractorMeta, mcls).__new__(mcls, name, bases, namespace)
 
-        check = False
         try:
-            check = cls != Extractor
+            cls != Extractor
         except NameError:
-            pass
+            return cls
 
-        if check:
-            if not hasattr(cls, "data"):
-                msg = "'{}' must redefine {}"
-                raise ExtractorError(msg.format(cls, "data attribute"))
-            if not cls.data:
-                msg = "'data' can't be empty"
-                raise ExtractorError(msg)
-            for d in cls.data:
-                if d not in DATAS:
-                    msg = "'data' must be a iterable with values in {}. Found '{}'"
-                    raise ExtractorError(msg.format(DATAS, d))
-            if len(set(cls.data)) != len(cls.data):
-                msg = "'data' has duplicated values: {}"
-                raise ExtractorError(msg.format(cls.data))
+        if not hasattr(cls, "data"):
+            msg = "'{}' must redefine {}"
+            raise ExtractorError(msg.format(cls, "data attribute"))
+        if not cls.data:
+            msg = "'data' can't be empty"
+            raise ExtractorError(msg)
+        for d in cls.data:
+            if d not in DATAS:
+                msg = "'data' must be a iterable with values in {}. Found '{}'"
+                raise ExtractorError(msg.format(DATAS, d))
+        if len(set(cls.data)) != len(cls.data):
+            msg = "'data' has duplicated values: {}"
+            raise ExtractorError(msg.format(cls.data))
 
-            if cls.fit == Extractor.fit:
-                msg = "'{}' must redefine {}"
-                raise ExtractorError(msg.format(cls, "fit method"))
+        if not hasattr(cls, "features"):
+            msg = "'{}' must redefine {}"
+            raise ExtractorError(msg.format(cls, "features attribute"))
+        if not cls.features:
+            msg = "'features' can't be empty"
+            raise ExtractorError(msg)
+        for f in cls.features:
+            if not isinstance(f, six.string_types):
+                msg = "Feature name must be an instance of string. Found {}"
+                raise TypeError(msg.format(type(f)))
+            if f in DATAS:
+                msg = "Params can't be in {}".format(DATAS)
+                raise ValueError(msg)
+        if len(set(cls.features)) != len(cls.features):
+            msg = "'features' has duplicated values: {}"
+            raise ExtractorError(msg.format(cls.features))
 
-            if not hasattr(cls, "dependencies"):
-                cls.dependencies = ()
-            for c in cls.dependencies:
-                if not inspect.isclass(c) or not issubclass(c, Extractor):
-                    msg = ("All dependencies of one extractor must be "
-                           "subclasses of Extractor.")
-                    raise TypeError(msg)
+        if cls.fit == Extractor.fit:
+            msg = "'{}' must redefine {}"
+            raise ExtractorError(msg.format(cls, "fit method"))
 
-            if not hasattr(cls, "params"):
-                cls.params = {}
-            for p, default in cls.params.items():
-                if not isinstance(p, six.string_types):
-                    msg = "Params name must be an instance of string. Found {}"
-                    raise TypeError(msg.format(type(p)))
+        if not hasattr(cls, "dependencies"):
+            cls.dependencies = ()
+        for c in cls.dependencies:
+            if not inspect.isclass(c) or not issubclass(c, Extractor):
+                msg = ("All dependencies of one extractor must be "
+                       "subclasses of Extractor.")
+                raise TypeError(msg)
 
-            cls._conf = ExtractorConf(
-                data=frozenset(cls.data),
-                dependencies = frozenset(cls.dependencies),
-                params = tuple(cls.params.items()))
+        if not hasattr(cls, "params"):
+            cls.params = {}
+        for p, default in cls.params.items():
+            if not isinstance(p, six.string_types):
+                msg = "Params name must be an instance of string. Found {}"
+                raise TypeError(msg.format(type(p)))
+            if p in DATAS:
+                msg = "Params can't be in {}".format(DATAS)
+                raise ValueError(msg)
 
-            del cls.data, cls.dependencies, cls.params
+        cls._conf = ExtractorConf(
+            data=frozenset(cls.data),
+            dependencies = frozenset(cls.dependencies),
+            params = tuple(cls.params.items()),
+            features=frozenset(cls.features))
+
+        del cls.data, cls.dependencies, cls.params, cls.features
 
         return cls
 
@@ -199,8 +217,7 @@ class Extractor(object):
         self.space = space
         self.name = type(self).__name__
         self.params = {}
-
-        ns = self.space.kwargs.get(self.name, {})
+        ns = self.space.params_by_features(self._conf.features)
         for p, d in self._conf.params:
             self.params[p] = ns.get(p, d)
 
@@ -226,15 +243,16 @@ class Extractor(object):
     def teardown(self):
         pass
 
-    def extract(self, data, features):
-        kwargs = {fname: features[name] for k in self._conf.dependencies}
+    def extract(self, data, dependencies):
+        kwargs = {fname: dependencies[name] for k in self._conf.dependencies}
         for d in self._conf.data:
             idx = DATA_IDXS[d]
             kwargs[d] = data[idx]
         kwargs.update(self.params)
         try:
             self.setup()
-            return self.fit(**kwargs)
+            features = self.fit(**kwargs)
+            return dict(zip(self._conf.features, features))
         finally:
             self.teardown()
 
@@ -247,6 +265,7 @@ class Amplitude(Extractor):
     """Half the difference between the maximum and the minimum magnitude"""
 
     data = ['magnitude']
+    features = ['Amplitude']
 
     def fit(self, magnitude):
         N = len(magnitude)
@@ -256,10 +275,11 @@ class Amplitude(Extractor):
                 np.median(sorted_mag[0:math.ceil(0.05 * N)])) / 2.0
 
 
-class Rcs(Extractor):
+class RCS(Extractor):
     """Range of cumulative sum"""
 
     data = ['magnitude']
+    features = ['Rcs']
 
     def fit(self, magnitude):
         sigma = np.std(magnitude)
@@ -272,6 +292,7 @@ class Rcs(Extractor):
 
 class StetsonK(Extractor):
     data = ['magnitude', 'error']
+    features = ['StetsonK']
 
     def fit(self, magnitude, error):
         mean_mag = (np.sum(magnitude/(error*error)) /
@@ -287,17 +308,19 @@ class StetsonK(Extractor):
         return K
 
 
-class Meanvariance(Extractor):
+class MeanVariance(Extractor):
     """variability index"""
 
     data = ['magnitude']
+    features = ['meanvariance']
 
     def fit(self, magnitude):
         return np.std(magnitude) / np.mean(magnitude)
 
 
-class Autocor_length(Extractor):
+class AutocorLength(Extractor):
     data = ['magnitude']
+    features = ['Autocor_length']
     params = {"nlags": 100}
 
     def fit(self, magnitude, nlags):
@@ -319,6 +342,7 @@ class SlottedA_length(Extractor):
     """T: tau (slot size in days. default: 4)"""
 
     data = ["magnitude", "time"]
+    features = ["SlottedA_length"]
     params = {"T": None}
 
     def slotted_autocorrelation(self, data, time, T, K,
@@ -403,9 +427,10 @@ class SlottedA_length(Extractor):
         return slots[k] * T
 
 
-class StetsonK_AC(Extractor):
+class StetsonKAC(Extractor):
 
     data = ['magnitude', 'time', 'error']
+    features = ["StetsonK_AC"]
 
     def fit(self, magnitude, time, error):
         sal = SlottedA_length(self.space)
@@ -427,6 +452,7 @@ class StetsonL(Extractor):
 
     data = ['aligned_magnitude', 'aligned_magnitude2',
             'aligned_error', 'aligned_error2']
+    features = ["StetsonL"]
 
     def fit(self, aligned_magnitude, aligned_magnitude2,
             aligned_error, aligned_error2):
@@ -464,6 +490,7 @@ class Con(Extractor):
     Pavlos not happy
     """
     data = ['magnitude']
+    features = ["Con"]
     params = {"consecutiveStar": 3}
 
     def fit(self, magnitude, consecutiveStar):
@@ -493,6 +520,7 @@ class Color(Extractor):
     mean(B1) - mean(B2)
     """
     data = ['magnitude', 'time', 'magnitude2']
+    features = ["Color"]
 
     def fit(self, magnitude, magnitude2):
         return np.mean(magnitude) - np.mean(magnitude2)
@@ -504,6 +532,7 @@ class Beyond1Std(Extractor):
     """
 
     data = ['magnitude', 'error']
+    features = ["Beyond1Std"]
 
     def fit(self, magnitude, error):
         n = len(magnitude)
@@ -521,8 +550,6 @@ class Beyond1Std(Extractor):
         return float(count) / n
 
 
-
-
 class SmallKurtosis(Extractor):
     """Small sample kurtosis of the magnitudes.
 
@@ -530,6 +557,7 @@ class SmallKurtosis(Extractor):
     """
 
     data = ['magnitude']
+    features = ["SmallKurtosis"]
 
     def fit(self, magnitude):
         n = len(magnitude)
@@ -548,6 +576,7 @@ class Std(Extractor):
     """Standard deviation of the magnitudes"""
 
     data = ['magnitude']
+    features = ["Std"]
 
     def fit(self, magnitude):
         return np.std(magnitude)
@@ -557,6 +586,7 @@ class Skew(Extractor):
     """Skewness of the magnitudes"""
 
     data = ['magnitude']
+    features = ["Skew"]
 
     def fit(self, magnitude):
         return stats.skew(magnitude)
@@ -567,6 +597,7 @@ class StetsonJ(Extractor):
 
     data = ['aligned_magnitude', 'aligned_magnitude2',
             'aligned_error', 'aligned_error2']
+    features = ["StetsonJ"]
 
     def fit(self, aligned_magnitude, aligned_magnitude2,
             aligned_error, aligned_error2):
@@ -600,6 +631,7 @@ class MaxSlope(Extractor):
     """
 
     data = ['magnitude', 'time']
+    features = ["MaxSlope"]
 
     def fit(self, magnitude, time):
         slope = np.abs(magnitude[1:] - magnitude[:-1]) / (time[1:] - time[:-1])
@@ -611,6 +643,7 @@ class MaxSlope(Extractor):
 class MedianAbsDev(Extractor):
 
     data = ['magnitude']
+    features = ["MedianAbsDev"]
 
     def fit(self, magnitude):
         median = np.median(magnitude)
@@ -626,6 +659,7 @@ class MedianBRP(Extractor):
     """
 
     data = ['magnitude']
+    features = ["MedianBRP"]
 
     def fit(self, magnitude):
         median = np.median(magnitude)
@@ -645,6 +679,7 @@ class PairSlopeTrend(Extractor):
     decreasing first differences.
     """
     data = ['magnitude']
+    features = ["PairSlopeTrend"]
 
     def fit(self, magnitude):
         data_last = magnitude[-30:]
@@ -656,6 +691,7 @@ class PairSlopeTrend(Extractor):
 class FluxPercentileRatioMid20(Extractor):
 
     data = ['magnitude']
+    features = ["FluxPercentileRatioMid20"]
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
@@ -675,8 +711,8 @@ class FluxPercentileRatioMid20(Extractor):
 
 class FluxPercentileRatioMid35(Extractor):
 
-
     data = ['magnitude']
+    features = ["FluxPercentileRatioMid35"]
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
@@ -697,6 +733,7 @@ class FluxPercentileRatioMid35(Extractor):
 class FluxPercentileRatioMid50(Extractor):
 
     data = ['magnitude']
+    features = ["FluxPercentileRatioMid50"]
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
@@ -717,6 +754,7 @@ class FluxPercentileRatioMid50(Extractor):
 class FluxPercentileRatioMid65(Extractor):
 
     data = ['magnitude']
+    features = ["FluxPercentileRatioMid65"]
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
@@ -736,8 +774,8 @@ class FluxPercentileRatioMid65(Extractor):
 
 class FluxPercentileRatioMid80(Extractor):
 
-
     data = ['magnitude']
+    features = ["FluxPercentileRatioMid80"]
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
@@ -758,6 +796,7 @@ class FluxPercentileRatioMid80(Extractor):
 class PercentDifferenceFluxPercentile(Extractor):
 
     data = ['magnitude']
+    features = ["PercentDifferenceFluxPercentile"]
 
     def fit(self, magnitude):
         median_data = np.median(magnitude)
@@ -776,6 +815,7 @@ class PercentDifferenceFluxPercentile(Extractor):
 class PercentAmplitude(Extractor):
 
     data = ['magnitude']
+    features = ["PercentAmplitude"]
 
     def fit(self, magnitude):
         median_data = np.median(magnitude)
@@ -790,6 +830,7 @@ class PercentAmplitude(Extractor):
 class LinearTrend(Extractor):
 
     data = ['magnitude', 'time']
+    features = ["LinearTrend"]
 
     def fit(self, magnitude, time):
         regression_slope = stats.linregress(time, magnitude)[0]

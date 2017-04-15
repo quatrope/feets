@@ -108,6 +108,7 @@ class FeatureSpace(object):
             fbdata = exts.keys()
         self._data = frozenset(data or extractors.DATAS)
         self._features_by_data = frozenset(fbdata)
+        import ipdb; ipdb.set_trace()
 
         # validate the list of features or select all of them
         if only:
@@ -132,14 +133,15 @@ class FeatureSpace(object):
         # create a ndarray for all the results
         self._features_as_array = np.array(sorted(self._features))
 
-        # TODO: excecution_order by dependencies
-        self._execution_plan = tuple(self._features_as_array)
-
         # initialize the extractors
-        self._features_extractors = {}
-        for fname in self._features:
-            Extractor = exts[fname]
-            self._features_extractors[fname] = Extractor(self)
+        features_extractors = set()
+        for fcls in set(exts.values()):
+            if fcls._conf.features.intersection(self._features):
+                self._fetures_extractors.add(fcls(self))
+        self._features_extractors = frozenset(features_extractors)
+
+        # TODO: excecution_order by dependencies
+        self._execution_plan = tuple(features_extractors)
 
     def __repr__(self):
         return str(self)
@@ -154,12 +156,17 @@ class FeatureSpace(object):
             self.__str = "<FeatureSpace: {}>".format(space)
         return self.__str
 
+    def params_by_features(self, features):
+        params = {}
+        for f in features:
+            params.update(self._kwargs.get(f, {}))
+        return params
+
     def extract(self, data):
         data, features = np.asarray(data), {}
         for fname in self._execution_plan:
-            fextractor = self._features_extractors[fname]
-            features[fname] = fextractor.extract(data, features)
-        fvalues = np.array([
+            features.update(fextractor.extract(data, features))
+         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
         return self._features_as_array, fvalues
 
@@ -189,7 +196,7 @@ class FeatureSpace(object):
 
     @property
     def features_extractors_(self):
-        return dict(self._features_extractors)
+        return self._features_extractors
 
     @property
     def features_as_array_(self):
