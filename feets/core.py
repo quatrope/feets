@@ -108,7 +108,6 @@ class FeatureSpace(object):
             fbdata = exts.keys()
         self._data = frozenset(data or extractors.DATAS)
         self._features_by_data = frozenset(fbdata)
-        import ipdb; ipdb.set_trace()
 
         # validate the list of features or select all of them
         if only:
@@ -137,7 +136,7 @@ class FeatureSpace(object):
         features_extractors = set()
         for fcls in set(exts.values()):
             if fcls._conf.features.intersection(self._features):
-                self._fetures_extractors.add(fcls(self))
+                features_extractors.add(fcls(self))
         self._features_extractors = frozenset(features_extractors)
 
         # TODO: excecution_order by dependencies
@@ -148,10 +147,7 @@ class FeatureSpace(object):
 
     def __str__(self):
         if not hasattr(self, "__str"):
-            extractors = []
-            for fname in self._features_as_array:
-                extractor = self._features_extractors[fname]
-                extractors.append(str(extractor))
+            extractors = [str(extractor) for extractor in self._execution_plan]
             space = ", ".join(extractors)
             self.__str = "<FeatureSpace: {}>".format(space)
         return self.__str
@@ -164,9 +160,9 @@ class FeatureSpace(object):
 
     def extract(self, data):
         data, features = np.asarray(data), {}
-        for fname in self._execution_plan:
+        for fextractor in self._execution_plan:
             features.update(fextractor.extract(data, features))
-         fvalues = np.array([
+        fvalues = np.array([
             features[fname] for fname in self._features_as_array])
         return self._features_as_array, fvalues
 

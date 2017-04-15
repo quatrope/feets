@@ -252,6 +252,8 @@ class Extractor(object):
         try:
             self.setup()
             features = self.fit(**kwargs)
+            if not hasattr(features, "__iter__"):
+                features = (features,)
             return dict(zip(self._conf.features, features))
         finally:
             self.teardown()
@@ -312,7 +314,7 @@ class MeanVariance(Extractor):
     """variability index"""
 
     data = ['magnitude']
-    features = ['meanvariance']
+    features = ['Meanvariance']
 
     def fit(self, magnitude):
         return np.std(magnitude) / np.mean(magnitude)
