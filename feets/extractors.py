@@ -226,9 +226,11 @@ class Extractor(object):
 
     def __str__(self):
         if not hasattr(self, "__str"):
-            if self.params:
+            params = dict(self._conf.params)
+            params.update(self.params)
+            if params:
                 params = ", ".join([
-                    "{}={}".format(k, v) for k, v in self.params.items()])
+                    "{}={}".format(k, v) for k, v in params.items()])
             else:
                 params = ""
             self.__str = "{}({})".format(self.name, params)
