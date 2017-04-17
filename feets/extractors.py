@@ -841,6 +841,334 @@ class LinearTrend(Extractor):
         return regression_slope
 
 
+
+class EtaColor(Extractor):
+
+    data = ['aligned_magnitude', 'aligned_time', 'aligned_magnitude2']
+    features = ["Eta_color"]
+
+    def fit(self, aligned_magnitude, aligned_time, aligned_magnitude2):
+        N = len(aligned_magnitude)
+        B_Rdata = aligned_magnitude - aligned_magnitude2
+
+        w = 1.0 / np.power(aligned_time[1:] - aligned_time[:-1], 2)
+        w_mean = np.mean(w)
+
+        N = len(aligned_time)
+        sigma2 = np.var(B_Rdata)
+
+        S1 = sum(w * (B_Rdata[1:] - B_Rdata[:-1]) ** 2)
+        S2 = sum(w)
+
+        eta_B_R = (w_mean * np.power(aligned_time[N - 1] -
+                   aligned_time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
+
+        return eta_B_R
+
+
+
+class Eta_e(Extractor):
+
+    data = ['magnitude', 'time']
+    features = ["Eta_e"]
+
+    def fit(self, magnitude, time):
+        w = 1.0 / np.power(np.subtract(time[1:], time[:-1]), 2)
+        w_mean = np.mean(w)
+
+        N = len(time)
+        sigma2 = np.var(magnitude)
+
+        S1 = sum(w * (magnitude[1:] - magnitude[:-1]) ** 2)
+        S2 = sum(w)
+
+        eta_e = (w_mean * np.power(time[N - 1] -
+                 time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
+
+        return eta_e
+
+
+class Mean(Extractor):
+
+    data = ['magnitude']
+    features = ["Mean"]
+
+    def fit(self, magnitude):
+        B_mean = np.mean(magnitude)
+        return B_mean
+
+
+class Q31(Extractor):
+
+    data = ['magnitude']
+    features = ["Q31"]
+
+    def fit(self, magnitude):
+        return np.percentile(magnitude, 75) - np.percentile(magnitude, 25)
+
+
+class Q31Color(Extractor):
+
+    data = ['aligned_magnitude', 'aligned_magnitude2']
+    features = ["Q31_color"]
+
+    def fit(self, aligned_magnitude, aligned_magnitude2):
+        N = len(aligned_magnitude)
+        b_r = aligned_magnitude[:N] - aligned_magnitude2[:N]
+
+        return np.percentile(b_r, 75) - np.percentile(b_r, 25)
+
+
+class AndersonDarling(Extractor):
+
+    data = ['magnitude']
+    features = ["AndersonDarling"]
+
+    def fit(self, magnitude):
+        ander = stats.anderson(magnitude)[0]
+        return 1 / (1.0 + np.exp(-10 * (ander - 0.3)))
+
+
+class LombScargle(Extractor):
+
+    data = ['magnitude', 'time']
+    features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
+    params = {"ofac": 6.}
+
+    def _compute_ls(self, magnitude, time, ofac):
+        fx, fy, nout, jmax, prob = lomb.fasper(time, magnitude, ofac, 100.)
+        period = fx[jmax]
+        T = 1.0 / period
+        new_time = np.mod(time, 2 * T) / (2 * T)
+
+        return T, new_time, prob, period
+
+    def _compute_cs(self, folded_data, N):
+        sigma = np.std(folded_data)
+        m = np.mean(folded_data)
+        s = np.cumsum(folded_data - m) * 1.0 / (N * sigma)
+        R = np.max(s) - np.min(s)
+        return R
+
+    def _compute_eta(self, folded_data, N):
+        sigma2 = np.var(folded_data)
+        Psi_eta = (1.0 / ((N - 1) * sigma2) *
+                   np.sum(np.power(folded_data[1:] - folded_data[:-1], 2)))
+        return Psi_eta
+
+    def fit(self, magnitude, time, ofac):
+        T, new_time, prob, period = self._compute_ls(magnitude, time, ofac)
+
+        folded_data = magnitude[np.argsort(new_time)]
+        N = len(folded_data)
+
+        R = self._compute_cs(folded_data, N)
+        Psi_eta = self._compute_eta(folded_data, N)
+
+        return T, prob, R, Psi_eta
+
+
+class CAR(Extractor):
+
+    data = ['magnitude', 'time', 'error']
+    features = ["CAR_sigma", "CAR_tau", "CAR_mean"]
+
+    def _CAR_Like(self, parameters, t, x, error_vars):
+
+        sigma = parameters[0]
+        tau = parameters[1]
+
+        b = np.mean(x) / tau
+        epsilon = 1e-300
+        cte_neg = -np.infty
+        num_datos = np.size(x)
+
+        Omega, x_hat, a, x_ast = [], [], [], []
+
+        Omega.append((tau * (sigma ** 2)) / 2.)
+        x_hat.append(0.)
+        a.append(0.)
+        x_ast.append(x[0] - b * tau)
+
+        loglik = 0.
+
+        for i in range(1, num_datos):
+
+            a_new = np.exp(-(t[i] - t[i - 1]) / tau)
+            x_ast.append(x[i] - b * tau)
+            x_hat.append(
+                a_new * x_hat[i - 1] +
+                (a_new * Omega[i - 1] / (Omega[i - 1] + error_vars[i - 1])) *
+                (x_ast[i - 1] - x_hat[i - 1]))
+
+            Omega.append(
+                Omega[0] * (1 - (a_new ** 2)) + ((a_new ** 2)) * Omega[i - 1] *
+                (1 - (Omega[i - 1] / (Omega[i - 1] + error_vars[i - 1]))))
+
+            loglik_inter = np.log(
+                ((2 * np.pi * (Omega[i] + error_vars[i])) ** -0.5) *
+                (np.exp(-0.5 * (((x_hat[i] - x_ast[i]) ** 2) /
+                 (Omega[i] + error_vars[i]))) + epsilon))
+
+            loglik = loglik + loglik_inter
+
+            if(loglik <= cte_neg):
+                print('CAR loglikelihood to inf')
+                return None
+
+        # the minus one is to perfor maximization using the minimize function
+        return -loglik
+
+    def _calculate_CAR(self, time, data, error):
+        N = len(magnitude)
+        magnitude = magnitude.reshape((N, 1))
+        time = time.reshape((N, 1))
+        error = error.reshape((N, 1)) ** 2
+
+        x0 = [10, 0.5]
+        bnds = ((0, 100), (0, 100))
+        res = minimize(self._CAR_Like, x0, args=(time, data, error),
+                       method='nelder-mead', bounds=bnds)
+        sigma, tau = res.x[0], res.x[1]
+        return sigma, tau
+
+    def fit(self, magnitude, time, error):
+        sigma, tau = self._calculate_CAR(time, magnitude, error)
+        mean = np.mean(magnitude) / tau
+        return sigma, tau, mean
+
+
+class FourierComponents(Extractor):
+
+    data = ['magnitude', 'time']
+    features = ['Freq1_harmonics_amplitude_0',
+                'Freq1_harmonics_amplitude_1',
+                'Freq1_harmonics_amplitude_2',
+                'Freq1_harmonics_amplitude_3',
+                'Freq2_harmonics_amplitude_0',
+                'Freq2_harmonics_amplitude_1',
+                'Freq2_harmonics_amplitude_2',
+                'Freq2_harmonics_amplitude_3',
+                'Freq3_harmonics_amplitude_0',
+                'Freq3_harmonics_amplitude_1',
+                'Freq3_harmonics_amplitude_2',
+                'Freq3_harmonics_amplitude_3',
+                'Freq1_harmonics_rel_phase_0',
+                'Freq1_harmonics_rel_phase_1',
+                'Freq1_harmonics_rel_phase_2',
+                'Freq1_harmonics_rel_phase_3',
+                'Freq2_harmonics_rel_phase_0',
+                'Freq2_harmonics_rel_phase_1',
+                'Freq2_harmonics_rel_phase_2',
+                'Freq2_harmonics_rel_phase_3',
+                'Freq3_harmonics_rel_phase_0',
+                'Freq3_harmonics_rel_phase_1',
+                'Freq3_harmonics_rel_phase_2',
+                'Freq3_harmonics_rel_phase_3']
+
+    def _model(self, x, a, b, c, Freq):
+        return (a * np.sin( 2 * np.pi * Freq * x) +
+                b * np.cos(2 * np.pi * Freq * x) + c)
+
+    def _yfunc_maker(self, Freq):
+        def func(x, a, b, c):
+            return (a * np.sin(2 * np.pi * Freq * x) +
+                    b * np.cos( 2 * np.pi * Freq * x) + c)
+        return func
+
+    def _compoenents(self, magnitude, time):
+        time = time - np.min(time)
+        A, PH, scaledPH = [], [], []
+        for i in range(3):
+
+            wk1, wk2, nout, jmax, prob = lomb.fasper(time, magnitude, 6., 100.)
+
+            fundamental_Freq = wk1[jmax]
+            Atemp, PHtemp, popts = [], [], []
+
+            for j in range(4):
+                function_to_fit = self._yfunc_maker((j + 1) * fundamental_Freq)
+                popt, pcov = curve_fit(function_to_fit, time, magnitude)
+                Atemp.append(np.sqrt(popt[0] ** 2 + popt[1] ** 2))
+                PHtemp.append(np.arctan(popt[1] / popt[0]))
+                popts.append(popt)
+
+            A.append(Atemp)
+            PH.append(PHtemp)
+
+            for j in range(4):
+                model = self._model(
+                    time, popts[j][0], popts[j][1],
+                    popts[j][2], (j+1) * fundamental_Freq)
+                magnitude = np.array(magnitude) - model
+
+        for ph in PH:
+            scaledPH.append(np.array(ph) - ph[0])
+
+    def fit(self, magnitude, time):
+        A, PH, sPH = self._components(magnitude, time)
+        freq1_aplitudes = [A[0][0], A[0][1], A[0][2], A[0][3]]
+        freq2_aplitudes = [A[1][0], A[1][1], A[1][2], A[1][3]]
+        freq3_aplitudes = [A[2][0], A[2][1], A[2][2], A[2][3]]
+
+        freq1_phases = [sPH[0][0], sPH[0][1], sPH[0][2], sPH[0][3]]
+        freq2_phases = [sPH[1][0], sPH[1][1], sPH[1][2], sPH[1][3]]
+        freq3_phases = [sPH[2][0], sPH[2][1], sPH[2][2], sPH[2][3]]
+
+        return (freq1_aplitudes + freq2_aplitudes + freq3_aplitudes +
+                freq1_phases + freq2_phases + freq3_phases)
+
+
+class Gskew(Extractor):
+    """Median-based measure of the skew"""
+
+    data = ['magnitude']
+    features = ["Gskew"]
+
+    def fit(self, magnitude):
+        median_mag = np.median(magnitude)
+        F_3_value = np.percentile(magnitude, 3)
+        F_97_value = np.percentile(magnitude, 97)
+
+        return (np.median(magnitude[magnitude <= F_3_value]) +
+                np.median(magnitude[magnitude >= F_97_value]) - 2 * median_mag)
+
+
+class StructureFunctions(Extractor):
+
+    data = ['magnitude', 'time']
+    features = ["StructureFunction_index_21",
+                "StructureFunction_index_31",
+                "StructureFunction_index_32"]
+
+    def fit(self, magnitude, time):
+        Nsf, Np = 100, 100
+        sf1, sf2, sf3 = np.zeros(Nsf), np.zeros(Nsf), np.zeros(Nsf)
+        f = interp1d(time, magnitude)
+
+        time_int = np.linspace(np.min(time), np.max(time), Np)
+        mag_int = f(time_int)
+
+        for tau in np.arange(1, Nsf):
+            sf1[tau-1] = np.mean(
+                np.power(np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]) , 1.0))
+            sf2[tau-1] = np.mean(
+                np.abs(np.power(
+                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]) , 2.0)))
+            sf3[tau-1] = np.mean(
+                np.abs(np.power(
+                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]) , 3.0)))
+        sf1_log = np.log10(np.trim_zeros(sf1))
+        sf2_log = np.log10(np.trim_zeros(sf2))
+        sf3_log = np.log10(np.trim_zeros(sf3))
+
+        m_21, b_21 = np.polyfit(sf1_log, sf2_log, 1)
+        m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
+        m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
+
+        return m_21, m_31, m_32
+
+
 # =============================================================================
 # REGISTERS
 # =============================================================================
