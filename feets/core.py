@@ -49,7 +49,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from . import extractors
+from . import extractors, util
 
 class FeatureError(Exception): pass
 
@@ -140,7 +140,7 @@ class FeatureSpace(object):
         self._features_extractors = frozenset(features_extractors)
 
         # TODO: excecution_order by dependencies
-        self._execution_plan = tuple(features_extractors)
+        self._execution_plan = tuple(util.fero(features_extractors))
 
     def __repr__(self):
         return str(self)

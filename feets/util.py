@@ -52,3 +52,47 @@ def dict2nt(name, d):
     "Convet a dict to a named tuple"
     nt = namedtuple(name, list(d.keys()))
     return nt(**d)
+
+
+def fero(extractors):
+    """Calculate the Feature Extractor Resolution Order of bases using the
+    C3 algorithm.
+
+    Based on:
+        http://code.activestate.com/recipes/577748-calculate-the-mro-of-a-class
+
+    """
+    # map every feature to their extractor
+    f2e = {}
+    for e in extractors:
+        f2e.update([(f, e) for f in e._conf.features])
+
+    # map all the extractors dependencies
+    seqs = [
+        f2e[f] for f in e._conf.features] for e in extractors
+    ] + [list(extractors)]
+
+    # C3
+    res = []
+    while True:
+      non_empty = list(filter(None, seqs))
+      if not non_empty:
+          # Nothing left to process, we're done.
+          return tuple(res)
+      for seq in non_empty:  # Find merge candidates among seq heads.
+          candidate = seq[0]
+          not_head = [s for s in non_empty if candidate in s[1:]]
+          if not_head:
+              # Reject the candidate.
+              candidate = None
+          else:
+              break
+      if not candidate:
+          raise TypeError("inconsistent hierarchy, no C3 FERO is possible")
+      res.append(candidate)
+      for seq in non_empty:
+          # Remove candidate.
+          if seq[0] == candidate:
+              del seq[0]
+
+    return res
