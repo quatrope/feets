@@ -61,7 +61,8 @@ from statsmodels.tsa import stattools
 from scipy.interpolate import interp1d
 
 from .util import dict2nt
-#~ import lomb
+from .lib import lomb
+
 
 # =============================================================================
 # CONSTANTS
