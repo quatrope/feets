@@ -41,24 +41,49 @@ __doc__ = """core functionalities of feets"""
 # IMPORTS
 # =============================================================================
 
-import os
-import time
-import inspect
-import warnings
+import logging
+import multiprocessing as mp
 
 import numpy as np
-import pandas as pd
 
 from . import extractors, util
 
-class FeatureError(Exception): pass
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+
+CPU_COUNT = mp.cpu_count()
 
 
-class FeatureNotFound(ValueError): pass
+# =============================================================================
+# LOG
+# =============================================================================
+
+logger = logging.getLogger("feets")
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.WARNING)
 
 
-class FeatureWarning(Warning): pass
+# =============================================================================
+# ERRORS AND EXCEPTIONS
+# =============================================================================
 
+class FeatureError(Exception):
+    pass
+
+
+class FeatureNotFound(ValueError):
+    pass
+
+
+class FeatureWarning(Warning):
+    pass
+
+
+# =============================================================================
+# FEATURE EXTRACTORS
+# =============================================================================
 
 class FeatureSpace(object):
     """
@@ -158,13 +183,16 @@ class FeatureSpace(object):
             params.update(self._kwargs.get(f, {}))
         return params
 
-    def extract(self, data):
+    def _extract(self, data):
         data, features = np.asarray(data), {}
         for fextractor in self._execution_plan:
             features.update(fextractor.extract(data, features))
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
         return self._features_as_array, fvalues
+
+    def extract(self, data):
+        return self._extract(data)
 
     @property
     def kwargs(self):
@@ -201,3 +229,84 @@ class FeatureSpace(object):
     @property
     def excecution_plan_(self):
         return self._execution_plan
+
+
+# =============================================================================
+# MULTIPROCESS
+# =============================================================================
+
+class FeatureSpaceProcess(mp.Process):
+
+    def __init__(self, space, data, **kwargs):
+        super(FeatureSpaceProcess, self).__init__(**kwargs)
+        self._space = space
+        self._data = data
+        self._queue = mp.Queue()
+
+    def run(self):
+        result = []
+        for data in self._data:
+            result.append(self._space._extract(self._data)[1])
+        self._queue.put(result)
+
+    @property
+    def space(self):
+        return self._space
+
+    @property
+    def data(self):
+        return self._data
+
+    @property
+    def queue(self):
+        return self._queue
+
+    @property
+    def result_(self):
+        return self._result
+
+
+class MPFeatureSpace(FeatureSpace):
+    """Multiprocess version of FeatureSpace
+
+    """
+    def __init__(self, data=None, only=None, exclude=None,
+                 proccls=FeatureSpaceProcess, **kwargs):
+        super(MPFeatureSpace, self).__init__(
+            data=data, only=only, exclude=exclude, **kwargs)
+        self._proccls = self.proc_cls
+
+    def __str__(self):
+        if not hasattr(self, "__str"):
+            extractors = [str(extractor) for extractor in self._execution_plan]
+            space = ", ".join(extractors)
+            self.__str = "<MPFeatureSpace: {}>".format(space)
+        return self.__str
+
+    def chunk_it(self, seq, num):
+        avg = len(seq) / float(num)
+        out = []
+        last = 0.0
+        while last < len(seq):
+            out.append(seq[int(last):int(last + avg)])
+            last += avg
+        return sorted(out, reverse=True)
+
+    def extract(self, data, procs=CPU_COUNT, **kwargs):
+        procs, fvalues = [], []
+        for chunk in self.chunk_it(data, procs):
+            proc = self._proccls(self, chunk)
+            proc.start()
+        for proc in procs:
+            proc.join()
+            fvalues.append(proc.result_)
+        return self._features_as_array, tuple(fvalues)
+
+    @property
+    def proccls(self):
+        return self._proccls
+
+
+# =============================================================================
+#
+# =============================================================================

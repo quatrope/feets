@@ -37,7 +37,6 @@
 # IMPORTS
 # =============================================================================
 
-import sys
 import os
 
 from ez_setup import use_setuptools
@@ -92,6 +91,7 @@ def do_setup():
         py_modules=["ez_setup"],
         install_requires=REQUIREMENTS,
     )
+
 
 if __name__ == "__main__":
     do_setup()

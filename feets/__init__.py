@@ -64,11 +64,12 @@ KEYWORDS = "light curve feature analysis".split()
 # IMPORTS
 # =============================================================================
 
-import os
+import os  # noqa
 
 if os.getenv("FEETS_IN_SETUP") != "True":
-    from .core import FeatureSpace
-    from .extractors import (
-        Extractor, register_extractor, registered_extractors, is_registered)
+    from .core import FeatureSpace, MPFeatureSpace  # noqa
+    from .extractors import (  # noqa
+        Extractor, register_extractor,  # noqa
+        registered_extractors, is_registered)  # noqa
 
 del os

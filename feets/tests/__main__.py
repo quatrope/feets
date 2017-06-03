@@ -41,7 +41,7 @@ import argparse
 import unittest
 import importlib
 
-from . import core, utils
+from . import core
 
 
 # =============================================================================

@@ -41,12 +41,7 @@ __doc__ = """Features extractors classes and register utilities"""
 # IMPORTS
 # =============================================================================
 
-import os
-import sys
-import time
 import math
-import bisect
-import abc
 import inspect
 from collections import namedtuple
 
@@ -60,8 +55,7 @@ from scipy.optimize import curve_fit
 from statsmodels.tsa import stattools
 from scipy.interpolate import interp1d
 
-from .util import dict2nt
-from .lib import lomb
+from .libs import lomb
 
 
 # =============================================================================
@@ -117,11 +111,11 @@ def registered_extractors():
 def is_registered(obj):
     if isinstance(obj, six.string_types):
         features = [obj]
-    elif not inspect.isclass(cls) or not issubclass(cls, Extractor):
+    elif not inspect.isclass(obj) or not issubclass(obj, Extractor):
         msg = "'cls' must be a subclass of Extractor. Found: {}"
-        raise TypeError(msg.format(cls))
+        raise TypeError(msg.format(obj))
     else:
-        features = cls._conf.features
+        features = obj._conf.features
     return {f: (f in _extractors) for f in features}
 
 
@@ -202,8 +196,8 @@ class ExtractorMeta(type):
 
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),
-            dependencies = frozenset(cls.dependencies),
-            params = tuple(cls.params.items()),
+            dependencies=frozenset(cls.dependencies),
+            params=tuple(cls.params.items()),
             features=frozenset(cls.features))
 
         del cls.data, cls.dependencies, cls.params, cls.features
@@ -247,7 +241,7 @@ class Extractor(object):
         pass
 
     def extract(self, data, dependencies):
-        kwargs = {fname: dependencies[name] for k in self._conf.dependencies}
+        kwargs = {k: dependencies[k] for k in self._conf.dependencies}
         for d in self._conf.data:
             idx = DATA_IDXS[d]
             kwargs[d] = data[idx]
@@ -401,7 +395,7 @@ class SlottedA_length(Extractor):
     def start_conditions(self, magnitude, time, T):
         N = len(time)
 
-        if T == None:
+        if T is None:
             deltaT = time[1:] - time[:-1]
             sorted_deltaT = np.sort(deltaT)
             T = sorted_deltaT[int(N * 0.05)+1]
@@ -461,6 +455,9 @@ class StetsonL(Extractor):
 
     def fit(self, aligned_magnitude, aligned_magnitude2,
             aligned_error, aligned_error2):
+        magnitude, magnitude2 = aligned_magnitude, aligned_magnitude2
+        error, error2 = aligned_error, aligned_error2
+
         N = len(magnitude)
 
         mean_mag = (np.sum(magnitude/(error*error)) /
@@ -510,7 +507,8 @@ class Con(Extractor):
         for i in xrange(N - consecutiveStar + 1):
             flag = 0
             for j in xrange(consecutiveStar):
-                if(magnitude[i + j] > m + 2 * sigma or magnitude[i + j] < m - 2 * sigma):
+                if(magnitude[i + j] > m + 2 * sigma or
+                   magnitude[i + j] < m - 2 * sigma):
                     flag = 1
                 else:
                     flag = 0
@@ -612,8 +610,9 @@ class StetsonJ(Extractor):
         mean_mag = (np.sum(aligned_magnitude/(aligned_error*aligned_error)) /
                     np.sum(1.0 / (aligned_error * aligned_error)))
 
-        mean_mag2 = (np.sum(aligned_magnitude2 / (aligned_error2*aligned_error2)) /
-                     np.sum(1.0 / (aligned_error2 * aligned_error2)))
+        mean_mag2 = (
+            np.sum(aligned_magnitude2 / (aligned_error2*aligned_error2)) /
+            np.sum(1.0 / (aligned_error2 * aligned_error2)))
 
         sigmap = (np.sqrt(N * 1.0 / (N - 1)) *
                   (aligned_magnitude[:N] - mean_mag) /
@@ -842,7 +841,6 @@ class LinearTrend(Extractor):
         return regression_slope
 
 
-
 class EtaColor(Extractor):
 
     data = ['aligned_magnitude', 'aligned_time', 'aligned_magnitude2']
@@ -865,7 +863,6 @@ class EtaColor(Extractor):
                    aligned_time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
 
         return eta_B_R
-
 
 
 class Eta_e(Extractor):
@@ -1020,7 +1017,7 @@ class CAR(Extractor):
         # the minus one is to perfor maximization using the minimize function
         return -loglik
 
-    def _calculate_CAR(self, time, data, error):
+    def _calculate_CAR(self, time, magnitude, error):
         N = len(magnitude)
         magnitude = magnitude.reshape((N, 1))
         time = time.reshape((N, 1))
@@ -1028,7 +1025,7 @@ class CAR(Extractor):
 
         x0 = [10, 0.5]
         bnds = ((0, 100), (0, 100))
-        res = minimize(self._CAR_Like, x0, args=(time, data, error),
+        res = minimize(self._CAR_Like, x0, args=(time, magnitude, error),
                        method='nelder-mead', bounds=bnds)
         sigma, tau = res.x[0], res.x[1]
         return sigma, tau
@@ -1068,13 +1065,13 @@ class FourierComponents(Extractor):
                 'Freq3_harmonics_rel_phase_3']
 
     def _model(self, x, a, b, c, Freq):
-        return (a * np.sin( 2 * np.pi * Freq * x) +
+        return (a * np.sin(2 * np.pi * Freq * x) +
                 b * np.cos(2 * np.pi * Freq * x) + c)
 
     def _yfunc_maker(self, Freq):
         def func(x, a, b, c):
             return (a * np.sin(2 * np.pi * Freq * x) +
-                    b * np.cos( 2 * np.pi * Freq * x) + c)
+                    b * np.cos(2 * np.pi * Freq * x) + c)
         return func
 
     def _compoenents(self, magnitude, time):
@@ -1152,13 +1149,13 @@ class StructureFunctions(Extractor):
 
         for tau in np.arange(1, Nsf):
             sf1[tau-1] = np.mean(
-                np.power(np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]) , 1.0))
+                np.power(np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 1.0))
             sf2[tau-1] = np.mean(
                 np.abs(np.power(
-                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]) , 2.0)))
+                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 2.0)))
             sf3[tau-1] = np.mean(
                 np.abs(np.power(
-                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]) , 3.0)))
+                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 3.0)))
         sf1_log = np.log10(np.trim_zeros(sf1))
         sf2_log = np.log10(np.trim_zeros(sf2))
         sf3_log = np.log10(np.trim_zeros(sf3))
