@@ -46,7 +46,7 @@ import multiprocessing as mp
 
 import numpy as np
 
-from . import extractors, util
+from . import extractors, util, err
 
 
 # =============================================================================
@@ -63,22 +63,6 @@ CPU_COUNT = mp.cpu_count()
 logger = logging.getLogger("feets")
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.WARNING)
-
-
-# =============================================================================
-# ERRORS AND EXCEPTIONS
-# =============================================================================
-
-class FeatureError(Exception):
-    pass
-
-
-class FeatureNotFound(ValueError):
-    pass
-
-
-class FeatureWarning(Warning):
-    pass
 
 
 # =============================================================================
@@ -138,14 +122,14 @@ class FeatureSpace(object):
         if only:
             for f in only:
                 if f not in exts:
-                    raise FeatureNotFound(f)
+                    raise err.FeatureNotFound(f)
         self._only = frozenset(only or exts.keys())
 
         # select the features to exclude or not exclude anything
         if exclude:
             for f in exclude:
                 if f not in exts:
-                    raise FeatureNotFound(f)
+                    raise err.FeatureNotFound(f)
         self._exclude = frozenset(exclude or ())
 
         # TODO: remove by dependencies

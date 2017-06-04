@@ -55,6 +55,7 @@ from scipy.optimize import curve_fit
 from statsmodels.tsa import stattools
 from scipy.interpolate import interp1d
 
+from . import err
 from .libs import lomb
 
 
@@ -96,12 +97,16 @@ _extractors = {}
 
 
 def register_extractor(cls):
-
     if not inspect.isclass(cls) or not issubclass(cls, Extractor):
         msg = "'cls' must be a subclass of Extractor. Found: {}"
         raise TypeError(msg.format(cls))
+    for d in cls._conf.dependencies:
+        if d not in _extractors.keys():
+            msg = "Dependency '{}' from extractor {}".format(d, cls)
+            raise err.FeatureNotFound(msg)
 
     _extractors.update((f, cls) for f in cls._conf.features)
+    return cls
 
 
 def registered_extractors():
@@ -119,16 +124,21 @@ def is_registered(obj):
     return {f: (f in _extractors) for f in features}
 
 
+def available_features():
+    return _extractors.keys()
+
+
+def extractor_of(feature):
+    return _extractors[feature]
+
+
+
 # =============================================================================
 # BASE CLASS
 # =============================================================================
 
 ExtractorConf = namedtuple(
     "ExtractorConf", ["data", "dependencies", "params", "features"])
-
-
-class ExtractorError(Exception):
-    pass
 
 
 class ExtractorMeta(type):
@@ -167,7 +177,8 @@ class ExtractorMeta(type):
                 raise TypeError(msg.format(type(f)))
             if f in DATAS:
                 msg = "Params can't be in {}".format(DATAS)
-                raise ValueError(msg)
+                raise err.DataReservedNameError(msg)
+
         if len(set(cls.features)) != len(cls.features):
             msg = "'features' has duplicated values: {}"
             raise ExtractorError(msg.format(cls.features))
@@ -178,11 +189,10 @@ class ExtractorMeta(type):
 
         if not hasattr(cls, "dependencies"):
             cls.dependencies = ()
-        for c in cls.dependencies:
-            if not inspect.isclass(c) or not issubclass(c, Extractor):
-                msg = ("All dependencies of one extractor must be "
-                       "subclasses of Extractor.")
-                raise TypeError(msg)
+        for d in cls.dependencies:
+            if not isinstance(d, six.string_types):
+                msg = "Dependencies must be an instance of string. Found {}"
+                raise TypeError(msg.format(type(d)))
 
         if not hasattr(cls, "params"):
             cls.params = {}
@@ -192,7 +202,7 @@ class ExtractorMeta(type):
                 raise TypeError(msg.format(type(p)))
             if p in DATAS:
                 msg = "Params can't be in {}".format(DATAS)
-                raise ValueError(msg)
+                raise err.DataReservedNameError(msg)
 
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),

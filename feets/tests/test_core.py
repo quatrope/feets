@@ -23,6 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 # =============================================================================
 # FUTURE
 # =============================================================================
@@ -31,46 +32,23 @@ from __future__ import unicode_literals
 
 
 # =============================================================================
-# DOCS
+# DOC
 # =============================================================================
 
-__doc__ = """Compilation of some of the existing light-curve features."""
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-__version__ = ("0", "4")
-
-NAME = "feets"
-
-DOC = __doc__
-
-VERSION = ".".join(__version__)
-
-AUTHORS = "JuanBC"
-
-EMAIL = "jbc.develop@gmail.com"
-
-URL = "http://scikit-criteria.org/"
-
-LICENSE = "MIT"
-
-KEYWORDS = "light curve feature analysis".split()
+__doc__ = """All feets base tests"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-import os  # noqa
+from .core import FeetsTestCase
 
-if os.getenv("FEETS_IN_SETUP") != "True":
-    from .core import FeatureSpace, MPFeatureSpace  # noqa
-    from .err import *  # noqa
-    from .extractors import (  # noqa
-        Extractor, register_extractor,  # noqa
-        registered_extractors, is_registered)  # noqa
 
-del os
+# =============================================================================
+# BASE CLASS
+# =============================================================================
+
+class FeetsTestCase(FeetsTestCase):
+
+    pass
