@@ -46,6 +46,8 @@ import numpy as np
 
 from .core import Extractor
 
+from .ext_slotted_a_length import SlottedA_length
+
 
 # =============================================================================
 # EXTRACTOR CLASS
@@ -82,3 +84,78 @@ class StetsonJ(Extractor):
              np.sqrt(np.abs(sigma_i))))
 
         return J
+
+
+class StetsonK(Extractor):
+    data = ['magnitude', 'error']
+    features = ['StetsonK']
+
+    def fit(self, magnitude, error):
+        mean_mag = (np.sum(magnitude/(error*error)) /
+                    np.sum(1.0 / (error * error)))
+
+        N = len(magnitude)
+        sigmap = (np.sqrt(N * 1.0 / (N - 1)) *
+                  (magnitude - mean_mag) / error)
+
+        K = (1 / np.sqrt(N * 1.0) *
+             np.sum(np.abs(sigmap)) / np.sqrt(np.sum(sigmap ** 2)))
+
+        return K
+
+
+class StetsonKAC(Extractor):
+
+    data = ['magnitude', 'time', 'error']
+    features = ["StetsonK_AC"]
+
+    def fit(self, magnitude, time, error):
+        sal = SlottedA_length(self.space)
+        autocor_vector = sal.start_conditions(
+            magnitude, time, **sal.params)[-1]
+
+        N_autocor = len(autocor_vector)
+        sigmap = (np.sqrt(N_autocor * 1.0 / (N_autocor - 1)) *
+                  (autocor_vector - np.mean(autocor_vector)) /
+                  np.std(autocor_vector))
+
+        K = (1 / np.sqrt(N_autocor * 1.0) *
+             np.sum(np.abs(sigmap)) / np.sqrt(np.sum(sigmap ** 2)))
+
+        return K
+
+
+class StetsonL(Extractor):
+
+    data = ['aligned_magnitude', 'aligned_magnitude2',
+            'aligned_error', 'aligned_error2']
+    features = ["StetsonL"]
+
+    def fit(self, aligned_magnitude, aligned_magnitude2,
+            aligned_error, aligned_error2):
+        magnitude, magnitude2 = aligned_magnitude, aligned_magnitude2
+        error, error2 = aligned_error, aligned_error2
+
+        N = len(magnitude)
+
+        mean_mag = (np.sum(magnitude/(error*error)) /
+                    np.sum(1.0 / (error * error)))
+        mean_mag2 = (np.sum(magnitude2/(error2*error2)) /
+                     np.sum(1.0 / (error2 * error2)))
+
+        sigmap = (np.sqrt(N * 1.0 / (N - 1)) *
+                  (magnitude[:N] - mean_mag) /
+                  error)
+
+        sigmaq = (np.sqrt(N * 1.0 / (N - 1)) *
+                  (magnitude2[:N] - mean_mag2) /
+                  error2)
+        sigma_i = sigmap * sigmaq
+
+        J = (1.0 / len(sigma_i) *
+             np.sum(np.sign(sigma_i) * np.sqrt(np.abs(sigma_i))))
+
+        K = (1 / np.sqrt(N * 1.0) *
+             np.sum(np.abs(sigma_i)) / np.sqrt(np.sum(sigma_i ** 2)))
+
+        return J * K / 0.798
