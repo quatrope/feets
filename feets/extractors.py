@@ -132,6 +132,30 @@ def extractor_of(feature):
     return _extractors[feature]
 
 
+def sort_by_dependencies(exts, retry=100):
+    """Calculate the Feature Extractor Resolution Order.
+
+    """
+    sorted_ext, features_from_sorted = [], set()
+    pending = [(e, 0) for e in exts]
+    while pending:
+        ext, cnt = pending.pop(0)
+
+        if not isinstance(ext, Extractor):
+            msg = "Only Extractor instances are allowed. Found {}"
+            raise TypeError(msg.format(type(ext)))
+
+        if ext._conf.dependencies.difference(features_from_sorted):
+            if cnt + 1 > retry:
+                msg = "Maximun retry to sort achieved from extractor {}"
+                raise err.FeatureError(msg.format(type(ext)))
+            pending.append((ext, cnt + 1))
+        else:
+            sorted_ext.append(ext)
+            features_from_sorted.update(ext._conf.features)
+    return tuple(sorted_ext)
+
+
 
 # =============================================================================
 # BASE CLASS

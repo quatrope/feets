@@ -46,7 +46,7 @@ import multiprocessing as mp
 
 import numpy as np
 
-from . import extractors, util, err
+from . import extractors, err
 
 
 # =============================================================================
@@ -148,8 +148,9 @@ class FeatureSpace(object):
                 features_extractors.add(fcls(self))
         self._features_extractors = frozenset(features_extractors)
 
-        # TODO: excecution_order by dependencies
-        self._execution_plan = tuple(util.fero(features_extractors))
+        # excecution order by dependencies
+        self._execution_plan = extractors.extractors.sort_by_dependencies(
+            features_extractors)
 
     def __repr__(self):
         return str(self)
