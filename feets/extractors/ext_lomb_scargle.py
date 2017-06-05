@@ -35,73 +35,58 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """Extractors Tests"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+import numpy as np
 
-import mock
+from ..libs import lomb
 
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class LombScargle(Extractor):
 
-    def test_sort_by_dependencies(self):
-        @register_extractor
-        class A(Extractor):
-            data = ["magnitude"]
-            features = ["test_a"]
+    data = ['magnitude', 'time']
+    features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
+    params = {"ofac": 6.}
 
-            def fit(self, *args):
-                pass
+    def _compute_ls(self, magnitude, time, ofac):
+        fx, fy, nout, jmax, prob = lomb.fasper(time, magnitude, ofac, 100.)
+        period = fx[jmax]
+        T = 1.0 / period
+        new_time = np.mod(time, 2 * T) / (2 * T)
 
-        @register_extractor
-        class B1(Extractor):
-            data = ["magnitude"]
-            features = ["test_b1"]
-            dependencies = ["test_a"]
+        return T, new_time, prob, period
 
-            def fit(self, *args):
-                pass
+    def _compute_cs(self, folded_data, N):
+        sigma = np.std(folded_data)
+        m = np.mean(folded_data)
+        s = np.cumsum(folded_data - m) * 1.0 / (N * sigma)
+        R = np.max(s) - np.min(s)
+        return R
 
-        @register_extractor
-        class B2(Extractor):
-            data = ["magnitude"]
-            features = ["test_b2"]
-            dependencies = ["test_a"]
+    def _compute_eta(self, folded_data, N):
+        sigma2 = np.var(folded_data)
+        Psi_eta = (1.0 / ((N - 1) * sigma2) *
+                   np.sum(np.power(folded_data[1:] - folded_data[:-1], 2)))
+        return Psi_eta
 
-            def fit(self, *args):
-                pass
+    def fit(self, magnitude, time, ofac):
+        T, new_time, prob, period = self._compute_ls(magnitude, time, ofac)
 
-        @register_extractor
-        class C(Extractor):
-            data = ["magnitude"]
-            features = ["test_c"]
-            dependencies = ["test_b1", "test_b2", "test_a"]
+        folded_data = magnitude[np.argsort(new_time)]
+        N = len(folded_data)
 
-            def fit(self, *args):
-                pass
+        R = self._compute_cs(folded_data, N)
+        Psi_eta = self._compute_eta(folded_data, N)
 
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
-        exts = [c, b1, a, b2]
-        plan = extractors.sort_by_dependencies(exts)
-        for idx, ext in enumerate(plan):
-            if idx == 0:
-                self.assertIs(ext, a)
-            elif idx in (1, 2):
-                self.assertIn(ext, (b1, b2))
-            elif idx == 3:
-                self.assertIs(ext, c)
-            else:
-                self.fail("to many extractors in plan: {}".format(idx))
+        return T, prob, R, Psi_eta

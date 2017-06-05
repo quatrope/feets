@@ -35,73 +35,38 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """Extractors Tests"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+import numpy as np
 
-import mock
-
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class Eta_e(Extractor):
 
-    def test_sort_by_dependencies(self):
-        @register_extractor
-        class A(Extractor):
-            data = ["magnitude"]
-            features = ["test_a"]
+    data = ['magnitude', 'time']
+    features = ["Eta_e"]
 
-            def fit(self, *args):
-                pass
+    def fit(self, magnitude, time):
+        w = 1.0 / np.power(np.subtract(time[1:], time[:-1]), 2)
+        w_mean = np.mean(w)
 
-        @register_extractor
-        class B1(Extractor):
-            data = ["magnitude"]
-            features = ["test_b1"]
-            dependencies = ["test_a"]
+        N = len(time)
+        sigma2 = np.var(magnitude)
 
-            def fit(self, *args):
-                pass
+        S1 = sum(w * (magnitude[1:] - magnitude[:-1]) ** 2)
+        S2 = sum(w)
 
-        @register_extractor
-        class B2(Extractor):
-            data = ["magnitude"]
-            features = ["test_b2"]
-            dependencies = ["test_a"]
+        eta_e = (w_mean * np.power(time[N - 1] -
+                 time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
 
-            def fit(self, *args):
-                pass
-
-        @register_extractor
-        class C(Extractor):
-            data = ["magnitude"]
-            features = ["test_c"]
-            dependencies = ["test_b1", "test_b2", "test_a"]
-
-            def fit(self, *args):
-                pass
-
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
-        exts = [c, b1, a, b2]
-        plan = extractors.sort_by_dependencies(exts)
-        for idx, ext in enumerate(plan):
-            if idx == 0:
-                self.assertIs(ext, a)
-            elif idx in (1, 2):
-                self.assertIn(ext, (b1, b2))
-            elif idx == 3:
-                self.assertIs(ext, c)
-            else:
-                self.fail("to many extractors in plan: {}".format(idx))
+        return eta_e

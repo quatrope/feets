@@ -35,73 +35,33 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """Extractors Tests"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+import math
 
-import mock
+import numpy as np
 
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class Amplitude(Extractor):
+    """Half the difference between the maximum and the minimum magnitude"""
 
-    def test_sort_by_dependencies(self):
-        @register_extractor
-        class A(Extractor):
-            data = ["magnitude"]
-            features = ["test_a"]
+    data = ['magnitude']
+    features = ['Amplitude']
 
-            def fit(self, *args):
-                pass
+    def fit(self, magnitude):
+        N = len(magnitude)
+        sorted_mag = np.sort(magnitude)
 
-        @register_extractor
-        class B1(Extractor):
-            data = ["magnitude"]
-            features = ["test_b1"]
-            dependencies = ["test_a"]
-
-            def fit(self, *args):
-                pass
-
-        @register_extractor
-        class B2(Extractor):
-            data = ["magnitude"]
-            features = ["test_b2"]
-            dependencies = ["test_a"]
-
-            def fit(self, *args):
-                pass
-
-        @register_extractor
-        class C(Extractor):
-            data = ["magnitude"]
-            features = ["test_c"]
-            dependencies = ["test_b1", "test_b2", "test_a"]
-
-            def fit(self, *args):
-                pass
-
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
-        exts = [c, b1, a, b2]
-        plan = extractors.sort_by_dependencies(exts)
-        for idx, ext in enumerate(plan):
-            if idx == 0:
-                self.assertIs(ext, a)
-            elif idx in (1, 2):
-                self.assertIn(ext, (b1, b2))
-            elif idx == 3:
-                self.assertIs(ext, c)
-            else:
-                self.fail("to many extractors in plan: {}".format(idx))
+        return (np.median(sorted_mag[-math.ceil(0.05 * N):]) -
+                np.median(sorted_mag[0:math.ceil(0.05 * N)])) / 2.0

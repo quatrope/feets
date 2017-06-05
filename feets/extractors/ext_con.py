@@ -35,73 +35,54 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """Extractors Tests"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+from six.moves import range
 
-import mock
+import numpy as np
 
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class Con(Extractor):
+    """Index introduced for selection of variable starts from OGLE database.
 
-    def test_sort_by_dependencies(self):
-        @register_extractor
-        class A(Extractor):
-            data = ["magnitude"]
-            features = ["test_a"]
 
-            def fit(self, *args):
-                pass
+    To calculate Con, we counted the number of three consecutive measurements
+    that are out of 2sigma range, and normalized by N-2
+    Pavlos not happy
+    """
+    data = ['magnitude']
+    features = ["Con"]
+    params = {"consecutiveStar": 3}
 
-        @register_extractor
-        class B1(Extractor):
-            data = ["magnitude"]
-            features = ["test_b1"]
-            dependencies = ["test_a"]
+    def fit(self, magnitude, consecutiveStar):
 
-            def fit(self, *args):
-                pass
+        N = len(magnitude)
+        if N < consecutiveStar:
+            return 0
+        sigma = np.std(magnitude)
+        m = np.mean(magnitude)
+        count = 0
 
-        @register_extractor
-        class B2(Extractor):
-            data = ["magnitude"]
-            features = ["test_b2"]
-            dependencies = ["test_a"]
-
-            def fit(self, *args):
-                pass
-
-        @register_extractor
-        class C(Extractor):
-            data = ["magnitude"]
-            features = ["test_c"]
-            dependencies = ["test_b1", "test_b2", "test_a"]
-
-            def fit(self, *args):
-                pass
-
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
-        exts = [c, b1, a, b2]
-        plan = extractors.sort_by_dependencies(exts)
-        for idx, ext in enumerate(plan):
-            if idx == 0:
-                self.assertIs(ext, a)
-            elif idx in (1, 2):
-                self.assertIn(ext, (b1, b2))
-            elif idx == 3:
-                self.assertIs(ext, c)
-            else:
-                self.fail("to many extractors in plan: {}".format(idx))
+        for i in range(N - consecutiveStar + 1):
+            flag = 0
+            for j in range(consecutiveStar):
+                if(magnitude[i + j] > m + 2 * sigma or
+                   magnitude[i + j] < m - 2 * sigma):
+                    flag = 1
+                else:
+                    flag = 0
+                    break
+            if flag:
+                count = count + 1
+        return count * 1.0 / (N - consecutiveStar + 1)

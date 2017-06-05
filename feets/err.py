@@ -23,9 +23,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# =============================================================================
+# DOCS
+# =============================================================================
+
 """Errors and warnings
 
 """
+
+# =============================================================================
+# EXCEPTIONS
+# =============================================================================
+
 
 class ExtractorBadDefinedError(Exception):
     pass
@@ -39,9 +48,13 @@ class FeatureNotFound(ValueError):
     pass
 
 
-class FeatureWarning(Warning):
+class DataReservedNameError(ValueError):
     pass
 
 
-class DataReservedNameError(ValueError):
+# =============================================================================
+# WARNINGS
+# =============================================================================
+
+class FeatureWarning(Warning):
     pass

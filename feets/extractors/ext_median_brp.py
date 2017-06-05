@@ -35,73 +35,38 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """Extractors Tests"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+import numpy as np
 
-import mock
-
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class MedianBRP(Extractor):
+    """Median buffer range percentage
 
-    def test_sort_by_dependencies(self):
-        @register_extractor
-        class A(Extractor):
-            data = ["magnitude"]
-            features = ["test_a"]
+    Fraction (<= 1) of photometric points within amplitude/10
+    of the median magnitude
+    """
 
-            def fit(self, *args):
-                pass
+    data = ['magnitude']
+    features = ["MedianBRP"]
 
-        @register_extractor
-        class B1(Extractor):
-            data = ["magnitude"]
-            features = ["test_b1"]
-            dependencies = ["test_a"]
+    def fit(self, magnitude):
+        median = np.median(magnitude)
+        amplitude = (np.max(magnitude) - np.min(magnitude)) / 10
+        n = len(magnitude)
 
-            def fit(self, *args):
-                pass
+        count = np.sum(np.logical_and(magnitude < median + amplitude,
+                                      magnitude > median - amplitude))
 
-        @register_extractor
-        class B2(Extractor):
-            data = ["magnitude"]
-            features = ["test_b2"]
-            dependencies = ["test_a"]
-
-            def fit(self, *args):
-                pass
-
-        @register_extractor
-        class C(Extractor):
-            data = ["magnitude"]
-            features = ["test_c"]
-            dependencies = ["test_b1", "test_b2", "test_a"]
-
-            def fit(self, *args):
-                pass
-
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
-        exts = [c, b1, a, b2]
-        plan = extractors.sort_by_dependencies(exts)
-        for idx, ext in enumerate(plan):
-            if idx == 0:
-                self.assertIs(ext, a)
-            elif idx in (1, 2):
-                self.assertIn(ext, (b1, b2))
-            elif idx == 3:
-                self.assertIs(ext, c)
-            else:
-                self.fail("to many extractors in plan: {}".format(idx))
+        return float(count) / n

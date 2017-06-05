@@ -35,73 +35,41 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """Extractors Tests"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+import numpy as np
 
-import mock
-
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class EtaColor(Extractor):
 
-    def test_sort_by_dependencies(self):
-        @register_extractor
-        class A(Extractor):
-            data = ["magnitude"]
-            features = ["test_a"]
+    data = ['aligned_magnitude', 'aligned_time', 'aligned_magnitude2']
+    features = ["Eta_color"]
 
-            def fit(self, *args):
-                pass
+    def fit(self, aligned_magnitude, aligned_time, aligned_magnitude2):
+        N = len(aligned_magnitude)
+        B_Rdata = aligned_magnitude - aligned_magnitude2
 
-        @register_extractor
-        class B1(Extractor):
-            data = ["magnitude"]
-            features = ["test_b1"]
-            dependencies = ["test_a"]
+        w = 1.0 / np.power(aligned_time[1:] - aligned_time[:-1], 2)
+        w_mean = np.mean(w)
 
-            def fit(self, *args):
-                pass
+        N = len(aligned_time)
+        sigma2 = np.var(B_Rdata)
 
-        @register_extractor
-        class B2(Extractor):
-            data = ["magnitude"]
-            features = ["test_b2"]
-            dependencies = ["test_a"]
+        S1 = sum(w * (B_Rdata[1:] - B_Rdata[:-1]) ** 2)
+        S2 = sum(w)
 
-            def fit(self, *args):
-                pass
+        eta_B_R = (w_mean * np.power(aligned_time[N - 1] -
+                   aligned_time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
 
-        @register_extractor
-        class C(Extractor):
-            data = ["magnitude"]
-            features = ["test_c"]
-            dependencies = ["test_b1", "test_b2", "test_a"]
-
-            def fit(self, *args):
-                pass
-
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
-        exts = [c, b1, a, b2]
-        plan = extractors.sort_by_dependencies(exts)
-        for idx, ext in enumerate(plan):
-            if idx == 0:
-                self.assertIs(ext, a)
-            elif idx in (1, 2):
-                self.assertIn(ext, (b1, b2))
-            elif idx == 3:
-                self.assertIs(ext, c)
-            else:
-                self.fail("to many extractors in plan: {}".format(idx))
+        return eta_B_R

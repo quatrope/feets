@@ -35,73 +35,53 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """Extractors Tests"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+import numpy as np
 
-import mock
-
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class StetsonL(Extractor):
 
-    def test_sort_by_dependencies(self):
-        @register_extractor
-        class A(Extractor):
-            data = ["magnitude"]
-            features = ["test_a"]
+    data = ['aligned_magnitude', 'aligned_magnitude2',
+            'aligned_error', 'aligned_error2']
+    features = ["StetsonL"]
 
-            def fit(self, *args):
-                pass
+    def fit(self, aligned_magnitude, aligned_magnitude2,
+            aligned_error, aligned_error2):
+        magnitude, magnitude2 = aligned_magnitude, aligned_magnitude2
+        error, error2 = aligned_error, aligned_error2
 
-        @register_extractor
-        class B1(Extractor):
-            data = ["magnitude"]
-            features = ["test_b1"]
-            dependencies = ["test_a"]
+        N = len(magnitude)
 
-            def fit(self, *args):
-                pass
+        mean_mag = (np.sum(magnitude/(error*error)) /
+                    np.sum(1.0 / (error * error)))
+        mean_mag2 = (np.sum(magnitude2/(error2*error2)) /
+                     np.sum(1.0 / (error2 * error2)))
 
-        @register_extractor
-        class B2(Extractor):
-            data = ["magnitude"]
-            features = ["test_b2"]
-            dependencies = ["test_a"]
+        sigmap = (np.sqrt(N * 1.0 / (N - 1)) *
+                  (magnitude[:N] - mean_mag) /
+                  error)
 
-            def fit(self, *args):
-                pass
+        sigmaq = (np.sqrt(N * 1.0 / (N - 1)) *
+                  (magnitude2[:N] - mean_mag2) /
+                  error2)
+        sigma_i = sigmap * sigmaq
 
-        @register_extractor
-        class C(Extractor):
-            data = ["magnitude"]
-            features = ["test_c"]
-            dependencies = ["test_b1", "test_b2", "test_a"]
+        J = (1.0 / len(sigma_i) *
+             np.sum(np.sign(sigma_i) * np.sqrt(np.abs(sigma_i))))
 
-            def fit(self, *args):
-                pass
+        K = (1 / np.sqrt(N * 1.0) *
+             np.sum(np.abs(sigma_i)) / np.sqrt(np.sum(sigma_i ** 2)))
 
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
-        exts = [c, b1, a, b2]
-        plan = extractors.sort_by_dependencies(exts)
-        for idx, ext in enumerate(plan):
-            if idx == 0:
-                self.assertIs(ext, a)
-            elif idx in (1, 2):
-                self.assertIn(ext, (b1, b2))
-            elif idx == 3:
-                self.assertIs(ext, c)
-            else:
-                self.fail("to many extractors in plan: {}".format(idx))
+        return J * K / 0.798

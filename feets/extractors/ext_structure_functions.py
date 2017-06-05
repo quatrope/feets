@@ -35,73 +35,54 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """Extractors Tests"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+import numpy as np
 
-import mock
+from scipy.interpolate import interp1d
 
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class StructureFunctions(Extractor):
 
-    def test_sort_by_dependencies(self):
-        @register_extractor
-        class A(Extractor):
-            data = ["magnitude"]
-            features = ["test_a"]
+    data = ['magnitude', 'time']
+    features = ["StructureFunction_index_21",
+                "StructureFunction_index_31",
+                "StructureFunction_index_32"]
 
-            def fit(self, *args):
-                pass
+    def fit(self, magnitude, time):
+        Nsf, Np = 100, 100
+        sf1, sf2, sf3 = np.zeros(Nsf), np.zeros(Nsf), np.zeros(Nsf)
+        f = interp1d(time, magnitude)
 
-        @register_extractor
-        class B1(Extractor):
-            data = ["magnitude"]
-            features = ["test_b1"]
-            dependencies = ["test_a"]
+        time_int = np.linspace(np.min(time), np.max(time), Np)
+        mag_int = f(time_int)
 
-            def fit(self, *args):
-                pass
+        for tau in np.arange(1, Nsf):
+            sf1[tau-1] = np.mean(
+                np.power(np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 1.0))
+            sf2[tau-1] = np.mean(
+                np.abs(np.power(
+                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 2.0)))
+            sf3[tau-1] = np.mean(
+                np.abs(np.power(
+                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 3.0)))
+        sf1_log = np.log10(np.trim_zeros(sf1))
+        sf2_log = np.log10(np.trim_zeros(sf2))
+        sf3_log = np.log10(np.trim_zeros(sf3))
 
-        @register_extractor
-        class B2(Extractor):
-            data = ["magnitude"]
-            features = ["test_b2"]
-            dependencies = ["test_a"]
+        m_21, b_21 = np.polyfit(sf1_log, sf2_log, 1)
+        m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
+        m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
 
-            def fit(self, *args):
-                pass
-
-        @register_extractor
-        class C(Extractor):
-            data = ["magnitude"]
-            features = ["test_c"]
-            dependencies = ["test_b1", "test_b2", "test_a"]
-
-            def fit(self, *args):
-                pass
-
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
-        exts = [c, b1, a, b2]
-        plan = extractors.sort_by_dependencies(exts)
-        for idx, ext in enumerate(plan):
-            if idx == 0:
-                self.assertIs(ext, a)
-            elif idx in (1, 2):
-                self.assertIn(ext, (b1, b2))
-            elif idx == 3:
-                self.assertIs(ext, c)
-            else:
-                self.fail("to many extractors in plan: {}".format(idx))
+        return m_21, m_31, m_32
