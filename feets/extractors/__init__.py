@@ -47,7 +47,7 @@ import six
 
 from .. import err
 
-from .core import Extractor
+from .core import Extractor, DATAS
 
 
 # =============================================================================

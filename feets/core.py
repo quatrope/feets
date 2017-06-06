@@ -149,7 +149,7 @@ class FeatureSpace(object):
         self._features_extractors = frozenset(features_extractors)
 
         # excecution order by dependencies
-        self._execution_plan = extractors.extractors.sort_by_dependencies(
+        self._execution_plan = extractors.sort_by_dependencies(
             features_extractors)
 
     def __repr__(self):
@@ -168,7 +168,7 @@ class FeatureSpace(object):
             params.update(self._kwargs.get(f, {}))
         return params
 
-    def _extract_one(data):
+    def _extract_one(self, data):
         data, features = np.asarray(data), {}
         for fextractor in self._execution_plan:
             features.update(fextractor.extract(data, features))
@@ -177,12 +177,12 @@ class FeatureSpace(object):
         return fvalues
 
     def extract_one(self, data):
-        return self._features_as_array, self._extract_one(data
+        return self._features_as_array, self._extract_one(data)
 
     def extract(self, data):
         result = []
-        for data in self._data:
-            result.append(self._extract_one(data))
+        for chunk in data:
+            result.append(self._extract_one(chunk))
         return self._features_as_array, np.asarray(result)
 
     @property
@@ -254,6 +254,8 @@ class FeatureSpaceProcess(mp.Process):
 
     @property
     def result_(self):
+        if not hasattr(self, "_result"):
+            self._result = self._queue.get()
         return self._result
 
 
@@ -265,7 +267,7 @@ class MPFeatureSpace(FeatureSpace):
                  proccls=FeatureSpaceProcess, **kwargs):
         super(MPFeatureSpace, self).__init__(
             data=data, only=only, exclude=exclude, **kwargs)
-        self._proccls = self.proc_cls
+        self._proccls = proccls
 
     def __str__(self):
         if not hasattr(self, "__str"):
@@ -283,15 +285,17 @@ class MPFeatureSpace(FeatureSpace):
             last += avg
         return sorted(out, reverse=True)
 
-    def extract(self, data, procs=CPU_COUNT, **kwargs):
+    def extract(self, data, procn=CPU_COUNT, **kwargs):
         procs, fvalues = [], []
-        for chunk in self.chunk_it(data, procs):
-            proc = self._proccls(self, chunk)
-            proc.start()
+        for chunk in self.chunk_it(data, procn):
+            if chunk:
+                proc = self._proccls(self, chunk, **kwargs)
+                proc.start()
+                procs.append(proc)
         for proc in procs:
             proc.join()
             fvalues.append(proc.result_)
-        return self._features_as_array, np.asarray(fvalues)
+        return self._features_as_array, np.array(fvalues)
 
     @property
     def proccls(self):
