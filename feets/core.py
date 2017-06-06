@@ -179,7 +179,7 @@ class FeatureSpace(object):
     def extract(self, data):
         result = []
         for data in self._data:
-            result.append(self.extract_one(self._data)[1])
+            result.append(self.extract_one(data)[1])
         return self._features_as_array, np.asarray(result)
 
     @property
@@ -234,7 +234,7 @@ class FeatureSpaceProcess(mp.Process):
     def run(self):
         result = []
         for data in self._data:
-            result.append(self._space.extract_one(self._data)[1])
+            result.append(self._space.extract_one(data)[1])
         self._queue.put(result)
 
     @property
