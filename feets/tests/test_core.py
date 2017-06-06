@@ -44,7 +44,7 @@ __doc__ = """All feets base tests"""
 
 import numpy as np
 
-from .. import MPFeatureSpace, FeatureSpace, registered_extractors
+from .. import MPFeatureSpace, FeatureSpace
 
 from .core import FeetsTestCase
 
