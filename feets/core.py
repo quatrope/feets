@@ -168,7 +168,7 @@ class FeatureSpace(object):
             params.update(self._kwargs.get(f, {}))
         return params
 
-    def _extract(self, data):
+    def extract_one(self, data):
         data, features = np.asarray(data), {}
         for fextractor in self._execution_plan:
             features.update(fextractor.extract(data, features))
@@ -177,7 +177,10 @@ class FeatureSpace(object):
         return self._features_as_array, fvalues
 
     def extract(self, data):
-        return self._extract(data)
+        result = []
+        for data in self._data:
+            result.append(self.extract_one(self._data)[1])
+        return self._features_as_array, np.asarray(result)
 
     @property
     def kwargs(self):
@@ -231,7 +234,7 @@ class FeatureSpaceProcess(mp.Process):
     def run(self):
         result = []
         for data in self._data:
-            result.append(self._space._extract(self._data)[1])
+            result.append(self._space.extract_one(self._data)[1])
         self._queue.put(result)
 
     @property
@@ -285,7 +288,7 @@ class MPFeatureSpace(FeatureSpace):
         for proc in procs:
             proc.join()
             fvalues.append(proc.result_)
-        return self._features_as_array, tuple(fvalues)
+        return self._features_as_array, np.asarray(fvalues)
 
     @property
     def proccls(self):
