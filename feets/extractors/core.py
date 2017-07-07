@@ -135,14 +135,15 @@ class ExtractorMeta(type):
             cls.dependencies = ()
         for d in cls.dependencies:
             if not isinstance(d, six.string_types):
-                msg = "Dependencies must be an instance of string. Found {}"
+                msg = (
+                    "All Dependencies must be an instance of string. Found {}")
                 raise TypeError(msg.format(type(d)))
 
         if not hasattr(cls, "params"):
             cls.params = {}
         for p, default in cls.params.items():
             if not isinstance(p, six.string_types):
-                msg = "Params name must be an instance of string. Found {}"
+                msg = "Params names must be an instance of string. Found {}"
                 raise TypeError(msg.format(type(p)))
             if p in DATAS:
                 msg = "Params can't be in {}".format(DATAS)
