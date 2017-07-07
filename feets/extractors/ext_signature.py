@@ -68,8 +68,7 @@ class Signature(Extractor):
         loc = np.argmin(lc_yaxis)
         lc_phase = np.remainder(time - time[loc], period) / period
 
-        bins = (params['xbins'], params['ybins'])
-        counts, xbins, ybins = np.histogram2d(lc_phase, lc_yaxis,
-                                              bins=bins, normed=True)
+        bins = (xbins, ybins)
+        counts = np.histogram2d(lc_phase, lc_yaxis, bins=bins, normed=True)[0]
 
-        return counts.reshape(params["xbins"] * params["ybins"])
+        return counts.reshape(xbins * ybins)
