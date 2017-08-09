@@ -56,10 +56,10 @@ class Signature(Extractor):
     dependencies = ['PeriodLS', 'Amplitude']
     params = {"xbins": 30, "ybins": 20}
 
-    features = []
-    for i in range(params["xbins"]):
-        for j in range(params["ybins"]):
-            features.append("Signature_x_{}_y_{}".format(i, j))
+    #~ features = []
+    #~ for i in range(params["xbins"]):
+        #~ for j in range(params["ybins"]):
+            #~ features.append("Signature_x_{}_y_{}".format(i, j))
 
     def fit(self, magnitude, time, PeriodLS, Amplitude, xbins, ybins):
         lc_yaxis = (magnitude - np.min(magnitude) ) /np.float(amplitude)

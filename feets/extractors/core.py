@@ -187,13 +187,27 @@ class Extractor(object):
         return self.__str
 
     def setup(self):
+        """This method will be executed before the feature is calculated"""
         pass
 
     def fit(self):
         raise NotImplementedError()
 
     def teardown(self):
+        """This method will be executed after the feature is calculated"""
         pass
+
+    def get_data(self):
+        return cls._conf.data
+
+    def get_dependencies(self):
+        return cls._conf.dependencies
+
+    def get_params(self):
+        return cls._conf.params
+
+    def get_features(self):
+        return cls._conf.features
 
     def extract(self, data, dependencies):
         kwargs = {k: dependencies[k] for k in self._conf.dependencies}
