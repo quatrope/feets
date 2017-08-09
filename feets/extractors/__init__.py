@@ -36,6 +36,16 @@ from __future__ import unicode_literals, print_function
 
 __doc__ = """Features extractors classes and register utilities"""
 
+__all__ = [
+    b"DATAS",
+    b"register_extractor",
+    b"registered_extractors",
+    b"is_registered",
+    b"available_features",
+    b"extractor_of",
+    b"sort_by_dependencies",
+    b"ExtractorBadDefinedError",
+    b"Extractor"]
 
 # =============================================================================
 # IMPORTS
@@ -47,7 +57,7 @@ import six
 
 from .. import err
 
-from .core import Extractor, DATAS  # noqa
+from .core import Extractor, ExtractorBadDefinedError, DATAS  # noqa
 
 
 # =============================================================================
@@ -61,12 +71,12 @@ def register_extractor(cls):
     if not inspect.isclass(cls) or not issubclass(cls, Extractor):
         msg = "'cls' must be a subclass of Extractor. Found: {}"
         raise TypeError(msg.format(cls))
-    for d in cls._conf.dependencies:
+    for d in cls.get_dependencies():
         if d not in _extractors.keys():
             msg = "Dependency '{}' from extractor {}".format(d, cls)
-            raise err.FeatureNotFound(msg)
+            raise ExtractorBadDefinedError(msg)
 
-    _extractors.update((f, cls) for f in cls._conf.features)
+    _extractors.update((f, cls) for f in cls.get_features())
     return cls
 
 
@@ -81,7 +91,7 @@ def is_registered(obj):
         msg = "'cls' must be a subclass of Extractor. Found: {}"
         raise TypeError(msg.format(obj))
     else:
-        features = obj._conf.features
+        features = obj.get_features()
     return {f: (f in _extractors) for f in features}
 
 
@@ -103,17 +113,18 @@ def sort_by_dependencies(exts, retry=100):
         ext, cnt = pending.pop(0)
 
         if not isinstance(ext, Extractor) and not issubclass(ext, Extractor):
-            msg = "Only Extractor instances are allowed. Found {}"
+            msg = "Only Extractor instances are allowed. Found {}."
             raise TypeError(msg.format(type(ext)))
 
-        if ext._conf.dependencies.difference(features_from_sorted):
+        deps = ext.get_dependencies()
+        if deps.difference(features_from_sorted):
             if cnt + 1 > retry:
-                msg = "Maximun retry to sort achieved from extractor {}"
-                raise err.FeatureError(msg.format(type(ext)))
+                msg = "Maximun retry to sort achieved from extractor {}."
+                raise RuntimeError(msg.format(type(ext)))
             pending.append((ext, cnt + 1))
         else:
             sorted_ext.append(ext)
-            features_from_sorted.update(ext._conf.features)
+            features_from_sorted.update(ext.get_features())
     return tuple(sorted_ext)
 
 
@@ -152,7 +163,7 @@ from .ext_anderson_darling import *  # noqa
 from .ext_slotted_a_length import *  # noqa
 from .ext_std import *  # noqa
 from .ext_con import *  # noqa
-#~ from .ext_signature import *  # noqa
+from .ext_signature import *  # noqa
 
 for cls in sort_by_dependencies(Extractor.__subclasses__()):
     register_extractor(cls)

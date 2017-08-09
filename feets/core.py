@@ -36,6 +36,12 @@ from __future__ import unicode_literals, print_function
 
 __doc__ = """core functionalities of feets"""
 
+__all__ = [
+    "CPU_COUNT",
+    "FeatureNotFound",
+    "FeatureSpace",
+    "MPFeatureSpace"]
+
 
 # =============================================================================
 # IMPORTS
@@ -63,6 +69,14 @@ CPU_COUNT = mp.cpu_count()
 logger = logging.getLogger("feets")
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.WARNING)
+
+
+# =============================================================================
+# EXCEPTIONS
+# =============================================================================
+
+class FeatureNotFound(ValueError):
+    pass
 
 
 # =============================================================================
@@ -111,7 +125,7 @@ class FeatureSpace(object):
         if data:
             fbdata = []
             for fname, f in exts.items():
-                if not f._conf.data.difference(data):
+                if not f.get_data().difference(data):
                     fbdata.append(fname)
         else:
             fbdata = exts.keys()
@@ -122,14 +136,14 @@ class FeatureSpace(object):
         if only:
             for f in only:
                 if f not in exts:
-                    raise err.FeatureNotFound(f)
+                    raise FeatureNotFound(f)
         self._only = frozenset(only or exts.keys())
 
         # select the features to exclude or not exclude anything
         if exclude:
             for f in exclude:
                 if f not in exts:
-                    raise err.FeatureNotFound(f)
+                    raise FeatureNotFound(f)
         self._exclude = frozenset(exclude or ())
 
         # TODO: remove by dependencies
