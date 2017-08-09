@@ -52,7 +52,7 @@ from feets.core import Extractor
 
 class Signature(Extractor):
 
-    data = ['magnitude', 'time]
+    data = ['magnitude', 'time']
     dependencies = ['PeriodLS', 'Amplitude']
     params = {"xbins": 30, "ybins": 20}
 

@@ -152,7 +152,7 @@ from .ext_anderson_darling import *  # noqa
 from .ext_slotted_a_length import *  # noqa
 from .ext_std import *  # noqa
 from .ext_con import *  # noqa
-from .ext_signature import *  # noqa
+#~ from .ext_signature import *  # noqa
 
 for cls in sort_by_dependencies(Extractor.__subclasses__()):
     register_extractor(cls)
