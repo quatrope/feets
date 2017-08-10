@@ -62,10 +62,10 @@ class FluxPercentileRatioMid20(Extractor):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 
-        F_60_index = math.ceil(0.60 * lc_length)
-        F_40_index = math.ceil(0.40 * lc_length)
-        F_5_index = math.ceil(0.05 * lc_length)
-        F_95_index = math.ceil(0.95 * lc_length)
+        F_60_index = int(math.ceil(0.60 * lc_length))
+        F_40_index = int(math.ceil(0.40 * lc_length))
+        F_5_index = int(math.ceil(0.05 * lc_length))
+        F_95_index = int(math.ceil(0.95 * lc_length))
 
         F_40_60 = sorted_data[F_60_index] - sorted_data[F_40_index]
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
@@ -83,10 +83,10 @@ class FluxPercentileRatioMid35(Extractor):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 
-        F_325_index = math.ceil(0.325 * lc_length)
-        F_675_index = math.ceil(0.675 * lc_length)
-        F_5_index = math.ceil(0.05 * lc_length)
-        F_95_index = math.ceil(0.95 * lc_length)
+        F_325_index = int(math.ceil(0.325 * lc_length))
+        F_675_index = int(math.ceil(0.675 * lc_length))
+        F_5_index = int(math.ceil(0.05 * lc_length))
+        F_95_index = int(math.ceil(0.95 * lc_length))
 
         F_325_675 = sorted_data[F_675_index] - sorted_data[F_325_index]
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
@@ -104,10 +104,10 @@ class FluxPercentileRatioMid50(Extractor):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 
-        F_25_index = math.ceil(0.25 * lc_length)
-        F_75_index = math.ceil(0.75 * lc_length)
-        F_5_index = math.ceil(0.05 * lc_length)
-        F_95_index = math.ceil(0.95 * lc_length)
+        F_25_index = int(math.ceil(0.25 * lc_length))
+        F_75_index = int(math.ceil(0.75 * lc_length))
+        F_5_index = int(math.ceil(0.05 * lc_length))
+        F_95_index = int(math.ceil(0.95 * lc_length))
 
         F_25_75 = sorted_data[F_75_index] - sorted_data[F_25_index]
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
@@ -125,10 +125,10 @@ class FluxPercentileRatioMid80(Extractor):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 
-        F_10_index = math.ceil(0.10 * lc_length)
-        F_90_index = math.ceil(0.90 * lc_length)
-        F_5_index = math.ceil(0.05 * lc_length)
-        F_95_index = math.ceil(0.95 * lc_length)
+        F_10_index = int(math.ceil(0.10 * lc_length))
+        F_90_index = int(math.ceil(0.90 * lc_length))
+        F_5_index = int(math.ceil(0.05 * lc_length))
+        F_95_index = int(math.ceil(0.95 * lc_length))
 
         F_10_90 = sorted_data[F_90_index] - sorted_data[F_10_index]
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
