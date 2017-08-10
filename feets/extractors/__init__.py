@@ -142,7 +142,7 @@ from .ext_color import *  # noqa
 from .ext_con import *  # noqa
 from .ext_eta_color import *  # noqa
 from .ext_eta_e import *  # noqa
-#~ from .ext_flux_percentile_ratio import *  # noqa
+from .ext_flux_percentile_ratio import *  # noqa
 #~ from .ext_fourier_components import *  # noqa
 from .ext_gskew import *  # noqa
 from .ext_linear_trend import *  # noqa
