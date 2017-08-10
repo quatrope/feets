@@ -185,7 +185,6 @@ class FeatureSpace(object):
     def _extract_one(self, data):
         data, features = np.asarray(data), {}
         for fextractor in self._execution_plan:
-            print(fextractor)
             features.update(fextractor.extract(data, features))
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])

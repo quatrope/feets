@@ -82,7 +82,23 @@ class FATSRegressionTestCase(FeetsTestCase):
             self.features = npz["features"]
             self.FATS_result = dict(zip(npz["features"], npz["values"]))
 
+        # creates an template for all error, messages
+        self.err_template = ("Feature '{feature}' missmatch. "
+                             "feets={feets_value}, FATS: {FATS_value}")
+
     def test_FATS_to_feets_regression(self):
         fs = FeatureSpace()
         result = fs.extract_one(self.lc)
-        import ipdb; ipdb.set_trace()
+        feets_result = dict(zip(*result))
+        cnt = 0
+        for feature in self.features:
+            if feature not in feets_result:
+                continue
+            cnt += 1
+            feets_value = feets_result[feature]
+            FATS_value = self.FATS_result[feature]
+            err_msg = self.err_template.format(
+                feature=feature, feets_value=feets_value,
+                FATS_value=FATS_value)
+            self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
+        print "Features: ", cnt
