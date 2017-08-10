@@ -255,6 +255,10 @@ class FeatureSpace:
                                     self.featureList.append(name)
 
                             else:
+                                try:
+                                    obj()
+                                except:
+                                    import ipdb; ipdb.set_trace()
                                 if set(obj().Data).issubset(self.Data):
                                     self.featureOrder.append((inspect.getsourcelines(obj)[-1:])[0])
                                     self.featureList.append(name)
