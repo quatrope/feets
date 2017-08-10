@@ -55,7 +55,7 @@ class Color(Extractor):
     """Average color for each MACHO lightcurve
     mean(B1) - mean(B2)
     """
-    data = ['magnitude', 'time', 'magnitude2']
+    data = ['magnitude', 'magnitude2']
     features = ["Color"]
 
     def fit(self, magnitude, magnitude2):

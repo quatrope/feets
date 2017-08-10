@@ -103,12 +103,13 @@ def extractor_of(feature):
     return _extractors[feature]
 
 
-def sort_by_dependencies(exts, retry=100):
+def sort_by_dependencies(exts, retry=None):
     """Calculate the Feature Extractor Resolution Order.
 
     """
     sorted_ext, features_from_sorted = [], set()
     pending = [(e, 0) for e in exts]
+    retry = len(_extractors) * 100 if retry is None else retry
     while pending:
         ext, cnt = pending.pop(0)
 
@@ -119,8 +120,8 @@ def sort_by_dependencies(exts, retry=100):
         deps = ext.get_dependencies()
         if deps.difference(features_from_sorted):
             if cnt + 1 > retry:
-                msg = "Maximun retry to sort achieved from extractor {}."
-                raise RuntimeError(msg.format(type(ext)))
+                msg = "Maximun retry ({}) to sort achieved from extractor {}."
+                raise RuntimeError(msg.format(retry, type(ext)))
             pending.append((ext, cnt + 1))
         else:
             sorted_ext.append(ext)
@@ -137,7 +138,7 @@ from .ext_anderson_darling import *  # noqa
 from .ext_autocor_length import *  # noqa
 from .ext_beyond1_std import *  # noqa
 #~ from .ext_car import *  # noqa
-#~ from .ext_color import *  # noqa
+from .ext_color import *  # noqa
 from .ext_con import *  # noqa
 from .ext_eta_color import *  # noqa
 from .ext_eta_e import *  # noqa
