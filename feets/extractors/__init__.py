@@ -27,7 +27,7 @@
 # FUTURE
 # =============================================================================
 
-from __future__ import unicode_literals, print_function
+from __future__ import print_function
 
 
 # =============================================================================
@@ -37,15 +37,15 @@ from __future__ import unicode_literals, print_function
 __doc__ = """Features extractors classes and register utilities"""
 
 __all__ = [
-    b"DATAS",
-    b"register_extractor",
-    b"registered_extractors",
-    b"is_registered",
-    b"available_features",
-    b"extractor_of",
-    b"sort_by_dependencies",
-    b"ExtractorBadDefinedError",
-    b"Extractor"]
+    "DATAS",
+    "register_extractor",
+    "registered_extractors",
+    "is_registered",
+    "available_features",
+    "extractor_of",
+    "sort_by_dependencies",
+    "ExtractorBadDefinedError",
+    "Extractor"]
 
 # =============================================================================
 # IMPORTS
