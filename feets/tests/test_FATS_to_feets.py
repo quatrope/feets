@@ -44,6 +44,8 @@ __doc__ = """FATS to feets compatibility testing"""
 
 import os
 
+import six
+
 import numpy as np
 
 from .. import MPFeatureSpace, FeatureSpace
@@ -82,7 +84,9 @@ class FATSRegressionTestCase(FeetsTestCase):
         # recreate the FATS result
         with np.load(self.FATS_result_path) as npz:
             self.features = npz["features"]
-            self.FATS_result = dict(zip(npz["features"], npz["values"]))
+            if six.PY3:
+                import ipdb; ipdb.set_trace()
+            self.FATS_result = dict(zip(self.features, npz["values"]))
 
         # creates an template for all error, messages
         self.err_template = ("Feature '{feature}' missmatch.")
@@ -93,7 +97,6 @@ class FATSRegressionTestCase(FeetsTestCase):
         feets_result = dict(zip(*result))
         for feature in self.features:
             if feature not in feets_result:
-                import ipdb; ipdb.set_trace()
                 self.fail("Missing feature {}".format(feature))
             feets_value = feets_result[feature]
             FATS_value = self.FATS_result[feature]
