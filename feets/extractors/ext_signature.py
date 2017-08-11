@@ -42,7 +42,6 @@ __doc__ = """"""
 # =============================================================================
 
 import numpy as np
-from scipy import stats
 
 from .core import Extractor
 
@@ -63,11 +62,11 @@ class Signature(Extractor):
             features.append("Signature_x_{}_y_{}".format(i, j))
 
     def fit(self, magnitude, time, PeriodLS, Amplitude, xbins, ybins):
-        lc_yaxis = (magnitude - np.min(magnitude) ) /np.float(amplitude)
+        lc_yaxis = (magnitude - np.min(magnitude)) / np.float(Amplitude)
 
         # SHIFT TO BEGIN AT MINIMUM
         loc = np.argmin(lc_yaxis)
-        lc_phase = np.remainder(time - time[loc], period) / period
+        lc_phase = np.remainder(time - time[loc], PeriodLS) / PeriodLS
 
         bins = (xbins, ybins)
         counts = np.histogram2d(lc_phase, lc_yaxis, bins=bins, normed=True)[0]

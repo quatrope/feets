@@ -46,7 +46,7 @@ import os
 
 import numpy as np
 
-from .. import MPFeatureSpace, FeatureSpace
+from .. import FeatureSpace
 
 from .core import FeetsTestCase
 

@@ -126,7 +126,8 @@ class ExtractorMeta(type):
 
         if not hasattr(cls, "features"):
             msg = "'{}' must redefine {}"
-            raise ExtractorBadDefinedError(msg.format(cls, "features attribute"))
+            raise ExtractorBadDefinedError(
+                msg.format(cls, "features attribute"))
         if not cls.features:
             msg = "'features' can't be empty"
             raise ExtractorBadDefinedError(msg)
