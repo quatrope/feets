@@ -116,6 +116,27 @@ class FluxPercentileRatioMid50(Extractor):
         return {"FluxPercentileRatioMid50": F_mid50}
 
 
+class FluxPercentileRatioMid65(Extractor):
+
+    data = ['magnitude']
+    features = ["FluxPercentileRatioMid65"]
+
+    def fit(self, magnitude):
+        sorted_data = np.sort(magnitude)
+        lc_length = len(sorted_data)
+
+        F_175_index = int(math.ceil(0.175 * lc_length))
+        F_825_index = int(math.ceil(0.825 * lc_length))
+        F_5_index = int(math.ceil(0.05 * lc_length))
+        F_95_index = int(math.ceil(0.95 * lc_length))
+
+        F_175_825 = sorted_data[F_825_index] - sorted_data[F_175_index]
+        F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
+        F_mid65 = F_175_825 / F_5_95
+
+        return {"FluxPercentileRatioMid65": F_mid65}
+
+
 class FluxPercentileRatioMid80(Extractor):
 
     data = ['magnitude']

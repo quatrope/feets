@@ -89,13 +89,10 @@ class FATSRegressionTestCase(FeetsTestCase):
         fs = FeatureSpace()
         result = fs.extract_one(self.lc)
         feets_result = dict(zip(*result))
-        cnt = 0
         for feature in self.features:
             if feature not in feets_result:
-                continue
-            cnt += 1
+                self.fail("Missing feature {}".format(feature))
             feets_value = feets_result[feature]
             FATS_value = self.FATS_result[feature]
             err_msg = self.err_template.format(feature=feature)
             self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
-        print("Features: {}/{}".format(cnt, len(self.features)))
