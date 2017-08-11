@@ -93,6 +93,7 @@ class FATSRegressionTestCase(FeetsTestCase):
         feets_result = dict(zip(*result))
         for feature in self.features:
             if feature not in feets_result:
+                import ipdb; ipdb.set_trace()
                 self.fail("Missing feature {}".format(feature))
             feets_value = feets_result[feature]
             FATS_value = self.FATS_result[feature]
