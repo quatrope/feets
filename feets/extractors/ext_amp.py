@@ -35,67 +35,39 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """FATS to feets compatibility testing"""
+__doc__ = """"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-import os
-
 import numpy as np
 
-from .. import MPFeatureSpace, FeatureSpace
-
-from .core import FeetsTestCase
+from .core import Extractor
 
 
 # =============================================================================
-# BASE CLASS
+# EXTRACTOR CLASS
 # =============================================================================
 
-class FATSRegressionTestCase(FeetsTestCase):
+class AMP(Extractor):
+    """AMP
 
-    FeatureSpaceClass = FeatureSpace
+    .. math::
 
-    def setUp(self):
-        # the paths
-        self.data_path = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)), "data")
-        self.lc_path = os.path.join(self.data_path, "lc_1.3444.614.B_R.npz")
-        self.FATS_result_path = os.path.join(self.data_path, "FATS_result.npz")
+        AMP = \log_{10} \sqrt{\frac{Count \times \sigma_{flux}}
+                                   {\mu_{flux}}}
 
-        # recreate the lightcurve
-        with np.load(self.lc_path) as npz:
-            self.lc = (
-                npz['mag'],
-                npz['time'],
-                npz['error'],
-                npz['mag2'],
-                npz['aligned_mag'],
-                npz['aligned_mag2'],
-                npz['aligned_time'],
-                npz['aligned_error'],
-                npz['aligned_error2'])
+    """
 
-        # recreate the FATS result
-        with np.load(self.FATS_result_path) as npz:
-            self.features = npz["features"]
-            self.features = self.features.astype("U")
-            self.FATS_result = dict(zip(self.features, npz["values"]))
+    data = ['time', 'magnitude']
+    features = ["AMP"]
 
-        # creates an template for all error, messages
-        self.err_template = ("Feature '{feature}' missmatch.")
-
-    def test_FATS_to_feets_extract_one(self):
-        fs = self.FeatureSpaceClass()
-        result = fs.extract_one(self.lc)
-        feets_result = dict(zip(*result))
-        for feature in self.features:
-            if feature not in feets_result:
-                self.fail("Missing feature {}".format(feature))
-            feets_value = feets_result[feature]
-            FATS_value = self.FATS_result[feature]
-            err_msg = self.err_template.format(feature=feature)
-            self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
+    def fit(self, time, magnitude):
+        sort_mask = np.argsort(time)
+        mags = magnitude[sort_mask]
+        fluxs = 10 ** (mags / -2.5)
+        count, std_flux, mean_flux = len(fluxs), np.std(fluxs), np.mean(fluxs)
+        amp = np.log10(np.sqrt(count * std_flux / mean_flux))
+        return {"AMP": amp}
