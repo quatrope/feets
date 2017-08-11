@@ -157,7 +157,7 @@ from .ext_percent_difference_flux_percentile import *  # noqa
 from .ext_q31 import *  # noqa
 from .ext_q31 import *  # noqa
 from .ext_rcs import *  # noqa
-#~ from .ext_signature import *  # noqa
+from .ext_signature import *  # noqa
 from .ext_skew import *  # noqa
 from .ext_slotted_a_length import *  # noqa
 from .ext_small_kurtosis import *  # noqa

@@ -52,9 +52,7 @@ import feets
 # CONSTANTS
 # =============================================================================
 
-REQUIREMENTS = [
-    "numpy", "scipy", "six", "statsmodels", "mock"
-]
+REQUIREMENTS = ["numpy", "scipy", "six", "statsmodels", "mock"]
 
 
 # =============================================================================
@@ -71,6 +69,8 @@ def do_setup():
         url=feets.URL,
         license=feets.LICENSE,
         keywords=feets.KEYWORDS,
+        package_data={"feets.tests.data": ['tests/data/*.*']},
+        include_package_data=True,
         classifiers=(
             "Development Status :: 4 - Beta",
             "Intended Audience :: Education",

@@ -54,14 +54,22 @@ class Signature(Extractor):
 
     data = ['magnitude', 'time']
     dependencies = ['PeriodLS', 'Amplitude']
-    params = {"xbins": 30, "ybins": 20}
+    params = {"xbins": 18, "ybins": 12}
 
     features = []
     for i in range(params["xbins"]):
         for j in range(params["ybins"]):
             features.append("Signature_x_{}_y_{}".format(i, j))
 
+    # this variable stores a sorted version of the features
+    # because feets only stores a frozenset of the original features
+    # for future validation.
+    sorted_features = tuple(features)
+
+    del i, j
+
     def fit(self, magnitude, time, PeriodLS, Amplitude, xbins, ybins):
+
         lc_yaxis = (magnitude - np.min(magnitude)) / np.float(Amplitude)
 
         # SHIFT TO BEGIN AT MINIMUM
@@ -71,4 +79,6 @@ class Signature(Extractor):
         bins = (xbins, ybins)
         counts = np.histogram2d(lc_phase, lc_yaxis, bins=bins, normed=True)[0]
 
-        return counts.reshape(xbins * ybins)
+        result = zip(self.sorted_features, counts.reshape(xbins * ybins))
+
+        return dict(result)
