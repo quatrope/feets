@@ -52,7 +52,7 @@ import multiprocessing as mp
 
 import numpy as np
 
-from . import extractors, err
+from . import extractors
 
 
 # =============================================================================

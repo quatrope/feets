@@ -45,8 +45,6 @@ from collections import namedtuple
 
 import six
 
-from .. import err
-
 
 # =============================================================================
 # CONSTANTS

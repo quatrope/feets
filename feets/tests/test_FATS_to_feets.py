@@ -57,6 +57,8 @@ from .core import FeetsTestCase
 
 class FATSRegressionTestCase(FeetsTestCase):
 
+    FeatureSpaceClass = FeatureSpace
+
     def setUp(self):
         # the paths
         self.data_path = os.path.join(
@@ -85,8 +87,8 @@ class FATSRegressionTestCase(FeetsTestCase):
         # creates an template for all error, messages
         self.err_template = ("Feature '{feature}' missmatch.")
 
-    def test_FATS_to_feets_regression(self):
-        fs = FeatureSpace()
+    def test_FATS_to_feets_extract_one(self):
+        fs = self.FeatureSpaceClass()
         result = fs.extract_one(self.lc)
         feets_result = dict(zip(*result))
         for feature in self.features:

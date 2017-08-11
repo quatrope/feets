@@ -48,7 +48,7 @@ def __spread__(y, yy, n, x, m):
   """
   nfac=[0,1,1,2,6,24,120,720,5040,40320,362880]
   if m > 10. :
-    print 'factorial table too small in spread'
+    print('factorial table too small in spread')
     return
 
   ix=long(x)
@@ -110,12 +110,12 @@ def fasper(x,y,ofac,hifac, MACC=4):
   #Check dimensions of input arrays
   n = long(len(x))
   if n != len(y):
-    print 'Incompatible arrays.'
+    print('Incompatible arrays.')
     return
 
   nout  = 0.5*ofac*hifac*n
   nfreqt = long(ofac*hifac*n*MACC)   #Size the FFT as next power
-  nfreq = 64L             # of 2 above nfreqt.
+  nfreq = 64             # of 2 above nfreqt.
 
   while nfreq < nfreqt:
     nfreq = 2*nfreq
@@ -140,7 +140,7 @@ def fasper(x,y,ofac,hifac, MACC=4):
   ck  = ((x-xmin)*fac) % fndim
   ckk  = (2.0*ck) % fndim
 
-  for j in range(0L, n):
+  for j in range(0, n):
     __spread__(y[j]-ave,wk1,ndim,ck[j],MACC)
     __spread__(1.0,wk2,ndim,ckk[j],MACC)
 

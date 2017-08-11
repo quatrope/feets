@@ -55,8 +55,6 @@ import inspect
 
 import six
 
-from .. import err
-
 from .core import Extractor, ExtractorBadDefinedError, DATAS  # noqa
 
 
@@ -133,6 +131,7 @@ def sort_by_dependencies(exts, retry=None):
 # REGISTERS
 # =============================================================================
 
+from .ext_amp import *  # noqa
 from .ext_amplitude import *  # noqa
 from .ext_anderson_darling import *  # noqa
 from .ext_autocor_length import *  # noqa
