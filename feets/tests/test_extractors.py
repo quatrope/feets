@@ -55,6 +55,7 @@ from .core import FeetsTestCase
 
 class SortByFependenciesTest(FeetsTestCase):
 
+    @mock.patch("feets.extractors._extractors", {})
     def test_sort_by_dependencies(self):
         @register_extractor
         class A(Extractor):

@@ -72,4 +72,4 @@ class Beyond1Std(Extractor):
         count = np.sum(np.logical_or(magnitude > weighted_mean + std,
                                      magnitude < weighted_mean - std))
 
-        return float(count) / n
+        return {"Beyond1Std": float(count) / n}

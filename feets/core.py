@@ -158,7 +158,7 @@ class FeatureSpace(object):
         # initialize the extractors
         features_extractors = set()
         for fcls in set(exts.values()):
-            if fcls._conf.features.intersection(self._features):
+            if fcls.get_features().intersection(self._features):
                 features_extractors.add(fcls(self))
         self._features_extractors = frozenset(features_extractors)
 

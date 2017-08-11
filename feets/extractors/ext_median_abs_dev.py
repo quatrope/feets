@@ -58,5 +58,5 @@ class MedianAbsDev(Extractor):
 
     def fit(self, magnitude):
         median = np.median(magnitude)
-        devs = (abs(magnitude - median))
-        return np.median(devs)
+        devs = abs(magnitude - median)
+        return {"MedianAbsDev": np.median(devs)}

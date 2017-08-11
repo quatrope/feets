@@ -63,5 +63,7 @@ class PairSlopeTrend(Extractor):
     def fit(self, magnitude):
         data_last = magnitude[-30:]
 
-        return (float(len(np.where(np.diff(data_last) > 0)[0]) -
-                len(np.where(np.diff(data_last) <= 0)[0])) / 30)
+        pst = (float(len(np.where(np.diff(data_last) > 0)[0]) -
+               len(np.where(np.diff(data_last) <= 0)[0])) / 30)
+
+        return {"PairSlopeTrend": pst}

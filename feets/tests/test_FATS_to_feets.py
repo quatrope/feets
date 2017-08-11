@@ -83,8 +83,7 @@ class FATSRegressionTestCase(FeetsTestCase):
             self.FATS_result = dict(zip(npz["features"], npz["values"]))
 
         # creates an template for all error, messages
-        self.err_template = ("Feature '{feature}' missmatch. "
-                             "feets={feets_value}, FATS: {FATS_value}")
+        self.err_template = ("Feature '{feature}' missmatch.")
 
     def test_FATS_to_feets_regression(self):
         fs = FeatureSpace()
@@ -97,8 +96,6 @@ class FATSRegressionTestCase(FeetsTestCase):
             cnt += 1
             feets_value = feets_result[feature]
             FATS_value = self.FATS_result[feature]
-            err_msg = self.err_template.format(
-                feature=feature, feets_value=feets_value,
-                FATS_value=FATS_value)
+            err_msg = self.err_template.format(feature=feature)
             self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
-        print "Features: ", cnt
+        print("Features: {}/{}".format(cnt, len(self.features)))

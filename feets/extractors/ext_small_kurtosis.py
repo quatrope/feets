@@ -70,4 +70,4 @@ class SmallKurtosis(Extractor):
         c1 = float(n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))
         c2 = float(3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
 
-        return c1 * S - c2
+        return {"SmallKurtosis": c1 * S - c2}

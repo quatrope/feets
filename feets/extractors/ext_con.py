@@ -85,4 +85,4 @@ class Con(Extractor):
                     break
             if flag:
                 count = count + 1
-        return count * 1.0 / (N - consecutiveStar + 1)
+        return {"Con": count * 1.0 / (N - consecutiveStar + 1)}

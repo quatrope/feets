@@ -93,7 +93,7 @@ class FourierComponents(Extractor):
                     b * np.cos(2 * np.pi * Freq * x) + c)
         return func
 
-    def _compoenents(self, magnitude, time):
+    def _components(self, magnitude, time):
         time = time - np.min(time)
         A, PH, scaledPH = [], [], []
         for i in range(3):
@@ -121,16 +121,38 @@ class FourierComponents(Extractor):
 
         for ph in PH:
             scaledPH.append(np.array(ph) - ph[0])
+        return A, PH, scaledPH
 
     def fit(self, magnitude, time):
         A, PH, sPH = self._components(magnitude, time)
-        freq1_aplitudes = [A[0][0], A[0][1], A[0][2], A[0][3]]
-        freq2_aplitudes = [A[1][0], A[1][1], A[1][2], A[1][3]]
-        freq3_aplitudes = [A[2][0], A[2][1], A[2][2], A[2][3]]
+        result = {
+            "Freq1_harmonics_amplitude_0": A[0][0],
+            "Freq1_harmonics_amplitude_1": A[0][1],
+            "Freq1_harmonics_amplitude_2": A[0][2],
+            "Freq1_harmonics_amplitude_3": A[0][3],
 
-        freq1_phases = [sPH[0][0], sPH[0][1], sPH[0][2], sPH[0][3]]
-        freq2_phases = [sPH[1][0], sPH[1][1], sPH[1][2], sPH[1][3]]
-        freq3_phases = [sPH[2][0], sPH[2][1], sPH[2][2], sPH[2][3]]
+            "Freq2_harmonics_amplitude_0": A[1][0],
+            "Freq2_harmonics_amplitude_1": A[1][1],
+            "Freq2_harmonics_amplitude_2": A[1][2],
+            "Freq2_harmonics_amplitude_3": A[1][3],
 
-        return (freq1_aplitudes + freq2_aplitudes + freq3_aplitudes +
-                freq1_phases + freq2_phases + freq3_phases)
+            "Freq3_harmonics_amplitude_0": A[2][0],
+            "Freq3_harmonics_amplitude_1": A[2][1],
+            "Freq3_harmonics_amplitude_2": A[2][2],
+            "Freq3_harmonics_amplitude_3": A[2][3],
+
+            "Freq1_harmonics_rel_phase_0": sPH[0][0],
+            "Freq1_harmonics_rel_phase_1": sPH[0][1],
+            "Freq1_harmonics_rel_phase_2": sPH[0][2],
+            "Freq1_harmonics_rel_phase_3": sPH[0][3],
+
+            "Freq2_harmonics_rel_phase_0": sPH[1][0],
+            "Freq2_harmonics_rel_phase_1": sPH[1][1],
+            "Freq2_harmonics_rel_phase_2": sPH[1][2],
+            "Freq2_harmonics_rel_phase_3": sPH[1][3],
+
+            "Freq3_harmonics_rel_phase_0": sPH[2][0],
+            "Freq3_harmonics_rel_phase_1": sPH[2][1],
+            "Freq3_harmonics_rel_phase_2": sPH[2][2],
+            "Freq3_harmonics_rel_phase_3": sPH[2][3]}
+        return result

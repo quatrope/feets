@@ -58,4 +58,4 @@ class Mean(Extractor):
 
     def fit(self, magnitude):
         B_mean = np.mean(magnitude)
-        return B_mean
+        return {"Mean": B_mean}

@@ -71,7 +71,7 @@ class FluxPercentileRatioMid20(Extractor):
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
         F_mid20 = F_40_60 / F_5_95
 
-        return F_mid20
+        return {"FluxPercentileRatioMid20": F_mid20}
 
 
 class FluxPercentileRatioMid35(Extractor):
@@ -92,7 +92,7 @@ class FluxPercentileRatioMid35(Extractor):
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
         F_mid35 = F_325_675 / F_5_95
 
-        return F_mid35
+        return {"FluxPercentileRatioMid35": F_mid35}
 
 
 class FluxPercentileRatioMid50(Extractor):
@@ -113,7 +113,7 @@ class FluxPercentileRatioMid50(Extractor):
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
         F_mid50 = F_25_75 / F_5_95
 
-        return F_mid50
+        return {"FluxPercentileRatioMid50": F_mid50}
 
 
 class FluxPercentileRatioMid80(Extractor):
@@ -134,4 +134,4 @@ class FluxPercentileRatioMid80(Extractor):
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
         F_mid80 = F_10_90 / F_5_95
 
-        return F_mid80
+        return {"FluxPercentileRatioMid80": F_mid80}

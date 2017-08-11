@@ -83,7 +83,7 @@ class StetsonJ(Extractor):
         J = (1.0 / len(sigma_i) * np.sum(np.sign(sigma_i) *
              np.sqrt(np.abs(sigma_i))))
 
-        return J
+        return {"StetsonJ": J}
 
 
 class StetsonK(Extractor):
@@ -101,7 +101,7 @@ class StetsonK(Extractor):
         K = (1 / np.sqrt(N * 1.0) *
              np.sum(np.abs(sigmap)) / np.sqrt(np.sum(sigmap ** 2)))
 
-        return K
+        return {"StetsonK": K}
 
 
 class StetsonKAC(Extractor):
@@ -122,7 +122,7 @@ class StetsonKAC(Extractor):
         K = (1 / np.sqrt(N_autocor * 1.0) *
              np.sum(np.abs(sigmap)) / np.sqrt(np.sum(sigmap ** 2)))
 
-        return K
+        return {"StetsonK_AC": K}
 
 
 class StetsonL(Extractor):
@@ -158,4 +158,4 @@ class StetsonL(Extractor):
         K = (1 / np.sqrt(N * 1.0) *
              np.sum(np.abs(sigma_i)) / np.sqrt(np.sum(sigma_i ** 2)))
 
-        return J * K / 0.798
+        return {"StetsonL": J * K / 0.798}

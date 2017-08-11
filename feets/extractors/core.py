@@ -87,12 +87,18 @@ class ExtractorBadDefinedError(Exception):
     pass
 
 
+class ExtractorContractError(ValueError):
+    """The extractor dont get the expectd features"""
+    pass
+
+
 # =============================================================================
 # BASE CLASSES
 # =============================================================================
 
 ExtractorConf = namedtuple(
-    "ExtractorConf", ["data", "dependencies", "params", "features"])
+    "ExtractorConf",
+    ["data", "dependencies", "params", "features"])
 
 
 class ExtractorMeta(type):
@@ -227,16 +233,33 @@ class Extractor(object):
         pass
 
     def extract(self, data, dependencies):
+        # add the required features as parameters to fit()
         kwargs = {k: dependencies[k] for k in self.get_dependencies()}
+
+        # add the required data as parameters to fit()
         for d in self.get_data():
             idx = DATA_IDXS[d]
             kwargs[d] = data[idx]
+
+        # add the configured parameters as parameters to fit()
         kwargs.update(self.params)
         try:
+            # setup & run te extractor
             self.setup()
-            features = self.fit(**kwargs)
-            if not hasattr(features, "__iter__"):
-                features = (features,)
-            return dict(zip(self.get_features(), features))
+            result = self.fit(**kwargs)
+
+            # validate if the extractors generates the expected features
+            expected = self.get_features()  # the expected features
+            diff = (
+                expected.difference(result.keys()) or
+                set(result).difference(expected))  # some diff
+            if diff:
+                cls = type(self)
+                estr, fstr = ", ".join(expected), ", ".join(result.keys())
+                msg = (
+                    "The extractor '{}' expect the features [{}], "
+                    "and found: [{}]").format(cls, estr, fstr)
+                raise ExtractorContractError(msg)
+            return dict(result)
         finally:
             self.teardown()

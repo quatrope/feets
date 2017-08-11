@@ -63,4 +63,4 @@ class PercentAmplitude(Extractor):
 
         percent_amplitude = max_distance / median_data
 
-        return percent_amplitude
+        return {"PercentAmplitude": percent_amplitude}

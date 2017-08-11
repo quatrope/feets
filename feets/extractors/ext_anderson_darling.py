@@ -60,4 +60,4 @@ class AndersonDarling(Extractor):
 
     def fit(self, magnitude):
         ander = stats.anderson(magnitude)[0]
-        return 1 / (1.0 + np.exp(-10 * (ander - 0.3)))
+        return {"AndersonDarling": 1 / (1.0 + np.exp(-10 * (ander - 0.3)))}

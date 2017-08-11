@@ -119,4 +119,5 @@ class CAR(Extractor):
     def fit(self, magnitude, time, error):
         sigma, tau = self._calculate_CAR(time, magnitude, error)
         mean = np.mean(magnitude) / tau
-        return sigma, tau, mean
+
+        return {"CAR_sigma": sigma, "CAR_tau": tau, "CAR_mean": mean}

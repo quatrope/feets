@@ -72,4 +72,4 @@ class EtaColor(Extractor):
         eta_B_R = (w_mean * np.power(aligned_time[N - 1] -
                    aligned_time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
 
-        return eta_B_R
+        return {"Eta_color": eta_B_R}

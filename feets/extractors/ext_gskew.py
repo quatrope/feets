@@ -62,5 +62,6 @@ class Gskew(Extractor):
         F_3_value = np.percentile(magnitude, 3)
         F_97_value = np.percentile(magnitude, 97)
 
-        return (np.median(magnitude[magnitude <= F_3_value]) +
+        skew = (np.median(magnitude[magnitude <= F_3_value]) +
                 np.median(magnitude[magnitude >= F_97_value]) - 2 * median_mag)
+        return {"Gskew": skew}

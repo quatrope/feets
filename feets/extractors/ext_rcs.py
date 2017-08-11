@@ -63,4 +63,4 @@ class RCS(Extractor):
         m = np.mean(magnitude)
         s = np.cumsum(magnitude - m) * 1.0 / (N * sigma)
         R = np.max(s) - np.min(s)
-        return R
+        return {"Rcs": R}

@@ -57,7 +57,8 @@ class Q31(Extractor):
     features = ["Q31"]
 
     def fit(self, magnitude):
-        return np.percentile(magnitude, 75) - np.percentile(magnitude, 25)
+        q31 = np.percentile(magnitude, 75) - np.percentile(magnitude, 25)
+        return {"Q31": q31}
 
 
 class Q31Color(Extractor):
@@ -68,5 +69,5 @@ class Q31Color(Extractor):
     def fit(self, aligned_magnitude, aligned_magnitude2):
         N = len(aligned_magnitude)
         b_r = aligned_magnitude[:N] - aligned_magnitude2[:N]
-
-        return np.percentile(b_r, 75) - np.percentile(b_r, 25)
+        q31_color = np.percentile(b_r, 75) - np.percentile(b_r, 25)
+        return {"Q31_color": q31_color}

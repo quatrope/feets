@@ -58,4 +58,4 @@ class Std(Extractor):
     features = ["Std"]
 
     def fit(self, magnitude):
-        return np.std(magnitude)
+        return {"Std": np.std(magnitude)}

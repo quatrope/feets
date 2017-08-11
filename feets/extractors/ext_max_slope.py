@@ -64,4 +64,4 @@ class MaxSlope(Extractor):
         slope = np.abs(magnitude[1:] - magnitude[:-1]) / (time[1:] - time[:-1])
         np.max(slope)
 
-        return np.max(slope)
+        return {"MaxSlope": np.max(slope)}

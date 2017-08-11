@@ -69,4 +69,4 @@ class PercentDifferenceFluxPercentile(Extractor):
 
         percent_difference = F_5_95 / median_data
 
-        return percent_difference
+        return {"PercentDifferenceFluxPercentile": percent_difference}

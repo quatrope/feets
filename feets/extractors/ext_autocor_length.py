@@ -70,4 +70,4 @@ class AutocorLength(Extractor):
             k = next((index for index, value in
                       enumerate(AC) if value < np.exp(-1)), None)
 
-        return k
+        return {'Autocor_length': k}

@@ -63,5 +63,6 @@ class Amplitude(Extractor):
         N = len(magnitude)
         sorted_mag = np.sort(magnitude)
 
-        return (np.median(sorted_mag[-int(math.ceil(0.05 * N)):]) -
-                np.median(sorted_mag[0:int(math.ceil(0.05 * N))])) / 2.0
+        amplitude = (np.median(sorted_mag[-int(math.ceil(0.05 * N)):]) -
+                     np.median(sorted_mag[0:int(math.ceil(0.05 * N))])) / 2.0
+        return {"Amplitude": amplitude}

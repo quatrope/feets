@@ -89,4 +89,5 @@ class LombScargle(Extractor):
         R = self._compute_cs(folded_data, N)
         Psi_eta = self._compute_eta(folded_data, N)
 
-        return T, prob, R, Psi_eta
+        return {"PeriodLS": T, "Period_fit": prob,
+                "Psi_CS": R, "Psi_eta": Psi_eta}

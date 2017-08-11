@@ -85,4 +85,6 @@ class StructureFunctions(Extractor):
         m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
         m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
 
-        return m_21, m_31, m_32
+        return {"StructureFunction_index_21": m_21,
+                "StructureFunction_index_31": m_31,
+                "StructureFunction_index_32": m_32}

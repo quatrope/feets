@@ -58,4 +58,4 @@ class LinearTrend(Extractor):
 
     def fit(self, magnitude, time):
         regression_slope = stats.linregress(time, magnitude)[0]
-        return regression_slope
+        return {"LinearTrend": regression_slope}

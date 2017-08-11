@@ -69,4 +69,4 @@ class Eta_e(Extractor):
         eta_e = (w_mean * np.power(time[N - 1] -
                  time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
 
-        return eta_e
+        return {"Eta_e": eta_e}
