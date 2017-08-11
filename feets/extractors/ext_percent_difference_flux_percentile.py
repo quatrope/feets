@@ -63,8 +63,8 @@ class PercentDifferenceFluxPercentile(Extractor):
 
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
-        F_5_index = math.ceil(0.05 * lc_length)
-        F_95_index = math.ceil(0.95 * lc_length)
+        F_5_index = int(math.ceil(0.05 * lc_length))
+        F_95_index = int(math.ceil(0.95 * lc_length))
         F_5_95 = sorted_data[F_95_index] - sorted_data[F_5_index]
 
         percent_difference = F_5_95 / median_data

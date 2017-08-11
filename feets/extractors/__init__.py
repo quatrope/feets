@@ -154,7 +154,7 @@ from .ext_median_abs_dev import *  # noqa
 from .ext_median_brp import *  # noqa
 from .ext_pair_slope_trend import *  # noqa
 from .ext_percent_amplitude import *  # noqa
-#~ from .ext_percent_difference_flux_percentile import *  # noqa
+from .ext_percent_difference_flux_percentile import *  # noqa
 from .ext_q31 import *  # noqa
 from .ext_q31 import *  # noqa
 from .ext_rcs import *  # noqa
