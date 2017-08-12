@@ -1,6 +1,6 @@
 .. image:: res/logo_medium.png
     :align: left
-    :scale: 50%
+    :scale: 25%
     :alt: Corral
 
 feets: feATURE eXTRACTOR FOR tIME sERIES
