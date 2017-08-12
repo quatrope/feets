@@ -17,32 +17,6 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
    :target: https://badge.fury.io/py/scikit-criteria
    :alt: Python 3.5
 
-Based on FATS:
-
-- **Authors:** Isadora Nun and Pavlos Protopapas
-- **Contributors:** Karim Pichara, Rahul Dave, Daniel Acuña, Nicolás Castro,
-  Cristobal Mackenzie, Andrés Riveros and Ming Zhu
-
-Main difference with FATS:
-
-- Removed licurve retrieval from public surveys (we only do one thing here)
-- Removed all the ``sys.exit()`` calls and replaced with Exceptions
-- PEP-8
-- Python 2 and 3
-- Warnings instead of prints
-- Only one type of results: numpy array.
-- Posibility of register more FeaturesExtractors.
-- Multiprocessing.
-
-
-Installation
-------------
-
-Clone this repository and do ``pip install -e``.
-
-Or ``pip install feets`` for the latest stable version.
-
-
 Description
 -----------
 
@@ -80,3 +54,57 @@ matching different features. In order to achieve this goal, the library should
 be run in every existent survey (MACHO, EROS, OGLE, Catalina, Pan-STARRS, etc)
 and future surveys (LSST) and the results should be ideally shared in the same
 open way as this library.
+
+Based on FATS:
+
+- **Authors:** Isadora Nun and Pavlos Protopapas
+- **Contributors:** Karim Pichara, Rahul Dave, Daniel Acuña, Nicolás Castro,
+  Cristobal Mackenzie, Andrés Riveros and Ming Zhu
+
+Main difference with FATS:
+
+- Removed licurve retrieval from public surveys (we only do one thing here)
+- Removed all the ``sys.exit()`` calls and replaced with Exceptions
+- PEP-8
+- Python 2 and 3
+- Warnings instead of prints
+- Only one type of results: numpy array.
+- Posibility of register more FeaturesExtractors.
+- Multiprocessing.
+
+
+Basic Install
+-------------
+
+Execute
+
+.. code-block:: bash
+
+    $ pip install feets
+
+
+Development Install
+-------------------
+
+1.  Clone this repo and then inside the local
+2.  Execute
+
+    .. code-block:: bash
+
+        $ pip install -e .
+
+
+Tutorial
+--------
+
+https://github.com/carpyncho/feets/blob/master/tutorial.ipynb
+
+
+Authors
+-------
+
+Juan BC
+
+jbc.develop@gmail.com
+
+`IATE <http://iate.oac.uncor.edu/>`_ - `UNR <http://unr.edu.ar/>`_
