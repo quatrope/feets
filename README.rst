@@ -1,6 +1,10 @@
 feets: feATURE eXTRACTOR FOR tIME sERIES
 ========================================
 
+.. image:: https://badge.fury.io/py/feets.svg
+    :target: https://badge.fury.io/py/feets
+    :alt: PyPi Version
+
 .. image:: https://travis-ci.org/carpyncho/feets.svg?branch=master
     :target: https://travis-ci.org/carpyncho/feets
     :alt: Build Status
