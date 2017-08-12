@@ -95,7 +95,7 @@ Main difference with FATS:
 # CONSTANTS
 # =============================================================================
 
-__version__ = ("0", "1")
+__version__ = ("0", "1", "1")
 
 NAME = "feets"
 
@@ -123,6 +123,7 @@ import os  # noqa
 if os.getenv("FEETS_IN_SETUP") != "True":
     from .core import *  # noqa
     from .extractors import *  # noqa
+    from . import tests  # noqa
 
 
 del os

@@ -37,5 +37,9 @@ from __future__ import unicode_literals
 
 __doc__ = """All feets tests"""
 
-if __name__ == "__main__":
-    print(__doc__)
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from .__main__ import run_tests  # noqa
