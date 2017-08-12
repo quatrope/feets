@@ -13,9 +13,6 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
    :target: https://badge.fury.io/py/scikit-criteria
    :alt: Python 3.5
 
-Compilation of some of the existing light-curve features.
-
-
 Based on FATS:
 
 - **Authors:** Isadora Nun and Pavlos Protopapas
