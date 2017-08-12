@@ -1,6 +1,10 @@
 feets: feATURE eXTRACTOR FOR tIME sERIES
 ========================================
 
+.. image:: https://travis-ci.org/carpyncho/feets.svg?branch=master
+    :target: https://travis-ci.org/carpyncho/feets
+    :alt: Build Status
+
 .. image:: https://img.shields.io/badge/License-MIT-blue.svg
    :target: https://tldrlegal.com/license/mit-license
    :alt: License
