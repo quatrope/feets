@@ -94,7 +94,12 @@ URL = "https://github.com/carpyncho/feets"
 
 LICENSE = "MIT"
 
-KEYWORDS = "light curve feature analysis".split()
+KEYWORDS = (
+    "machine-learning",
+    "feature-extraction",
+    "timeseries",
+    "astronomy",
+    "multiprocessing")
 
 
 # =============================================================================
