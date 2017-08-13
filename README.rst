@@ -1,3 +1,8 @@
+.. image:: res/logo_medium.png
+    :align: left
+    :scale: 25%
+    :alt: Corral
+
 feets: feATURE eXTRACTOR FOR tIME sERIES
 ========================================
 
@@ -14,11 +19,15 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
    :alt: License
 
 .. image:: https://img.shields.io/badge/python-2.7-blue.svg
-   :target: https://badge.fury.io/py/scikit-criteria
+   :target: https://badge.fury.io/py/feets
    :alt: Python 2.7
 
+.. image:: https://img.shields.io/badge/python-3.4-blue.svg
+   :target: https://badge.fury.io/py/feets
+   :alt: Python 3.4
+
 .. image:: https://img.shields.io/badge/python-3.5-blue.svg
-   :target: https://badge.fury.io/py/scikit-criteria
+   :target: https://badge.fury.io/py/feets
    :alt: Python 3.5
 
 Description
