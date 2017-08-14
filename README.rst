@@ -114,7 +114,7 @@ Development Install
 Tutorial
 --------
 
-https://nbviewer.jupyter.org/github/carpyncho/feets/blob/master/doc/tutorial.ipynb
+http://feets.readthedocs.io
 
 
 Authors
