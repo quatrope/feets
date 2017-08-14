@@ -118,7 +118,6 @@ def sort_by_dependencies(exts, retry=None):
         deps = ext.get_dependencies()
         if deps.difference(features_from_sorted):
             if cnt + 1 > retry:
-                #~ import ipdb; ipdb.set_trace()
                 msg = "Maximun retry ({}) to sort achieved from extractor {}."
                 raise RuntimeError(msg.format(retry, type(ext)))
             pending.append((ext, cnt + 1))

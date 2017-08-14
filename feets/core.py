@@ -308,8 +308,8 @@ class MPFeatureSpace(FeatureSpace):
                 procs.append(proc)
         for proc in procs:
             proc.join()
-            fvalues.append(proc.result_)
-        return self._features_as_array, np.array(fvalues)
+            fvalues.extend(proc.result_)
+        return self._features_as_array, np.asarray(fvalues)
 
     @property
     def proccls(self):

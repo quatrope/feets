@@ -46,7 +46,7 @@ import os
 
 import numpy as np
 
-from .. import FeatureSpace
+from .. import FeatureSpace, MPFeatureSpace
 
 from .core import FeetsTestCase
 
@@ -88,10 +88,7 @@ class FATSRegressionTestCase(FeetsTestCase):
         # creates an template for all error, messages
         self.err_template = ("Feature '{feature}' missmatch.")
 
-    def test_FATS_to_feets_extract_one(self):
-        fs = self.FeatureSpaceClass()
-        result = fs.extract_one(self.lc)
-        feets_result = dict(zip(*result))
+    def assertFATS(self, feets_result):
         for feature in self.features:
             if feature not in feets_result:
                 self.fail("Missing feature {}".format(feature))
@@ -99,3 +96,22 @@ class FATSRegressionTestCase(FeetsTestCase):
             FATS_value = self.FATS_result[feature]
             err_msg = self.err_template.format(feature=feature)
             self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
+
+    def test_FATS_to_feets_extract_one(self):
+        fs = self.FeatureSpaceClass()
+        result = fs.extract_one(self.lc)
+        feets_result = dict(zip(*result))
+        self.assertFATS(feets_result)
+
+    def test_FATS_to_feets_extract(self):
+        fs = self.FeatureSpaceClass()
+        rfeatures, rdatas = fs.extract([self.lc] * 3)
+        for result in rdatas:
+            feets_result = dict(zip(rfeatures, result))
+            self.assertFATS(feets_result)
+        self.assertEqual(len(rdatas), 3)
+
+
+class MPFATSRegressionTestCase(FATSRegressionTestCase):
+
+    FeatureSpaceClass = MPFeatureSpace
