@@ -40,6 +40,6 @@ def macho_video():
 
 
 def macho_example11():
-    picture = Image(filename='res/curvas_ejemplos11.jpg')
+    picture = Image(filename='_static/curvas_ejemplos11.jpg')
     picture.size = (100, 100)
     return picture
