@@ -110,7 +110,7 @@ Development Install
 Tutorial
 --------
 
-https://github.com/carpyncho/feets/blob/master/tutorial.ipynb
+https://nbviewer.jupyter.org/github/carpyncho/feets/blob/master/doc/tutorial.ipynb
 
 
 Authors
