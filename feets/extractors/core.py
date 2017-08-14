@@ -197,6 +197,12 @@ class Extractor(object):
     def get_features(cls):
         return cls._conf.features
 
+    @classmethod
+    def get_subclasses(cls):
+        subs = cls.__subclasses__()
+        subs.sort(key=lambda sc: len(sc.get_dependencies()))
+        return subs
+
     def __init__(self, space):
         self.space = space
         self.name = type(self).__name__

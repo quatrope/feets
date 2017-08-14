@@ -118,6 +118,7 @@ def sort_by_dependencies(exts, retry=None):
         deps = ext.get_dependencies()
         if deps.difference(features_from_sorted):
             if cnt + 1 > retry:
+                #~ import ipdb; ipdb.set_trace()
                 msg = "Maximun retry ({}) to sort achieved from extractor {}."
                 raise RuntimeError(msg.format(retry, type(ext)))
             pending.append((ext, cnt + 1))
@@ -165,6 +166,9 @@ from .ext_std import *  # noqa
 from .ext_stetson import *  # noqa
 from .ext_structure_functions import *  # noqa
 
-for cls in sort_by_dependencies(Extractor.__subclasses__()):
+to_register = Extractor.get_subclasses()
+
+for cls in to_register:
     register_extractor(cls)
-del cls
+
+del cls, to_register
