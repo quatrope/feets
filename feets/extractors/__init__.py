@@ -107,7 +107,7 @@ def sort_by_dependencies(exts, retry=None):
     """
     sorted_ext, features_from_sorted = [], set()
     pending = [(e, 0) for e in exts]
-    retry = len(_extractors) * 100 if retry is None else retry
+    retry = len(exts) * 100 if retry is None else retry
     while pending:
         ext, cnt = pending.pop(0)
 
@@ -165,9 +165,7 @@ from .ext_std import *  # noqa
 from .ext_stetson import *  # noqa
 from .ext_structure_functions import *  # noqa
 
-to_register = Extractor.get_subclasses()
-
-for cls in to_register:
+for cls in sort_by_dependencies(Extractor.__subclasses__()):
     register_extractor(cls)
 
-del cls, to_register
+del cls
