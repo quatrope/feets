@@ -1,0 +1,10 @@
+
+div.nbinput, div.nboutput {
+    background-color: #eeeeee !important;
+}
+
+
+div.input_area {
+    background-color: transparent !important;
+    border: none !important;
+}

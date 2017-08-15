@@ -11,7 +11,7 @@ from JSAnimation import IPython_display
 
 from IPython.display import Image, HTML, YouTubeVideo
 
-
+# introduction
 def ts_anim():
     # create a simple animation
     fig = plt.figure()
@@ -43,3 +43,8 @@ def macho_example11():
     picture = Image(filename='_static/curvas_ejemplos11.jpg')
     picture.size = (100, 100)
     return picture
+
+# the library
+
+magnitude_ex = np.random.rand(30)
+time_ex = np.arange(0, 30)
