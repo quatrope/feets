@@ -41,6 +41,8 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
+import warnings
+
 import numpy as np
 
 from scipy.optimize import minimize
@@ -111,8 +113,11 @@ class CAR(Extractor):
 
         x0 = [10, 0.5]
         bnds = ((0, 100), (0, 100))
-        res = minimize(self._CAR_Like, x0, args=(time, magnitude, error),
-                       method='nelder-mead', bounds=bnds)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
+            res = minimize(self._CAR_Like, x0,
+                           args=(time, magnitude, error),
+                           method='nelder-mead', bounds=bnds)
         sigma, tau = res.x[0], res.x[1]
         return sigma, tau
 
