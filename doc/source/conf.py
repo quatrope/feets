@@ -112,7 +112,7 @@ html_theme_options = {
     'logo': 'logo_medium.png',
     'github_user': 'bitprophet',
     'github_repo': 'alabaster',
-    'page_width': "80%",
+    'page_width': "92%",
     'logo_name': False
 }
 
