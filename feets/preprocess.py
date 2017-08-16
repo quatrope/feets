@@ -50,7 +50,8 @@ def remove_noise(mag, time, error, error_limit=3, std_limit=5):
     data, mjd = mag, time
 
     data_len = len(mjd)
-    error_tolerance = error_limit * np.mean(error)  # self.m
+    error_mean = np.mean(error)
+    error_tolerance = error_limit * (error_mean or 1)
     data_mean = np.mean(data)
     data_std = np.std(data)
 
