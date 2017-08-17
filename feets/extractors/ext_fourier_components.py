@@ -82,6 +82,7 @@ class FourierComponents(Extractor):
                 'Freq3_harmonics_rel_phase_1',
                 'Freq3_harmonics_rel_phase_2',
                 'Freq3_harmonics_rel_phase_3']
+    params = {"ofac": 6.}
 
     def _model(self, x, a, b, c, Freq):
         return (a * np.sin(2 * np.pi * Freq * x) +
@@ -93,12 +94,13 @@ class FourierComponents(Extractor):
                     b * np.cos(2 * np.pi * Freq * x) + c)
         return func
 
-    def _components(self, magnitude, time):
+    def _components(self, magnitude, time, ofac):
         time = time - np.min(time)
-        A, PH, scaledPH = [], [], []
+        A, PH = [], []
         for i in range(3):
 
-            wk1, wk2, nout, jmax, prob = lomb.fasper(time, magnitude, 6., 100.)
+            wk1, wk2, nout, jmax, prob = lomb.fasper(
+                time, magnitude, ofac, 100.)
 
             fundamental_Freq = wk1[jmax]
             Atemp, PHtemp, popts = [], [], []
@@ -119,12 +121,13 @@ class FourierComponents(Extractor):
                     popts[j][2], (j+1) * fundamental_Freq)
                 magnitude = np.array(magnitude) - model
 
-        for ph in PH:
-            scaledPH.append(np.array(ph) - ph[0])
-        return A, PH, scaledPH
+        PH = np.asarray(PH)
+        scaledPH =  PH - PH[:,0].reshape((len(PH), 1))
 
-    def fit(self, magnitude, time):
-        A, PH, sPH = self._components(magnitude, time)
+        return A, scaledPH
+
+    def fit(self, magnitude, time, ofac):
+        A, sPH = self._components(magnitude, time, ofac)
         result = {
             "Freq1_harmonics_amplitude_0": A[0][0],
             "Freq1_harmonics_amplitude_1": A[0][1],
