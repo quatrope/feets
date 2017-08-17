@@ -103,26 +103,27 @@ class FourierComponents(Extractor):
                 time, magnitude, ofac, 100.)
 
             fundamental_Freq = wk1[jmax]
-            Atemp, PHtemp, popts = [], [], []
+            Atemp, PHtemp = [], []
+            omagnitude = magnitude
 
             for j in range(4):
                 function_to_fit = self._yfunc_maker((j + 1) * fundamental_Freq)
-                popt, pcov = curve_fit(function_to_fit, time, magnitude)
-                Atemp.append(np.sqrt(popt[0] ** 2 + popt[1] ** 2))
-                PHtemp.append(np.arctan(popt[1] / popt[0]))
-                popts.append(popt)
+                popt0, popt1, popt2 = curve_fit(
+                    function_to_fit, time, omagnitude)[0][:3]
+
+                Atemp.append(np.sqrt(popt0 ** 2 + popt1 ** 2))
+                PHtemp.append(np.arctan(popt1 / popt0))
+
+                model = self._model(
+                    time, popt0, popt1, popt2,
+                    (j+1) * fundamental_Freq)
+                magnitude = np.array(magnitude) - model
 
             A.append(Atemp)
             PH.append(PHtemp)
 
-            for j in range(4):
-                model = self._model(
-                    time, popts[j][0], popts[j][1],
-                    popts[j][2], (j+1) * fundamental_Freq)
-                magnitude = np.array(magnitude) - model
-
         PH = np.asarray(PH)
-        scaledPH =  PH - PH[:,0].reshape((len(PH), 1))
+        scaledPH = PH - PH[:, 0].reshape((len(PH), 1))
 
         return A, scaledPH
 

@@ -106,6 +106,7 @@ def _car_like(parameters, t, x, error_vars):
     # the minus one is to perfor maximization using the minimize function
     return -loglik
 
+
 # =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
