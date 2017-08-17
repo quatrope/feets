@@ -72,24 +72,6 @@ be run in every existent survey (MACHO, EROS, OGLE, Catalina, Pan-STARRS, etc)
 and future surveys (LSST) and the results should be ideally shared in the same
 open way as this library.
 
-Based on FATS:
-
-- **Authors:** Isadora Nun and Pavlos Protopapas
-- **Contributors:** Karim Pichara, Rahul Dave, Daniel Acuña, Nicolás Castro,
-  Cristobal Mackenzie, Andrés Riveros and Ming Zhu
-
-Main difference with FATS:
-
-- Removed licurve retrieval from public surveys (we only do one thing here)
-- Removed all the ``sys.exit()`` calls and replaced with Exceptions
-- PEP-8
-- Python 2 and 3
-- Warnings instead of prints
-- Only one type of results: numpy array.
-- Posibility of register more FeaturesExtractors.
-- Multiprocessing.
-
-
 Basic Install
 -------------
 
@@ -125,3 +107,18 @@ Juan BC
 jbc.develop@gmail.com
 
 `IATE <http://iate.oac.uncor.edu/>`_ - `UNR <http://unr.edu.ar/>`_
+
+----
+
+Based on "FATS" by Isadora Nun and Pavlos Protopapas (https://github.com/isadoranun/FATS)
+
+Main difference with FATS:
+
+- Removed licurve retrieval from public surveys (we only do one thing here)
+- Removed all the ``sys.exit()`` calls and replaced with Exceptions
+- PEP-8
+- Python 2 and 3
+- Warnings instead of prints
+- Only one type of results: numpy array.
+- Posibility of register more FeaturesExtractors.
+- Multiprocessing.
