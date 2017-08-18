@@ -119,8 +119,8 @@ def fasper(x,y,ofac,hifac, MACC=4):
     print('Incompatible arrays.')
     return
 
-  nout  = 0.5*ofac*hifac*n
-  nfreqt = long(ofac*hifac*n*MACC)   #Size the FFT as next power
+  nout  = 0.5 * ofac * hifac * n
+  nfreqt = long(ofac * hifac * n * MACC)   #Size the FFT as next power
   nfreq = 64             # of 2 above nfreqt.
 
   while nfreq < nfreqt:

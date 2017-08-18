@@ -112,6 +112,6 @@ class FATSRegressionTestCase(FeetsTestCase):
         self.assertEqual(len(rdatas), 3)
 
 
-class MPFATSRegressionTestCase(FATSRegressionTestCase):
-
-    FeatureSpaceClass = MPFeatureSpace
+#~ class MPFATSRegressionTestCase(FATSRegressionTestCase):
+#~
+    #~ FeatureSpaceClass = MPFeatureSpace
