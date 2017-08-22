@@ -33,9 +33,8 @@ from __future__ import print_function
 from numpy import *
 from numpy.fft import *
 
-import numba
 
-@numba.jit
+
 def __spread__(y, yy, n, x, m):
   """
   Given an array yy(0:n-1), extirpolate (spread) a value y into
@@ -71,7 +70,7 @@ def __spread__(y, yy, n, x, m):
       nden=(nden/(j+1-ilo))*(j-ihi)
       yy[j] = yy[j] + y*fac/(nden*(x-j))
 
-@numba.jit
+
 def fasper(x,y,ofac,hifac, MACC=4):
   """ function fasper
     Given abscissas x (which need not be equally spaced) and ordinates
@@ -197,7 +196,7 @@ def fasper(x,y,ofac,hifac, MACC=4):
 
   return wk1,wk2,nout,jmax,prob
 
-@numba.jit
+
 def getSignificance(wk1, wk2, nout, ofac):
   """ returns the peak false alarm probabilities
   Hence the lower is the probability and the more significant is the peak
