@@ -44,30 +44,9 @@ __doc__ = """"""
 
 import numpy as np
 
-from astropy.stats import lombscargle
-
-from ..libs import fap
+from ..libs import lomb
 
 from .core import Extractor
-
-
-# =============================================================================
-# FUNCTIONS
-# =============================================================================
-
-def fasper(time, magnitude, error=None,
-           model_kwds=None, autopower_kwds=None):
-
-    model_kwds = model_kwds or {}
-    autopower_kwds = autopower_kwds or {}
-    model = lombscargle.LombScargle(time, magnitude, error, **model_kwds)
-    frequency, power = model.autopower(**autopower_kwds)
-
-    fmax = np.argmax(power)
-
-    best_period = 1 / frequency[fmax]
-
-    return frequency, power, fmax
 
 
 # =============================================================================
@@ -78,15 +57,15 @@ class LombScargle(Extractor):
 
     data = ['magnitude', 'time']
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
-    params = {"fasper_kwds": None}
+    params = {"ofac": 6.}
 
-    def _compute_ls(self, magnitude, time, fasper_kwds):
-        frequency, power, fmax = fasper(time, magnitude, **fasper_kwds)
+    def _compute_ls(self, magnitude, time, ofac):
+        fx, fy, nout, jmax, prob = lomb.fasper(time, magnitude, ofac, 100.)
+        period = fx[jmax]
+        T = 1.0 / period
+        new_time = np.mod(time, 2 * T) / (2 * T)
 
-        best_period = 1 / frequency[fmax]
-        new_time = np.mod(time, 2 * best_period) / (2 * best_period)
-
-        return best_period, new_time
+        return T, new_time, prob, period
 
     def _compute_cs(self, folded_data, N):
         sigma = np.std(folded_data)
@@ -101,10 +80,8 @@ class LombScargle(Extractor):
                    np.sum(np.power(folded_data[1:] - folded_data[:-1], 2)))
         return Psi_eta
 
-    def fit(self, magnitude, time, fasper_kwds):
-        fasper_kwds = fasper_kwds or {}
-
-        best_period, new_time = self._compute_ls(magnitude, time, fasper_kwds)
+    def fit(self, magnitude, time, ofac):
+        T, new_time, prob, period = self._compute_ls(magnitude, time, ofac)
 
         folded_data = magnitude[np.argsort(new_time)]
         N = len(folded_data)
@@ -112,5 +89,5 @@ class LombScargle(Extractor):
         R = self._compute_cs(folded_data, N)
         Psi_eta = self._compute_eta(folded_data, N)
 
-        return {"PeriodLS": best_period, "Period_fit": 1,
+        return {"PeriodLS": T, "Period_fit": prob,
                 "Psi_CS": R, "Psi_eta": Psi_eta}
