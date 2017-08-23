@@ -55,8 +55,8 @@ from .core import Extractor
 # FUNCTIONS
 # =============================================================================
 
-def fasper(time, magnitude, error=None,
-           model_kwds=None, autopower_kwds=None):
+def lscargle(time, magnitude, error=None,
+             model_kwds=None, autopower_kwds=None):
 
     model_kwds = model_kwds or {}
     autopower_kwds = autopower_kwds or {}
@@ -78,10 +78,10 @@ class LombScargle(Extractor):
 
     data = ['magnitude', 'time']
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
-    params = {"fasper_kwds": None}
+    params = {"lscargle_kwds": None}
 
-    def _compute_ls(self, magnitude, time, fasper_kwds):
-        frequency, power, fmax = fasper(time, magnitude, **fasper_kwds)
+    def _compute_ls(self, magnitude, time, lscargle_kwds):
+        frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)
 
         best_period = 1 / frequency[fmax]
         new_time = np.mod(time, 2 * best_period) / (2 * best_period)
@@ -101,10 +101,10 @@ class LombScargle(Extractor):
                    np.sum(np.power(folded_data[1:] - folded_data[:-1], 2)))
         return Psi_eta
 
-    def fit(self, magnitude, time, fasper_kwds):
-        fasper_kwds = fasper_kwds or {}
+    def fit(self, magnitude, time, lscargle_kwds):
+        lscargle_kwds = lscargle_kwds or {}
 
-        best_period, new_time = self._compute_ls(magnitude, time, fasper_kwds)
+        best_period, new_time = self._compute_ls(magnitude, time, lscargle_kwds)
 
         folded_data = magnitude[np.argsort(new_time)]
         N = len(folded_data)

@@ -46,7 +46,8 @@ import numpy as np
 
 from scipy.optimize import curve_fit
 
-from .ext_lomb_scargle import lscargle
+from ..libs import lomb
+
 from .core import Extractor
 
 
@@ -81,7 +82,7 @@ class FourierComponents(Extractor):
                 'Freq3_harmonics_rel_phase_1',
                 'Freq3_harmonics_rel_phase_2',
                 'Freq3_harmonics_rel_phase_3']
-    params = {"lscargle_kwds": None}
+    params = {"ofac": 6.}
 
     def _model(self, x, a, b, c, Freq):
         return (a * np.sin(2 * np.pi * Freq * x) +
@@ -93,14 +94,15 @@ class FourierComponents(Extractor):
                     b * np.cos(2 * np.pi * Freq * x) + c)
         return func
 
-    def _components(self, magnitude, time, lscargle_kwds):
-        print lscargle_kwds
+    def _components(self, magnitude, time, ofac):
         time = time - np.min(time)
         A, PH = [], []
         for i in range(3):
-            frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)
 
-            fundamental_Freq = frequency[fmax]
+            wk1, wk2, nout, jmax, prob = lomb.fasper(
+                time, magnitude, ofac, 100.)
+
+            fundamental_Freq = wk1[jmax]
             Atemp, PHtemp = [], []
             omagnitude = magnitude
 
@@ -125,10 +127,8 @@ class FourierComponents(Extractor):
 
         return A, scaledPH
 
-    def fit(self, magnitude, time, lscargle_kwds):
-        lscargle_kwds = lscargle_kwds or {}
-
-        A, sPH = self._components(magnitude, time, lscargle_kwds)
+    def fit(self, magnitude, time, ofac):
+        A, sPH = self._components(magnitude, time, ofac)
         result = {
             "Freq1_harmonics_amplitude_0": A[0][0],
             "Freq1_harmonics_amplitude_1": A[0][1],
