@@ -46,7 +46,8 @@ import numpy as np
 
 from astropy.stats import lombscargle
 
-from ..libs import ls_fap
+# TODO: Fuck
+# from ..libs import ls_fap
 
 from .core import Extractor
 
@@ -102,7 +103,8 @@ class LombScargle(Extractor):
     def fit(self, magnitude, time, lscargle_kwds):
         lscargle_kwds = lscargle_kwds or {}
 
-        best_period, new_time = self._compute_ls(magnitude, time, lscargle_kwds)
+        best_period, new_time = self._compute_ls(
+            magnitude, time, lscargle_kwds)
 
         folded_data = magnitude[np.argsort(new_time)]
         N = len(folded_data)
