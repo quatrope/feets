@@ -46,7 +46,7 @@ import numpy as np
 
 from astropy.stats import lombscargle
 
-from ..libs import fap
+from ..libs import ls_fap
 
 from .core import Extractor
 
