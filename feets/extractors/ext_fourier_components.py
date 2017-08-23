@@ -94,7 +94,6 @@ class FourierComponents(Extractor):
         return func
 
     def _components(self, magnitude, time, lscargle_kwds):
-        print lscargle_kwds
         time = time - np.min(time)
         A, PH = [], []
         for i in range(3):
