@@ -65,8 +65,6 @@ def lscargle(time, magnitude, error=None,
 
     fmax = np.argmax(power)
 
-    best_period = 1 / frequency[fmax]
-
     return frequency, power, fmax
 
 
