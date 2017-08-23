@@ -52,7 +52,7 @@ import feets
 # CONSTANTS
 # =============================================================================
 
-REQUIREMENTS = ["numpy", "scipy", "six", "statsmodels", "mock", "numba"]
+REQUIREMENTS = ["numpy", "scipy", "six", "statsmodels", "mock", "astropy"]
 
 
 # =============================================================================
