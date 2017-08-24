@@ -46,9 +46,9 @@ import numpy as np
 
 from scipy.optimize import curve_fit
 
-from ..libs import lomb
+import lomb
 
-from .core import Extractor
+from feets import Extractor
 
 
 # =============================================================================

@@ -52,6 +52,13 @@ from .core import Extractor
 
 
 # =============================================================================
+# CONSTANTS
+# =============================================================================
+
+EPS = np.finfo(float).eps
+
+
+# =============================================================================
 # FUNCTIONS
 # =============================================================================
 
@@ -68,8 +75,11 @@ def lscargle(time, magnitude, error=None,
     return frequency, power, fmax
 
 
-def fap(power, fmax, time, mag, method, normalization, method_kwds)
-    ls_fap.false_alarm_probability(power.max(), fmax, t, y, dy=eps, method="simple", normalization="standard")
+def fap(power, fmax, time, mag, method, normalization, method_kwds=None):
+    method_kwds = method_kwds or {}
+    return ls_fap.false_alarm_probability(
+        power, fmax, time, mag,
+        dy=0.01, method=method, normalization=normalization)
 
 
 # =============================================================================
@@ -80,15 +90,21 @@ class LombScargle(Extractor):
 
     data = ['magnitude', 'time']
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
-    params = {"lscargle_kwds": None}
+    params = {
+        "lscargle_kwds": {
+            "autopower_kwds": {"normalization": "standard"}},
+        "fap_kwds": {
+            "normalization": "standard",
+            "method": "simple"}
+    }
 
     def _compute_ls(self, magnitude, time, lscargle_kwds):
         frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)
-
         best_period = 1 / frequency[fmax]
-
         return frequency, power, fmax, best_period
 
+    def _compute_fap(self, power, fmax, time, magnitude, fap_kwds):
+        return fap(np.max(power), fmax, time, magnitude, **fap_kwds)
 
     def _compute_cs(self, folded_data, N):
         sigma = np.std(folded_data)
@@ -104,17 +120,20 @@ class LombScargle(Extractor):
         return Psi_eta
 
     def fit(self, magnitude, time, lscargle_kwds, fap_kwds):
-        lscargle_kwds = lscargle_kwds or {}
-
-        frequency, power, fmax, best_period, new_time = self._compute_ls(
+        # first we retrieve the frequencies, power,
+        # max frequency and best_period
+        frequency, power, fmax, best_period = self._compute_ls(
             magnitude, time, lscargle_kwds)
 
-        fap = self._compute_fap(power, fmax, time, magnitude, **fap_kwds)
+        # false alarm probability
+        fap = self._compute_fap(power, fmax, time, magnitude, fap_kwds)
 
+        # fold the data
         new_time = np.mod(time, 2 * best_period) / (2 * best_period)
         folded_data = magnitude[np.argsort(new_time)]
         N = len(folded_data)
 
+        # CS and Psi_eta
         R = self._compute_cs(folded_data, N)
         Psi_eta = self._compute_eta(folded_data, N)
 

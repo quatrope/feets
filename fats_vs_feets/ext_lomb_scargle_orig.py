@@ -44,9 +44,9 @@ __doc__ = """"""
 
 import numpy as np
 
-from ..libs import lomb
+import lomb
 
-from .core import Extractor
+from feets import Extractor
 
 
 # =============================================================================
