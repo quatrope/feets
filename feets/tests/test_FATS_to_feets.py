@@ -88,11 +88,17 @@ class FATSRegressionTestCase(FeetsTestCase):
         # creates an template for all error, messages
         self.err_template = ("Feature '{feature}' missmatch.")
 
+    def exclude_value_feature_evaluation(self, feature):
+        return (
+            "_harmonics_" in feature or
+            feature in ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"])
+
     def assertFATS(self, feets_result):
-        return
         for feature in self.features:
             if feature not in feets_result:
                 self.fail("Missing feature {}".format(feature))
+            if self.exclude_value_feature_evaluation(feature):
+                continue
             feets_value = feets_result[feature]
             FATS_value = self.FATS_result[feature]
             err_msg = self.err_template.format(feature=feature)
