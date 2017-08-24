@@ -46,8 +46,7 @@ import numpy as np
 
 from astropy.stats import lombscargle
 
-# TODO: Fuck
-# from ..libs import ls_fap
+from ..libs import ls_fap
 
 from .core import Extractor
 
@@ -69,6 +68,10 @@ def lscargle(time, magnitude, error=None,
     return frequency, power, fmax
 
 
+def fap(power, fmax, time, mag, method, normalization, method_kwds)
+    ls_fap.false_alarm_probability(power.max(), fmax, t, y, dy=eps, method="simple", normalization="standard")
+
+
 # =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
@@ -83,9 +86,9 @@ class LombScargle(Extractor):
         frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)
 
         best_period = 1 / frequency[fmax]
-        new_time = np.mod(time, 2 * best_period) / (2 * best_period)
 
-        return best_period, new_time
+        return frequency, power, fmax, best_period
+
 
     def _compute_cs(self, folded_data, N):
         sigma = np.std(folded_data)
@@ -100,17 +103,20 @@ class LombScargle(Extractor):
                    np.sum(np.power(folded_data[1:] - folded_data[:-1], 2)))
         return Psi_eta
 
-    def fit(self, magnitude, time, lscargle_kwds):
+    def fit(self, magnitude, time, lscargle_kwds, fap_kwds):
         lscargle_kwds = lscargle_kwds or {}
 
-        best_period, new_time = self._compute_ls(
+        frequency, power, fmax, best_period, new_time = self._compute_ls(
             magnitude, time, lscargle_kwds)
 
+        fap = self._compute_fap(power, fmax, time, magnitude, **fap_kwds)
+
+        new_time = np.mod(time, 2 * best_period) / (2 * best_period)
         folded_data = magnitude[np.argsort(new_time)]
         N = len(folded_data)
 
         R = self._compute_cs(folded_data, N)
         Psi_eta = self._compute_eta(folded_data, N)
 
-        return {"PeriodLS": best_period, "Period_fit": 1,
+        return {"PeriodLS": best_period, "Period_fit": fap,
                 "Psi_CS": R, "Psi_eta": Psi_eta}

@@ -201,8 +201,6 @@ def fap_simple(Z, fmax, t, y, dy, normalization='standard'):
     T = max(t) - min(t)
     N_eff = fmax * T
     p_s = cdf_single(Z, N, normalization=normalization)
-    print(Z)
-    print(p_s)
     return 1 - p_s ** N_eff
 
 
