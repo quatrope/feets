@@ -106,16 +106,15 @@ class FeatureSpaceTestCase(FeetsTestCase):
 
         self.space = self.FeatureSpaceCls(only=["Same"])
 
-        data = np.array([
-            [4], [1], [2], [3]
-        ])
+        for _ in range(200):
+            data = np.unique(np.random.randint(1, 1000, 10))
+            np.random.shuffle(data)
+            data = data.reshape((len(data), 1, 1))
 
-        features, values_col = self.space.extract(data)
+            features, values_col = self.space.extract(data)
 
-        import ipdb; ipdb.set_trace()
-
-
-
+            self.assertArrayEqual(data.squeeze(), values_col.squeeze())
+            self.assertEquals(values_col.shape, data.shape[:-1])
 
 
 class MPFeatureSpaceTestCase(FeatureSpaceTestCase):
