@@ -69,7 +69,7 @@ def do_setup():
         author_email=feets.EMAIL,
         url=feets.URL,
         license=feets.LICENSE,
-        keywords=", ".join(feets.KEYWORDS),
+        keywords=list(feets.KEYWORDS),
         package_data={"feets.tests.data": ['tests/data/*.*']},
         include_package_data=True,
         classifiers=[
@@ -92,7 +92,6 @@ def do_setup():
         py_modules=["ez_setup"],
         install_requires=REQUIREMENTS,
     )
-
 
 if __name__ == "__main__":
     do_setup()
