@@ -69,7 +69,7 @@ def do_setup():
         author_email=feets.EMAIL,
         url=feets.URL,
         license=feets.LICENSE,
-        keywords=" ".join(feets.KEYWORDS),
+        keywords=", ".join(feets.KEYWORDS),
         package_data={"feets.tests.data": ['tests/data/*.*']},
         include_package_data=True,
         classifiers=[
