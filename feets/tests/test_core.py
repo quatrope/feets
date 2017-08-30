@@ -44,7 +44,9 @@ __doc__ = """All feets base tests"""
 
 import numpy as np
 
-from .. import MPFeatureSpace, FeatureSpace
+import mock
+
+from .. import MPFeatureSpace, FeatureSpace, Extractor, register_extractor
 
 from .core import FeetsTestCase
 
@@ -90,6 +92,30 @@ class FeatureSpaceTestCase(FeetsTestCase):
         for values in values_col:
             self.assertTrue(len(features) == 1 and features[0] == "Amplitude")
             self.assertAllClose(values[features == "Amplitude"], 0.45203809)
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_features_order(self):
+
+        @register_extractor
+        class ReturnSame(Extractor):
+            data = ["magnitude"]
+            features = ["Same"]
+
+            def fit(self, magnitude):
+                return {"Same": magnitude[0]}
+
+        self.space = self.FeatureSpaceCls(only=["Same"])
+
+        data = np.array([
+            [4], [1], [2], [3]
+        ])
+
+        features, values_col = self.space.extract(data)
+
+        import ipdb; ipdb.set_trace()
+
+
+
 
 
 class MPFeatureSpaceTestCase(FeatureSpaceTestCase):
