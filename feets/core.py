@@ -290,22 +290,12 @@ class MPFeatureSpace(FeatureSpace):
             self.__str = "<MPFeatureSpace: {}>".format(space)
         return self.__str
 
-    def chunk_it(self, seq, num):
-        avg = len(seq) / float(num)
-        out = []
-        last = 0.0
-        while last < len(seq):
-            out.append(seq[int(last):int(last + avg)])
-            last += avg
-        return sorted(out, reverse=True)
-
     def extract(self, data, procn=CPU_COUNT, **kwargs):
         procs, fvalues = [], []
-        for chunk in self.chunk_it(data, procn):
-            if chunk:
-                proc = self._proccls(self, chunk, **kwargs)
-                proc.start()
-                procs.append(proc)
+        for chunk in np.array_split(data, procn):
+            proc = self._proccls(self, chunk, **kwargs)
+            proc.start()
+            procs.append(proc)
         for proc in procs:
             proc.join()
             fvalues.extend(proc.result_)
