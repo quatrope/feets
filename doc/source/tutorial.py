@@ -2,6 +2,8 @@
 
 # JSAnimation import available at https://github.com/jakevdp/JSAnimation
 
+import warnings
+
 import numpy as np
 
 import jinja2
@@ -12,6 +14,8 @@ from matplotlib import animation
 from JSAnimation import IPython_display
 
 from IPython.display import Image, HTML, YouTubeVideo
+
+warnings.simplefilter("ignore", FutureWarning)
 
 import feets
 
@@ -84,14 +88,14 @@ def features_table():
             continue
         row = (
             feature,
-            ext.get_features().difference([feature]), 
-            ext.get_dependencies(), 
+            ext.get_features().difference([feature]),
+            ext.get_dependencies(),
             ext.get_data())
         rows.append(row)
 
     FourierComponents = feets.extractor_of("Freq2_harmonics_rel_phase_0")
     rows.append((
-        "Freq{i}_harmonics_amplitude_{j}", 
+        "Freq{i}_harmonics_amplitude_{j}",
         ["Freq{i}_harmonics_amplitude_{j} and Freq{i}_harmonics_rel_phase_{j}"],
         FourierComponents.get_dependencies(), FourierComponents.get_data()
     ))

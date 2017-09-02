@@ -8,3 +8,29 @@ div.input_area {
     background-color: transparent !important;
     border: none !important;
 }
+
+div.note {
+    background-color: #6595c5;
+    border: 1px solid #CCC;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table thead tr th{
+background-color: #6595c5;
+}
+
+table thead tr th,
+table tbody tr td {
+    border: 1px solid #CCC;
+    margin: 0px;
+    font-size: 15px;
+    font-family: san-serif;
+
+}
+
+tr:nth-child(even) {
+  background-color: #dde1ff;
+}
