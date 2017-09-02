@@ -4,12 +4,16 @@
 
 import numpy as np
 
+import jinja2
+
 from matplotlib import pyplot as plt
 from matplotlib import animation
 
 from JSAnimation import IPython_display
 
 from IPython.display import Image, HTML, YouTubeVideo
+
+import feets
 
 # introduction
 def ts_anim():
@@ -48,3 +52,48 @@ def macho_example11():
 
 magnitude_ex = np.random.rand(30)
 time_ex = np.arange(0, 30)
+
+# features table
+
+FEATURES_TABLE_TEMPLATE = jinja2.Template("""
+<table class="table-condensed">
+    <thead>
+        <th>Feature</th>
+        <th>Computed with</th>
+        <th>Dependencies</th>
+        <th>Input Data</th>
+    </thead>
+    <tbody>
+        {% for feat, cwith, deps, input in rows %}
+        <tr>
+            <td>{{ feat }}</td>
+            <td>{{ ", ".join(cwith or []) }}</td>
+            <td>{{ ", ".join(deps or []) }}</td>
+            <td>{{ ", ".join(input or []) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+""")
+
+def features_table():
+
+    rows = []
+    for feature, ext in feets.extractors.registered_extractors().items():
+        if "Signature" in feature or "_harmonics_" in feature:
+            continue
+        row = (
+            feature,
+            ext.get_features().difference([feature]), 
+            ext.get_dependencies(), 
+            ext.get_data())
+        rows.append(row)
+
+    FourierComponents = feets.extractor_of("Freq2_harmonics_rel_phase_0")
+    rows.append((
+        "Freq{i}_harmonics_amplitude_{j}", 
+        ["Freq{i}_harmonics_amplitude_{j} and Freq{i}_harmonics_rel_phase_{j}"],
+        FourierComponents.get_dependencies(), FourierComponents.get_data()
+    ))
+
+    return HTML(FEATURES_TABLE_TEMPLATE.render(rows=sorted(rows)))
