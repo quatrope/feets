@@ -60,6 +60,11 @@ def load_macho_example():
     """lightcurve of 2 bands from the MACHO survey.
     The Id of the source is 1.3444.614
 
+    Notes
+    -----
+
+    The files are gathered from the original FATS project tutorial:
+    https://github.com/isadoranun/tsfeat
 
     """
     path = os.path.join(DATA_PATH, "lc_1.3444.614.B_R.npz")
