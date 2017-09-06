@@ -38,8 +38,6 @@
 
 import os
 
-import six
-
 import numpy as np
 
 
