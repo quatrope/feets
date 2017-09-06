@@ -101,3 +101,24 @@ def features_table():
     ))
 
     return HTML(FEATURES_TABLE_TEMPLATE.render(rows=sorted(rows)))
+
+RESULT_TABLE_TEMPLATE = jinja2.Template("""
+<table class="table-condensed">
+    <thead>
+        <th>Feature</th>
+        <th>Value</th>
+    </thead>
+    <tbody>
+        {% for k, v in rows %}
+        <tr>
+            <td>{{ k }}</td>
+            <td>{{ v }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+""")
+
+def as_table(features, values):
+    rows = zip(features, values)
+    return HTML(RESULT_TABLE_TEMPLATE.render(rows=rows))
