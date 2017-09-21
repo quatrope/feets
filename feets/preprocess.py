@@ -70,7 +70,7 @@ def remove_noise(time, mag, error, error_limit=3, std_limit=5):
     mjd_out = np.asarray(mjd_out)
     error_out = np.asarray(error_out)
 
-    return data_out, mjd_out, error_out
+    return mjd_out, data_out, error_out
 
 
 def align(time, time2, mag, mag2, error, error2):
