@@ -59,7 +59,7 @@ class RemoveNoiseTestCase(FeetsTestCase):
         time = np.arange(5)
         mag = np.random.rand(5)
         error = np.zeros(5)
-        preprocess.remove_noise(mag, time, error)
+        preprocess.remove_noise(time, mag, error)
 
 
 class AlignTestCase(FeetsTestCase):
@@ -76,7 +76,7 @@ class AlignTestCase(FeetsTestCase):
         error2 = error[time2]
 
         atime, amag, amag2, aerror, aerror2 = preprocess.align(
-            mag, mag2, time, time2, error, error2)
+            time, time2, mag, mag2, error, error2)
 
         self.assertArrayEqual(amag, amag2)
         self.assertTrue(
@@ -102,7 +102,7 @@ class AlignTestCase(FeetsTestCase):
         error2 = np.hstack((error, np.random.rand(1)))[time2]
 
         atime, amag, amag2, aerror, aerror2 = preprocess.align(
-            mag, mag2, time, time2, error, error2)
+            time, time2, mag, mag2, error, error2)
 
         self.assertArrayEqual(amag, amag2)
         self.assertArrayEqual(aerror, aerror2)

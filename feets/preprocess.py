@@ -41,7 +41,7 @@ __all__ = [
 # FUNCTIONS
 # =============================================================================
 
-def remove_noise(mag, time, error, error_limit=3, std_limit=5):
+def remove_noise(time, mag, error, error_limit=3, std_limit=5):
     """Points within 'std_limit' standard deviations from the mean and with
     errors greater than 'error_limit' times the error mean are
     considered as noise and thus are eliminated.
@@ -73,7 +73,7 @@ def remove_noise(mag, time, error, error_limit=3, std_limit=5):
     return data_out, mjd_out, error_out
 
 
-def align(mag, mag2, time, time2, error, error2):
+def align(time, time2, mag, mag2, error, error2):
     """Synchronizes the light-curves in the two different bands.
 
     Returns
