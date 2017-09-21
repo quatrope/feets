@@ -27,7 +27,10 @@
 # DOCS
 # =============================================================================
 
-"""Base IO code for all datasets
+"""IO code for read some macho lightcurves
+
+The files are gathered from the original FATS project tutorial:
+https://github.com/isadoranun/tsfeat
 
 """
 
@@ -47,7 +50,9 @@ import numpy as np
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 
-DATA_PATH = os.path.join(PATH, "data")
+DATA_PATH = os.path.join(PATH, "data", "macho")
+
+AVAILABLE_IDS = [fp.rsplit(".", 2)[0] for fp in os.listdir(DATA_PATH)]
 
 
 # =============================================================================
@@ -55,7 +60,7 @@ DATA_PATH = os.path.join(PATH, "data")
 # =============================================================================
 
 def load_macho_example():
-    """lightcurve of 2 bands from the MACHO survey.
+    """lightcurve of 2 bands (R, B) from the MACHO survey.
     The Id of the source is 1.3444.614
 
     Notes
@@ -65,16 +70,29 @@ def load_macho_example():
     https://github.com/isadoranun/tsfeat
 
     """
-    path = os.path.join(DATA_PATH, "lc_1.3444.614.B_R.npz")
-    with np.load(path) as npz:
-        lc = (
-            npz['mag'],
-            npz['time'],
-            npz['error'],
-            npz['mag2'],
-            npz['aligned_mag'],
-            npz['aligned_mag2'],
-            npz['aligned_time'],
-            npz['aligned_error'],
-            npz['aligned_error2'])
-    return lc
+    return load_macho("lc_1.3444.614")
+
+
+def load_macho(macho_id):
+    """lightcurve of 2 bands (R, B) from the MACHO survey.
+
+    Notes
+    -----
+
+    The files are gathered from the original FATS project tutorial:
+    https://github.com/isadoranun/tsfeat
+
+    """
+    if macho_id not in AVAILABLE_IDS:
+        raise ValueError("macho_id must be one of: {}".format(AVAILABLE_IDS))
+    tarfile = "{}.tar.bz2".format(macho_id)
+    tarpath = os.path.join(DATA_PATH, tarfile)
+
+    rpath = "{}.R.mjd".format(macho_id)
+    bpath = "{}.B.mjd".format(macho_id)
+    with tarfile.open(tarpath, mode="r:bz2") as tf:
+        rlc = np.loadtxt(tf.extractfile(rpath))
+        blc = np.loadtxt(tf.extractfile(bpath))
+    rtime, rmag, rerror = rlc[:, 0], rlc[:, 1], rlc[:, 2]
+    btime, bmag, berror = blc[:, 0], blc[:, 1], blc[:, 2]
+    return rtime, btime, rmag, bmag, rerror, berror

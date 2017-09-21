@@ -46,7 +46,7 @@ import os
 
 import numpy as np
 
-from .. import FeatureSpace, MPFeatureSpace, datasets
+from .. import FeatureSpace, MPFeatureSpace
 
 from .core import FeetsTestCase
 
@@ -63,9 +63,21 @@ class FATSRegressionTestCase(FeetsTestCase):
         # the paths
         self.data_path = os.path.join(
             os.path.abspath(os.path.dirname(__file__)), "data")
+        self.lc_path = os.path.join(self.data_path, "FATS_aligned.npz")
         self.FATS_result_path = os.path.join(self.data_path, "FATS_result.npz")
 
-        self.lc = datasets.load_macho_example()
+        # recreate light curve
+        with np.load(self.lc_path) as npz:
+            self.lc = (
+                npz['mag'],
+                npz['time'],
+                npz['error'],
+                npz['mag2'],
+                npz['aligned_mag'],
+                npz['aligned_mag2'],
+                npz['aligned_time'],
+                npz['aligned_error'],
+                npz['aligned_error2'])
 
         # recreate the FATS result
         with np.load(self.FATS_result_path) as npz:

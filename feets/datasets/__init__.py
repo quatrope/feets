@@ -38,4 +38,4 @@ including methods to load and fetch some example light curves.
 # IMPORTS
 # =============================================================================
 
-from .base import load_macho_example # noqa
+from .macho import load_macho, load_macho_example # noqa
