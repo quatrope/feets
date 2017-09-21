@@ -74,6 +74,15 @@ class FATSPreprocessRegressionTestCase(FeetsTestCase):
             self.pF_mag, self.pF_mag2 = npz["mag"], npz["mag2"]
             self.pF_error, self.pF_error2 = npz["error"], npz["error2"]
 
+        self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
+        with np.load(self.lc_path) as npz:
+            self.aF_time = npz['aligned_time']
+            self.aF_mag = npz['aligned_mag']
+            self.aF_mag2 = npz['aligned_mag2']
+            self.aF_error = npz['aligned_error']
+            self.aF_error2 = npz['aligned_error2']
+
+
     def test_remove_noise(self):
         p_time, p_mag, p_error = preprocess.remove_noise(
             self.time, self.mag, self.error)
@@ -85,6 +94,17 @@ class FATSPreprocessRegressionTestCase(FeetsTestCase):
         self.assertArrayEqual(p_mag2, self.pF_mag2)
         self.assertArrayEqual(p_error, self.pF_error)
         self.assertArrayEqual(p_error2, self.pF_error2)
+
+    def test_align(self):
+        a_time, a_mag, a_mag2, a_error, a_error2 = preprocess.align(
+            self.pF_time, self.pF_time2,
+            self.pF_mag, self.pF_mag2,
+            self.pF_error, self.pF_error2)
+        self.assertArrayEqual(a_time, self.aF_time)
+        self.assertArrayEqual(a_mag, self.aF_mag)
+        self.assertArrayEqual(a_mag2, self.aF_mag2)
+        self.assertArrayEqual(a_error, self.aF_error)
+        self.assertArrayEqual(a_error2, self.aF_error2)
 
 #~ class FATSRegressionTestCase(FeetsTestCase):
 

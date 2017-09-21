@@ -40,6 +40,7 @@ https://github.com/isadoranun/tsfeat
 # =============================================================================
 
 import os
+import tarfile
 
 import numpy as np
 
@@ -85,8 +86,8 @@ def load_macho(macho_id):
     """
     if macho_id not in AVAILABLE_IDS:
         raise ValueError("macho_id must be one of: {}".format(AVAILABLE_IDS))
-    tarfile = "{}.tar.bz2".format(macho_id)
-    tarpath = os.path.join(DATA_PATH, tarfile)
+    tarfname = "{}.tar.bz2".format(macho_id)
+    tarpath = os.path.join(DATA_PATH, tarfname)
 
     rpath = "{}.R.mjd".format(macho_id)
     bpath = "{}.B.mjd".format(macho_id)
