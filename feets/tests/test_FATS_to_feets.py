@@ -82,7 +82,6 @@ class FATSPreprocessRegressionTestCase(FeetsTestCase):
             self.aF_error = npz['aligned_error']
             self.aF_error2 = npz['aligned_error2']
 
-
     def test_remove_noise(self):
         p_time, p_mag, p_error = preprocess.remove_noise(
             self.time, self.mag, self.error)

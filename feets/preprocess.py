@@ -106,7 +106,7 @@ def align(time, time2, mag, mag2, error, error2):
     # recreate columns
     new_time = merged.index.values
     new_mag, new_mag2 = merged.mag.values, merged.mag2.values
-    new_error, new_error2 = merged.error.values, merged.error.values
+    new_error, new_error2 = merged.error.values, merged.error2.values
 
     if len(time) > len(time2):
         new_mag, new_mag2 = new_mag2, new_mag
