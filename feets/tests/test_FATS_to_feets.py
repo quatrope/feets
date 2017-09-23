@@ -105,68 +105,69 @@ class FATSPreprocessRegressionTestCase(FeetsTestCase):
         self.assertArrayEqual(a_error, self.aF_error)
         self.assertArrayEqual(a_error2, self.aF_error2)
 
-#~ class FATSRegressionTestCase(FeetsTestCase):
 
-    #~ FeatureSpaceClass = FeatureSpace
+class FATSRegressionTestCase(FeetsTestCase):
 
-    #~ def setUp(self):
-        #~ # the paths
-        #~ self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
-        #~ self.FATS_result_path = os.path.join(DATA_PATH, "FATS_result.npz")
+    FeatureSpaceClass = FeatureSpace
 
-        #~ # recreate light curve
-        #~ with np.load(self.lc_path) as npz:
-            #~ self.lc = (
-                #~ npz['mag'],
-                #~ npz['time'],
-                #~ npz['error'],
-                #~ npz['mag2'],
-                #~ npz['aligned_mag'],
-                #~ npz['aligned_mag2'],
-                #~ npz['aligned_time'],
-                #~ npz['aligned_error'],
-                #~ npz['aligned_error2'])
+    def setUp(self):
+        # the paths
+        self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
+        self.FATS_result_path = os.path.join(DATA_PATH, "FATS_result.npz")
 
-        #~ # recreate the FATS result
-        #~ with np.load(self.FATS_result_path) as npz:
-            #~ self.features = npz["features"]
-            #~ self.features = self.features.astype("U")
-            #~ self.FATS_result = dict(zip(self.features, npz["values"]))
+        # recreate light curve
+        with np.load(self.lc_path) as npz:
+            self.lc = (
+                npz['mag'],
+                npz['time'],
+                npz['error'],
+                npz['mag2'],
+                npz['aligned_mag'],
+                npz['aligned_mag2'],
+                npz['aligned_time'],
+                npz['aligned_error'],
+                npz['aligned_error2'])
 
-        #~ # creates an template for all error, messages
-        #~ self.err_template = ("Feature '{feature}' missmatch.")
+        # recreate the FATS result
+        with np.load(self.FATS_result_path) as npz:
+            self.features = npz["features"]
+            self.features = self.features.astype("U")
+            self.FATS_result = dict(zip(self.features, npz["values"]))
 
-    #~ def exclude_value_feature_evaluation(self, feature):
-        #~ return (
-            #~ "_harmonics_" in feature or
-            #~ feature in ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"])
+        # creates an template for all error, messages
+        self.err_template = ("Feature '{feature}' missmatch.")
 
-    #~ def assertFATS(self, feets_result):
-        #~ for feature in self.features:
-            #~ if feature not in feets_result:
-                #~ self.fail("Missing feature {}".format(feature))
-            #~ if self.exclude_value_feature_evaluation(feature):
-                #~ continue
-            #~ feets_value = feets_result[feature]
-            #~ FATS_value = self.FATS_result[feature]
-            #~ err_msg = self.err_template.format(feature=feature)
-            #~ self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
+    def exclude_value_feature_evaluation(self, feature):
+        return (
+            "_harmonics_" in feature or
+            feature in ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"])
 
-    #~ def test_FATS_to_feets_extract_one(self):
-        #~ fs = self.FeatureSpaceClass()
-        #~ result = fs.extract_one(self.lc)
-        #~ feets_result = dict(zip(*result))
-        #~ self.assertFATS(feets_result)
+    def assertFATS(self, feets_result):
+        for feature in self.features:
+            if feature not in feets_result:
+                self.fail("Missing feature {}".format(feature))
+            if self.exclude_value_feature_evaluation(feature):
+                continue
+            feets_value = feets_result[feature]
+            FATS_value = self.FATS_result[feature]
+            err_msg = self.err_template.format(feature=feature)
+            self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
 
-    #~ def test_FATS_to_feets_extract(self):
-        #~ fs = self.FeatureSpaceClass()
-        #~ rfeatures, rdatas = fs.extract([self.lc] * 3)
-        #~ for result in rdatas:
-            #~ feets_result = dict(zip(rfeatures, result))
-            #~ self.assertFATS(feets_result)
-        #~ self.assertEqual(len(rdatas), 3)
+    def test_FATS_to_feets_extract_one(self):
+        fs = self.FeatureSpaceClass()
+        result = fs.extract_one(self.lc)
+        feets_result = dict(zip(*result))
+        self.assertFATS(feets_result)
+
+    def test_FATS_to_feets_extract(self):
+        fs = self.FeatureSpaceClass()
+        rfeatures, rdatas = fs.extract([self.lc] * 3)
+        for result in rdatas:
+            feets_result = dict(zip(rfeatures, result))
+            self.assertFATS(feets_result)
+        self.assertEqual(len(rdatas), 3)
 
 
-#~ class MPFATSRegressionTestCase(FATSRegressionTestCase):
+class MPFATSRegressionTestCase(FATSRegressionTestCase):
 
-    #~ FeatureSpaceClass = MPFeatureSpace
+    FeatureSpaceClass = MPFeatureSpace
