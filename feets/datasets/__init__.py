@@ -38,4 +38,5 @@ including methods to load and fetch some example light curves.
 # IMPORTS
 # =============================================================================
 
-from .macho import load_macho, load_macho_example # noqa
+from .macho import load_MACHO, load_MACHO_example, available_MACHO_lc  # noqa
+from .ogle3 import load_OGLE3_catalog, fetch_OGLE3  # noqa

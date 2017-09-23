@@ -53,14 +53,19 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 
 DATA_PATH = os.path.join(PATH, "data", "macho")
 
-AVAILABLE_IDS = [fp.rsplit(".", 2)[0] for fp in os.listdir(DATA_PATH)]
-
 
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
 
-def load_macho_example():
+def available_MACHO_lc():
+    """Retrieve a list with the available MACHO lightcurves
+
+    """
+    return [fp.rsplit(".", 2)[0] for fp in os.listdir(DATA_PATH)]
+
+
+def load_MACHO_example():
     """lightcurve of 2 bands (R, B) from the MACHO survey.
     The Id of the source is 1.3444.614
 
@@ -71,10 +76,10 @@ def load_macho_example():
     https://github.com/isadoranun/tsfeat
 
     """
-    return load_macho("lc_1.3444.614")
+    return load_MACHO("lc_1.3444.614")
 
 
-def load_macho(macho_id):
+def load_MACHO(macho_id):
     """lightcurve of 2 bands (R, B) from the MACHO survey.
 
     Notes
@@ -84,8 +89,6 @@ def load_macho(macho_id):
     https://github.com/isadoranun/tsfeat
 
     """
-    if macho_id not in AVAILABLE_IDS:
-        raise ValueError("macho_id must be one of: {}".format(AVAILABLE_IDS))
     tarfname = "{}.tar.bz2".format(macho_id)
     tarpath = os.path.join(DATA_PATH, tarfname)
 

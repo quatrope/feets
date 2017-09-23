@@ -65,7 +65,7 @@ DATA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
 class FATSPreprocessRegressionTestCase(FeetsTestCase):
 
     def setUp(self):
-        d = datasets.load_macho_example()
+        d = datasets.load_MACHO_example()
         self.time, self.time2, self.mag, self.mag2, self.error, self.error2 = d
 
         self.preprc_path = os.path.join(DATA_PATH, "FATS_preprc.npz")

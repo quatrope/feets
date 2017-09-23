@@ -1,0 +1,164 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# The MIT License (MIT)
+
+# Copyright (c) 2017 Juan Cabral
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# =============================================================================
+# DOCS
+# =============================================================================
+
+"""Code for acces the OGLE-III On-line Catalog of Variable Stars.
+
+The main goal of this catalog is to record all variable sources located in the
+OGLE-III fields in the Magellanic Clouds and Galactic bulge. The data
+currently available include:
+
+- classical Cepheids in the Galactic Bulge, LMC and SMC,
+- type II Cepheids in the Galactic Bulge, LMC and SMC,
+- anomalous Cepheids in LMC and SMC,
+- RR Lyrae stars in the Galactic Bulge, LMC and SMC,
+- Long Period Variables in the Galactic Bulge, LMC and SMC,
+- Double Period Variables in LMC,
+- R CrB stars in LMC,
+- Delta Sct stars in LMC.
+
+The catalog data include basic parameters of the stars (coordinates, periods,
+mean magnitudes, amplitudes, parameters of the Fourier light curve
+decompositions), VI multi-epoch photometry collected since 2001, and for
+some stars supplemented with the OGLE-II photometry obtained between
+1997 and 2000, finding charts and cross-identifications with previously
+published catalogs.
+
+**Note to the user:** If you use or refer to the data obtained from this
+catalog in your scientific work, please cite the appropriate papers:
+
+- Udalski, Szymanski, Soszynski and Poleski, 2008, Acta Astron., 58, 69
+  (OGLE-III photometry)
+- Soszynski et al., 2008a, Acta Astron., 58, 163
+  (Classical Cepheids in the LMC)
+- Soszynski et al., 2008b, Acta Astron., 58, 293
+  (Type II and Anomalous Cepheids in the LMC)
+- Soszynski et al., 2009a, Acta Astron., 59, 1
+  (RR Lyrae Stars in the LMC)
+- Soszynski et al., 2009b, Acta Astron., 59, 239
+  (Long Period Variables in the LMC)
+- Soszynski et al., 2009c, Acta Astron., 59, 335
+  (R CrB Variables in the LMC)
+- Poleski et al., 2010a, Acta Astron., 60, 1
+  (δ Scuti Variables in the LMC)
+- Poleski et al., 2010b, Acta Astron., 60, 179
+  (Double Period Variables in the LMC)
+- Soszynski et al., 2010a, Acta Astron., 60, 17
+  (Classical Cepheids in the SMC)
+- Soszynski et al., 2010b, Acta Astron., 60, 91
+  (Type II Cepheids in the SMC)
+- Soszynski et al., 2010c, Acta Astron., 60, 165
+  (RR Lyrae Stars in the SMC)
+- Soszynski et al., 2011a, Acta Astron., 61, 1
+  (RR Lyrae Stars in the Galactic Bulge)
+- Soszynski et al., 2011b, Acta Astron., 61, 217
+  (Long-Period Variables in the Small Magellanic Cloud)
+- Soszynski et al., 2011c, Acta Astron., 61, 285;   2013b,
+  Acta Astron., 63, 37;  (Classical and Type II Cepheids in the Galactic Bulge)
+- Soszynski et al., 2013a, Acta Astron., 63, 21
+  (Long-Period Variables in the Galactic Bulge)
+
+More Info: http://ogledb.astrouw.edu.pl/~ogle/CVS/
+
+"""
+
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+import os
+import bz2
+
+import pandas as pd
+
+from . import base
+
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+
+PATH = os.path.abspath(os.path.dirname(__file__))
+
+CATALOG_PATH = os.path.join(PATH, "data", "ogle3.txt.bz2")
+
+DATA_DIR = "ogle3"
+
+URL = "http://ogledb.astrouw.edu.pl/~ogle/CVS/sendobj.php?starcat={}"
+
+
+# =============================================================================
+# FUNCTIONS
+# =============================================================================
+
+def _get_OGLE3_data_home(data_home):
+    # retrieve the data home
+    data_home = base.get_data_home(data_home=data_home)
+    o3_dh = os.path.join(data_home, DATA_DIR)
+    if not os.path.exists(o3_dh):
+        os.makedirs(o3_dh)
+    return o3_dh
+
+
+def load_OGLE3_catalog():
+    """Return the full list of variables stars of OGLE-3 as a DataFrame
+
+    """
+    with bz2.BZ2File(CATALOG_PATH) as bz2fp:
+        df = pd.read_table(bz2fp, skiprows=6)
+    df.rename(columns={"# ID": "ID"}, inplace=True)
+    return df
+
+
+def fetch_OGLE3(ogle3_id, data_home=None, download_if_missing=True):
+    """Retrieve a lighte curve from OGLE-3 database
+
+    Parameters
+    ----------
+    data_home : optional, default: None
+        Specify another download and cache folder for the datasets. By default
+        all feets data is stored in '~/feets' subfolders.
+    download_if_missing : optional, True by default
+        If False, raise a IOError if the data is not locally available
+        instead of trying to download the data from the source site.
+
+    """
+
+    # retrieve the data dir for ogle
+    store_path = _get_OGLE3_data_home(data_home)
+
+    # the data dir for this lightcurve
+    file_path = os.path.join(store_path, "{}.tar".format(ogle3_id))
+
+    # the url of the lightcurve
+    if download_if_missing:
+        url = URL.format(ogle3_id)
+        base.fetch(url, file_path)
+
+    raise NotImplementedError("Still need to work here")
