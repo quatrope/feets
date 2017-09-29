@@ -66,7 +66,8 @@ class FATSPreprocessRegressionTestCase(FeetsTestCase):
 
     def setUp(self):
         d = datasets.load_MACHO_example()
-        self.time, self.time2, self.mag, self.mag2, self.error, self.error2 = d
+        self.time, self.mag, self.error = d.lc[0]
+        self.time2, self.mag2, self.error2 = d.lc[1]
 
         self.preprc_path = os.path.join(DATA_PATH, "FATS_preprc.npz")
         with np.load(self.preprc_path) as npz:

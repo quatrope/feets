@@ -87,6 +87,10 @@ More Info: http://ogledb.astrouw.edu.pl/~ogle/CVS/
 
 """
 
+# This is for add as descr in every Data instance
+DESCR = "LightCurve from OGLE-3\n\n{}".format(
+    "\n".join(__doc__.splitlines()[2:]))
+
 
 # =============================================================================
 # IMPORTS
@@ -94,6 +98,9 @@ More Info: http://ogledb.astrouw.edu.pl/~ogle/CVS/
 
 import os
 import bz2
+import tarfile
+
+import numpy as np
 
 import pandas as pd
 
@@ -126,6 +133,12 @@ def _get_OGLE3_data_home(data_home):
     return o3_dh
 
 
+def _check_dim(lc):
+    if lc.ndim == 1:
+        lc.shape = 1, 3
+    return lc
+
+
 def load_OGLE3_catalog():
     """Return the full list of variables stars of OGLE-3 as a DataFrame
 
@@ -136,17 +149,28 @@ def load_OGLE3_catalog():
     return df
 
 
-def fetch_OGLE3(ogle3_id, data_home=None, download_if_missing=True):
+def fetch_OGLE3(ogle3_id, data_home=None,
+                metadata=None, download_if_missing=True):
     """Retrieve a lighte curve from OGLE-3 database
 
     Parameters
     ----------
+    ogle3_id : str
+        The id of the source (see: ``load_OGLE3_catalog()`` for
+        available sources.
     data_home : optional, default: None
         Specify another download and cache folder for the datasets. By default
         all feets data is stored in '~/feets' subfolders.
+    metadata : bool | None
+        If it's True, the row of the dataframe from ``load_OGLE3_catalog()``
+        with the metadata of the source are added to the result.
     download_if_missing : optional, True by default
         If False, raise a IOError if the data is not locally available
         instead of trying to download the data from the source site.
+
+    Returns
+    -------
+    a Data object
 
     """
 
@@ -156,9 +180,33 @@ def fetch_OGLE3(ogle3_id, data_home=None, download_if_missing=True):
     # the data dir for this lightcurve
     file_path = os.path.join(store_path, "{}.tar".format(ogle3_id))
 
+    # members of the two bands of ogle3
+    members = {"I": "./{}.I.dat".format(ogle3_id),
+               "V": "./{}.V.dat".format(ogle3_id)}
+
     # the url of the lightcurve
     if download_if_missing:
         url = URL.format(ogle3_id)
         base.fetch(url, file_path)
 
-    raise NotImplementedError("Still need to work here")
+    lcs, bands = [], []
+    with tarfile.TarFile(file_path) as tfp:
+        members_names = tfp.getnames()
+        for band_name, member_name in members.items():
+            if member_name in members_names:
+                member = tfp.getmember(member_name)
+                src = tfp.extractfile(member)
+                lcs.append(_check_dim(np.loadtxt(src)))
+                bands.append(band_name)
+
+    if metadata:
+        cat = load_OGLE3_catalog()
+        metadata = cat[cat.ID == ogle3_id]
+        del cat
+
+    lcs = map(base.split_lc, lcs)
+    data = (base.TIME, base.MAG, base.ERROR)
+
+    return base.Data(
+        lc=tuple(lcs), lcid=ogle3_id, metadata=metadata,
+        DESCR=DESCR, bands=tuple(bands), data=data)

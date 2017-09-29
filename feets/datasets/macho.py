@@ -44,6 +44,8 @@ import tarfile
 
 import numpy as np
 
+from . import base
+
 
 # =============================================================================
 # CONSTANTS
@@ -97,6 +99,13 @@ def load_MACHO(macho_id):
     with tarfile.open(tarpath, mode="r:bz2") as tf:
         rlc = np.loadtxt(tf.extractfile(rpath))
         blc = np.loadtxt(tf.extractfile(bpath))
-    rtime, rmag, rerror = rlc[:, 0], rlc[:, 1], rlc[:, 2]
-    btime, bmag, berror = blc[:, 0], blc[:, 1], blc[:, 2]
-    return rtime, btime, rmag, bmag, rerror, berror
+
+    lcs = map(base.split_lc, [rlc, blc])
+    data = (base.TIME, base.MAG, base.ERROR)
+    bands = ("R", "B")
+    descr = ("The files are gathered from the original FATS project "
+             "tutorial: https://github.com/isadoranun/tsfeat")
+
+    return base.Data(
+        lc=tuple(lcs), lcid=macho_id, metadata=None,
+        DESCR=descr, bands=bands, data=data)
