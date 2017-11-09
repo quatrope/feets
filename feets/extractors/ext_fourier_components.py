@@ -81,7 +81,12 @@ class FourierComponents(Extractor):
                 'Freq3_harmonics_rel_phase_1',
                 'Freq3_harmonics_rel_phase_2',
                 'Freq3_harmonics_rel_phase_3']
-    params = {"lscargle_kwds": None}
+    params = {
+        "lscargle_kwds": {
+            "autopower_kwds": {
+                "normalization": "standard",
+                "nyquist_factor": 100}}
+    }
 
     def _model(self, x, a, b, c, Freq):
         return (a * np.sin(2 * np.pi * Freq * x) +

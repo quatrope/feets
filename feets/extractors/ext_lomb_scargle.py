@@ -92,7 +92,10 @@ class LombScargle(Extractor):
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
     params = {
         "lscargle_kwds": {
-            "autopower_kwds": {"normalization": "standard"}},
+            "autopower_kwds": {
+                "normalization": "standard",
+                "nyquist_factor": 100,
+                }},
         "fap_kwds": {
             "normalization": "standard",
             "method": "simple"}
