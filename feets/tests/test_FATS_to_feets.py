@@ -46,7 +46,7 @@ import os
 
 import numpy as np
 
-from .. import FeatureSpace, MPFeatureSpace, datasets, preprocess
+from .. import FeatureSpace, datasets, preprocess
 
 from .core import FeetsTestCase
 
@@ -109,8 +109,6 @@ class FATSPreprocessRegressionTestCase(FeetsTestCase):
 
 class FATSRegressionTestCase(FeetsTestCase):
 
-    FeatureSpaceClass = FeatureSpace
-
     def setUp(self):
         # the paths
         self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
@@ -155,20 +153,15 @@ class FATSRegressionTestCase(FeetsTestCase):
             self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
 
     def test_FATS_to_feets_extract_one(self):
-        fs = self.FeatureSpaceClass()
+        fs = FeatureSpace()
         result = fs.extract_one(self.lc)
         feets_result = dict(zip(*result))
         self.assertFATS(feets_result)
 
     def test_FATS_to_feets_extract(self):
-        fs = self.FeatureSpaceClass()
+        fs = FeatureSpace()
         rfeatures, rdatas = fs.extract([self.lc] * 3)
         for result in rdatas:
             feets_result = dict(zip(rfeatures, result))
             self.assertFATS(feets_result)
         self.assertEqual(len(rdatas), 3)
-
-
-class MPFATSRegressionTestCase(FATSRegressionTestCase):
-
-    FeatureSpaceClass = MPFeatureSpace

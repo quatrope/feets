@@ -37,18 +37,23 @@ from __future__ import unicode_literals, print_function
 __doc__ = """core functionalities of feets"""
 
 __all__ = [
-    "CPU_COUNT",
     "FeatureNotFound",
-    "FeatureSpace",
-    "MPFeatureSpace"]
+    "Features",
+    "FeatureSpace"]
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+import sys
 import logging
-import multiprocessing as mp
+from collections import Mapping
+
+import six
+from six.moves import zip
+
+from tabulate import tabulate
 
 import numpy as np
 
@@ -59,7 +64,11 @@ from . import extractors
 # CONSTANTS
 # =============================================================================
 
-CPU_COUNT = mp.cpu_count()
+TABULATE_PARAMS = {
+    "headers": "firstrow",
+    "numalign": "center",
+    "stralign": "center",
+}
 
 
 # =============================================================================
@@ -82,6 +91,80 @@ class FeatureNotFound(ValueError):
 # =============================================================================
 # FEATURE EXTRACTORS
 # =============================================================================
+
+class Features(Mapping):
+
+    def __init__(self, names, values):
+        self._names = names
+        self._values = values
+
+    def __dir__(self):
+        dlist = list(super(Features, self).__dir__())
+        dlist += list(self._names)
+        return dlist
+
+    def __getitem__(self, name):
+        index = np.where(self._names == name)[0]
+        if index.size == 0:
+            raise KeyError(name)
+        return self._values[index][0]
+
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
+
+    def __iter__(self):
+        return iter(self._names)
+
+    def __len__(self):
+        return self._names.size
+
+    def __unicode__(self):
+        return self.to_str()
+
+    def __bytes__(self):
+        encoding = sys.getdefaultencoding()
+        return self.__unicode__().encode(encoding, 'replace')
+
+    def __str__(self):
+        """Return a string representation for a particular Object
+        Invoked by str(df) in both py2/py3.
+        Yields Bytestring in Py2, Unicode String in py3.
+        """
+        if six.PY3:
+            return self.__unicode__()
+        return self.__bytes__()
+
+    def __repr__(self):
+        return str(self)
+
+    def _repr_html_(self):
+        return self.to_str(tablefmt="html")
+
+    def to_str(self, **params):
+        """String representation of the Features object.
+        Parameters
+        ----------
+        kwargs :
+            Parameters to configure
+            `tabulate <https://bitbucket.org/astanin/python-tabulate>`_
+        Return
+        ------
+        str :
+            String representation of the Data object.
+        """
+
+        params.update({
+            k: v for k, v in TABULATE_PARAMS.items() if k not in params})
+        headers = [["Feature", "Value"]]
+        rows = [[n, v] for n, v in zip(self._names, self._values)]
+        return tabulate(headers + rows, **params)
+
+    def raw(self):
+        return self._names, self._values
+
 
 class FeatureSpace(object):
     """
@@ -234,73 +317,3 @@ class FeatureSpace(object):
     @property
     def excecution_plan_(self):
         return self._execution_plan
-
-
-# =============================================================================
-# MULTIPROCESS
-# =============================================================================
-
-class FeatureSpaceProcess(mp.Process):
-
-    def __init__(self, space, data, **kwargs):
-        super(FeatureSpaceProcess, self).__init__(**kwargs)
-        self._space = space
-        self._data = data
-        self._queue = mp.Queue()
-
-    def run(self):
-        result = []
-        for data in self._data:
-            result.append(self._space._extract_one(data))
-        self._queue.put(result)
-
-    @property
-    def space(self):
-        return self._space
-
-    @property
-    def data(self):
-        return self._data
-
-    @property
-    def queue(self):
-        return self._queue
-
-    @property
-    def result_(self):
-        if not hasattr(self, "_result"):
-            self._result = self._queue.get()
-        return self._result
-
-
-class MPFeatureSpace(FeatureSpace):
-    """Multiprocess version of FeatureSpace
-
-    """
-    def __init__(self, data=None, only=None, exclude=None,
-                 proccls=FeatureSpaceProcess, **kwargs):
-        super(MPFeatureSpace, self).__init__(
-            data=data, only=only, exclude=exclude, **kwargs)
-        self._proccls = proccls
-
-    def __str__(self):
-        if not hasattr(self, "__str"):
-            extractors = [str(extractor) for extractor in self._execution_plan]
-            space = ", ".join(extractors)
-            self.__str = "<MPFeatureSpace: {}>".format(space)
-        return self.__str
-
-    def extract(self, data, procn=CPU_COUNT, **kwargs):
-        procs, fvalues = [], []
-        for chunk in np.array_split(data, procn):
-            proc = self._proccls(self, chunk, **kwargs)
-            proc.start()
-            procs.append(proc)
-        for proc in procs:
-            proc.join()
-            fvalues.extend(proc.result_)
-        return self._features_as_array, np.asarray(fvalues)
-
-    @property
-    def proccls(self):
-        return self._proccls

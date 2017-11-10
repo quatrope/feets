@@ -46,7 +46,7 @@ import numpy as np
 
 import mock
 
-from .. import MPFeatureSpace, FeatureSpace, Extractor, register_extractor
+from .. import FeatureSpace, Extractor, register_extractor
 
 from .core import FeetsTestCase
 
@@ -57,10 +57,8 @@ from .core import FeetsTestCase
 
 class FeatureSpaceTestCase(FeetsTestCase):
 
-    FeatureSpaceCls = FeatureSpace
-
     def setUp(self):
-        self.space = self.FeatureSpaceCls(only=["Amplitude"])
+        self.space = FeatureSpace(only=["Amplitude"])
 
     def test_extract_one(self):
         data = np.array([[
@@ -104,7 +102,7 @@ class FeatureSpaceTestCase(FeetsTestCase):
             def fit(self, magnitude):
                 return {"Same": magnitude[0]}
 
-        self.space = self.FeatureSpaceCls(only=["Same"])
+        self.space = FeatureSpace(only=["Same"])
 
         for _ in range(200):
             data = np.unique(np.random.randint(1, 1000, 10))
@@ -115,8 +113,3 @@ class FeatureSpaceTestCase(FeetsTestCase):
 
             self.assertArrayEqual(data.squeeze(), values_col.squeeze())
             self.assertEquals(values_col.shape, data.shape[:-1])
-
-
-class MPFeatureSpaceTestCase(FeatureSpaceTestCase):
-
-    FeatureSpaceCls = MPFeatureSpace
