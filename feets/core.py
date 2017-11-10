@@ -274,13 +274,16 @@ class FeatureSpace(object):
         return fvalues
 
     def extract_one(self, data):
-        return self._features_as_array, self._extract_one(data)
+        return Features(self._features_as_array,
+                        self._extract_one(data))
 
     def extract(self, data):
         result = []
         for chunk in data:
             result.append(self._extract_one(chunk))
-        return self._features_as_array, np.asarray(result)
+        return Features(
+            self._features_as_array,
+            np.asarray(result))
 
     @property
     def kwargs(self):
