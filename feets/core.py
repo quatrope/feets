@@ -38,7 +38,6 @@ __doc__ = """core functionalities of feets"""
 
 __all__ = [
     "FeatureNotFound",
-    "Features",
     "FeatureSpace"]
 
 
@@ -46,14 +45,7 @@ __all__ = [
 # IMPORTS
 # =============================================================================
 
-import sys
 import logging
-from collections import Mapping
-
-import six
-from six.moves import zip
-
-from tabulate import tabulate
 
 import numpy as np
 
@@ -91,79 +83,6 @@ class FeatureNotFound(ValueError):
 # =============================================================================
 # FEATURE EXTRACTORS
 # =============================================================================
-
-class Features(Mapping):
-
-    def __init__(self, names, values):
-        self._names = names
-        self._values = values
-
-    def __dir__(self):
-        dlist = list(super(Features, self).__dir__())
-        dlist += list(self._names)
-        return dlist
-
-    def __getitem__(self, name):
-        index = np.where(self._names == name)[0]
-        if index.size == 0:
-            raise KeyError(name)
-        return self._values[index][0]
-
-    def __getattr__(self, name):
-        try:
-            return self[name]
-        except KeyError:
-            raise AttributeError(name)
-
-    def __iter__(self):
-        return iter(self._names)
-
-    def __len__(self):
-        return self._names.size
-
-    def __unicode__(self):
-        return self.to_str()
-
-    def __bytes__(self):
-        encoding = sys.getdefaultencoding()
-        return self.__unicode__().encode(encoding, 'replace')
-
-    def __str__(self):
-        """Return a string representation for a particular Object
-        Invoked by str(df) in both py2/py3.
-        Yields Bytestring in Py2, Unicode String in py3.
-        """
-        if six.PY3:
-            return self.__unicode__()
-        return self.__bytes__()
-
-    def __repr__(self):
-        return str(self)
-
-    def _repr_html_(self):
-        return self.to_str(tablefmt="html")
-
-    def to_str(self, **params):
-        """String representation of the Features object.
-        Parameters
-        ----------
-        kwargs :
-            Parameters to configure
-            `tabulate <https://bitbucket.org/astanin/python-tabulate>`_
-        Return
-        ------
-        str :
-            String representation of the Data object.
-        """
-
-        params.update({
-            k: v for k, v in TABULATE_PARAMS.items() if k not in params})
-        headers = [["Feature", "Value"]]
-        rows = [[n, v] for n, v in zip(self._names, self._values)]
-        return tabulate(headers + rows, **params)
-
-    def raw(self):
-        return self._names, self._values
 
 
 class FeatureSpace(object):
@@ -274,16 +193,13 @@ class FeatureSpace(object):
         return fvalues
 
     def extract_one(self, data):
-        return Features(self._features_as_array,
-                        self._extract_one(data))
+        return self._features_as_array, self._extract_one(data)
 
     def extract(self, data):
         result = []
         for chunk in data:
             result.append(self._extract_one(chunk))
-        return Features(
-            self._features_as_array,
-            np.asarray(result))
+        return self._features_as_array, np.asarray(result)
 
     @property
     def kwargs(self):
