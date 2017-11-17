@@ -13,7 +13,7 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
 .. image:: https://travis-ci.org/carpyncho/feets.svg?branch=master
     :target: https://travis-ci.org/carpyncho/feets
     :alt: Build Status
-    
+
 .. image:: https://readthedocs.org/projects/feets/badge/?version=latest
     :target: http://feets.readthedocs.io/en/latest/
     :alt: ReadTheDocs.org
@@ -25,10 +25,6 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
 .. image:: https://img.shields.io/badge/python-2.7-blue.svg
    :target: https://badge.fury.io/py/feets
    :alt: Python 2.7
-
-.. image:: https://img.shields.io/badge/python-3.4-blue.svg
-   :target: https://badge.fury.io/py/feets
-   :alt: Python 3.4
 
 .. image:: https://img.shields.io/badge/python-3.5-blue.svg
    :target: https://badge.fury.io/py/feets
