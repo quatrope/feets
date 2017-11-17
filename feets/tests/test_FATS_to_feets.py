@@ -154,14 +154,6 @@ class FATSRegressionTestCase(FeetsTestCase):
 
     def test_FATS_to_feets_extract_one(self):
         fs = FeatureSpace()
-        result = fs.extract_one(self.lc)
+        result = fs.extract(self.lc)
         feets_result = dict(zip(*result))
         self.assertFATS(feets_result)
-
-    def test_FATS_to_feets_extract(self):
-        fs = FeatureSpace()
-        rfeatures, rdatas = fs.extract([self.lc] * 3)
-        for result in rdatas:
-            feets_result = dict(zip(rfeatures, result))
-            self.assertFATS(feets_result)
-        self.assertEqual(len(rdatas), 3)
