@@ -44,8 +44,9 @@ import tarfile
 
 import numpy as np
 
-from . import base
+from ..extractors.core import DATA_TIME, DATA_MAGNITUDE, DATA_ERROR
 
+from .base import Bunch
 
 # =============================================================================
 # CONSTANTS
@@ -54,6 +55,7 @@ from . import base
 PATH = os.path.abspath(os.path.dirname(__file__))
 
 DATA_PATH = os.path.join(PATH, "data", "macho")
+
 
 
 # =============================================================================
@@ -100,12 +102,19 @@ def load_MACHO(macho_id):
         rlc = np.loadtxt(tf.extractfile(rpath))
         blc = np.loadtxt(tf.extractfile(bpath))
 
-    lcs = map(base.split_lc, [rlc, blc])
-    data = (base.TIME, base.MAG, base.ERROR)
-    bands = ("R", "B")
+    data = (DATA_TIME, DATA_MAGNITUDE, DATA_ERROR)
+    bands = Bunch(
+        R=Bunch(**{
+            DATA_TIME: rlc[:, 0],
+            DATA_MAGNITUDE: rlc[:, 1],
+            DATA_ERROR: rlc[:, 2]}),
+        B=Bunch(**{
+            DATA_TIME: blc[:, 0],
+            DATA_MAGNITUDE: blc[:, 1],
+            DATA_ERROR: blc[:, 2]}))
     descr = ("The files are gathered from the original FATS project "
              "tutorial: https://github.com/isadoranun/tsfeat")
 
-    return base.Data(
-        lc=tuple(lcs), lcid=macho_id, metadata=None,
+    return Bunch(
+        lcid=macho_id, metadata=None,
         DESCR=descr, bands=bands, data=data)

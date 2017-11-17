@@ -65,9 +65,13 @@ DATA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
 class FATSPreprocessRegressionTestCase(FeetsTestCase):
 
     def setUp(self):
-        d = datasets.load_MACHO_example()
-        self.time, self.mag, self.error = d.lc[0]
-        self.time2, self.mag2, self.error2 = d.lc[1]
+        lc = datasets.load_MACHO_example()
+        self.time = lc.bands.R.time
+        self.mag = lc.bands.R.magnitude
+        self.error = lc.bands.R.error
+        self.time2 = lc.bands.B.time
+        self.mag2 = lc.bands.B.magnitude
+        self.error2 = lc.bands.B.error
 
         self.preprc_path = os.path.join(DATA_PATH, "FATS_preprc.npz")
         with np.load(self.preprc_path) as npz:
@@ -117,13 +121,13 @@ class FATSRegressionTestCase(FeetsTestCase):
         # recreate light curve
         with np.load(self.lc_path) as npz:
             self.lc = (
-                npz['mag'],
                 npz['time'],
+                npz['mag'],
                 npz['error'],
                 npz['mag2'],
+                npz['aligned_time'],
                 npz['aligned_mag'],
                 npz['aligned_mag2'],
-                npz['aligned_time'],
                 npz['aligned_error'],
                 npz['aligned_error2'])
 
@@ -139,7 +143,17 @@ class FATSRegressionTestCase(FeetsTestCase):
     def exclude_value_feature_evaluation(self, feature):
         return (
             "_harmonics_" in feature or
-            feature in ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"])
+            feature in [ ])
+
+    def assert_feature_params(self, feature):
+        feature_params = {
+            "PeriodLS": {"atol": 1e-04},
+            "Period_fit": {"atol": 1e-40},
+            "Psi_CS": {"atol": 1e-02},
+            "Psi_eta": {"atol": 1e-01}}
+        params = {"err_msg": self.err_template.format(feature=feature)}
+        params .update(feature_params.get(feature, {}))
+        return params
 
     def assertFATS(self, feets_result):
         for feature in self.features:
@@ -149,11 +163,11 @@ class FATSRegressionTestCase(FeetsTestCase):
                 continue
             feets_value = feets_result[feature]
             FATS_value = self.FATS_result[feature]
-            err_msg = self.err_template.format(feature=feature)
-            self.assertAllClose(feets_value, FATS_value, err_msg=err_msg)
+            params = self.assert_feature_params(feature)
+            self.assertAllClose(feets_value, FATS_value, **params)
 
     def test_FATS_to_feets_extract_one(self):
         fs = FeatureSpace()
-        result = fs.extract(self.lc)
+        result = fs.extract(*self.lc)
         feets_result = dict(zip(*result))
         self.assertFATS(feets_result)

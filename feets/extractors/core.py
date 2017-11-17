@@ -60,20 +60,17 @@ DATA_ALIGNED_TIME = "aligned_time"
 DATA_ALIGNED_ERROR = "aligned_error"
 DATA_ALIGNED_ERROR2 = "aligned_error2"
 
-
-DATA_IDXS = {
-    DATA_MAGNITUDE: 0,
-    DATA_TIME: 1,
-    DATA_ERROR: 2,
-    DATA_MAGNITUDE2: 3,
-    DATA_ALIGNED_MAGNITUDE: 4,
-    DATA_ALIGNED_MAGNITUDE2: 5,
-    DATA_ALIGNED_TIME: 6,
-    DATA_ALIGNED_ERROR: 7,
-    DATA_ALIGNED_ERROR2: 8
-}
-
-DATAS = tuple([d[0] for d in sorted(DATA_IDXS.items(), key=lambda di: di[1])])
+DATAS = (
+    DATA_TIME,
+    DATA_MAGNITUDE,
+    DATA_ERROR,
+    DATA_MAGNITUDE2,
+    DATA_ALIGNED_TIME,
+    DATA_ALIGNED_MAGNITUDE,
+    DATA_ALIGNED_MAGNITUDE2,
+    DATA_ALIGNED_ERROR,
+    DATA_ALIGNED_ERROR2
+)
 
 
 # =============================================================================
@@ -231,21 +228,24 @@ class Extractor(object):
         """This method will be executed after the feature is calculated"""
         pass
 
-    def extract(self, data, dependencies):
+    def extract(self, **kwargs):
+        # create the besel for the parameters
+        fit_kwargs = {}
+
         # add the required features as parameters to fit()
-        kwargs = {k: dependencies[k] for k in self.get_dependencies()}
+        dependencies = kwargs["features"]
+        fit_kwargs = {k: dependencies[k] for k in self.get_dependencies()}
 
         # add the required data as parameters to fit()
         for d in self.get_data():
-            idx = DATA_IDXS[d]
-            kwargs[d] = data[idx]
+            fit_kwargs[d] = kwargs[d]
 
         # add the configured parameters as parameters to fit()
-        kwargs.update(self.params)
+        fit_kwargs.update(self.params)
         try:
             # setup & run te extractor
             self.setup()
-            result = self.fit(**kwargs)
+            result = self.fit(**fit_kwargs)
 
             # validate if the extractors generates the expected features
             expected = self.get_features()  # the expected features

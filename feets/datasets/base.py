@@ -44,17 +44,6 @@ import requests
 
 
 # =============================================================================
-# CONSTANTS
-# =============================================================================
-
-TIME = "time"
-
-MAG = "mag"
-
-ERROR = "error"
-
-
-# =============================================================================
 # FUNCTIONS
 # =============================================================================
 
@@ -131,26 +120,11 @@ def fetch(url, dest, force=False):
     return cached, dest
 
 
-def split_lc(lc):
-    """Split the lightcurve in 2 or 3 column format into a tuple of 2 or 3
-    elements.
-
-    If the lc has 3 columns then a tuple with the elements (time, mag, error)
-    are returned, otherwise onli (time, mag).
-
-    """
-
-    has_error = lc.shape[1] == 3
-    if has_error:
-        return lc[:, 0], lc[:, 1], lc[:, 2]
-    return lc[:, 0], lc[:, 1]
-
-
 # =============================================================================
 # CLASSES
 # =============================================================================
 
-class Data(dict):  # THANKS SKLEARN
+class Bunch(dict):  # THANKS SKLEARN
     """Container object for datasets
     Dictionary-like object that exposes its keys as attributes.
 
@@ -169,7 +143,7 @@ class Data(dict):  # THANKS SKLEARN
     """
 
     def __init__(self, **kwargs):
-        super(Data, self).__init__(kwargs)
+        super(Bunch, self).__init__(kwargs)
 
     def __setattr__(self, key, value):
         self[key] = value

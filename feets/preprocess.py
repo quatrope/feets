@@ -43,13 +43,13 @@ __all__ = [
 # FUNCTIONS
 # =============================================================================
 
-def remove_noise(time, mag, error, error_limit=3, std_limit=5):
+def remove_noise(time, magnitude, error, error_limit=3, std_limit=5):
     """Points within 'std_limit' standard deviations from the mean and with
     errors greater than 'error_limit' times the error mean are
     considered as noise and thus are eliminated.
 
     """
-    data, mjd = mag, time
+    data, mjd = magnitude, time
 
     data_len = len(mjd)
     error_mean = np.mean(error)
@@ -75,15 +75,15 @@ def remove_noise(time, mag, error, error_limit=3, std_limit=5):
     return mjd_out, data_out, error_out
 
 
-def align(time, time2, mag, mag2, error, error2):
+def align(time, time2, magnitude, magnitude2, error, error2):
     """Synchronizes the light-curves in the two different bands.
 
     Returns
     -------
 
     aligned_time
-    aligned_mag
-    aligned_mag2
+    aligned_magnitude
+    aligned_magnitude2
     aligned_error
     aligned_error2
 
@@ -93,8 +93,8 @@ def align(time, time2, mag, mag2, error, error2):
     error2 = np.zeros(time2.shape) if error2 is None else error2
 
     # this asume that the first series is the short one
-    sserie = pd.DataFrame({"mag": mag, "error": error}, index=time)
-    lserie = pd.DataFrame({"mag": mag2, "error": error2}, index=time2)
+    sserie = pd.DataFrame({"mag": magnitude, "error": error}, index=time)
+    lserie = pd.DataFrame({"mag": magnitude2, "error": error2}, index=time2)
 
     # if the second serie is logest then revert
     if len(time) > len(time2):

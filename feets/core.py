@@ -184,12 +184,36 @@ class FeatureSpace(object):
             params.update(self._kwargs.get(f, {}))
         return params
 
-    def extract(self, data):
-        data, features = np.asarray(data), {}
+    def kwargs_as_array(self, kwargs):
+        array_kwargs = {}
+        for k, v in kwargs.items():
+            array_kwargs[k] = v if v is None  else np.asarray(v)
+        return array_kwargs
+
+    def extract(self, time=None, magnitude=None, error=None,
+                magnitude2=None, aligned_time=None,
+                aligned_magnitude=None, aligned_magnitude2=None,
+                aligned_error=None, aligned_error2=None):
+
+        kwargs = self.kwargs_as_array({
+            "time": time,
+            "magnitude": magnitude,
+            "error": error,
+            "magnitude2": magnitude2,
+            "aligned_time": aligned_time,
+            "aligned_magnitude": aligned_magnitude,
+            "aligned_magnitude2": aligned_magnitude2,
+            "aligned_error": aligned_error,
+            "aligned_error2": aligned_error2})
+
+        features = {}
         for fextractor in self._execution_plan:
-            features.update(fextractor.extract(data, features))
+            result = fextractor.extract(features=features, **kwargs)
+            features.update(result)
+
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
+
         return self._features_as_array, fvalues
 
     @property
