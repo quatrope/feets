@@ -187,7 +187,7 @@ class FeatureSpace(object):
     def kwargs_as_array(self, kwargs):
         array_kwargs = {}
         for k, v in kwargs.items():
-            array_kwargs[k] = v if v is None  else np.asarray(v)
+            array_kwargs[k] = v if v is None else np.asarray(v)
         return array_kwargs
 
     def extract(self, time=None, magnitude=None, error=None,

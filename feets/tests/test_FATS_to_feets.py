@@ -141,9 +141,7 @@ class FATSRegressionTestCase(FeetsTestCase):
         self.err_template = ("Feature '{feature}' missmatch.")
 
     def exclude_value_feature_evaluation(self, feature):
-        return (
-            "_harmonics_" in feature or
-            feature in [ ])
+        return "_harmonics_" in feature
 
     def assert_feature_params(self, feature):
         feature_params = {

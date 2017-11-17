@@ -75,7 +75,6 @@ class FeatureSpaceTestCase(FeetsTestCase):
         self.assertTrue(len(features) == 1 and features[0] == "Amplitude")
         self.assertAllClose(values[features == "Amplitude"], 0.45203809)
 
-
     @mock.patch("feets.extractors._extractors", {})
     def test_features_order(self):
 
