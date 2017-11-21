@@ -162,12 +162,16 @@ class FeatureSpace(object):
         # create a ndarray for all the results
         self._features_as_array = np.array(sorted(self._features))
 
-        # initialize the extractors
+        # initialize the extractors and determine the required data only
         features_extractors = set()
+        required_data = set()
         for fcls in set(exts.values()):
             if fcls.get_features().intersection(self._features):
-                features_extractors.add(fcls(self))
+                fext = fcls(self)
+                features_extractors.add(fext)
+                required_data.update(fext.get_data())
         self._features_extractors = frozenset(features_extractors)
+        self._required_data = frozenset(required_data)
 
         # excecution order by dependencies
         self._execution_plan = extractors.sort_by_dependencies(
@@ -192,7 +196,7 @@ class FeatureSpace(object):
     def kwargs_as_array(self, kwargs):
         array_kwargs = {}
         for k, v in kwargs.items():
-            if k in self._data and v is None:
+            if k in self._required_data and v is None:
                 raise DataRequiredError(k)
             array_kwargs[k] = v if v is None else np.asarray(v)
         return array_kwargs
@@ -258,3 +262,7 @@ class FeatureSpace(object):
     @property
     def excecution_plan_(self):
         return self._execution_plan
+
+    @property
+    def required_data_(self):
+        return self._required_data
