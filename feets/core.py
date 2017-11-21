@@ -38,6 +38,7 @@ __doc__ = """core functionalities of feets"""
 
 __all__ = [
     "FeatureNotFound",
+    "DataRequiredError",
     "FeatureSpace"]
 
 
@@ -77,6 +78,10 @@ logger.setLevel(logging.WARNING)
 # =============================================================================
 
 class FeatureNotFound(ValueError):
+    pass
+
+
+class DataRequiredError(ValueError):
     pass
 
 
@@ -187,6 +192,8 @@ class FeatureSpace(object):
     def kwargs_as_array(self, kwargs):
         array_kwargs = {}
         for k, v in kwargs.items():
+            if k in self._data and v is None:
+                raise DataRequiredError(k)
             array_kwargs[k] = v if v is None else np.asarray(v)
         return array_kwargs
 
