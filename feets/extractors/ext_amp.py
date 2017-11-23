@@ -52,7 +52,7 @@ from .core import Extractor
 # =============================================================================
 
 class AMP(Extractor):
-    """AMP
+    """Calculate the AMP feature.
 
     .. math::
 

@@ -122,3 +122,35 @@ RESULT_TABLE_TEMPLATE = jinja2.Template("""
 def as_table(features, values):
     rows = zip(features, values)
     return HTML(RESULT_TABLE_TEMPLATE.render(rows=rows))
+
+DOC_TEMPLATE = jinja2.Template("""
+    <div class="features-doc">
+      <ol>
+          {% for name, doc in rows %}
+          <li class="extractor {{ name }}">
+              <div>
+                 <h3>Extractor <code>{{ name }}</code>.</h3>
+                 <p>{{ doc }}</p>
+              </div>
+          </li>
+          {% endfor %}
+      </ol>
+    </div>
+
+""")
+
+
+def features_doc():
+    import feets
+    from docutils.core import publish_parts
+    
+    rows = []
+    extractors = sorted({
+        e for e in feets.registered_extractors().values()})
+    for idx, ext in enumerate(extractors):
+        name = ext.__name__
+        doc = publish_parts(ext.__doc__ or name, 
+                            writer_name='html')["html_body"]
+        rows.append((name, doc))
+    return HTML(DOC_TEMPLATE.render(rows=rows))
+        

@@ -19,7 +19,7 @@ table {
 }
 
 table thead tr th{
-background-color: #6595c5;
+    background-color: #6595c5;
 }
 
 table thead tr th,
@@ -33,4 +33,17 @@ table tbody tr td {
 
 tr:nth-child(even) {
   background-color: #dde1ff;
+}
+
+div.section#The-Features div.nboutput {
+     background-color: white !important;
+}
+
+div.section#The-Features div.nboutput div.document {
+    width: 100%;
+    margin: 0px !important;
+}
+
+div.section#The-Features div.nboutput div.prompt.empty {
+    display: none !important;
 }

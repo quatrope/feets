@@ -94,7 +94,7 @@ def is_registered(obj):
 
 
 def available_features():
-    return _extractors.keys()
+    return sorted(_extractors.keys())
 
 
 def extractor_of(feature):
