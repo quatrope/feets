@@ -4,3 +4,5 @@ numpydoc==0.7.0
 six
 nbsphinx
 seaborn
+ExpectException
+sphinx_bootstrap_theme

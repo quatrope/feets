@@ -123,19 +123,55 @@ def as_table(features, values):
     rows = zip(features, values)
     return HTML(RESULT_TABLE_TEMPLATE.render(rows=rows))
 
+
 DOC_TEMPLATE = jinja2.Template("""
-    <div class="features-doc">
-      <ol>
-          {% for name, doc in rows %}
-          <li class="extractor {{ name }}">
-              <div>
-                 <h3>Extractor <code>{{ name }}</code>.</h3>
-                 <p>{{ doc }}</p>
-              </div>
-          </li>
-          {% endfor %}
-      </ol>
+<div class="panel-group" id="extractors" role="tablist" aria-multiselectable="true">
+  {% for name, doc, ext, fresume, datas in rows %}
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading-feature-{{ name }}">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#extractors" href="#collapse-feature-{{ name }}" aria-expanded="true" aria-controls="collapse-feature-{{ name }}">
+          Extractor <span class="text-info">{{ name }}</span>
+        
+         <span class="pull-right">
+             {% for feature in fresume %}
+             <span class="label lb-lg feature-resume label-default">{{ feature }}</span>
+             {% endfor %}
+         </span>
+         </a>
+         
+      </h4>
     </div>
+    <div id="collapse-feature-{{ name }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-feature-{{ name }}">
+      <div class="panel-body">
+         <p>{{ doc }}</p>
+        <h5>Required Data</h5>
+         <div>
+             {% for data in datas %}
+                 <span class="label label-info">{{ data }}</span>
+             {% endfor %}
+         </div>
+         
+         <h5>Full list of features</h5>
+         <div>
+             {% for feature in ext.get_features() %}
+             <span class="label label-default">{{ feature }}</span>
+             {% endfor %}
+         </div>
+         
+         <h5>Dependencies</h5>
+         <div>
+         {% for dep in ext.get_dependencies() %}
+            <span class="label label-warning">{{ dep }}</span>
+         {% else %}
+             -
+         {% endfor %}
+         </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 
 """)
 
@@ -151,6 +187,12 @@ def features_doc():
         name = ext.__name__
         doc = publish_parts(ext.__doc__ or name, 
                             writer_name='html')["html_body"]
-        rows.append((name, doc))
+        features = ext.get_features()
+        data = sorted(ext.get_data(), key=feets.extractors.DATAS.index)
+        
+        if len(features) > 4:
+            features = list(features)[:4] + ["..."]
+        rows.append((name, doc, ext, features, data))
+    rows.sort()
     return HTML(DOC_TEMPLATE.render(rows=rows))
         

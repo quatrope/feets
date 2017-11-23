@@ -54,6 +54,19 @@ from .core import Extractor
 # =============================================================================
 
 class AndersonDarling(Extractor):
+    """
+    **AndersonDarling**
+
+    The Anderson-Darling test is a statistical test of whether a given
+    sample of data is drawn from a given probability distribution. When
+    applied to testing if a normal distribution adequately describes a set of
+    data, it is one of the most powerful statistical tools for detecting most
+    departures from normality.
+
+    For a normal distribution the Anderson-Darling statistic should take values
+    close to 0.25.
+
+    """
 
     data = ['magnitude']
     features = ["AndersonDarling"]

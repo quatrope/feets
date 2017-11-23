@@ -105,15 +105,15 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+import sphinx_bootstrap_theme
+html_theme = 'bootstrap'
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+
+html_logo = "_static/logo_medium.png"
 
 html_theme_options = {
-    'fixed_sidebar': True,
-    'logo': 'logo_medium.png',
-    'github_user': 'bitprophet',
-    'github_repo': 'alabaster',
-    'page_width': "92%",
-    'logo_name': False
+    'navbar_pagenav_name': "Content",
+    'bootswatch_theme': "cerulean",
 }
 
 if on_rtd:

@@ -54,7 +54,14 @@ from .core import Extractor
 # =============================================================================
 
 class Amplitude(Extractor):
-    """Half the difference between the maximum and the minimum magnitude"""
+    """
+    **Amplitude**
+
+    The amplitude is defined as the half of the difference between the median
+    of the maximum 5% and the median of the minimum 5% magnitudes. For a
+    sequence of numbers from 0 to 1000 the amplitude should be equal to 475.5.
+
+    """
 
     data = ['magnitude']
     features = ['Amplitude']
