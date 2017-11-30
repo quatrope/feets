@@ -54,12 +54,25 @@ from .core import Extractor
 # =============================================================================
 
 class Con(Extractor):
-    """Index introduced for selection of variable starts from OGLE database.
+    r"""
 
+    **Con**
 
-    To calculate Con, we counted the number of three consecutive measurements
-    that are out of 2sigma range, and normalized by N-2
-    Pavlos not happy
+    Index introduced for the selection of variable stars from the OGLE
+    database (Wozniak 2000). To calculate Con, we count the number of three
+    consecutive data points that are brighter or fainter than :math:`2\sigma`
+    and normalize the number by :math:`N−2`.
+
+    For a normal distribution and by considering just one star, Con should
+    take values close to 0.045:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Con'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Con': 0.0476}
+
     """
     data = ['magnitude']
     features = ["Con"]

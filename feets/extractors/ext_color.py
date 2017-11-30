@@ -52,8 +52,19 @@ from .core import Extractor
 # =============================================================================
 
 class Color(Extractor):
-    """Average color for each MACHO lightcurve
-    mean(B1) - mean(B2)
+    """
+    **Color**
+
+    The color is defined as the difference between the average magnitude of
+    two different bands observations.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Color'])
+        >>> features, values = fs.extract(**lc)
+        >>> dict(zip(features, values))
+        {'Color': -0.33325502453332145}
+
     """
     data = ['magnitude', 'magnitude2']
     features = ["Color"]

@@ -112,6 +112,24 @@ def _car_like(parameters, t, x, error_vars):
 # =============================================================================
 
 class CAR(Extractor):
+    r"""In order to model the irregular sampled times series we use CAR(
+    (Brockwell and Davis, 2002), a continious time auto regressive model.
+    CAR process has three parameters, it provides a natural and consistent
+    way of estimating a characteristic time scale and variance of light-curves.
+    CAR process is described by the following stochastic differential
+    equation:
+
+    .. math::
+
+        dX(t) = - \frac{1}{\tau} X(t)dt + \sigma_C \sqrt{dt} \epsilon(t) + bdt,
+
+
+    .. math::
+
+        for \: \tau, \sigma_C, t \geq 0
+
+
+    """
 
     data = ['magnitude', 'time', 'error']
     features = ["CAR_sigma", "CAR_tau", "CAR_mean"]

@@ -52,12 +52,11 @@ from .core import Extractor
 # =============================================================================
 
 class AMP(Extractor):
-    """Calculate the AMP feature.
+    r"""Calculate the AMP feature.
 
     .. math::
 
-        AMP = \log_{10} \sqrt{\frac{Count \times \sigma_{flux}}
-                                   {\mu_{flux}}}
+        AMP = \log_{10}(\sqrt{N_{obs}})
 
     """
 
@@ -69,5 +68,5 @@ class AMP(Extractor):
         mags = magnitude[sort_mask]
         fluxs = 10 ** (mags / -2.5)
         count, std_flux, mean_flux = len(fluxs), np.std(fluxs), np.mean(fluxs)
-        amp = np.log10(np.sqrt(count * std_flux / mean_flux))
+        amp = np.log10(np.sqrt(count) * std_flux / mean_flux)
         return {"AMP": amp}

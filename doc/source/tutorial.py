@@ -178,6 +178,9 @@ DOC_TEMPLATE = jinja2.Template("""
 
 def features_doc():
     import feets
+    
+    import rst2html5_
+    
     from docutils.core import publish_parts
     
     rows = []
@@ -185,8 +188,12 @@ def features_doc():
         e for e in feets.registered_extractors().values()})
     for idx, ext in enumerate(extractors):
         name = ext.__name__
-        doc = publish_parts(ext.__doc__ or name, 
-                            writer_name='html')["html_body"]
+
+        doc = publish_parts(
+            ext.__doc__ or name,
+            writer_name='html5', 
+            writer=rst2html5_.HTML5Writer())["body"]
+        
         features = ext.get_features()
         data = sorted(ext.get_data(), key=feets.extractors.DATAS.index)
         

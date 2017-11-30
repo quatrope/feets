@@ -52,6 +52,21 @@ from .core import Extractor
 # =============================================================================
 
 class EtaColor(Extractor):
+    """
+
+    **Eta_color** (:math:`\eta_{color}`)
+
+    Variability index Eta_e (:math:`\eta^e`)
+    calculated from the color light-curve.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Eta_color'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Eta_color': 1.991749074648397}
+
+    """
 
     data = ['aligned_magnitude', 'aligned_time', 'aligned_magnitude2']
     features = ["Eta_color"]

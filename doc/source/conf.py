@@ -109,7 +109,7 @@ import sphinx_bootstrap_theme
 html_theme = 'bootstrap'
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
-html_logo = "_static/logo_medium.png"
+html_logo = "_static/logo_small.png"
 
 html_theme_options = {
     'navbar_pagenav_name': "Content",
