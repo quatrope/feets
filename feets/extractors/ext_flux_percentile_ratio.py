@@ -50,7 +50,7 @@ from .core import Extractor
 
 
 # =============================================================================
-# EXTRACTOR CLASS
+# CONSTANTS
 # =============================================================================
 
 COMMON_DOC = r"""
@@ -82,6 +82,11 @@ So, the expected values for each of the flux percentile features are:
 - flux_percentile_ratio_mid80 = 0.779
 
 """
+
+
+# =============================================================================
+# EXTRACTOR CLASS
+# =============================================================================
 
 class FluxPercentileRatioMid20(Extractor):
     __doc__ = COMMON_DOC
