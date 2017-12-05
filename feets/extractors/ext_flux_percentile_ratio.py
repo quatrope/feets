@@ -53,7 +53,38 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+COMMON_DOC = r"""
+In order to caracterize the sorted magnitudes distribution we use percentiles.
+If :math:`F_{5, 95}` is the difference between 95% and 5% magnitude values,
+we calculate the following:
+
+- flux_percentile_ratio_mid20: ratio :math:`F_{40, 60}/F_{5, 95}`
+- flux_percentile_ratio_mid35: ratio :math:`F_{32.5, 67.5}/F_{5, 95}`
+- flux_percentile_ratio_mid50: ratio :math:`F_{25, 75}/F_{5, 95}`
+- flux_percentile_ratio_mid65: ratio :math:`F_{17.5, 82.5}/F_{5, 95}`
+- flux_percentile_ratio_mid80: ratio :math:`F_{10, 90}/F_{5, 95}`
+
+For the first feature for example, in the case of a normal distribution, this
+is equivalente to calculate:
+
+.. math::
+
+    \frac{erf^{-1}(2 \cdot 0.6-1)-erf^{-1}(2 \cdot 0.4-1)}
+         {erf^{-1}(2 \cdot 0.95-1)-erf^{-1}(2 \cdot 0.05-1)}
+
+
+So, the expected values for each of the flux percentile features are:
+
+- flux_percentile_ratio_mid20 = 0.154
+- flux_percentile_ratio_mid35 = 0.275
+- flux_percentile_ratio_mid50 = 0.410
+- flux_percentile_ratio_mid65 = 0.568
+- flux_percentile_ratio_mid80 = 0.779
+
+"""
+
 class FluxPercentileRatioMid20(Extractor):
+    __doc__ = COMMON_DOC
 
     data = ['magnitude']
     features = ["FluxPercentileRatioMid20"]
@@ -75,6 +106,7 @@ class FluxPercentileRatioMid20(Extractor):
 
 
 class FluxPercentileRatioMid35(Extractor):
+    __doc__ = COMMON_DOC
 
     data = ['magnitude']
     features = ["FluxPercentileRatioMid35"]
@@ -96,6 +128,7 @@ class FluxPercentileRatioMid35(Extractor):
 
 
 class FluxPercentileRatioMid50(Extractor):
+    __doc__ = COMMON_DOC
 
     data = ['magnitude']
     features = ["FluxPercentileRatioMid50"]
@@ -117,6 +150,7 @@ class FluxPercentileRatioMid50(Extractor):
 
 
 class FluxPercentileRatioMid65(Extractor):
+    __doc__ = COMMON_DOC
 
     data = ['magnitude']
     features = ["FluxPercentileRatioMid65"]
@@ -138,6 +172,7 @@ class FluxPercentileRatioMid65(Extractor):
 
 
 class FluxPercentileRatioMid80(Extractor):
+    __doc__ = COMMON_DOC
 
     data = ['magnitude']
     features = ["FluxPercentileRatioMid80"]

@@ -15,6 +15,9 @@ help:
 editnb:
 	cd .. && jupyter notebook doc/source/index.ipynb; cd -;
 
+autobuild:
+	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)"
+
 .PHONY: help Makefile
 
 # Catch-all target: route all unknown targets to Sphinx using the new
