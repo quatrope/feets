@@ -9,10 +9,6 @@ div.input_area {
     border: none !important;
 }
 
-div.note {
-    background-color: #6595c5;
-    border: 1px solid #CCC;
-}
 
 table {
     border-collapse: collapse;
@@ -26,9 +22,6 @@ table thead tr th,
 table tbody tr td {
     border: 1px solid #CCC;
     margin: 0px;
-    font-size: 15px;
-    font-family: san-serif;
-
 }
 
 tr:nth-child(even) {
@@ -47,3 +40,17 @@ div.section#The-Features div.nboutput div.document {
 div.section#The-Features div.nboutput div.prompt.empty {
     display: none !important;
 }
+
+
+div.section#The-Features blockquote > span.math {
+    display: block !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/*
+div.section#The-Features p span.math,
+div.section#The-Features ol span.math, {
+    display: inline !important;
+}
+*/
