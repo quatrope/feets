@@ -137,6 +137,10 @@ DOC_TEMPLATE = jinja2.Template("""
              {% for feature in fresume %}
              <span class="label lb-lg feature-resume label-default">{{ feature }}</span>
              {% endfor %}
+
+             {% if not doc %}
+             <span class="label lb-lg feature-resume label-danger">doc missing</span>
+             {% endif %}
          </span>
          </a>
 
@@ -190,7 +194,7 @@ def features_doc():
         name = ext.__name__
 
         doc = publish_parts(
-            ext.__doc__ or name,
+            ext.__doc__ or "",
             writer_name='html5',
             writer=rst2html5_.HTML5Writer())["body"]
 
