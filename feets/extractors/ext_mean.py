@@ -52,6 +52,20 @@ from .core import Extractor
 # =============================================================================
 
 class Mean(Extractor):
+    r"""
+    **Mean**
+
+    Mean magnitude. For a normal distribution it should take a value
+    close to zero:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Mean'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Mean': 0.0082611563419413246}
+
+    """
 
     data = ['magnitude']
     features = ["Mean"]

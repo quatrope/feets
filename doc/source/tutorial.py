@@ -132,14 +132,14 @@ DOC_TEMPLATE = jinja2.Template("""
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#extractors" href="#collapse-feature-{{ name }}" aria-expanded="true" aria-controls="collapse-feature-{{ name }}">
           Extractor <span class="text-info">{{ name }}</span>
-        
+
          <span class="pull-right">
              {% for feature in fresume %}
              <span class="label lb-lg feature-resume label-default">{{ feature }}</span>
              {% endfor %}
          </span>
          </a>
-         
+
       </h4>
     </div>
     <div id="collapse-feature-{{ name }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-feature-{{ name }}">
@@ -151,14 +151,14 @@ DOC_TEMPLATE = jinja2.Template("""
                  <span class="label label-info">{{ data }}</span>
              {% endfor %}
          </div>
-         
+
          <h5>Full list of features</h5>
          <div>
              {% for feature in ext.get_features() %}
              <span class="label label-default">{{ feature }}</span>
              {% endfor %}
          </div>
-         
+
          <h5>Dependencies</h5>
          <div>
          {% for dep in ext.get_dependencies() %}
@@ -178,11 +178,11 @@ DOC_TEMPLATE = jinja2.Template("""
 
 def features_doc():
     import feets
-    
+
     import rst2html5_
-    
+
     from docutils.core import publish_parts
-    
+
     rows = []
     extractors = sorted({
         e for e in feets.registered_extractors().values()})
@@ -191,15 +191,14 @@ def features_doc():
 
         doc = publish_parts(
             ext.__doc__ or name,
-            writer_name='html5', 
+            writer_name='html5',
             writer=rst2html5_.HTML5Writer())["body"]
-        
+
         features = ext.get_features()
         data = sorted(ext.get_data(), key=feets.extractors.DATAS.index)
-        
+
         if len(features) > 4:
             features = list(features)[:4] + ["..."]
         rows.append((name, doc, ext, features, data))
     rows.sort()
     return HTML(DOC_TEMPLATE.render(rows=rows))
-        

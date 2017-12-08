@@ -52,7 +52,29 @@ from .core import Extractor
 # =============================================================================
 
 class Skew(Extractor):
-    """Skewness of the magnitudes"""
+    r"""
+
+    **Skew**
+
+    The skewness of a sample is defined as follow:
+
+    .. math::
+
+        Skewness = \frac{N}{(N-1)(N-2)}
+            \sum_{i=1}^N (\frac{m_i-\hat{m}}{\sigma})^3
+
+    Example:
+
+    For a normal distribution it should be equal to zero:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Skew'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Skew': -0.00023325826785278685}
+
+    """
 
     data = ['magnitude']
     features = ["Skew"]

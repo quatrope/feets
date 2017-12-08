@@ -52,7 +52,21 @@ from .core import Extractor
 # =============================================================================
 
 class Gskew(Extractor):
-    """Median-based measure of the skew"""
+    """Median-of-magnitudes based measure of the skew.
+
+    .. math::
+
+        Gskew = m_{q3} + m_{q97} - 2m
+
+    Where:
+
+    - :math:`m_{q3}` is the median of magnitudes lesser or equal than the
+      quantile 3.
+    - :math:`m_{q97}` is the median of magnitudes greater or equal than the
+      quantile 97.
+    - :math:`m` is the median of magnitudes.
+
+    """
 
     data = ['magnitude']
     features = ["Gskew"]

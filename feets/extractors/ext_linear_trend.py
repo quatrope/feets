@@ -52,6 +52,19 @@ from .core import Extractor
 # =============================================================================
 
 class LinearTrend(Extractor):
+    r"""
+    **LinearTrend**
+
+    Slope of a linear fit to the light-curve.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['LinearTrend'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'LinearTrend': -3.2084065290292509e-06}
+
+    """
 
     data = ['magnitude', 'time']
     features = ["LinearTrend"]
