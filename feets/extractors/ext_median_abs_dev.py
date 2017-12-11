@@ -52,6 +52,27 @@ from .core import Extractor
 # =============================================================================
 
 class MedianAbsDev(Extractor):
+    r"""
+
+    **MedianAbsDev**
+
+    The median absolute deviation is defined as the median discrepancy of the
+    data from the median data:
+
+    .. math::
+
+        Median Absolute Deviation = median(|mag - median(mag)|)
+
+    It should take a value close to 0.675 for a normal distribution:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['MedianAbsDev'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'MedianAbsDev': 0.66332131466690614}
+
+    """
 
     data = ['magnitude']
     features = ["MedianAbsDev"]

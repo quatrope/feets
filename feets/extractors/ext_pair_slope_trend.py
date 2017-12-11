@@ -52,10 +52,20 @@ from .core import Extractor
 # =============================================================================
 
 class PairSlopeTrend(Extractor):
-    """
+    r"""
+    **PairSlopeTrend**
+
     Considering the last 30 (time-sorted) measurements of source magnitude,
     the fraction of increasing first differences minus the fraction of
     decreasing first differences.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['PairSlopeTrend'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'PairSlopeTrend': -0.16666666666666666}
+
     """
     data = ['magnitude']
     features = ["PairSlopeTrend"]

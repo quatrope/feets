@@ -52,6 +52,22 @@ from .core import Extractor
 # =============================================================================
 
 class Q31(Extractor):
+    r"""
+    **Q31** (:math:`Q_{3-1}`)
+
+    :math:`Q_{3-1}` is the difference between the third quartile, :math:`Q_3`,
+    and the first quartile, :math:`Q_1`, of a raw light curve.
+    :math:`Q_1` is a split between the lowest 25% and the highest 75% of data.
+    :math:`Q_3` is a split between the lowest 75% and the highest 25% of data.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Q31'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Q31': 1.3320376563134508}
+
+    """
 
     data = ['magnitude']
     features = ["Q31"]
@@ -62,6 +78,20 @@ class Q31(Extractor):
 
 
 class Q31Color(Extractor):
+    r"""
+    **Q31_color** (:math:`Q_{3-1|B-R}`)
+
+    :math:`Q_{3-1}` applied to the difference between both bands of a light
+    curve (B-R).
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Q31_color'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Q31_color': 1.8840489594535512}
+
+    """
 
     data = ['aligned_magnitude', 'aligned_magnitude2']
     features = ["Q31_color"]

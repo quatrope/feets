@@ -52,7 +52,7 @@ from .core import Extractor
 # =============================================================================
 
 class MeanVariance(Extractor):
-    """
+    r"""
     **Meanvariance** (:math:`\frac{\sigma}{\bar{m}}`)
 
     This is a simple variability index and is defined as the ratio of the

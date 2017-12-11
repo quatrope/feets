@@ -52,10 +52,19 @@ from .core import Extractor
 # =============================================================================
 
 class MedianBRP(Extractor):
-    """Median buffer range percentage
+    r"""
+    **MedianBRP** (Median buffer range percentage)
 
     Fraction (<= 1) of photometric points within amplitude/10
     of the median magnitude
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['MedianBRP'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'MedianBRP': 0.559}
+
     """
 
     data = ['magnitude']

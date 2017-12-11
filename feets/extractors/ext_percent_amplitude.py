@@ -52,6 +52,19 @@ from .core import Extractor
 # =============================================================================
 
 class PercentAmplitude(Extractor):
+    r"""
+    **PercentAmplitude**
+
+    Largest percentage difference between either the max or min magnitude
+    and the median.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['PercentAmplitude'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'PercentAmplitude': -168.991253993057}
+    """
 
     data = ['magnitude']
     features = ["PercentAmplitude"]

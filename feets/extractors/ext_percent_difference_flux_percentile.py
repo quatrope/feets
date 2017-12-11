@@ -54,6 +54,19 @@ from .core import Extractor
 # =============================================================================
 
 class PercentDifferenceFluxPercentile(Extractor):
+    r"""
+    **PercentDifferenceFluxPercentile**
+
+    Ratio of :math:`F_{5, 95}` over the median magnitude.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['PercentDifferenceFluxPercentile'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'PercentDifferenceFluxPercentile': -134.93590403825007}
+
+    """
 
     data = ['magnitude']
     features = ["PercentDifferenceFluxPercentile"]

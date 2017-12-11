@@ -52,7 +52,32 @@ from .core import Extractor
 # =============================================================================
 
 class RCS(Extractor):
-    """Range of cumulative sum"""
+    """
+    **Rcs** - Range of cumulative sum (:math:`R_{cs}`)
+
+    :math:`R_{cs}` is the range of a cumulative sum (Ellaway 1978) of each
+    light-curve and is defined as:
+
+    .. math::
+
+        R_{cs} = max(S) - min(S) \\
+        S = \frac{1}{N \sigma} \sum_{i=1}^l (m_i - \bar{m})
+
+    where max(min) is the maximum (minimum) value of S and
+    :math:`l=1,2, \dots, N`.
+
+    :math:`R_{cs}` should take a value close to zero for any symmetric
+    distribution:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Rcs'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Rcs': 0.0094459606901065168}
+
+
+    """
 
     data = ['magnitude']
     features = ['Rcs']
