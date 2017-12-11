@@ -52,7 +52,26 @@ from .core import Extractor
 # =============================================================================
 
 class Std(Extractor):
-    """Standard deviation of the magnitudes"""
+    r"""
+    **Std** - Standard deviation of the magnitudes
+
+
+    The standard deviation :math:`\sigma` of the sample is defined as:
+
+    .. math::
+
+        \sigma=\frac{1}{N-1}\sum_{i} (y_{i}-\hat{y})^2
+
+    For example, a white noise time serie should have :math:`\sigma=1`
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Std'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Std': 0.99320419310116881}
+
+    """
 
     data = ['magnitude']
     features = ["Std"]

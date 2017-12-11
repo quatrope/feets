@@ -130,7 +130,7 @@ DOC_TEMPLATE = jinja2.Template("""
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="heading-feature-{{ name }}">
       <h4 class="panel-title">
-        <a role="button" data-toggle="collapse" data-parent="#extractors" href="#collapse-feature-{{ name }}" aria-expanded="true" aria-controls="collapse-feature-{{ name }}">
+        <a class="extractor-doc" role="button" data-toggle="collapse" data-parent="#extractors" href="#collapse-feature-{{ name }}" aria-expanded="true" aria-controls="collapse-feature-{{ name }}">
           Extractor <span class="text-info">{{ name }}</span>
 
          <span class="pull-right">

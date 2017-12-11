@@ -52,11 +52,42 @@ from .core import Extractor
 # =============================================================================
 
 class SlottedA_length(Extractor):
-    """T: tau (slot size in days. default: 4)"""
+    r"""
+    **SlottedA_length** - Slotted Autocorrelation
+
+    In slotted autocorrelation, time lags are defined as intervals or slots
+    instead of single values. The slotted autocorrelation function at a
+    certain time lag slot is computed by averaging the cross product between
+    samples whose time differences fall in the given slot.
+
+    .. math::
+
+        \hat{\rho}(\tau=kh) = \frac {1}{\hat{\rho}(0)\,N_\tau}
+            \sum_{t_i}\sum_{t_j= t_i+(k-1/2)h }^{t_i+(k+1/2)h}
+            \bar{y}_i(t_i)\,\, \bar{y}_j(t_j)
+
+    Where :math:`h` is the slot size, :math:`\bar{y}` is the normalized
+    magnitude, :math:`\hat{\rho}(0)` is the slotted autocorrelation for the
+    first lag, and :math:`N_\tau` is the number of pairs that fall in the
+    given slot.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(
+        ...     only=['SlottedA_length'], SlottedA_length={"t": 1})
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'SlottedA_length': 1.}
+
+    **Parameters**
+
+    - ``T``: tau - slot size in days (default=1).
+
+    """
 
     data = ["magnitude", "time"]
     features = ["SlottedA_length"]
-    params = {"T": None}
+    params = {"T": 1}
 
     def slotted_autocorrelation(self, data, time, T, K,
                                 second_round=False, K1=100):
