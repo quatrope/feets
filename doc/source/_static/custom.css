@@ -48,9 +48,6 @@ div.section#The-Features blockquote > span.math {
     margin-bottom: 10px;
 }
 
-/*
-div.section#The-Features p span.math,
-div.section#The-Features ol span.math, {
-    display: inline !important;
+ul#features-list-links {
+height: 200px; overflow: auto;
 }
-*/
