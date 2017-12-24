@@ -35,7 +35,32 @@ from __future__ import unicode_literals
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+__doc__ = r"""These three features are based on the Welch/Stetson variability
+index :math:`I` (Stetson, 1996) defined by the equation:
+
+.. math::
+
+    I = \sqrt{\frac{1}{n(n-1)}} \sum_{i=1}^n {(\frac{b_i-\hat{b}}{\sigma_{b,i}})
+        (\frac{v_i - \hat{v}}{\sigma_{v,i}})}
+
+where \:math:`b_i` and :math:`v_i` are the apparent magnitudes obtained for
+the candidate star in two observations closely spaced in time on some occasion
+:math:`i`, :math:`\sigma_{b, i}` and :math:`\sigma_{v, i}` are the standard
+errors of those magnitudes, :math:`\hat{b}` and \hat{v} are the weighted mean
+magnitudes in the two filters, and :math:`n` is the number of observation
+pairs.
+
+Since a given frame pair may include data from two filters which did not have
+equal numbers of observations overall, the "relative error" is calculated as
+follows:
+
+.. math::
+
+    \delta = \sqrt{\frac{n}{n-1}} \frac{v-\hat{v}}{\sigma_v}
+
+allowing all residuals to be compared on an equal basis.
+
+"""
 
 
 # =============================================================================
@@ -54,7 +79,30 @@ from .ext_slotted_a_length import SlottedA_length
 # =============================================================================
 
 class StetsonJ(Extractor):
-    """Stetson (1996) variability index, a robust standard deviation"""
+    __doc__ = __doc__ + r"""
+
+    **StetsonJ**
+
+    Stetson J is a robust version of the variability index. It is calculated
+    based on two simultaneous light curves of a same star and is defined as:
+
+    .. math::
+
+        J =  \sum_{k=1}^n  sgn(P_k) \sqrt{|P_k|}
+
+    with :math:`P_k = \delta_{i_k} \delta_{j_k}`
+
+    For a Gaussian magnitude distribution, J should take a value close to zero:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['StetsonJ'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'StetsonJ': 0.010765631555204736}
+
+
+    """
 
     data = ['aligned_magnitude', 'aligned_magnitude2',
             'aligned_error', 'aligned_error2']
@@ -87,6 +135,29 @@ class StetsonJ(Extractor):
 
 
 class StetsonK(Extractor):
+    __doc__ = __doc__ + r"""
+
+    **StetsonK**
+
+    Stetson K is a robust kurtosis measure:
+
+    .. math::
+
+        \frac{1/N \sum_{i=1}^N |\delta_i|}{\sqrt{1/N \sum_{i=1}^N \delta_i^2}}
+
+    where the index :math:`i` runs over all :math:`N` observations available
+    for the star without regard to pairing. For a Gaussian magnitude
+    distribution K should take a value close to :math:`\sqrt{2/\pi} = 0.798`:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['StetsonK'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'StetsonK': 0.79914938521401002}
+
+    """
+
     data = ['magnitude', 'error']
     features = ['StetsonK']
 
@@ -105,6 +176,21 @@ class StetsonK(Extractor):
 
 
 class StetsonKAC(Extractor):
+    __doc__ = __doc__ + r"""
+
+    **StetsonK_AC**
+
+    Stetson K applied to the slotted autocorrelation function of the
+    light-curve.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['SlottedA_length','StetsonK_AC'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'SlottedA_length': 1.0, 'StetsonK_AC': 0.20917402545294403}
+
+    """
 
     data = ['magnitude', 'time', 'error']
     features = ["StetsonK_AC"]
@@ -126,6 +212,28 @@ class StetsonKAC(Extractor):
 
 
 class StetsonL(Extractor):
+    __doc__ = __doc__ + r"""
+
+    **StetsonL**
+
+    Stetson L variability index describes the synchronous variability of
+    different bands and is defined as:
+
+    .. math::
+
+        L = \frac{JK}{0.798}
+
+    Again, for a Gaussian magnitude distribution, L should take a value close
+    to zero:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['SlottedL'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'StetsonL': 0.0085957106316273714}
+
+    """
 
     data = ['aligned_magnitude', 'aligned_magnitude2',
             'aligned_error', 'aligned_error2']

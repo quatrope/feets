@@ -112,7 +112,66 @@ def _car_like(parameters, t, x, error_vars):
 # =============================================================================
 
 class CAR(Extractor):
+    r"""In order to model the irregular sampled times series we use CAR
+    (Brockwell and Davis, 2002), a continious time auto regressive model.
 
+    CAR process has three parameters, it provides a natural and consistent way
+    of estimating a characteristic time scale and variance of light-curves.
+    CAR process is described by the following stochastic differential equation:
+
+    .. math::
+
+        dX(t) = - \frac{1}{\tau} X(t)dt +
+            \sigma_C \sqrt{dt} \epsilon(t) + bdt, \\
+        for \: \tau, \sigma_C, t \geq 0
+
+    where the mean value of the lightcurve :math:`X(t)` is :math:`b\tau`
+    and the variance is :math:`\frac{\tau\sigma_C^2}{2}`.
+    :math:`\tau`  is the relaxation time of the process :math:`X(t)`, it can
+    be interpreted as describing the variability amplitude of the time series.
+    :math:`\sigma_C` can be interpreted as describing the variability of the
+    time series on time scales shorter than :math:`\tau`.
+    :math:`\epsilon(t)` is a white noise process with zero mean and variance
+    equal to one.
+
+    The likelihood function of a CAR model for a light-curve with observations
+    :math:`x - \{x_1, \dots, x_n\}` observed at times
+    :math:`\{t_1, \dots, t_n\}` with measurements error variances
+    :math:`\{\delta_1^2, \dots, \delta_n^2\}` is:
+
+    .. math::
+
+        p (x|b,\sigma_C,\tau) = \prod_{i=1}^n \frac{1}{
+            [2 \pi (\Omega_i + \delta_i^2 )]^{1/2}} exp \{-\frac{1}{2}
+            \frac{(\hat{x}_i - x^*_i )^2}{\Omega_i + \delta^2_i}\} \\
+
+        x_i^* = x_i - b\tau \\
+
+        \hat{x}_0 = 0 \\
+
+        \Omega_0 = \frac{\tau \sigma^2_C}{2} \\
+
+        \hat{x}_i = a_i\hat{x}_{i-1} + \frac{a_i \Omega_{i-1}}{\Omega_{i-1} +
+            \delta^2_{i-1}} (x^*_{i-1} + \hat{x}_{i-1}) \\
+
+        \Omega_i = \Omega_0 (1- a_i^2 ) + a_i^2 \Omega_{i-1}
+            (1 - \frac{\Omega_{i-1}}{\Omega_{i-1} + \delta^2_{i-1}} )
+
+    To find the optimal parameters we maximize the likelihood with respect to
+    :math:`\sigma_C` and :math:`\tau` and calculate :math:`b` as the mean
+    magnitude of the light-curve divided by :math:`\tau`.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(
+        ...     only=['CAR_sigma', 'CAR_tau','CAR_mean'])
+        >>> features, values = fs.extract(**lc_periodic)
+        >>> dict(zip(features, values))
+        {'CAR_mean': -9.230698873903961,
+         'CAR_sigma': -0.21928049298842511,
+         'CAR_tau': 0.64112037377348619}
+
+    """
     data = ['magnitude', 'time', 'error']
     features = ["CAR_sigma", "CAR_tau", "CAR_mean"]
     params = {"minimize_method": "powell"}
