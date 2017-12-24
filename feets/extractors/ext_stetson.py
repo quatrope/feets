@@ -40,7 +40,8 @@ index :math:`I` (Stetson, 1996) defined by the equation:
 
 .. math::
 
-    I = \sqrt{\frac{1}{n(n-1)}} \sum_{i=1}^n {(\frac{b_i-\hat{b}}{\sigma_{b,i}})
+    I = \sqrt{\frac{1}{n(n-1)}} \sum_{i=1}^n {
+        (\frac{b_i-\hat{b}}{\sigma_{b,i}})
         (\frac{v_i - \hat{v}}{\sigma_{v,i}})}
 
 where \:math:`b_i` and :math:`v_i` are the apparent magnitudes obtained for
