@@ -115,8 +115,9 @@ class CAR(Extractor):
 
     data = ['magnitude', 'time', 'error']
     features = ["CAR_sigma", "CAR_tau", "CAR_mean"]
+    params = {"minimize_method": "powell"}
 
-    def _calculate_CAR(self, time, magnitude, error):
+    def _calculate_CAR(self, time, magnitude, error, minimize_method):
         magnitude = magnitude.copy()
         time = time.copy()
         error = error.copy() ** 2
@@ -127,7 +128,7 @@ class CAR(Extractor):
             warnings.filterwarnings('ignore')
             res = minimize(_car_like, x0,
                            args=(time, magnitude, error),
-                           method='nelder-mead', bounds=bnds)
+                           method=minimize_method, bounds=bnds)
         sigma, tau = res.x[0], res.x[1]
         return sigma, tau
 
