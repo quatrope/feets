@@ -49,5 +49,17 @@ div.section#The-Features blockquote > span.math {
 }
 
 ul#features-list-links {
-height: 200px; overflow: auto;
+    height: 200px; overflow: auto;
+}
+
+div.section#The-Features div.input-group {
+    width: 100% !important;
+}
+
+div.section#The-Features div.input-group span.input-group-addon {
+    width: 15% !important;
+}
+
+div.section#The-Features div.input-group span.form-control {
+    width: 85% !important;
 }
