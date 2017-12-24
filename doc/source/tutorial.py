@@ -163,6 +163,26 @@ DOC_TEMPLATE = jinja2.Template("""
              {% endfor %}
          </div>
 
+        <h5>Parameters</h5>
+        <div class="row">
+         <div class="col-md-6">
+             {% if ext.get_features()  %}
+             <table class="table table-condensed table-hover">
+             <tbody>
+             {% for k, v in ext.get_params() %}
+             <tr>
+                <th>{{ k }}</th>
+                <td><code>{{v}}</code></td>
+             <tr>
+             {% endfor %}
+             </tbody>
+             </table>
+             {% else %}
+             -
+             {% endif %}
+         </div>
+         </div>
+
          <h5>Dependencies</h5>
          <div>
          {% for dep in ext.get_dependencies() %}
