@@ -193,20 +193,20 @@ class FeatureSpace(object):
             params.update(self._kwargs.get(f, {}))
         return params
 
-    def kwargs_as_array(self, kwargs):
-        array_kwargs = {}
-        for k, v in kwargs.items():
+    def dict_data_as_array(self, d):
+        array_data = {}
+        for k, v in d.items():
             if k in self._required_data and v is None:
                 raise DataRequiredError(k)
-            array_kwargs[k] = v if v is None else np.asarray(v)
-        return array_kwargs
+            array_data[k] = v if v is None else np.asarray(v)
+        return array_data
 
     def extract(self, time=None, magnitude=None, error=None,
                 magnitude2=None, aligned_time=None,
                 aligned_magnitude=None, aligned_magnitude2=None,
                 aligned_error=None, aligned_error2=None):
 
-        kwargs = self.kwargs_as_array({
+        kwargs = self.dict_data_as_array({
             "time": time,
             "magnitude": magnitude,
             "error": error,
