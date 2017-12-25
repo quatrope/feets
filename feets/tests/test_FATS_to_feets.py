@@ -165,7 +165,7 @@ class FATSRegressionTestCase(FeetsTestCase):
             self.assertAllClose(feets_value, FATS_value, **params)
 
     def test_FATS_to_feets_extract_one(self):
-        fs = FeatureSpace()
+        fs = FeatureSpace(SlottedA_length={"T": None})
         result = fs.extract(*self.lc)
         feets_result = dict(zip(*result))
         self.assertFATS(feets_result)
