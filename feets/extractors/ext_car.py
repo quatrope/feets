@@ -174,7 +174,7 @@ class CAR(Extractor):
     """
     data = ['magnitude', 'time', 'error']
     features = ["CAR_sigma", "CAR_tau", "CAR_mean"]
-    params = {"minimize_method": "powell"}
+    params = {"minimize_method": "nelder-mead"}
 
     def _calculate_CAR(self, time, magnitude, error, minimize_method):
         magnitude = magnitude.copy()
