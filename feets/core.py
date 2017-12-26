@@ -177,6 +177,14 @@ class FeatureSpace(object):
         self._execution_plan = extractors.sort_by_dependencies(
             features_extractors)
 
+        not_found = set(self._kwargs).difference(self._features)
+        if not_found:
+            msg = (
+                "This space not found feature(s) {} "
+                "to assign the given parameter(s)"
+            ).format(", ".join(not_found))
+            raise FeatureNotFound(msg)
+
     def __repr__(self):
         return str(self)
 

@@ -221,7 +221,7 @@ class Extractor(object):
                 defined_in = set(setted_params[p] for p in repeated)
                 defined_in.update([feature])
                 msg = (
-                    "Parameters '{}' for the extractor '{}' are defined "
+                    "Parameter(s) '{}' for the extractor '{}' are defined "
                     "multiple times by the features: {}"
                 ).format(
                     ", ".join(repeated),

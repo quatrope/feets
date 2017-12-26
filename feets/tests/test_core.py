@@ -47,7 +47,8 @@ import numpy as np
 import mock
 
 from .. import (
-    FeatureSpace, Extractor, register_extractor, ExtractorContractError)
+    FeatureSpace, FeatureNotFound,
+    Extractor, register_extractor, ExtractorContractError)
 
 from .core import FeetsTestCase
 
@@ -95,13 +96,37 @@ class FeatureSpaceTestCase(FeetsTestCase):
             self.assertArrayEqual(data[0], values_col)
 
     def test_features_kwargs(self):
+        # ok
         FeatureSpace(
             only=["CAR_sigma"],
             CAR_sigma={"minimize_method": "powell"})
+
+        # invalid parameter
         with self.assertRaises(ExtractorContractError):
             FeatureSpace(only=["CAR_sigma"], CAR_sigma={"o": 1})
+
+        # invalid parameter with valid parameter
+        with self.assertRaises(ExtractorContractError):
+            FeatureSpace(
+                only=["CAR_sigma"],
+                CAR_sigma={"o": 1, "minimize_method": "powell"})
+
+        # one feature ok the other no
+        with self.assertRaises(ExtractorContractError):
+            FeatureSpace(
+                only=["CAR_sigma", "CAR_tau"],
+                CAR_sigma={"o": "o"},
+                CAR_tau={"minimize_method": "powell"})
+
+        # redefinition of the same parameter
         with self.assertRaises(ExtractorContractError):
             FeatureSpace(
                 only=["CAR_sigma", "CAR_tau"],
                 CAR_sigma={"minimize_method": "powell"},
+                CAR_tau={"minimize_method": "powell"})
+
+        # setup extractor with a no required feature
+        with self.assertRaises(FeatureNotFound):
+            FeatureSpace(
+                only=["CAR_sigma"],
                 CAR_tau={"minimize_method": "powell"})
