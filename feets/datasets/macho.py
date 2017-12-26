@@ -46,7 +46,8 @@ import numpy as np
 
 from ..extractors.core import DATA_TIME, DATA_MAGNITUDE, DATA_ERROR
 
-from .base import Bunch
+from .base import Bunch, LightCurve
+
 
 # =============================================================================
 # CONSTANTS
@@ -103,14 +104,14 @@ def load_MACHO(macho_id):
 
     data = (DATA_TIME, DATA_MAGNITUDE, DATA_ERROR)
     bands = Bunch(
-        R=Bunch(**{
-            DATA_TIME: rlc[:, 0],
-            DATA_MAGNITUDE: rlc[:, 1],
-            DATA_ERROR: rlc[:, 2]}),
-        B=Bunch(**{
-            DATA_TIME: blc[:, 0],
-            DATA_MAGNITUDE: blc[:, 1],
-            DATA_ERROR: blc[:, 2]}))
+        R=LightCurve(
+            time=rlc[:, 0],
+            magnitude=rlc[:, 1],
+            error=rlc[:, 2]),
+        B=LightCurve(
+            time=blc[:, 0],
+            magnitude=blc[:, 1],
+            error=blc[:, 2]))
     descr = ("The files are gathered from the original FATS project "
              "tutorial: https://github.com/isadoranun/tsfeat")
 
