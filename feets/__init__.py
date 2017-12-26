@@ -98,8 +98,7 @@ KEYWORDS = (
     "machine-learning",
     "feature-extraction",
     "timeseries",
-    "astronomy",
-    "multiprocessing")
+    "astronomy")
 
 
 # =============================================================================

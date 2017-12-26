@@ -60,8 +60,6 @@ from .core import (
     Extractor, ExtractorBadDefinedError, ExtractorContractError, DATAS)  # noqa
 
 
-
-
 # =============================================================================
 # REGISTER UTILITY
 # =============================================================================

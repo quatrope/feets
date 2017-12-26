@@ -46,7 +46,8 @@ import numpy as np
 
 import mock
 
-from .. import FeatureSpace, Extractor, register_extractor
+from .. import (
+    FeatureSpace, Extractor, register_extractor, ExtractorContractError)
 
 from .core import FeetsTestCase
 
@@ -92,3 +93,15 @@ class FeatureSpaceTestCase(FeetsTestCase):
 
             features, values_col = space.extract(magnitude=data)
             self.assertArrayEqual(data[0], values_col)
+
+    def test_features_kwargs(self):
+        FeatureSpace(
+            only=["CAR_sigma"],
+            CAR_sigma={"minimize_method": "powell"})
+        with self.assertRaises(ExtractorContractError):
+            FeatureSpace(only=["CAR_sigma"], CAR_sigma={"o": 1})
+        with self.assertRaises(ExtractorContractError):
+            FeatureSpace(
+                only=["CAR_sigma", "CAR_tau"],
+                CAR_sigma={"minimize_method": "powell"},
+                CAR_tau={"minimize_method": "powell"})

@@ -190,7 +190,7 @@ class FeatureSpace(object):
     def params_by_features(self, features):
         params = {}
         for f in features:
-            params.update(self._kwargs.get(f, {}))
+            params[f] = self._kwargs.get(f, {})
         return params
 
     def dict_data_as_array(self, d):

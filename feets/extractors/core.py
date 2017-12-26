@@ -83,7 +83,10 @@ class ExtractorBadDefinedError(Exception):
 
 
 class ExtractorContractError(ValueError):
-    """The extractor dont get the expected features"""
+    """The extractor dont get the expected features, data, parameters
+    or wathever
+
+    """
     pass
 
 
@@ -187,8 +190,8 @@ class Extractor(object):
         return cls._conf.dependencies
 
     @classmethod
-    def get_params(cls):
-        return cls._conf.params
+    def get_default_params(cls):
+        return dict(cls._conf.params)
 
     @classmethod
     def get_features(cls):
@@ -197,18 +200,47 @@ class Extractor(object):
     def __init__(self, space):
         self.space = space
         self.name = type(self).__name__
-        self.params = {}
-        ns = self.space.params_by_features(self.get_features())
-        for p, d in self.get_params():
-            self.params[p] = ns.get(p, d)
+
+        self.params = self.get_default_params()
+
+        features = self.get_features()
+        by_features = self.space.params_by_features(features)
+        setted_params, custom_params = {}, {}
+        for feature, cparams in by_features.items():
+
+            # check if all parameters are allowed in this extractor
+            not_allowed = set(cparams).difference(self.params)
+            if not_allowed:
+                msg = "Extractor '{}' not allow the parameters: {}".format(
+                    type(self).__name__, ", ".join(not_allowed))
+                raise ExtractorContractError(msg)
+
+            # check if two features are defining the same parameter
+            repeated = set(cparams).intersection(custom_params)
+            if repeated:
+                defined_in = set(setted_params[p] for p in repeated)
+                defined_in.update([feature])
+                msg = (
+                    "Parameters '{}' for the extractor '{}' are defined "
+                    "multiple times by the features: {}"
+                ).format(
+                    ", ".join(repeated),
+                    type(self).__name__,
+                    ", ".join(defined_in))
+                raise ExtractorContractError(msg)
+
+            # here all is ok
+            setted_params.update(dict.fromkeys(cparams, feature))
+            custom_params.update(cparams)
+
+        self.params.update(custom_params)
 
     def __repr__(self):
         return str(self)
 
     def __str__(self):
         if not hasattr(self, "__str"):
-            params = dict(self.get_params())
-            params.update(self.params)
+            params = self.params
             if params:
                 params = ", ".join([
                     "{}={}".format(k, v) for k, v in params.items()])
