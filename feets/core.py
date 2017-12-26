@@ -91,34 +91,73 @@ class DataRequiredError(ValueError):
 
 
 class FeatureSpace(object):
-    """
-    This Class is a wrapper class, to allow user select the
+    """Wrapper class, to allow user select the
     features based on the available time series vectors (magnitude, time,
     error, second magnitude, etc.) or specify a list of features.
+    The finally selected features for the execution plan are are those that
+    satisfy all the filters.
 
-    __init__ will take in the list of the available data and featureList.
+    Parameters
+    ----------
 
-    User could only specify the available time series vectors, which will
-    output all the features that need this data to be calculated.
+    data : array-like, optional, default ``None``
+        available time series vectors, which will
+        output all the features that need this data to be calculated.
 
-    User could only specify featureList, which will output
-    all the features in the list.
+    only : array-like, optional, default ``None``
+        List of features, which will output
+        all the features in the list.
 
-    User could specify a list of the available time series vectors and
-    featureList, which will output all the features in the List that
-    use the available data.
+    exclude : array-like, optional, default ``None``
+        List of features, which will not output
 
-    Additional parameters are used for individual features.
-    Format is featurename = [parameters]
+    kwargs
+        Extra configuration for the feature extractors.
+        format is ``Feature_name={param1: value, param2: value, ...}``
 
-    usage:
-    data = np.random.randint(0,10000, 100000000)
-    # automean is the featurename and [0,0] is the parameter for the feature
-    a = FeatureSpace(category='all', automean=[0,0])
-    print a.featureList
-    a=a.calculateFeature(data)
-    print a.result(method='array')
-    print a.result(method='dict')
+    Examples
+    --------
+
+    **List of features as an input:**
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Std'])
+        >>> features, values = fs.extract(*lc)
+        >>> dict(zip(features, values))
+        {"Std": .42}
+
+    **Available data as an input:**
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(data=['magnitude','time'])
+        >>> features, values = fs.extract(*lc)
+        >>> dict(zip(features, values))
+        {...}
+
+    **List of features and available data as an input:**
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(
+        ...     only=['Mean','Beyond1Std', 'CAR_sigma','Color'],
+        ...     data=['magnitude', 'error'])
+        >>> features, values = fs.extract(*lc)
+        >>> dict(zip(features, values))
+        {"Beyond1Std": ..., "Mean": ...}
+
+    **Excluding list as an input**
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(
+        ...     only=['Mean','Beyond1Std','CAR_sigma','Color'],
+        ...     data=['magnitude', 'error'],
+        ...     exclude=["Beyond1Std"])
+        >>> features, values = fs.extract(**lc)
+        >>> dict(zip(features, values))
+        {"Mean": 23}
 
     """
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
