@@ -51,6 +51,16 @@ import logging
 import numpy as np
 
 from . import extractors
+from .extractors.core import (
+    DATA_MAGNITUDE,
+    DATA_TIME,
+    DATA_ERROR,
+    DATA_MAGNITUDE2,
+    DATA_ALIGNED_MAGNITUDE,
+    DATA_ALIGNED_MAGNITUDE2,
+    DATA_ALIGNED_TIME,
+    DATA_ALIGNED_ERROR,
+    DATA_ALIGNED_ERROR2)
 
 
 # =============================================================================
@@ -254,15 +264,15 @@ class FeatureSpace(object):
                 aligned_error=None, aligned_error2=None):
 
         kwargs = self.dict_data_as_array({
-            "time": time,
-            "magnitude": magnitude,
-            "error": error,
-            "magnitude2": magnitude2,
-            "aligned_time": aligned_time,
-            "aligned_magnitude": aligned_magnitude,
-            "aligned_magnitude2": aligned_magnitude2,
-            "aligned_error": aligned_error,
-            "aligned_error2": aligned_error2})
+            DATA_TIME: time,
+            DATA_MAGNITUDE: magnitude,
+            DATA_ERROR: error,
+            DATA_MAGNITUDE2: magnitude2,
+            DATA_ALIGNED_TIME: aligned_time,
+            DATA_ALIGNED_MAGNITUDE: aligned_magnitude,
+            DATA_ALIGNED_MAGNITUDE2: aligned_magnitude2,
+            DATA_ALIGNED_ERROR: aligned_error,
+            DATA_ALIGNED_ERROR2: aligned_error2})
 
         features = {}
         for fextractor in self._execution_plan:
