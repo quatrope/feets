@@ -45,6 +45,7 @@ __all__ = [
     "extractor_of",
     "sort_by_dependencies",
     "ExtractorBadDefinedError",
+    "ExtractorContractError",
     "Extractor"]
 
 # =============================================================================
@@ -55,7 +56,10 @@ import inspect
 
 import six
 
-from .core import Extractor, ExtractorBadDefinedError, DATAS  # noqa
+from .core import (
+    Extractor, ExtractorBadDefinedError, ExtractorContractError, DATAS)  # noqa
+
+
 
 
 # =============================================================================

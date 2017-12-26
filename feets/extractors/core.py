@@ -83,7 +83,7 @@ class ExtractorBadDefinedError(Exception):
 
 
 class ExtractorContractError(ValueError):
-    """The extractor dont get the expectd features"""
+    """The extractor dont get the expected features"""
     pass
 
 
