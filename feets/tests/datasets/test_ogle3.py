@@ -43,6 +43,7 @@ __doc__ = """All ogle3 access tests"""
 # =============================================================================
 
 import os
+import tarfile
 
 import numpy as np
 
@@ -52,7 +53,7 @@ import mock
 
 from ...datasets import ogle3
 
-from ..core import FeetsTestCase
+from ..core import FeetsTestCase, DATA_PATH
 
 
 # =============================================================================
@@ -88,3 +89,10 @@ class LoadFetchOGLE3(FeetsTestCase):
                     data = ogle3.fetch_OGLE3(oid)
                     self.assertEquals(data["lcid"], oid)
                     fetch.assert_called_with(url, file_path)
+
+    def test_fetch_OGLE3_real_TAR(self):
+        file_path = os.path.join(DATA_PATH, "OGLE-BLG-LPV-232406.tar")
+        with tarfile.TarFile(file_path) as tfp:
+            with mock.patch("feets.datasets.base.fetch"), \
+                    mock.patch("tarfile.TarFile", return_value=tfp):
+                        ogle3.fetch_OGLE3("OGLE-BLG-LPV-232406")

@@ -42,6 +42,8 @@ import shutil
 
 import requests
 
+from ..extractors import DATAS
+
 
 # =============================================================================
 # FUNCTIONS
@@ -156,6 +158,20 @@ class Bunch(dict):  # THANKS SKLEARN
             return self[key]
         except KeyError:
             raise AttributeError(key)
+
+    def __setstate__(self, state):
+        pass
+
+
+class LightCurve(Bunch):
+    """A bunch that only accept feets lightcurve keys"""
+
+    def __init__(self, **kwargs):
+        invalid = set(kwargs).difference(DATAS)
+        if invalid:
+            msg = "LightCurve got an unexpected keyword argument(s) '{}'"
+            raise TypeError(msg.format(", ".join(invalid)))
+        super(LightCurve, self).__init__(**kwargs)
 
     def __setstate__(self, state):
         pass

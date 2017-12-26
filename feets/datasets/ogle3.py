@@ -107,7 +107,7 @@ import pandas as pd
 from ..extractors.core import DATA_TIME, DATA_MAGNITUDE, DATA_ERROR
 
 from . import base
-from .base import Bunch
+from .base import Bunch, LightCurve
 
 
 # =============================================================================
@@ -202,11 +202,8 @@ def fetch_OGLE3(ogle3_id, data_home=None,
                 member = tfp.getmember(member_name)
                 src = tfp.extractfile(member)
                 lc = _check_dim(np.loadtxt(src))
-
-                bands[band_name] = Bunch({
-                    DATA_TIME: lc[:, 0],
-                    DATA_MAGNITUDE: lc[:, 1],
-                    DATA_ERROR: lc[:, 2]})
+                bands[band_name] = LightCurve(
+                    time=lc[:, 0], magnitude=lc[:, 1], error=lc[:, 2])
 
     if metadata:
         cat = load_OGLE3_catalog()

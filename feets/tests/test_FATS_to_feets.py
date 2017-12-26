@@ -48,14 +48,7 @@ import numpy as np
 
 from .. import FeatureSpace, datasets, preprocess
 
-from .core import FeetsTestCase
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-DATA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
+from .core import FeetsTestCase, DATA_PATH
 
 
 # =============================================================================
