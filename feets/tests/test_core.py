@@ -57,10 +57,8 @@ from .core import FeetsTestCase
 
 class FeatureSpaceTestCase(FeetsTestCase):
 
-    def setUp(self):
-        self.space = FeatureSpace(only=["Amplitude"])
-
     def test_extract(self):
+        space = FeatureSpace(only=["Amplitude"])
         magnitude = np.array([
             0.46057565, 0.51372940, 0.70136533, 0.21454228,
             0.54792300, 0.33433717, 0.44879870, 0.55571062,
@@ -71,7 +69,7 @@ class FeatureSpaceTestCase(FeetsTestCase):
             0.54201036, 0.87854618, 0.07388174, 0.21543205,
             0.59295337, 0.56771493])
 
-        features, values = self.space.extract(magnitude=magnitude)
+        features, values = space.extract(magnitude=magnitude)
         self.assertTrue(len(features) == 1 and features[0] == "Amplitude")
         self.assertAllClose(values[features == "Amplitude"], 0.45203809)
 
@@ -86,11 +84,11 @@ class FeatureSpaceTestCase(FeetsTestCase):
             def fit(self, magnitude):
                 return {"Same": magnitude[0]}
 
-        self.space = FeatureSpace(only=["Same"])
+        space = FeatureSpace(only=["Same"])
 
         for _ in range(200):
             data = np.unique(np.random.randint(1, 1000, 10))
             np.random.shuffle(data)
 
-            features, values_col = self.space.extract(magnitude=data)
+            features, values_col = space.extract(magnitude=data)
             self.assertArrayEqual(data[0], values_col)
