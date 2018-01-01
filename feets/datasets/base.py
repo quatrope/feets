@@ -39,10 +39,15 @@
 
 import os
 import shutil
+from collections import Mapping
+
+import numpy as np
 
 import requests
 
-from ..extractors import DATAS
+import attr
+
+from ..extractors.core import DATAS
 
 
 # =============================================================================
@@ -126,11 +131,11 @@ def fetch(url, dest, force=False):
 # CLASSES
 # =============================================================================
 
-class Bunch(dict):  # THANKS SKLEARN
+class Bunch(Mapping):  # THANKS SKLEARN
     """Container object for datasets
     Dictionary-like object that exposes its keys as attributes.
 
-    >>> b = Data(a=1, b=2)
+    >>> b = Bunch(a=1, b=2)
     >>> b['b']
     2
     >>> b.b
@@ -144,18 +149,31 @@ class Bunch(dict):  # THANKS SKLEARN
 
     """
 
-    def __init__(self, **kwargs):
-        super(Bunch, self).__init__(kwargs)
+    def __init__(self, data=None, **kwargs):
+        if data and kwargs:
+            raise ValueError(
+                "If 'data' is not none keywords aguments are not allowed")
+        self._data = dict(data) if data else kwargs
 
-    def __setattr__(self, key, value):
-        self[key] = value
+    def __repr__(self):
+        keys_str = ", ".join(self._data.keys())
+        return "Bunch({})".format(keys_str)
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
 
     def __dir__(self):
-        return self.keys()
+        return self._data.keys()
 
     def __getattr__(self, key):
         try:
-            return self[key]
+            return self._data[key]
         except KeyError:
             raise AttributeError(key)
 
@@ -163,15 +181,79 @@ class Bunch(dict):  # THANKS SKLEARN
         pass
 
 
-class LightCurve(Bunch):
-    """A bunch that only accept feets lightcurve keys"""
+# This ugly code creates a LightCurve object based on the extractor constants
+# and ad som validations and a custom repr, as
 
-    def __init__(self, **kwargs):
-        invalid = set(kwargs).difference(DATAS)
-        if invalid:
-            msg = "LightCurve got an unexpected keyword argument(s) '{}'"
-            raise TypeError(msg.format(", ".join(invalid)))
-        super(LightCurve, self).__init__(**kwargs)
+LightCurveBase = attr.make_class(
+    'LightCurveBase', {
+        k: attr.ib(default=attr.NOTHING if k in DATAS[:2] else None,
+                   converter=attr.converters.optional(np.asarray))
+        for k in DATAS}, frozen=True)
 
-    def __setstate__(self, state):
-        pass
+
+class LightCurve(LightCurveBase, Mapping):
+
+    def __repr__(self):
+        fields = [
+            a.name for a in attr.fields(LightCurveBase)
+            if getattr(self, a.name) is not None]
+        fields_str = ", ".join(fields)
+        return "LightCurve({})".format(fields_str)
+
+    def __getitem__(self, k):
+        try:
+            return getattr(self, k)
+        except AttributeError:
+            raise KeyError(k)
+
+    def __iter__(self):
+        return iter(k for k, v in attr.asdict(self).items() if v is not None)
+
+    def __len__(self):
+        return len(attr.fields(LightCurveBase))
+
+
+# The real dataset object
+
+@attr.s(frozen=True)
+class Dataset(Mapping):
+    """This object encapsulates a full dataset with their metadata.
+
+    Attributes
+    ----------
+
+    id : any object or None
+        the id of the lightcurve or None
+    ds_name : str
+        The name of the dataset
+    description : str
+        description about the dataser
+    bands : tuple
+        the names of the attributes inside data
+    metadata : dict-like
+        arbitrary data.
+    data : dict-like
+        lightcurves collection in a dint-like object
+
+    """
+    id = attr.ib()
+    ds_name = attr.ib(converter=str)
+    description = attr.ib(converter=str, repr=False)
+    bands = attr.ib(converter=tuple)
+    metadata = attr.ib(
+        repr=False, converter=attr.converters.optional(Bunch))
+    data = attr.ib(
+        repr=False, converter=lambda value: Bunch({
+            k: LightCurve(**v) for k, v in value.items()}))
+
+    def __getitem__(self, k):
+        try:
+            return getattr(self, k)
+        except AttributeError:
+            raise KeyError(k)
+
+    def __iter__(self):
+        return iter(k for k, v in attr.asdict(self).items() if v is not None)
+
+    def __len__(self):
+        return len(attr.fields(Dataset))

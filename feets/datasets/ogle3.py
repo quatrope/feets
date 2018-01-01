@@ -104,10 +104,8 @@ import numpy as np
 
 import pandas as pd
 
-from ..extractors.core import DATA_TIME, DATA_MAGNITUDE, DATA_ERROR
-
 from . import base
-from .base import Bunch, LightCurve
+from .base import Dataset
 
 
 # =============================================================================
@@ -193,8 +191,8 @@ def fetch_OGLE3(ogle3_id, data_home=None,
         url = URL.format(ogle3_id)
         base.fetch(url, file_path)
 
-    data = (DATA_TIME, DATA_MAGNITUDE, DATA_ERROR)
-    bands = Bunch()
+    bands = []
+    data = {}
     with tarfile.TarFile(file_path) as tfp:
         members_names = tfp.getnames()
         for band_name, member_name in members.items():
@@ -202,13 +200,15 @@ def fetch_OGLE3(ogle3_id, data_home=None,
                 member = tfp.getmember(member_name)
                 src = tfp.extractfile(member)
                 lc = _check_dim(np.loadtxt(src))
-                bands[band_name] = LightCurve(
-                    time=lc[:, 0], magnitude=lc[:, 1], error=lc[:, 2])
-
+                data[band_name] = {"time": lc[:, 0],
+                                   "magnitude": lc[:, 1],
+                                   "error": lc[:, 2]}
+                bands.append(band_name)
     if metadata:
         cat = load_OGLE3_catalog()
-        metadata = cat[cat.ID == ogle3_id]
+        metadata = cat[cat.ID == ogle3_id].iloc[0].to_dict()
         del cat
 
-    return Bunch(
-        lcid=ogle3_id, metadata=metadata, DESCR=DESCR, bands=bands, data=data)
+    return Dataset(
+        id=ogle3_id, metadata=metadata, ds_name="OGLE-III",
+        description=DESCR, bands=bands, data=data)

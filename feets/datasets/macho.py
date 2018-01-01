@@ -44,9 +44,7 @@ import tarfile
 
 import numpy as np
 
-from ..extractors.core import DATA_TIME, DATA_MAGNITUDE, DATA_ERROR
-
-from .base import Bunch, LightCurve
+from .base import Dataset
 
 
 # =============================================================================
@@ -102,19 +100,20 @@ def load_MACHO(macho_id):
         rlc = np.loadtxt(tf.extractfile(rpath))
         blc = np.loadtxt(tf.extractfile(bpath))
 
-    data = (DATA_TIME, DATA_MAGNITUDE, DATA_ERROR)
-    bands = Bunch(
-        R=LightCurve(
-            time=rlc[:, 0],
-            magnitude=rlc[:, 1],
-            error=rlc[:, 2]),
-        B=LightCurve(
-            time=blc[:, 0],
-            magnitude=blc[:, 1],
-            error=blc[:, 2]))
+    bands = ("R", "B")
+    data = {
+        "R": {
+            "time": rlc[:, 0],
+            "magnitude": rlc[:, 1],
+            "error": rlc[:, 2]},
+        "B": {
+            "time": blc[:, 0],
+            "magnitude": blc[:, 1],
+            "error": blc[:, 2]}
+    }
     descr = ("The files are gathered from the original FATS project "
              "tutorial: https://github.com/isadoranun/tsfeat")
 
-    return Bunch(
-        lcid=macho_id, metadata=None,
-        DESCR=descr, bands=bands, data=data)
+    return Dataset(
+        id=macho_id, metadata=None, ds_name="MACHO",
+        description=descr, bands=bands, data=data)

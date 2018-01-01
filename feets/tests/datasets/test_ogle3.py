@@ -87,7 +87,7 @@ class LoadFetchOGLE3(FeetsTestCase):
         with mock.patch("feets.datasets.base.fetch") as fetch, \
                 mock.patch("tarfile.TarFile"):
                     data = ogle3.fetch_OGLE3(oid)
-                    self.assertEquals(data["lcid"], oid)
+                    self.assertEquals(data["id"], oid)
                     fetch.assert_called_with(url, file_path)
 
     def test_fetch_OGLE3_real_TAR(self):
