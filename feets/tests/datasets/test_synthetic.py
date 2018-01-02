@@ -42,14 +42,7 @@ __doc__ = """All ogle3 access tests"""
 # IMPORTS
 # =============================================================================
 
-import os
-import tarfile
-
 import numpy as np
-
-import pandas as pd
-
-import mock
 
 from ...datasets import synthetic as syn
 

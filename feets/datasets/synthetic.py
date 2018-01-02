@@ -36,9 +36,6 @@
 # IMPORTS
 # =============================================================================
 
-import os
-import tarfile
-
 import numpy as np
 
 from .base import Dataset
@@ -83,7 +80,6 @@ def create_random(magf, magf_params, errf, errf_params,
         return Dataset(
             id=id, ds_name=ds_name, description=description,
             bands=bands, metadata=metadata, data=data)
-
 
 
 def create_normal(mu=0., sigma=1., mu_err=0.,
