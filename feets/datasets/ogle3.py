@@ -105,7 +105,7 @@ import numpy as np
 import pandas as pd
 
 from . import base
-from .base import Dataset
+from .base import Data
 
 
 # =============================================================================
@@ -172,7 +172,37 @@ def fetch_OGLE3(ogle3_id, data_home=None,
     Returns
     -------
 
-    A LightCurve object
+    A Data object.
+
+
+    Examples
+    --------
+
+    .. code-block:: pycon
+
+        >>> ds = fetch_OGLE3("OGLE-BLG-LPV-232377")
+        >>> ds
+        Data(id='OGLE-BLG-LPV-232377', ds_name='OGLE-III', bands=('I', 'V'))
+        >>> ds.bands
+        ('I', 'V')
+        >>> ds.data.I
+        LightCurve(time[100], magnitude[100], error[100])
+        >>> ds.data.I.magnitude
+        array([ 13.816,  13.826,  13.818,  13.812,  13.8  ,  13.827,  13.797,
+                13.82 ,  13.804,  13.783,  13.823,  13.8  ,  13.84 ,  13.817,
+                13.802,  13.824,  13.822,  13.81 ,  13.844,  13.848,  13.813,
+                13.836,  13.83 ,  13.83 ,  13.837,  13.811,  13.814,  13.82 ,
+                13.826,  13.822,  13.821,  13.817,  13.813,  13.809,  13.817,
+                13.836,  13.804,  13.801,  13.813,  13.823,  13.818,  13.831,
+                13.833,  13.814,  13.814,  13.812,  13.822,  13.814,  13.818,
+                13.817,  13.8  ,  13.804,  13.799,  13.809,  13.815,  13.846,
+                13.796,  13.791,  13.804,  13.853,  13.839,  13.816,  13.825,
+                13.81 ,  13.8  ,  13.807,  13.819,  13.829,  13.844,  13.84 ,
+                13.842,  13.818,  13.801,  13.804,  13.814,  13.821,  13.821,
+                13.822,  13.82 ,  13.803,  13.813,  13.826,  13.855,  13.865,
+                13.854,  13.828,  13.809,  13.828,  13.833,  13.829,  13.816,
+                13.82 ,  13.827,  13.834,  13.811,  13.817,  13.808,  13.834,
+                13.814,  13.829])
 
     """
 
@@ -209,6 +239,6 @@ def fetch_OGLE3(ogle3_id, data_home=None,
         metadata = cat[cat.ID == ogle3_id].iloc[0].to_dict()
         del cat
 
-    return Dataset(
+    return Data(
         id=ogle3_id, metadata=metadata, ds_name="OGLE-III",
         description=DESCR, bands=bands, data=data)

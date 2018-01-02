@@ -218,8 +218,8 @@ class LightCurve(LightCurveBase, Mapping):
 # The real dataset object
 
 @attr.s(frozen=True)
-class Dataset(Mapping):
-    """This object encapsulates a full dataset with their metadata.
+class Data(Mapping):
+    """This object encapsulates a full data with their metadata.
 
     Attributes
     ----------
@@ -229,7 +229,7 @@ class Dataset(Mapping):
     ds_name : str
         The name of the dataset
     description : str
-        description about the dataser
+        description about the dataset
     bands : tuple
         the names of the attributes inside data
     metadata : dict-like
@@ -258,4 +258,4 @@ class Dataset(Mapping):
         return iter(k for k, v in attr.asdict(self).items() if v is not None)
 
     def __len__(self):
-        return len(attr.fields(Dataset))
+        return len(attr.fields(Data))

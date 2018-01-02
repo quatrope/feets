@@ -46,7 +46,8 @@ import os
 
 import numpy as np
 
-from .. import FeatureSpace, datasets, preprocess
+from .. import FeatureSpace, preprocess
+from .. datasets import macho
 
 from .core import FeetsTestCase, DATA_PATH
 
@@ -58,7 +59,7 @@ from .core import FeetsTestCase, DATA_PATH
 class FATSPreprocessRegressionTestCase(FeetsTestCase):
 
     def setUp(self):
-        lc = datasets.load_MACHO_example()
+        lc = macho.load_MACHO_example()
         self.time = lc.data.R.time
         self.mag = lc.data.R.magnitude
         self.error = lc.data.R.error

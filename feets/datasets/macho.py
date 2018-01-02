@@ -44,7 +44,7 @@ import tarfile
 
 import numpy as np
 
-from .base import Dataset
+from .base import Data
 
 
 # =============================================================================
@@ -114,6 +114,6 @@ def load_MACHO(macho_id):
     descr = ("The files are gathered from the original FATS project "
              "tutorial: https://github.com/isadoranun/tsfeat")
 
-    return Dataset(
+    return Data(
         id=macho_id, metadata=None, ds_name="MACHO",
         description=descr, bands=bands, data=data)
