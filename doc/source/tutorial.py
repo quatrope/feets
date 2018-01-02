@@ -166,7 +166,7 @@ DOC_TEMPLATE = jinja2.Template("""
         <h5>Parameters</h5>
         <div class="row">
         <div class="col-md-10">
-            {% for k, v in ext.get_params() %}
+            {% for k, v in ext.get_default_params().items() %}
             <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1">{{k}}</span>
                 <span type="text" class="form-control"
