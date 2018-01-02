@@ -194,9 +194,11 @@ LightCurveBase = attr.make_class(
 class LightCurve(LightCurveBase, Mapping):
 
     def __repr__(self):
-        fields = [
-            a.name for a in attr.fields(LightCurveBase)
-            if getattr(self, a.name) is not None]
+        fields = []
+        for a in attr.fields(LightCurveBase):
+            v = getattr(self, a.name)
+            if v is not None:
+                fields.append("{}[{}]".format(a.name, len(v)))
         fields_str = ", ".join(fields)
         return "LightCurve({})".format(fields_str)
 
