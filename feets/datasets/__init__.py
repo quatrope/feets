@@ -38,5 +38,7 @@ including methods to load and fetch some example light curves.
 # IMPORTS
 # =============================================================================
 
+from .synthetic import (  # noqa
+    create_random, create_normal, create_uniform, create_periodic)  # noqa
 from .macho import load_MACHO, load_MACHO_example, available_MACHO_lc  # noqa
 from .ogle3 import load_OGLE3_catalog, fetch_OGLE3  # noqa
