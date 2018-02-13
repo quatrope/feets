@@ -61,7 +61,7 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 
 def run(argv=None):
     argv = argv or []
-    pytest.main(['-x', PATH] + argv)
+    return pytest.main(['-x', PATH] + argv)
 
 
 # =============================================================================
@@ -69,4 +69,4 @@ def run(argv=None):
 # =============================================================================
 
 if __name__ == "__main__":
-    run(sys.argv[1:])
+    sys.exit(run(sys.argv[1:]))
