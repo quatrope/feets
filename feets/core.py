@@ -212,24 +212,31 @@ class FeatureSpace(object):
         self._features_as_array = np.array(sorted(self._features))
 
         # initialize the extractors and determine the required data only
-        features_extractors = set()
+        features_extractors, features_extractors_names = set(), set()
         required_data = set()
         for fcls in set(exts.values()):
             if fcls.get_features().intersection(self._features):
-                fext = fcls(self)
+
+                params = self._kwargs.get(fcls.__name__, {})
+                fext = fcls(**params)
+
                 features_extractors.add(fext)
+                features_extractors_names.add(fext.name)
                 required_data.update(fext.get_data())
+
         self._features_extractors = frozenset(features_extractors)
+        self._features_extractors_names = frozenset(features_extractors_names)
         self._required_data = frozenset(required_data)
 
         # excecution order by dependencies
         self._execution_plan = extractors.sort_by_dependencies(
             features_extractors)
 
-        not_found = set(self._kwargs).difference(self._features)
+        not_found = set(self._kwargs).difference(
+            self._features_extractors_names)
         if not_found:
             msg = (
-                "This space not found feature(s) {} "
+                "This space not found feature(s) extractor(s) {} "
                 "to assign the given parameter(s)"
             ).format(", ".join(not_found))
             raise FeatureNotFound(msg)
@@ -243,12 +250,6 @@ class FeatureSpace(object):
             space = ", ".join(extractors)
             self.__str = "<FeatureSpace: {}>".format(space)
         return self.__str
-
-    def params_by_features(self, features):
-        params = {}
-        for f in features:
-            params[f] = self._kwargs.get(f, {})
-        return params
 
     def dict_data_as_array(self, d):
         array_data = {}

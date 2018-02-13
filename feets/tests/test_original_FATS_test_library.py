@@ -208,7 +208,7 @@ def test_Period_Psi(periodic_lc):
         "lscargle_kwds": {
             "autopower_kwds": {
                 "normalization": "standard",
-                "nyquist_factor": 10,
+                "nyquist_factor": 1,
             }
         }
     }

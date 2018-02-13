@@ -197,43 +197,20 @@ class Extractor(object):
     def get_features(cls):
         return cls._conf.features
 
-    def __init__(self, space):
-        self.space = space
+    def __init__(self, **cparams):
         self.name = type(self).__name__
 
         self.params = self.get_default_params()
+        set(cparams).difference(self.params)
 
-        features = self.get_features()
-        by_features = self.space.params_by_features(features)
-        setted_params, custom_params = {}, {}
-        for feature, cparams in by_features.items():
+        not_allowed = set(cparams).difference(self.params)
+        if not_allowed:
+            msg = "Extractor '{}' not allow the parameters: {}".format(
+                type(self).__name__, ", ".join(not_allowed))
+            raise ExtractorContractError(msg)
 
-            # check if all parameters are allowed in this extractor
-            not_allowed = set(cparams).difference(self.params)
-            if not_allowed:
-                msg = "Extractor '{}' not allow the parameters: {}".format(
-                    type(self).__name__, ", ".join(not_allowed))
-                raise ExtractorContractError(msg)
-
-            # check if two features are defining the same parameter
-            repeated = set(cparams).intersection(custom_params)
-            if repeated:
-                defined_in = set(setted_params[p] for p in repeated)
-                defined_in.update([feature])
-                msg = (
-                    "Parameter(s) '{}' for the extractor '{}' are defined "
-                    "multiple times by the features: {}"
-                ).format(
-                    ", ".join(repeated),
-                    type(self).__name__,
-                    ", ".join(defined_in))
-                raise ExtractorContractError(msg)
-
-            # here all is ok
-            setted_params.update(dict.fromkeys(cparams, feature))
-            custom_params.update(cparams)
-
-        self.params.update(custom_params)
+        # here all is ok
+        self.params.update(cparams)
 
     def __repr__(self):
         return str(self)
