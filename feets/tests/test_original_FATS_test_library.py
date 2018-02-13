@@ -254,12 +254,12 @@ def test_Gskew(white_noise):
     assert result >= -0.2 and result <= 0.2
 
 
-#~ def test_StructureFunction(random_walk):
-    #~ fs = FeatureSpace(only=[
-        #~ 'StructureFunction_index_21',
-        #~ 'StructureFunction_index_31',
-        #~ 'StructureFunction_index_32'])
-    #~ result = fs.extract(**random_walk)[1][0]
-    #~ assert(result[0] >= 1.520 and result[0] <= 2.067)
-    #~ assert(result[1] >= 1.821 and result[1] <= 3.162)
-    #~ assert(result[2] >= 1.243 and result[2] <= 1.562)
+def test_StructureFunction(random_walk):
+    fs = FeatureSpace(only=[
+        'StructureFunction_index_21',
+        'StructureFunction_index_31',
+        'StructureFunction_index_32'])
+    result = fs.extract(**random_walk)[1]
+    assert(result[0] >= 1.520 and result[0] <= 2.067)
+    assert(result[1] >= 1.821 and result[1] <= 3.162)
+    assert(result[2] >= 1.243 and result[2] <= 1.562)
