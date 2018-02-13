@@ -115,6 +115,11 @@ class ExtractorsTestCases(FeetsTestCase):
     def setUp(self):
         self.random = np.random.RandomState(42)
 
+    def test_theoric_Amplitude(self):
+        ext = extractors.Amplitude(mock.MagicMock())
+        value = ext.fit(np.arange(0, 1001))["Amplitude"]
+        self.assertEquals(value, 475)
+
     def test_theoric_AndersonDarling(self):
         ext = extractors.AndersonDarling(mock.MagicMock())
         values = np.empty(1000)
@@ -139,15 +144,6 @@ class ExtractorsTestCases(FeetsTestCase):
             mags = self.random.normal(size=1000)
             values[idx] = ext.fit(mags, consecutiveStar=1)["Con"]
         self.assertAllClose(values.mean(), 0.045557)
-
-    def test_theoric_Eta_e(self):
-        ext = extractors.Eta_e(mock.MagicMock())
-        time = np.linspace(1, 1000, 1000)
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(time=time, magnitude=mags)['Eta_e']
-        self.assertAllClose(values.mean(), 1.9995841787485646)
 
     def test_theoric_MeanVariance(self):
         ext = extractors.MeanVariance(mock.MagicMock())
