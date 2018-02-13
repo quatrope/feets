@@ -47,14 +47,10 @@ https://github.com/isadoranun/FATS/blob/b45b5c1/FATS/test_library.py
 # =============================================================================
 
 import numpy as np
-import os.path
-import tarfile
-import sys
-import pandas as pd
+
 import pytest
 
 from ..core import FeatureSpace
-
 
 
 # =============================================================================
@@ -71,8 +67,6 @@ def white_noise():
     mjd = np.arange(10000)
     error = random.normal(loc=0.01, scale=0.8, size=10000)
     second_data = random.normal(size=10000)
-    mjd2 = np.arange(10000)
-    error2 = random.normal(loc=0.01, scale=0.8, size=10000)
     aligned_data = data
     aligned_second_data = second_data
     aligned_mjd = mjd
@@ -92,11 +86,11 @@ def periodic_lc():
     N = 100
     mjd_periodic = np.arange(N)
     Period = 20
-    cov = np.zeros([N,N])
+    cov = np.zeros([N, N])
     mean = np.zeros(N)
     for i in np.arange(N):
         for j in np.arange(N):
-            cov[i,j] = np.exp( -(np.sin( (np.pi/Period) *(i-j))**2))
+            cov[i, j] = np.exp(-(np.sin((np.pi/Period) * (i-j)) ** 2))
     data_periodic = random.multivariate_normal(mean, cov)
     lc = {
         "magnitude": data_periodic,
@@ -119,12 +113,12 @@ def random_walk():
     N = 10000
     alpha = 1.
     sigma = 0.5
-    data_rw = np.zeros([N,1])
+    data_rw = np.zeros([N, 1])
     data_rw[0] = 1
     time_rw = xrange(1, N)
     for t in time_rw:
         data_rw[t] = alpha * data_rw[t-1] + random.normal(loc=0.0, scale=sigma)
-    time_rw = np.array(range(0,N)) + 1 * random.uniform(size=N)
+    time_rw = np.array(range(0, N)) + 1 * random.uniform(size=N)
     data_rw = data_rw.squeeze()
     lc = {
         "magnitude": data_rw,
@@ -170,7 +164,7 @@ def test_FluxPercentile(white_noise):
     fs = FeatureSpace(only=[
         'FluxPercentileRatioMid20', 'FluxPercentileRatioMid35',
         'FluxPercentileRatioMid50', 'FluxPercentileRatioMid65',
-        'FluxPercentileRatioMid80'] )
+        'FluxPercentileRatioMid80'])
     result = fs.extract(**white_noise)[1]
     assert result[0] >= 0.145 and result[0] <= 0.160
     assert result[1] >= 0.260 and result[1] <= 0.290
@@ -204,7 +198,7 @@ def test_PairSlopeTrend(white_noise):
 
 
 def test_Period_Psi(periodic_lc):
-    params =  {
+    params = {
         "lscargle_kwds": {
             "autopower_kwds": {
                 "normalization": "standard",

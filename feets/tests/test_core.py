@@ -47,8 +47,7 @@ import numpy as np
 import mock
 
 from .. import (
-    FeatureSpace, FeatureNotFound,
-    Extractor, register_extractor, ExtractorContractError)
+    FeatureSpace, Extractor, register_extractor, ExtractorContractError)
 
 from .core import FeetsTestCase
 
