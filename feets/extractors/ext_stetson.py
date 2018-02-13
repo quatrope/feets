@@ -191,13 +191,19 @@ class StetsonKAC(Extractor):
         >>> dict(zip(features, values))
         {'SlottedA_length': 1.0, 'StetsonK_AC': 0.20917402545294403}
 
+    **Parameters**
+
+    - ``T``: tau - slot size in days (default=1).
+
     """
 
     data = ['magnitude', 'time', 'error']
     features = ["StetsonK_AC"]
+    params = {"T": 1}
 
-    def fit(self, magnitude, time, error):
-        sal = SlottedA_length(self.space)
+
+    def fit(self, magnitude, time, error, T):
+        sal = SlottedA_length(T=T)
         autocor_vector = sal.start_conditions(
             magnitude, time, **sal.params)[-1]
 

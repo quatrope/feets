@@ -94,9 +94,7 @@ class SortByFependenciesTest(FeetsTestCase):
             def fit(self, *args):
                 pass
 
-        space = mock.MagicMock()
-
-        a, b1, b2, c = A(space), B1(space), B2(space), C(space)
+        a, b1, b2, c = A(), B1(), B2(), C()
         exts = [c, b1, a, b2]
         plan = extractors.sort_by_dependencies(exts)
         for idx, ext in enumerate(plan):
@@ -116,12 +114,12 @@ class ExtractorsTestCases(FeetsTestCase):
         self.random = np.random.RandomState(42)
 
     def test_theoric_Amplitude(self):
-        ext = extractors.Amplitude(mock.MagicMock())
+        ext = extractors.Amplitude()
         value = ext.fit(np.arange(0, 1001))["Amplitude"]
         self.assertEquals(value, 475)
 
     def test_theoric_AndersonDarling(self):
-        ext = extractors.AndersonDarling(mock.MagicMock())
+        ext = extractors.AndersonDarling()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -129,7 +127,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.60131775688198352)
 
     def test_theoric_Beyond1Std(self):
-        ext = extractors.Beyond1Std(mock.MagicMock())
+        ext = extractors.Beyond1Std()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -138,7 +136,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.32972600000000002)
 
     def test_theoric_Con(self):
-        ext = extractors.Con(mock.MagicMock())
+        ext = extractors.Con()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -146,7 +144,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.045557)
 
     def test_theoric_MeanVariance(self):
-        ext = extractors.MeanVariance(mock.MagicMock())
+        ext = extractors.MeanVariance()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.uniform(size=1000)
@@ -154,7 +152,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.57664232208148747)
 
     def test_theoric_MedianAbsDev(self):
-        ext = extractors.MedianAbsDev(mock.MagicMock())
+        ext = extractors.MedianAbsDev()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -162,7 +160,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.67490807679242459)
 
     def test_theoric_RCS(self):
-        ext = extractors.RCS(mock.MagicMock())
+        ext = extractors.RCS()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.uniform(size=1000)
@@ -170,7 +168,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.03902862976795655)
 
     def test_theoric_Skew(self):
-        ext = extractors.Skew(mock.MagicMock())
+        ext = extractors.Skew()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -178,7 +176,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), -0.0017170680368871292)
 
     def test_theoric_SmallKurtosis(self):
-        ext = extractors.SmallKurtosis(mock.MagicMock())
+        ext = extractors.SmallKurtosis()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -186,7 +184,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.00040502517673364258)
 
     def test_theoric_Std(self):
-        ext = extractors.Std(mock.MagicMock())
+        ext = extractors.Std()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -194,7 +192,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.9994202277548033)
 
     def test_theoric_StetsonJ(self):
-        ext = extractors.StetsonJ(mock.MagicMock())
+        ext = extractors.StetsonJ()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -207,7 +205,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), -0.41057516272)
 
     def test_theoric_StetsonK(self):
-        ext = extractors.StetsonK(mock.MagicMock())
+        ext = extractors.StetsonK()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
@@ -216,7 +214,7 @@ class ExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), 0.205082990282)
 
     def test_theoric_StetsonL(self):
-        ext = extractors.StetsonL(mock.MagicMock())
+        ext = extractors.StetsonL()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)

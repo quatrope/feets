@@ -99,34 +99,14 @@ class FeatureSpaceTestCase(FeetsTestCase):
         # ok
         FeatureSpace(
             only=["CAR_sigma"],
-            CAR_sigma={"minimize_method": "powell"})
+            CAR={"minimize_method": "powell"})
 
         # invalid parameter
         with self.assertRaises(ExtractorContractError):
-            FeatureSpace(only=["CAR_sigma"], CAR_sigma={"o": 1})
+            FeatureSpace(only=["CAR_sigma"], CAR={"o": 1})
 
         # invalid parameter with valid parameter
         with self.assertRaises(ExtractorContractError):
             FeatureSpace(
                 only=["CAR_sigma"],
-                CAR_sigma={"o": 1, "minimize_method": "powell"})
-
-        # one feature ok the other no
-        with self.assertRaises(ExtractorContractError):
-            FeatureSpace(
-                only=["CAR_sigma", "CAR_tau"],
-                CAR_sigma={"o": "o"},
-                CAR_tau={"minimize_method": "powell"})
-
-        # redefinition of the same parameter
-        with self.assertRaises(ExtractorContractError):
-            FeatureSpace(
-                only=["CAR_sigma", "CAR_tau"],
-                CAR_sigma={"minimize_method": "powell"},
-                CAR_tau={"minimize_method": "powell"})
-
-        # setup extractor with a no required feature
-        with self.assertRaises(FeatureNotFound):
-            FeatureSpace(
-                only=["CAR_sigma"],
-                CAR_tau={"minimize_method": "powell"})
+                CAR={"o": 1, "minimize_method": "powell"})
