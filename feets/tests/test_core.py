@@ -109,3 +109,33 @@ class FeatureSpaceTestCase(FeetsTestCase):
             FeatureSpace(
                 only=["CAR_sigma"],
                 CAR={"o": 1, "minimize_method": "powell"})
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_remove_by_dependencies(self):
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["test_a", "test_a2"]
+
+            def fit(self, *args):
+                pass
+
+        @register_extractor
+        class B1(Extractor):
+            data = ["magnitude"]
+            features = ["test_b1"]
+            dependencies = ["test_a"]
+
+            def fit(self, *args):
+                pass
+
+        @register_extractor
+        class C(Extractor):
+            data = ["magnitude"]
+            features = ["test_c"]
+
+            def fit(self, *args):
+                pass
+
+        fs = FeatureSpace(exclude=["test_a"])
+        self.assertCountEqual(fs.features_, ["test_c", "test_a2"])

@@ -202,11 +202,23 @@ class FeatureSpace(object):
                     raise FeatureNotFound(f)
         self._exclude = frozenset(exclude or ())
 
-        # TODO: remove by dependencies
-
-        # final list of features
-        self._features = self._features_by_data.intersection(
+        # the candidate to be the features to be extracted
+        candidates = self._features_by_data.intersection(
             self._only).difference(self._exclude)
+
+        # remove by dependencies
+        if only or exclude:
+            final = set()
+            for f in candidates:
+                fcls = exts[f]
+                dependencies = fcls.get_dependencies()
+                if dependencies.issubset(candidates):
+                    final.add(f)
+        else:
+            final = candidates
+
+        # the final features
+        self._features = frozenset(final)
 
         # create a ndarray for all the results
         self._features_as_array = np.array(sorted(self._features))
