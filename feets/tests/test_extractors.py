@@ -42,11 +42,13 @@ __doc__ = """Extractors Tests"""
 # IMPORTS
 # =============================================================================
 
-from .. import Extractor, register_extractor, extractors
+import unittest
 
 import numpy as np
 
 import mock
+
+from .. import Extractor, register_extractor, extractors
 
 from .core import FeetsTestCase
 
@@ -113,20 +115,21 @@ class ExtractorsTestCases(FeetsTestCase):
     def setUp(self):
         self.random = np.random.RandomState(42)
 
-    def test_theoric_Amplitude(self):
+    def test_FATS_doc_Amplitude(self):
         ext = extractors.Amplitude()
         value = ext.fit(np.arange(0, 1001))["Amplitude"]
         self.assertEquals(value, 475)
 
-    def test_theoric_AndersonDarling(self):
+    @unittest.skip("FATS say must be 0.2, but actual is -0.60")
+    def test_FATS_doc_AndersonDarling(self):
         ext = extractors.AndersonDarling()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
             values[idx] = ext.fit(mags)["AndersonDarling"]
-        self.assertAllClose(values.mean(), 0.60131775688198352)
+        self.assertAllClose(values.mean(), 0.25)
 
-    def test_theoric_Beyond1Std(self):
+    def test_FATS_doc_Beyond1Std(self):
         ext = extractors.Beyond1Std()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -135,7 +138,7 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(mags, errors)["Beyond1Std"]
         self.assertAllClose(values.mean(), 0.32972600000000002)
 
-    def test_theoric_Con(self):
+    def test_FATS_doc_Con(self):
         ext = extractors.Con()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -143,7 +146,7 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(mags, consecutiveStar=1)["Con"]
         self.assertAllClose(values.mean(), 0.045557)
 
-    def test_theoric_MeanVariance(self):
+    def test_FATS_doc_MeanVariance(self):
         ext = extractors.MeanVariance()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -151,7 +154,7 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(magnitude=mags)['Meanvariance']
         self.assertAllClose(values.mean(), 0.57664232208148747)
 
-    def test_theoric_MedianAbsDev(self):
+    def test_FATS_doc_MedianAbsDev(self):
         ext = extractors.MedianAbsDev()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -159,7 +162,7 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(magnitude=mags)['MedianAbsDev']
         self.assertAllClose(values.mean(), 0.67490807679242459)
 
-    def test_theoric_RCS(self):
+    def test_FATS_doc_RCS(self):
         ext = extractors.RCS()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -167,7 +170,7 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(magnitude=mags)['Rcs']
         self.assertAllClose(values.mean(), 0.03902862976795655)
 
-    def test_theoric_Skew(self):
+    def test_FATS_doc_Skew(self):
         ext = extractors.Skew()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -175,7 +178,7 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(magnitude=mags)['Skew']
         self.assertAllClose(values.mean(), -0.0017170680368871292)
 
-    def test_theoric_SmallKurtosis(self):
+    def test_FATS_doc_SmallKurtosis(self):
         ext = extractors.SmallKurtosis()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -183,7 +186,7 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(magnitude=mags)['SmallKurtosis']
         self.assertAllClose(values.mean(), 0.00040502517673364258)
 
-    def test_theoric_Std(self):
+    def test_FATS_doc_Std(self):
         ext = extractors.Std()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -191,7 +194,8 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(magnitude=mags)['Std']
         self.assertAllClose(values.mean(), 0.9994202277548033)
 
-    def test_theoric_StetsonJ(self):
+    @unittest.skip("FATS say must be 0, but actual is -0.41")
+    def test_FATS_doc_StetsonJ(self):
         ext = extractors.StetsonJ()
         values = np.empty(1000)
         for idx in range(values.size):
@@ -202,18 +206,19 @@ class ExtractorsTestCases(FeetsTestCase):
             values[idx] = ext.fit(
                 aligned_magnitude=mags, aligned_magnitude2=mags2,
                 aligned_error=errors, aligned_error2=errors2)['StetsonJ']
-        self.assertAllClose(values.mean(), -0.41057516272)
+        self.assertAllClose(values.mean(), 0)
 
-    def test_theoric_StetsonK(self):
+    @unittest.skip("FATS say must be 2/pi, but actual is -0.20")
+    def test_FATS_doc_StetsonK(self):
         ext = extractors.StetsonK()
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
             errors = self.random.normal(scale=0.001, size=1000)
             values[idx] = ext.fit(magnitude=mags, error=errors)['StetsonK']
-        self.assertAllClose(values.mean(), 0.205082990282)
+        self.assertAllClose(values.mean(), 0.798)
 
-    def test_theoric_StetsonL(self):
+    def test_FATS_doc_StetsonL(self):
         ext = extractors.StetsonL()
         values = np.empty(1000)
         for idx in range(values.size):

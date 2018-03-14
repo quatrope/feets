@@ -68,9 +68,11 @@ allowing all residuals to be compared on an equal basis.
 # IMPORTS
 # =============================================================================
 
+import warnings
+
 import numpy as np
 
-from .core import Extractor
+from .core import Extractor, ExtractorWarning
 
 from .ext_slotted_a_length import SlottedA_length
 
@@ -108,6 +110,13 @@ class StetsonJ(Extractor):
     data = ['aligned_magnitude', 'aligned_magnitude2',
             'aligned_error', 'aligned_error2']
     features = ["StetsonJ"]
+
+    def __init__(self, **cparams):
+        warnings.warn((
+            "The original FATS documentation says that the result of StetsonJ "
+            "must be ~0 for gausian distribution but the  "
+            "result is ~-0.41"), ExtractorWarning)
+        super(StetsonJ, self).__init__(**cparams)
 
     def fit(self, aligned_magnitude, aligned_magnitude2,
             aligned_error, aligned_error2):
@@ -161,6 +170,13 @@ class StetsonK(Extractor):
 
     data = ['magnitude', 'error']
     features = ['StetsonK']
+
+    def __init__(self, **cparams):
+        warnings.warn((
+            "The original FATS documentation says that the result of StetsonK "
+            "must be 2/pi=0.798 for gausian distribution but the "
+            "result is ~0.2"), ExtractorWarning)
+        super(StetsonK, self).__init__(**cparams)
 
     def fit(self, magnitude, error):
         mean_mag = (np.sum(magnitude/(error*error)) /

@@ -41,6 +41,7 @@ __doc__ = """Features extractors base classes classes"""
 # IMPORTS
 # =============================================================================
 
+import warnings
 from collections import namedtuple
 
 import six
@@ -78,17 +79,24 @@ DATAS = (
 # =============================================================================
 
 class ExtractorBadDefinedError(Exception):
-    """The extractor are not properly defined"""
+    """The extractor are not properly defined."""
     pass
 
 
 class ExtractorContractError(ValueError):
     """The extractor dont get the expected features, data, parameters
-    or wathever
+    or wathever.
 
     """
     pass
 
+
+class ExtractorWarning(UserWarning):
+    """Warn about the Extractor behavior."""
+    pass
+
+
+warnings.simplefilter("always", ExtractorWarning)
 
 # =============================================================================
 # BASE CLASSES
