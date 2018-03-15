@@ -1,4 +1,4 @@
-function setUpContent(){
+function setupContent(){
     $("div#extractors .warning").addClass("alert alert-warning");
     $("div#extractors .warning").prepend("<h5>Warning<h5><hr>");
 
@@ -25,6 +25,6 @@ function setUpContent(){
 }
 
 $(document).ready(function(){
-
+    setupContent();
 
 });
