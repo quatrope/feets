@@ -133,13 +133,18 @@ DOC_TEMPLATE = jinja2.Template("""
         <a class="extractor-doc" role="button" data-toggle="collapse" data-parent="#extractors" href="#collapse-feature-{{ name }}" aria-expanded="true" aria-controls="collapse-feature-{{ name }}">
           <span class="extractor-name">Extractor <span class="text-info">{{ name }}</span></span>
 
-         <span class="pull-right">
+          <span class="pull-right">
+
+              {% if not ext.is_stable() %}
+              <span class="label lb-lg feature-resume label-warning">UNSTABLE</span>
+              {% endif %}
+
              {% for feature in fresume %}
              <span class="label lb-lg feature-resume label-default">{{ feature }}</span>
              {% endfor %}
 
              {% if not doc %}
-             <span class="label lb-lg feature-resume label-danger">doc missing</span>
+             <span class="label lb-lg feature-resume label-danger">No Doc</span>
              {% endif %}
          </span>
          </a>
@@ -148,6 +153,14 @@ DOC_TEMPLATE = jinja2.Template("""
     </div>
     <div id="collapse-feature-{{ name }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-feature-{{ name }}">
       <div class="panel-body">
+            {% if not ext.is_stable() %}
+            <div class="alert alert-warning" role="alert">
+                <h4>Warning!</h4>
+                <hr>
+                This <code>Extractor</code> is marked as unstable.
+            </div>
+            {% endif %}
+
          <p>{{ doc }}</p>
         <h5>Required Data</h5>
          <div>

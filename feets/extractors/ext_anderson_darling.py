@@ -72,6 +72,7 @@ class AndersonDarling(Extractor):
 
     data = ['magnitude']
     features = ["AndersonDarling"]
+    stable = False
 
     def __init__(self, **cparams):
         warnings.warn((

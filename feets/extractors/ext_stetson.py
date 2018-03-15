@@ -110,6 +110,7 @@ class StetsonJ(Extractor):
     data = ['aligned_magnitude', 'aligned_magnitude2',
             'aligned_error', 'aligned_error2']
     features = ["StetsonJ"]
+    stable = False
 
     def __init__(self, **cparams):
         warnings.warn((
@@ -170,6 +171,7 @@ class StetsonK(Extractor):
 
     data = ['magnitude', 'error']
     features = ['StetsonK']
+    stable = False
 
     def __init__(self, **cparams):
         warnings.warn((

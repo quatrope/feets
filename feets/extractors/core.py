@@ -104,7 +104,7 @@ warnings.simplefilter("always", ExtractorWarning)
 
 ExtractorConf = namedtuple(
     "ExtractorConf",
-    ["data", "dependencies", "params", "features"])
+    ["data", "dependencies", "params", "features", "stable"])
 
 
 class ExtractorMeta(type):
@@ -173,13 +173,17 @@ class ExtractorMeta(type):
                 msg = "Params can't be in {}".format(DATAS)
                 raise ExtractorBadDefinedError(msg)
 
+        if not hasattr(cls, "stable"):
+            cls.stable = True
+
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),
             dependencies=frozenset(cls.dependencies),
             params=tuple(cls.params.items()),
-            features=frozenset(cls.features))
+            features=frozenset(cls.features),
+            stable=cls.stable)
 
-        del cls.data, cls.dependencies, cls.params, cls.features
+        del cls.data, cls.dependencies, cls.params, cls.features, cls.stable
 
         return cls
 
@@ -204,6 +208,10 @@ class Extractor(object):
     @classmethod
     def get_features(cls):
         return cls._conf.features
+
+    @classmethod
+    def is_stable(cls):
+        return cls._conf.stable
 
     def __init__(self, **cparams):
         self.name = type(self).__name__
