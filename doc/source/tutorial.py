@@ -199,7 +199,7 @@ DOC_TEMPLATE = jinja2.Template("""
 </div>
 <script>
 $("div#extractors .warning").addClass("alert alert-warning");
-$("div#extractors .warning").prepend("<h5>Warning<h5><hr>");
+$("div#extractors .warning").prepend("<h5 class='text-warning'>Warning<h5><hr>");
 </script>
 
 """)

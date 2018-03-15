@@ -1,10 +1,5 @@
 function setupContent(){
-    $("div#extractors .warning").addClass("alert alert-warning");
-    $("div#extractors .warning").prepend("<h5>Warning<h5><hr>");
-
-    var $liFeatures = $("ul.localtoc li").has("a[href='#The-Features']");
-    $liFeatures.append("<ul id='features-list-links'></ul>");
-    var $ulFeaturesList = $liFeatures.find("ul#features-list-links");
+    var $ulFeaturesList = $("<ul id='features-list-links'></ul>");
 
     var $allPanels = $("div.panel-group#extractors div.panel, div.panel-collapse");
 
@@ -22,6 +17,9 @@ function setupContent(){
             window.location.hash = "#" + id;
         });
     });
+
+    var $liFeatures = $("ul.localtoc li").has("a[href='#The-Features']");
+    $liFeatures.append($ulFeaturesList);
 }
 
 $(document).ready(function(){
