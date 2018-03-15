@@ -42,13 +42,11 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
-import warnings
-
 import numpy as np
 
 from scipy import stats
 
-from .core import Extractor, ExtractorWarning
+from .core import Extractor
 
 
 # =============================================================================
@@ -72,14 +70,10 @@ class AndersonDarling(Extractor):
 
     data = ['magnitude']
     features = ["AndersonDarling"]
-    stable = False
-
-    def __init__(self, **cparams):
-        warnings.warn((
-            "The original FATS documentation says that the result of "
-            "AndersonDarling must be ~0.25 for gausian distribution but the  "
-            "result is ~-0.60"), ExtractorWarning)
-        super(AndersonDarling, self).__init__(**cparams)
+    warnings = [
+        ("The original FATS documentation says that the result of "
+         "AndersonDarling must be ~0.25 for gausian distribution but the  "
+         "result is ~-0.60")]
 
     def fit(self, magnitude):
         ander = stats.anderson(magnitude)[0]

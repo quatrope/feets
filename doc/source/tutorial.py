@@ -135,8 +135,8 @@ DOC_TEMPLATE = jinja2.Template("""
 
           <span class="pull-right">
 
-              {% if not ext.is_stable() %}
-              <span class="label lb-lg feature-resume label-warning">UNSTABLE</span>
+              {% if not ext.has_warnings() %}
+              <span class="label lb-lg feature-resume label-warning">Warning</span>
               {% endif %}
 
              {% for feature in fresume %}
@@ -153,14 +153,6 @@ DOC_TEMPLATE = jinja2.Template("""
     </div>
     <div id="collapse-feature-{{ name }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-feature-{{ name }}">
       <div class="panel-body">
-            {% if not ext.is_stable() %}
-            <div class="alert alert-warning" role="alert">
-                <h4>Warning!</h4>
-                <hr>
-                This <code>Extractor</code> is marked as unstable.
-            </div>
-            {% endif %}
-
          <p>{{ doc }}</p>
         <h5>Required Data</h5>
          <div>
@@ -205,6 +197,10 @@ DOC_TEMPLATE = jinja2.Template("""
   </div>
   {% endfor %}
 </div>
+<script>
+$("div#extractors .warning").addClass("alert alert-warning");
+$("div#extractors .warning").prepend("<h5>Warning<h5><hr>");
+</script>
 
 """)
 

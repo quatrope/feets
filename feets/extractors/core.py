@@ -104,7 +104,7 @@ warnings.simplefilter("always", ExtractorWarning)
 
 ExtractorConf = namedtuple(
     "ExtractorConf",
-    ["data", "dependencies", "params", "features", "stable"])
+    ["data", "dependencies", "params", "features", "warnings"])
 
 
 class ExtractorMeta(type):
@@ -173,17 +173,22 @@ class ExtractorMeta(type):
                 msg = "Params can't be in {}".format(DATAS)
                 raise ExtractorBadDefinedError(msg)
 
-        if not hasattr(cls, "stable"):
-            cls.stable = True
+        if not hasattr(cls, "warnings"):
+            cls.warnings = []
 
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),
             dependencies=frozenset(cls.dependencies),
             params=tuple(cls.params.items()),
             features=frozenset(cls.features),
-            stable=cls.stable)
+            warnings=tuple(cls.warnings))
 
-        del cls.data, cls.dependencies, cls.params, cls.features, cls.stable
+        if not cls.__doc__:
+            cls.__doc__ = ""
+        cls.__doc__ += "\n" + "\n".join([
+            ".. warning:: {}".format(w) for w in cls.warnings])
+
+        del cls.data, cls.dependencies, cls.params, cls.features, cls.warnings
 
         return cls
 
@@ -210,10 +215,17 @@ class Extractor(object):
         return cls._conf.features
 
     @classmethod
-    def is_stable(cls):
-        return cls._conf.stable
+    def get_warnings(cls):
+        return cls._conf.warnings
+
+    @classmethod
+    def has_warnings(cls):
+        return not cls._conf.warnings
 
     def __init__(self, **cparams):
+        for w in self.get_warnings():
+            warnings.warn(w, ExtractorWarning)
+
         self.name = type(self).__name__
 
         self.params = self.get_default_params()
