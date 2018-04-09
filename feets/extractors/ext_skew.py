@@ -74,6 +74,15 @@ class Skew(Extractor):
         >>> dict(zip(features, values))
         {'Skew': -0.00023325826785278685}
 
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
     """
 
     data = ['magnitude']

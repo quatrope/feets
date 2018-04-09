@@ -66,6 +66,14 @@ class AndersonDarling(Extractor):
     For a normal distribution the Anderson-Darling statistic should take values
     close to 0.25.
 
+    References
+    ----------
+
+    .. [kim2009trending] Kim, D. W., Protopapas, P., Alcock, C., Byun, Y. I.,
+       & Bianco, F. (2009). De-Trending Time Series for Astronomical
+       Variability Surveys. Monthly Notices of the Royal Astronomical Society,
+       397(1), 558-568. Doi:10.1111/j.1365-2966.2009.14967.x.
+
     """
 
     data = ['magnitude']

@@ -83,6 +83,14 @@ class SlottedA_length(Extractor):
 
     - ``T``: tau - slot size in days (default=1).
 
+    References
+    ----------
+
+    .. [huijse2012information] Huijse, P., Estevez, P. A., Protopapas, P.,
+       Zegers, P., & Principe, J. C. (2012). An information theoretic algorithm
+       for finding periodicities in stellar light curves. IEEE Transactions on
+       Signal Processing, 60(10), 5135-5145.
+
     """
 
     data = ["magnitude", "time"]

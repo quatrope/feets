@@ -55,7 +55,15 @@ from .core import Extractor
 
 class StructureFunctions(Extractor):
     r"""The structure function of rotation measures (RMs) contains information
-    on electron density and magnetic field fluctuations (Simonetti et al. 1984)
+    on electron density and magnetic field fluctuations.
+
+    References
+    ----------
+
+    .. [simonetti1984small] Simonetti, J. H., Cordes, J. M., & Spangler, S. R.
+       (1984). Small-scale variations in the galactic magnetic field-The
+       rotation measure structure function and birefringence in interstellar
+       scintillations. The Astrophysical Journal, 284, 126-134.
 
     """
 

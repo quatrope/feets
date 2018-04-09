@@ -63,3 +63,14 @@ div.section#The-Features div.input-group span.input-group-addon {
 div.section#The-Features div.input-group span.form-control {
     width: 85% !important;
 }
+
+div.section#The-Features table.citation {
+    border: none;
+}
+
+div.section#The-Features table.citation td {
+    border: none;
+    padding-left: 20px;
+    padding-bottom: 10px;
+
+}

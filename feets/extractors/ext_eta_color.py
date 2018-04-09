@@ -66,6 +66,14 @@ class EtaColor(Extractor):
         >>> dict(zip(features, values))
         {'Eta_color': 1.991749074648397}
 
+    References
+    ----------
+
+    .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
+       Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
+       The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
+       Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
+
     """
 
     data = ['aligned_magnitude', 'aligned_time', 'aligned_magnitude2']

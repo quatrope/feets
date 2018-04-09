@@ -125,6 +125,22 @@ class LombScargle(Extractor):
 
     :math:`\eta^e`  index calculated from the folded light curve.
 
+
+    References
+    ----------
+
+    .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
+       Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
+       algorithm using time variability and machine learning: Selection of
+       1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
+       database. The Astrophysical Journal, 735(2), 68.
+       Doi:10.1088/0004-637X/735/2/68.
+
+    .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
+       Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
+       The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
+       Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
+
     """
 
     data = ['magnitude', 'time']

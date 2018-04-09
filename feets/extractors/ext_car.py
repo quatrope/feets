@@ -171,6 +171,15 @@ class CAR(Extractor):
          'CAR_sigma': -0.21928049298842511,
          'CAR_tau': 0.64112037377348619}
 
+    References
+    ----------
+
+    .. [pichara2012improved] Pichara, K., Protopapas, P., Kim, D. W.,
+       Marquette, J. B., & Tisserand, P. (2012). An improved quasar detection
+       method in EROS-2 and MACHO LMC data sets. Monthly Notices of the Royal
+       Astronomical Society, 427(2), 1284-1297.
+       Doi:10.1111/j.1365-2966.2012.22061.x.
+
     """
     data = ['magnitude', 'time', 'error']
     features = ["CAR_sigma", "CAR_tau", "CAR_mean"]

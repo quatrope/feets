@@ -19,6 +19,9 @@ warnings.simplefilter("ignore", FutureWarning)
 
 import feets
 
+warnings.simplefilter("ignore", feets.ExtractorWarning)
+
+
 # introduction
 def ts_anim():
     # create a simple animation
@@ -204,6 +207,31 @@ $("div#extractors .warning").prepend("<h5 class='text-warning'>Warning<h5><hr>")
 
 """)
 
+def deindent_reference(string):
+    lines = string.splitlines()
+    to_remove = []
+    to_bold = []
+    for idx, l in enumerate(lines):
+        if l.strip() and (not l.replace("-", "").strip() or not l.replace("=", "").strip()):
+            to_remove.append(idx)
+            to_bold.append(idx - 1)
+
+    deindented = []
+    for idx, l in enumerate(lines):
+        if idx in to_remove:
+            continue
+        elif idx in to_bold:
+            l = u"**{}**".format(l.strip())
+        deindented.append(l)
+
+    return "\n".join(deindented)
+
+
+def make_title(name):
+    name = "{} Extactor".format(name)
+    dec = "=" * len(name)
+    return "{}\n{}\n{}\n".format(dec, name, dec)
+
 
 def features_doc():
     import feets
@@ -219,9 +247,10 @@ def features_doc():
         name = ext.__name__
 
         doc = publish_parts(
-            ext.__doc__ or "",
+            make_title(name) + deindent_reference(ext.__doc__  or ""),
             writer_name='html5',
             writer=rst2html5_.HTML5Writer())["body"]
+
 
         features = ext.get_features()
         data = sorted(ext.get_data(), key=feets.extractors.DATAS.index)

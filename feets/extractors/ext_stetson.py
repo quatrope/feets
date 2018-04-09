@@ -102,6 +102,14 @@ class StetsonJ(Extractor):
         >>> dict(zip(features, values))
         {'StetsonJ': 0.010765631555204736}
 
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
 
     """
 
@@ -160,6 +168,15 @@ class StetsonK(Extractor):
         >>> dict(zip(features, values))
         {'StetsonK': 0.79914938521401002}
 
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
     """
 
     data = ['magnitude', 'error']
@@ -200,6 +217,16 @@ class StetsonKAC(Extractor):
     **Parameters**
 
     - ``T``: tau - slot size in days (default=1).
+
+    References
+    ----------
+
+    .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
+       Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
+       algorithm using time variability and machine learning: Selection of
+       1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
+       database. The Astrophysical Journal, 735(2), 68.
+       Doi:10.1088/0004-637X/735/2/68.
 
     """
 
@@ -244,6 +271,16 @@ class StetsonL(Extractor):
         >>> features, values = fs.extract(**lc_normal)
         >>> dict(zip(features, values))
         {'StetsonL': 0.0085957106316273714}
+
+    References
+    ----------
+
+    .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
+       Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
+       algorithm using time variability and machine learning: Selection of
+       1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
+       database. The Astrophysical Journal, 735(2), 68.
+       Doi:10.1088/0004-637X/735/2/68.
 
     """
 

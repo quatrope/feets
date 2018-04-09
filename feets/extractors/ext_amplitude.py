@@ -61,6 +61,16 @@ class Amplitude(Extractor):
     of the maximum 5% and the median of the minimum 5% magnitudes. For a
     sequence of numbers from 0 to 1000 the amplitude should be equal to 475.5.
 
+
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
     """
 
     data = ['magnitude']

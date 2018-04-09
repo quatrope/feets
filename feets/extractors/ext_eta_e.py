@@ -81,7 +81,6 @@ class Eta_e(Extractor):
                     \frac{\sum_{i=1}^{N-1} w_i (m_{i+1} - m_i)^2}
                         {\sigma^2 \sum_{i=1}^{N-1} w_i}
 
-
     Where:
 
     .. math::
@@ -97,6 +96,15 @@ class Eta_e(Extractor):
         >>> features, values = fs.extract(**lc_normal)
         >>> dict(zip(features, values))
         {'Eta_e': 2.0028592616231866}
+
+
+    References
+    ----------
+
+    .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
+       Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
+       The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
+       Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
 
     """
 
