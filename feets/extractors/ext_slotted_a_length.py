@@ -99,7 +99,7 @@ class SlottedA_length(Extractor):
 
     def slotted_autocorrelation(self, data, time, T, K,
                                 second_round=False, K1=100):
-
+        K1 = int(K1)
         slots, i = np.zeros((K, 1)), 1
 
         # make time start from 0
