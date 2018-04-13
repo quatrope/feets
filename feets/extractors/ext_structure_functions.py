@@ -98,9 +98,23 @@ class StructureFunctions(Extractor):
         sf2_log = np.log10(np.trim_zeros(sf2))
         sf3_log = np.log10(np.trim_zeros(sf3))
 
-        m_21, b_21 = np.polyfit(sf1_log, sf2_log, 1)
-        m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
-        m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
+        if len(sf1_log) and len(sf2_log):
+            m_21, b_21 = np.polyfit(sf1_log, sf2_log, 1)
+        else:
+            print("warn: can't compute sf_index_21")
+            m_21 = np.nan
+
+        if len(sf1_log) and len(sf3_log):
+            m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
+        else:
+            print("warn: can't compute sf_index_31")
+            m_31 = np.nan
+
+        if len(sf2_log) and len(sf3_log):
+            m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
+        else:
+            print("warn: can't compute sf_index_32")
+            m_32 = np.nan
 
         return {"StructureFunction_index_21": m_21,
                 "StructureFunction_index_31": m_31,
