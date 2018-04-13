@@ -176,4 +176,6 @@ class SlottedA_length(Extractor):
                 SAC2 = SAC[slots]
                 k = next((index for index, value in
                          enumerate(SAC2) if value < np.exp(-1)), None)
-        return {"SlottedA_length": slots[k] * T}
+
+        val = np.nan if k is None else slots[k] * T
+        return {"SlottedA_length": val}
