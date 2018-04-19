@@ -122,6 +122,9 @@ html_theme_options = {
     'logo': 'logo_small.png',
     'github_user': 'carpyncho',
     'github_repo': 'feets',
+    'extra_nav_links': {
+        "feets Source Code": "https://github.com/carpyncho/feets"
+    }
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

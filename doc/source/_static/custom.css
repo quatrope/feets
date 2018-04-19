@@ -82,3 +82,8 @@ div.section#The-Features table.citation td {
 div.body h4 {
     margin-top: 10px;
 }
+
+div.footer {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
