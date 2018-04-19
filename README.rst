@@ -111,11 +111,9 @@ Based on "FATS" by Isadora Nun and Pavlos Protopapas (https://github.com/isadora
 
 Main difference with FATS:
 
-- Removed licurve retrieval from public surveys (we only do one thing here)
 - Removed all the ``sys.exit()`` calls and replaced with Exceptions
 - PEP-8
 - Python 2 and 3
 - Warnings instead of prints
 - Only one type of results: numpy array.
 - Posibility of register more FeaturesExtractors.
-- Multiprocessing.
