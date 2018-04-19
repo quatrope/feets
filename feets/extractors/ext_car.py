@@ -47,7 +47,7 @@ import numpy as np
 
 from scipy.optimize import minimize
 
-from .core import Extractor
+from .core import Extractor, FeatureExtractionWarning
 
 
 # =============================================================================
@@ -99,9 +99,10 @@ def _car_like(parameters, t, x, error_vars):
 
         loglik = loglik + loglik_inter
 
-        if(loglik <= CTE_NEG):
-            print('CAR loglikelihood to inf')
-            return None
+        if loglik <= CTE_NEG:
+            warnings.warn(
+                "CAR log-likelihood to inf", FeatureExtractionWarning)
+            return -np.infty
 
     # the minus one is to perfor maximization using the minimize function
     return -loglik

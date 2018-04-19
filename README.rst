@@ -26,9 +26,10 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
    :target: https://badge.fury.io/py/feets
    :alt: Python 2.7
 
-.. image:: https://img.shields.io/badge/python-3.5-blue.svg
+.. image:: https://img.shields.io/badge/python-3.5+-blue.svg
    :target: https://badge.fury.io/py/feets
-   :alt: Python 3.5
+   :alt: Python 3.5+
+   
 
 Description
 -----------
@@ -110,11 +111,9 @@ Based on "FATS" by Isadora Nun and Pavlos Protopapas (https://github.com/isadora
 
 Main difference with FATS:
 
-- Removed licurve retrieval from public surveys (we only do one thing here)
 - Removed all the ``sys.exit()`` calls and replaced with Exceptions
 - PEP-8
 - Python 2 and 3
 - Warnings instead of prints
 - Only one type of results: numpy array.
 - Posibility of register more FeaturesExtractors.
-- Multiprocessing.

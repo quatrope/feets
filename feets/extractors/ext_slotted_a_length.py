@@ -172,8 +172,10 @@ class SlottedA_length(Extractor):
                 break
             else:
                 SAC, slots = self.slotted_autocorrelation(
-                    magnitude, time, T, K, second_round=True, K1=K/2)
+                    magnitude, time, T, K, second_round=True, K1=int(K/2))
                 SAC2 = SAC[slots]
                 k = next((index for index, value in
                          enumerate(SAC2) if value < np.exp(-1)), None)
-        return {"SlottedA_length": slots[k] * T}
+
+        val = np.nan if k is None else slots[k] * T
+        return {"SlottedA_length": val}
