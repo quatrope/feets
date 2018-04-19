@@ -96,7 +96,14 @@ class ExtractorWarning(UserWarning):
     pass
 
 
+class FeatureExtractionWarning(UserWarning):
+    """Warn about calculation of some feature"""
+    pass
+
+
 warnings.simplefilter("always", ExtractorWarning)
+warnings.simplefilter("always", FeatureExtractionWarning)
+
 
 # =============================================================================
 # BASE CLASSES

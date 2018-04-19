@@ -99,7 +99,7 @@ class SlottedA_length(Extractor):
 
     def slotted_autocorrelation(self, data, time, T, K,
                                 second_round=False, K1=100):
-        K1 = int(K1)
+
         slots, i = np.zeros((K, 1)), 1
 
         # make time start from 0
@@ -172,7 +172,7 @@ class SlottedA_length(Extractor):
                 break
             else:
                 SAC, slots = self.slotted_autocorrelation(
-                    magnitude, time, T, K, second_round=True, K1=K/2)
+                    magnitude, time, T, K, second_round=True, K1=int(K/2))
                 SAC2 = SAC[slots]
                 k = next((index for index, value in
                          enumerate(SAC2) if value < np.exp(-1)), None)
