@@ -128,6 +128,9 @@ def as_table(features, values):
 
 
 DOC_TEMPLATE = jinja2.Template("""
+<div class="section" id="The-Features">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <div class="panel-group" id="extractors" role="tablist" aria-multiselectable="true">
   {% for name, doc, ext, fresume, datas in rows %}
   <div class="panel panel-default">
@@ -204,7 +207,7 @@ DOC_TEMPLATE = jinja2.Template("""
 $("div#extractors .warning").addClass("alert alert-warning");
 $("div#extractors .warning").prepend("<h5 class='text-warning'>Warning<h5><hr>");
 </script>
-
+</div>
 """)
 
 def deindent_reference(string):

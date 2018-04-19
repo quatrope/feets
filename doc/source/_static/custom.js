@@ -23,6 +23,6 @@ function setupContent(){
 }
 
 $(document).ready(function(){
-    setupContent();
+    //~ setupContent();
 
 });

@@ -102,19 +102,8 @@ todo_include_todos = False
 
 # -- Options for HTML output ----------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-import sphinx_bootstrap_theme
-html_theme = 'bootstrap'
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
-
 html_logo = "_static/logo_small.png"
 
-html_theme_options = {
-    'navbar_pagenav_name': "Content",
-    'bootswatch_theme': "cerulean",
-}
 
 if on_rtd:
     from mock import Mock as MagicMock
@@ -129,7 +118,11 @@ if on_rtd:
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'logo': 'logo_small.png',
+    'github_user': 'carpyncho',
+    'github_repo': 'feets',
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
