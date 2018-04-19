@@ -78,7 +78,6 @@ class LoadFetchOGLE3(FeetsTestCase):
 
     def test_fetch_OGLE3(self):
         store_path = ogle3._get_OGLE3_data_home(None)
-
         cat = ogle3.load_OGLE3_catalog()
         oid = np.random.choice(cat.ID)
         url = ogle3.URL.format(oid)

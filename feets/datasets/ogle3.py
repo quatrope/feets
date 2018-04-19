@@ -99,6 +99,7 @@ DESCR = "LightCurve from OGLE-3\n\n{}".format(
 import os
 import bz2
 import tarfile
+import warnings
 
 import numpy as np
 
@@ -144,7 +145,8 @@ def load_OGLE3_catalog():
     """Return the full list of variables stars of OGLE-3 as a DataFrame
 
     """
-    with bz2.BZ2File(CATALOG_PATH) as bz2fp:
+    with bz2.BZ2File(CATALOG_PATH) as bz2fp, warnings.catch_warnings():
+        warnings.simplefilter("ignore")
         df = pd.read_table(bz2fp, skiprows=6)
     df.rename(columns={"# ID": "ID"}, inplace=True)
     return df
