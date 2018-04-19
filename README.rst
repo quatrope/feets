@@ -26,9 +26,10 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
    :target: https://badge.fury.io/py/feets
    :alt: Python 2.7
 
-.. image:: https://img.shields.io/badge/python-3.5-blue.svg
+.. image:: https://img.shields.io/badge/python-3.5+-blue.svg
    :target: https://badge.fury.io/py/feets
-   :alt: Python 3.5
+   :alt: Python 3.5+
+   
 
 Description
 -----------
