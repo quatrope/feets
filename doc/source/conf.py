@@ -24,16 +24,7 @@ sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-# modules to mock in readthedocs
-MOCK_MODULES = ["numpy", "scipy", "matplotlib", "pandas", "statsmodels"]
 
-if on_rtd:
-    from mock import Mock as MagicMock
-    class Mock(MagicMock):
-        @classmethod
-        def __getattr__(cls, name):
-            return Mock()
-    sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
 # to retrieve scikit criteria metadata
