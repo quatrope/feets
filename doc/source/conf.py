@@ -29,7 +29,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 import feets
 
 # modules to mock in readthedocs
-MOCK_MODULES = ["numpy", "scipy", "matplotlib", "pandas"]
+MOCK_MODULES = ["numpy", "scipy", "matplotlib", "pandas", "statsmodels"]
 
 
 # -- General configuration ------------------------------------------------

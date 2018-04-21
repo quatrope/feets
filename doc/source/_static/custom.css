@@ -76,7 +76,12 @@ div.section#The-Features table.citation td {
     border: none;
     padding-left: 20px;
     padding-bottom: 10px;
+}
 
+
+div.section#The-Features span.label.feature-resume {
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 60%;
 }
 
 div.body h4 {
