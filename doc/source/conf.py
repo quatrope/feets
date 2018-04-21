@@ -107,6 +107,7 @@ html_logo = "_static/logo_small.png"
 
 
 if on_rtd:
+    print("FOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
     from mock import Mock as MagicMock
     class Mock(MagicMock):
         @classmethod
