@@ -61,7 +61,6 @@ class Amplitude(Extractor):
     of the maximum 5% and the median of the minimum 5% magnitudes. For a
     sequence of numbers from 0 to 1000 the amplitude should be equal to 475.5.
 
-
     References
     ----------
 

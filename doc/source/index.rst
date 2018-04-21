@@ -92,13 +92,13 @@ Contents
 
     install
     tutorial.ipynb
-    api/feets.rst
+    api/modules.rst
 
 
 Code of conduct
 ---------------
 
-feets endorse the
+feets endorse
 `the Astropy Project code of conduct <http://www.astropy.org/code_of_conduct.html>`_.
 
 

@@ -25,11 +25,11 @@ sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # to retrieve scikit criteria metadata
-os.environ["FEETS_IN_SETUP"] = "True"
+#~ os.environ["FEETS_IN_SETUP"] = "True"
 import feets
 
 # modules to mock in readthedocs
-MOCK_MODULES = ["numpy", "scipy", "matplotlib"]
+MOCK_MODULES = ["numpy", "scipy", "matplotlib", "pandas"]
 
 
 # -- General configuration ------------------------------------------------
@@ -42,10 +42,11 @@ MOCK_MODULES = ["numpy", "scipy", "matplotlib"]
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
+
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
+    'sphinx.ext.autosummary',
     'numpydoc',
     'nbsphinx']
 
@@ -112,6 +113,8 @@ if on_rtd:
         def __getattr__(cls, name):
             return Mock()
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
+html_theme = "alabaster"
 
 
 # Theme options are theme-specific and customize the look and feel of a theme
