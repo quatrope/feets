@@ -95,17 +95,16 @@ Contents
     api/modules.rst
 
 
-Code of conduct
----------------
-
-feets endorse
-`the Astropy Project code of conduct <http://www.astropy.org/code_of_conduct.html>`_.
-
-
-
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+Code of conduct
+---------------
+
+feets endorse
+`the Astropy Project code of conduct <http://www.astropy.org/code_of_conduct.html>`_.
