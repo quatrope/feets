@@ -85,10 +85,12 @@ def get_data_home(data_home=None):
 
 def clear_data_home(data_home=None):
     """Delete all the content of the data home cache.
+
     Parameters
     ----------
     data_home : str | None
         The path to feets data dir.
+
     """
     data_home = get_data_home(data_home)
     shutil.rmtree(data_home)

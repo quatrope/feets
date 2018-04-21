@@ -192,8 +192,10 @@ class ExtractorMeta(type):
 
         if not cls.__doc__:
             cls.__doc__ = ""
-        cls.__doc__ += "\n" + "\n".join([
-            ".. warning:: {}".format(w) for w in cls.warnings])
+
+        if cls.warnings:
+            cls.__doc__ += "\n    Warnings\n    ---------\n" + "\n".join([
+                "    " + w for w in cls.warnings])
 
         del cls.data, cls.dependencies, cls.params, cls.features, cls.warnings
 
