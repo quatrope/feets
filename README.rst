@@ -1,7 +1,7 @@
 .. image:: res/logo_medium.png
     :align: left
     :scale: 25%
-    :alt: Corral
+    :alt: feets
 
 feets: feATURE eXTRACTOR FOR tIME sERIES
 ========================================
