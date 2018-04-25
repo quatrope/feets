@@ -92,6 +92,7 @@ Contents
 
     install
     tutorial.ipynb
+    extractors_tutorial.ipynb
     api/modules.rst
 
 

@@ -114,6 +114,7 @@ html_theme = "alabaster"
 #
 html_theme_options = {
     'logo': 'logo_small.png',
+    'logo_name': True,
     'github_user': 'carpyncho',
     'github_repo': 'feets',
     'extra_nav_links': {
