@@ -15,7 +15,7 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
     :alt: Build Status
 
 .. image:: https://img.shields.io/badge/docs-passing-brightgreen.svg
-    :target: http://feets.readthedocs.io/en/latest/
+    :target: http://feets.readthedocs.io
     :alt: ReadTheDocs.org
 
 .. image:: https://img.shields.io/badge/License-MIT-blue.svg
