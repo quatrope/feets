@@ -14,7 +14,7 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
     :target: https://travis-ci.org/carpyncho/feets
     :alt: Build Status
 
-.. image:: https://readthedocs.org/projects/feets/badge/?version=latest
+.. image:: https://img.shields.io/badge/docs-passing-brightgreen.svg
     :target: http://feets.readthedocs.io/en/latest/
     :alt: ReadTheDocs.org
 
