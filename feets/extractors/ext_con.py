@@ -54,12 +54,35 @@ from .core import Extractor
 # =============================================================================
 
 class Con(Extractor):
-    """Index introduced for selection of variable starts from OGLE database.
+    r"""
 
+    **Con**
 
-    To calculate Con, we counted the number of three consecutive measurements
-    that are out of 2sigma range, and normalized by N-2
-    Pavlos not happy
+    Index introduced for the selection of variable stars from the OGLE
+    database (Wozniak 2000). To calculate Con, we count the number of three
+    consecutive data points that are brighter or fainter than :math:`2\sigma`
+    and normalize the number by :math:`N−2`.
+
+    For a normal distribution and by considering just one star, Con should
+    take values close to 0.045:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Con'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Con': 0.0476}
+
+    References
+    ----------
+
+    .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
+       Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
+       algorithm using time variability and machine learning: Selection of
+       1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
+       database. The Astrophysical Journal, 735(2), 68.
+       Doi:10.1088/0004-637X/735/2/68.
+
     """
     data = ['magnitude']
     features = ["Con"]
@@ -85,4 +108,4 @@ class Con(Extractor):
                     break
             if flag:
                 count = count + 1
-        return count * 1.0 / (N - consecutiveStar + 1)
+        return {"Con": count * 1.0 / (N - consecutiveStar + 1)}

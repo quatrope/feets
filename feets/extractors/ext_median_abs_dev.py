@@ -52,11 +52,41 @@ from .core import Extractor
 # =============================================================================
 
 class MedianAbsDev(Extractor):
+    r"""
+
+    **MedianAbsDev**
+
+    The median absolute deviation is defined as the median discrepancy of the
+    data from the median data:
+
+    .. math::
+
+        Median Absolute Deviation = median(|mag - median(mag)|)
+
+    It should take a value close to 0.675 for a normal distribution:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['MedianAbsDev'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'MedianAbsDev': 0.66332131466690614}
+
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
+    """
 
     data = ['magnitude']
     features = ["MedianAbsDev"]
 
     def fit(self, magnitude):
         median = np.median(magnitude)
-        devs = (abs(magnitude - median))
-        return np.median(devs)
+        devs = abs(magnitude - median)
+        return {"MedianAbsDev": np.median(devs)}

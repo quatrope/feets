@@ -41,11 +41,10 @@ __doc__ = """Features extractors base classes classes"""
 # IMPORTS
 # =============================================================================
 
+import warnings
 from collections import namedtuple
 
 import six
-
-from .. import err
 
 
 # =============================================================================
@@ -62,27 +61,57 @@ DATA_ALIGNED_TIME = "aligned_time"
 DATA_ALIGNED_ERROR = "aligned_error"
 DATA_ALIGNED_ERROR2 = "aligned_error2"
 
+DATAS = (
+    DATA_TIME,
+    DATA_MAGNITUDE,
+    DATA_ERROR,
+    DATA_MAGNITUDE2,
+    DATA_ALIGNED_TIME,
+    DATA_ALIGNED_MAGNITUDE,
+    DATA_ALIGNED_MAGNITUDE2,
+    DATA_ALIGNED_ERROR,
+    DATA_ALIGNED_ERROR2
+)
 
-DATA_IDXS = {
-    DATA_MAGNITUDE: 0,
-    DATA_TIME: 1,
-    DATA_ERROR: 2,
-    DATA_MAGNITUDE2: 3,
-    DATA_ALIGNED_MAGNITUDE: 4,
-    DATA_ALIGNED_MAGNITUDE2: 5,
-    DATA_ALIGNED_TIME: 6,
-    DATA_ALIGNED_ERROR: 7,
-    DATA_ALIGNED_ERROR2: 8
-}
 
-DATAS = tuple([d[0] for d in sorted(DATA_IDXS.items(), key=lambda di: di[1])])
+# =============================================================================
+# EXCEPTIONS
+# =============================================================================
+
+class ExtractorBadDefinedError(Exception):
+    """The extractor are not properly defined."""
+    pass
+
+
+class ExtractorContractError(ValueError):
+    """The extractor dont get the expected features, data, parameters
+    or wathever.
+
+    """
+    pass
+
+
+class ExtractorWarning(UserWarning):
+    """Warn about the Extractor behavior."""
+    pass
+
+
+class FeatureExtractionWarning(UserWarning):
+    """Warn about calculation of some feature"""
+    pass
+
+
+warnings.simplefilter("always", ExtractorWarning)
+warnings.simplefilter("always", FeatureExtractionWarning)
+
 
 # =============================================================================
 # BASE CLASSES
 # =============================================================================
 
 ExtractorConf = namedtuple(
-    "ExtractorConf", ["data", "dependencies", "params", "features"])
+    "ExtractorConf",
+    ["data", "dependencies", "params", "features", "warnings"])
 
 
 class ExtractorMeta(type):
@@ -97,64 +126,78 @@ class ExtractorMeta(type):
 
         if not hasattr(cls, "data"):
             msg = "'{}' must redefine {}"
-            raise err.ExtractorError(msg.format(cls, "data attribute"))
+            raise ExtractorBadDefinedError(
+                msg.format(cls, "data attribute"))
         if not cls.data:
             msg = "'data' can't be empty"
-            raise err.ExtractorError(msg)
+            raise ExtractorBadDefinedError(msg)
         for d in cls.data:
             if d not in DATAS:
                 msg = "'data' must be a iterable with values in {}. Found '{}'"
-                raise err.ExtractorError(msg.format(DATAS, d))
+                raise ExtractorBadDefinedError(msg.format(DATAS, d))
         if len(set(cls.data)) != len(cls.data):
             msg = "'data' has duplicated values: {}"
-            raise err.ExtractorError(msg.format(cls.data))
+            raise ExtractorBadDefinedError(msg.format(cls.data))
 
         if not hasattr(cls, "features"):
             msg = "'{}' must redefine {}"
-            raise err.ExtractorError(msg.format(cls, "features attribute"))
+            raise ExtractorBadDefinedError(
+                msg.format(cls, "features attribute"))
         if not cls.features:
             msg = "'features' can't be empty"
-            raise err.ExtractorError(msg)
+            raise ExtractorBadDefinedError(msg)
         for f in cls.features:
             if not isinstance(f, six.string_types):
                 msg = "Feature name must be an instance of string. Found {}"
-                raise TypeError(msg.format(type(f)))
+                raise ExtractorBadDefinedError(msg.format(type(f)))
             if f in DATAS:
                 msg = "Params can't be in {}".format(DATAS)
-                raise err.DataReservedNameError(msg)
+                raise ExtractorBadDefinedError(msg)
 
         if len(set(cls.features)) != len(cls.features):
             msg = "'features' has duplicated values: {}"
-            raise err.ExtractorError(msg.format(cls.features))
+            raise ExtractorBadDefinedError(msg.format(cls.features))
 
         if cls.fit == Extractor.fit:
             msg = "'{}' must redefine {}"
-            raise err.ExtractorError(msg.format(cls, "fit method"))
+            raise ExtractorBadDefinedError(msg.format(cls, "fit method"))
 
         if not hasattr(cls, "dependencies"):
             cls.dependencies = ()
         for d in cls.dependencies:
             if not isinstance(d, six.string_types):
-                msg = "Dependencies must be an instance of string. Found {}"
-                raise TypeError(msg.format(type(d)))
+                msg = (
+                    "All Dependencies must be an instance of string. Found {}")
+                raise ExtractorBadDefinedError(msg.format(type(d)))
 
         if not hasattr(cls, "params"):
             cls.params = {}
         for p, default in cls.params.items():
             if not isinstance(p, six.string_types):
-                msg = "Params name must be an instance of string. Found {}"
-                raise TypeError(msg.format(type(p)))
+                msg = "Params names must be an instance of string. Found {}"
+                raise ExtractorBadDefinedError(msg.format(type(p)))
             if p in DATAS:
                 msg = "Params can't be in {}".format(DATAS)
-                raise err.DataReservedNameError(msg)
+                raise ExtractorBadDefinedError(msg)
+
+        if not hasattr(cls, "warnings"):
+            cls.warnings = []
 
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),
             dependencies=frozenset(cls.dependencies),
             params=tuple(cls.params.items()),
-            features=frozenset(cls.features))
+            features=frozenset(cls.features),
+            warnings=tuple(cls.warnings))
 
-        del cls.data, cls.dependencies, cls.params, cls.features
+        if not cls.__doc__:
+            cls.__doc__ = ""
+
+        if cls.warnings:
+            cls.__doc__ += "\n    Warnings\n    ---------\n" + "\n".join([
+                "    " + w for w in cls.warnings])
+
+        del cls.data, cls.dependencies, cls.params, cls.features, cls.warnings
 
         return cls
 
@@ -162,21 +205,56 @@ class ExtractorMeta(type):
 @six.add_metaclass(ExtractorMeta)
 class Extractor(object):
 
-    def __init__(self, space):
-        self.space = space
+    _conf = None
+
+    @classmethod
+    def get_data(cls):
+        return cls._conf.data
+
+    @classmethod
+    def get_dependencies(cls):
+        return cls._conf.dependencies
+
+    @classmethod
+    def get_default_params(cls):
+        return dict(cls._conf.params)
+
+    @classmethod
+    def get_features(cls):
+        return cls._conf.features
+
+    @classmethod
+    def get_warnings(cls):
+        return cls._conf.warnings
+
+    @classmethod
+    def has_warnings(cls):
+        return not cls._conf.warnings
+
+    def __init__(self, **cparams):
+        for w in self.get_warnings():
+            warnings.warn(w, ExtractorWarning)
+
         self.name = type(self).__name__
-        self.params = {}
-        ns = self.space.params_by_features(self._conf.features)
-        for p, d in self._conf.params:
-            self.params[p] = ns.get(p, d)
+
+        self.params = self.get_default_params()
+        set(cparams).difference(self.params)
+
+        not_allowed = set(cparams).difference(self.params)
+        if not_allowed:
+            msg = "Extractor '{}' not allow the parameters: {}".format(
+                type(self).__name__, ", ".join(not_allowed))
+            raise ExtractorContractError(msg)
+
+        # here all is ok
+        self.params.update(cparams)
 
     def __repr__(self):
         return str(self)
 
     def __str__(self):
         if not hasattr(self, "__str"):
-            params = dict(self._conf.params)
-            params.update(self.params)
+            params = self.params
             if params:
                 params = ", ".join([
                     "{}={}".format(k, v) for k, v in params.items()])
@@ -186,25 +264,47 @@ class Extractor(object):
         return self.__str
 
     def setup(self):
+        """This method will be executed before the feature is calculated"""
         pass
 
     def fit(self):
         raise NotImplementedError()
 
     def teardown(self):
+        """This method will be executed after the feature is calculated"""
         pass
 
-    def extract(self, data, dependencies):
-        kwargs = {k: dependencies[k] for k in self._conf.dependencies}
-        for d in self._conf.data:
-            idx = DATA_IDXS[d]
-            kwargs[d] = data[idx]
-        kwargs.update(self.params)
+    def extract(self, **kwargs):
+        # create the besel for the parameters
+        fit_kwargs = {}
+
+        # add the required features as parameters to fit()
+        dependencies = kwargs["features"]
+        fit_kwargs = {k: dependencies[k] for k in self.get_dependencies()}
+
+        # add the required data as parameters to fit()
+        for d in self.get_data():
+            fit_kwargs[d] = kwargs[d]
+
+        # add the configured parameters as parameters to fit()
+        fit_kwargs.update(self.params)
         try:
+            # setup & run te extractor
             self.setup()
-            features = self.fit(**kwargs)
-            if not hasattr(features, "__iter__"):
-                features = (features,)
-            return dict(zip(self._conf.features, features))
+            result = self.fit(**fit_kwargs)
+
+            # validate if the extractors generates the expected features
+            expected = self.get_features()  # the expected features
+            diff = (
+                expected.difference(result.keys()) or
+                set(result).difference(expected))  # some diff
+            if diff:
+                cls = type(self)
+                estr, fstr = ", ".join(expected), ", ".join(result.keys())
+                msg = (
+                    "The extractor '{}' expect the features [{}], "
+                    "and found: [{}]").format(cls, estr, fstr)
+                raise ExtractorContractError(msg)
+            return dict(result)
         finally:
             self.teardown()

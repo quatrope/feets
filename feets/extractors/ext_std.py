@@ -52,10 +52,38 @@ from .core import Extractor
 # =============================================================================
 
 class Std(Extractor):
-    """Standard deviation of the magnitudes"""
+    r"""
+    **Std** - Standard deviation of the magnitudes
+
+
+    The standard deviation :math:`\sigma` of the sample is defined as:
+
+    .. math::
+
+        \sigma=\frac{1}{N-1}\sum_{i} (y_{i}-\hat{y})^2
+
+    For example, a white noise time serie should have :math:`\sigma=1`
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Std'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Std': 0.99320419310116881}
+
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
+    """
 
     data = ['magnitude']
     features = ["Std"]
 
     def fit(self, magnitude):
-        return np.std(magnitude)
+        return {"Std": np.std(magnitude)}

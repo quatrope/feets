@@ -52,10 +52,32 @@ from .core import Extractor
 # =============================================================================
 
 class Mean(Extractor):
+    r"""
+    **Mean**
+
+    Mean magnitude. For a normal distribution it should take a value
+    close to zero:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Mean'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Mean': 0.0082611563419413246}
+
+    References
+    ----------
+
+    .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
+       Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
+       The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
+       Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
+
+    """
 
     data = ['magnitude']
     features = ["Mean"]
 
     def fit(self, magnitude):
         B_mean = np.mean(magnitude)
-        return B_mean
+        return {"Mean": B_mean}

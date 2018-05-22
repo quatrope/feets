@@ -42,11 +42,13 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
+import warnings
+
 import numpy as np
 
 from scipy.interpolate import interp1d
 
-from .core import Extractor
+from .core import Extractor, FeatureExtractionWarning
 
 
 # =============================================================================
@@ -54,6 +56,18 @@ from .core import Extractor
 # =============================================================================
 
 class StructureFunctions(Extractor):
+    r"""The structure function of rotation measures (RMs) contains information
+    on electron density and magnetic field fluctuations.
+
+    References
+    ----------
+
+    .. [simonetti1984small] Simonetti, J. H., Cordes, J. M., & Spangler, S. R.
+       (1984). Small-scale variations in the galactic magnetic field-The
+       rotation measure structure function and birefringence in interstellar
+       scintillations. The Astrophysical Journal, 284, 126-134.
+
+    """
 
     data = ['magnitude', 'time']
     features = ["StructureFunction_index_21",
@@ -81,8 +95,30 @@ class StructureFunctions(Extractor):
         sf2_log = np.log10(np.trim_zeros(sf2))
         sf3_log = np.log10(np.trim_zeros(sf3))
 
-        m_21, b_21 = np.polyfit(sf1_log, sf2_log, 1)
-        m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
-        m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
+        if len(sf1_log) and len(sf2_log):
+            m_21, b_21 = np.polyfit(sf1_log, sf2_log, 1)
+        else:
+            warnings.warn(
+                "Can't compute StructureFunction_index_21",
+                FeatureExtractionWarning)
+            m_21 = np.nan
 
-        return m_21, m_31, m_32
+        if len(sf1_log) and len(sf3_log):
+            m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
+        else:
+            warnings.warn(
+                "Can't compute StructureFunction_index_31",
+                FeatureExtractionWarning)
+            m_31 = np.nan
+
+        if len(sf2_log) and len(sf3_log):
+            m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
+        else:
+            warnings.warn(
+                "Can't compute StructureFunction_index_32",
+                FeatureExtractionWarning)
+            m_32 = np.nan
+
+        return {"StructureFunction_index_21": m_21,
+                "StructureFunction_index_31": m_31,
+                "StructureFunction_index_32": m_32}

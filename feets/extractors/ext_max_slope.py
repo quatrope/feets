@@ -53,15 +53,40 @@ from .core import Extractor
 
 class MaxSlope(Extractor):
     """
+    **MaxSlope**
+
+    Maximum absolute magnitude slope between two consecutive observations.
+
     Examining successive (time-sorted) magnitudes, the maximal first difference
     (value of delta magnitude over delta time)
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['MaxSlope'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'MaxSlope': 5.4943105823904741}
+
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
+
     """
 
     data = ['magnitude', 'time']
     features = ["MaxSlope"]
+    params = {"timesort": True}
 
-    def fit(self, magnitude, time):
+    def fit(self, magnitude, time, timesort):
+        if timesort:
+            sort = np.argsort(time)
+            time, magnitude = time[sort], magnitude[sort]
+
         slope = np.abs(magnitude[1:] - magnitude[:-1]) / (time[1:] - time[:-1])
-        np.max(slope)
-
-        return np.max(slope)
+        return {"MaxSlope": np.max(slope)}

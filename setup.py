@@ -53,8 +53,9 @@ import feets
 # =============================================================================
 
 REQUIREMENTS = [
-    "numpy", "scipy", "six", "statsmodels", "mock"
-]
+    "numpy", "scipy", "six", "pytest",
+    "statsmodels", "mock", "astropy",
+    "pandas", "requests", "attrs"]
 
 
 # =============================================================================
@@ -65,13 +66,16 @@ def do_setup():
     setup(
         name=feets.NAME,
         version=feets.VERSION,
-        description=feets.DOC,
+        long_description=feets.DOC,
+        description=feets.DOC.splitlines()[0],
         author=feets.AUTHORS,
         author_email=feets.EMAIL,
         url=feets.URL,
         license=feets.LICENSE,
-        keywords=feets.KEYWORDS,
-        classifiers=(
+        keywords=list(feets.KEYWORDS),
+        package_data={"feets.tests.data": ['tests/data/*.*']},
+        include_package_data=True,
+        classifiers=[
             "Development Status :: 4 - Beta",
             "Intended Audience :: Education",
             "Intended Audience :: Science/Research",
@@ -85,7 +89,7 @@ def do_setup():
             "Programming Language :: Python :: 3.5",
             "Programming Language :: Python :: Implementation :: CPython",
             "Topic :: Scientific/Engineering",
-        ),
+        ],
         packages=[
             pkg for pkg in find_packages() if pkg.startswith("feets")],
         py_modules=["ez_setup"],

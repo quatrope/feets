@@ -44,12 +44,20 @@ __doc__ = """All feets base tests"""
 
 import unittest
 import random
+import os
 
 import numpy as np
 import numpy.testing as npt
 
 import six
 from six.moves import range
+
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+
+DATA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
 
 
 # =============================================================================

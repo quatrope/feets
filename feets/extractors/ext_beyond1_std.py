@@ -52,8 +52,28 @@ from .core import Extractor
 # =============================================================================
 
 class Beyond1Std(Extractor):
-    """Percentage of points beyond one st. dev. from the weighted
-    (by photometric errors) mean
+    """
+    **Beyond1Std**
+
+    Percentage of points beyond one standard deviation from the weighted mean.
+    For a normal distribution, it should take a value close to 0.32:
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Beyond1Std'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'Beyond1Std': 0.317}
+
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
     """
 
     data = ['magnitude', 'error']
@@ -72,4 +92,4 @@ class Beyond1Std(Extractor):
         count = np.sum(np.logical_or(magnitude > weighted_mean + std,
                                      magnitude < weighted_mean - std))
 
-        return float(count) / n
+        return {"Beyond1Std": float(count) / n}

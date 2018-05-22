@@ -52,6 +52,29 @@ from .core import Extractor
 # =============================================================================
 
 class PercentAmplitude(Extractor):
+    r"""
+    **PercentAmplitude**
+
+    Largest percentage difference between either the max or min magnitude
+    and the median.
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['PercentAmplitude'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'PercentAmplitude': -168.991253993057}
+
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
+    """
 
     data = ['magnitude']
     features = ["PercentAmplitude"]
@@ -63,4 +86,4 @@ class PercentAmplitude(Extractor):
 
         percent_amplitude = max_distance / median_data
 
-        return percent_amplitude
+        return {"PercentAmplitude": percent_amplitude}

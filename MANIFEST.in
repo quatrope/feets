@@ -1,0 +1,4 @@
+include *.md
+recursive-include feets/tests/data *.*
+include LICENSE
+include README.rst

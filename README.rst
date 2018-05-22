@@ -1,33 +1,35 @@
+.. image:: res/logo_medium.png
+    :align: left
+    :scale: 25%
+    :alt: feets
+
 feets: feATURE eXTRACTOR FOR tIME sERIES
 ========================================
 
-Compilation of some of the existing light-curve features.
+.. image:: https://badge.fury.io/py/feets.svg
+    :target: https://badge.fury.io/py/feets
+    :alt: PyPi Version
 
+.. image:: https://travis-ci.org/carpyncho/feets.svg?branch=master
+    :target: https://travis-ci.org/carpyncho/feets
+    :alt: Build Status
 
-Based on FATS:
+.. image:: https://img.shields.io/badge/docs-passing-brightgreen.svg
+    :target: http://feets.readthedocs.io
+    :alt: ReadTheDocs.org
 
-- **Authors:** Isadora Nun and Pavlos Protopapas
-- **Contributors:** Karim Pichara, Rahul Dave, Daniel Acuña, Nicolás Castro,
-  Cristobal Mackenzie, Andrés Riveros and Ming Zhu
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+   :target: https://tldrlegal.com/license/mit-license
+   :alt: License
 
-Main difference with FATS:
+.. image:: https://img.shields.io/badge/python-2.7-blue.svg
+   :target: https://badge.fury.io/py/feets
+   :alt: Python 2.7
 
-- Removed licurve retrieval from public surveys (we only do one thing here)
-- Removed all the ``sys.exit()`` calls and replaced with Exceptions
-- PEP-8
-- Python 2 and 3
-- Warnings instead of prints
-- Only one type of results: numpy array with steroids
-- Posibility of register more FeaturesExtractors.
-
-
-Installation
-------------
-
-Clone this repository and do ``pip install -e``.
-
-Or ``pip install feets`` for the latest stable version.
-
+.. image:: https://img.shields.io/badge/python-3.5+-blue.svg
+   :target: https://badge.fury.io/py/feets
+   :alt: Python 3.5+
+   
 
 Description
 -----------
@@ -66,3 +68,52 @@ matching different features. In order to achieve this goal, the library should
 be run in every existent survey (MACHO, EROS, OGLE, Catalina, Pan-STARRS, etc)
 and future surveys (LSST) and the results should be ideally shared in the same
 open way as this library.
+
+Basic Install
+-------------
+
+Execute
+
+.. code-block:: bash
+
+    $ pip install feets
+
+
+Development Install
+-------------------
+
+1.  Clone this repo and then inside the local
+2.  Execute
+
+    .. code-block:: bash
+
+        $ pip install -e .
+
+
+Tutorial
+--------
+
+http://feets.readthedocs.io
+
+
+Authors
+-------
+
+Juan BC
+
+jbc.develop@gmail.com
+
+`IATE <http://iate.oac.uncor.edu/>`_ - `UNR <http://unr.edu.ar/>`_
+
+----
+
+Based on "FATS" by Isadora Nun and Pavlos Protopapas (https://github.com/isadoranun/FATS)
+
+Main difference with FATS:
+
+- Removed all the ``sys.exit()`` calls and replaced with Exceptions
+- PEP-8
+- Python 2 and 3
+- Warnings instead of prints
+- Only one type of results: numpy array.
+- Posibility of register more FeaturesExtractors.

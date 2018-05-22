@@ -36,24 +36,42 @@ from __future__ import unicode_literals, print_function
 
 __doc__ = """core functionalities of feets"""
 
+__all__ = [
+    "FeatureNotFound",
+    "DataRequiredError",
+    "FeatureSpace"]
+
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
 import logging
-import multiprocessing as mp
 
 import numpy as np
 
-from . import extractors, err
+from . import extractors
+from .extractors.core import (
+    DATA_MAGNITUDE,
+    DATA_TIME,
+    DATA_ERROR,
+    DATA_MAGNITUDE2,
+    DATA_ALIGNED_MAGNITUDE,
+    DATA_ALIGNED_MAGNITUDE2,
+    DATA_ALIGNED_TIME,
+    DATA_ALIGNED_ERROR,
+    DATA_ALIGNED_ERROR2)
 
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
 
-CPU_COUNT = mp.cpu_count()
+TABULATE_PARAMS = {
+    "headers": "firstrow",
+    "numalign": "center",
+    "stralign": "center",
+}
 
 
 # =============================================================================
@@ -66,38 +84,90 @@ logger.setLevel(logging.WARNING)
 
 
 # =============================================================================
+# EXCEPTIONS
+# =============================================================================
+
+class FeatureNotFound(ValueError):
+    pass
+
+
+class DataRequiredError(ValueError):
+    pass
+
+
+# =============================================================================
 # FEATURE EXTRACTORS
 # =============================================================================
 
+
 class FeatureSpace(object):
-    """
-    This Class is a wrapper class, to allow user select the
+    """Wrapper class, to allow user select the
     features based on the available time series vectors (magnitude, time,
     error, second magnitude, etc.) or specify a list of features.
+    The finally selected features for the execution plan are are those that
+    satisfy all the filters.
 
-    __init__ will take in the list of the available data and featureList.
+    Parameters
+    ----------
 
-    User could only specify the available time series vectors, which will
-    output all the features that need this data to be calculated.
+    data : array-like, optional, default ``None``
+        available time series vectors, which will
+        output all the features that need this data to be calculated.
 
-    User could only specify featureList, which will output
-    all the features in the list.
+    only : array-like, optional, default ``None``
+        List of features, which will output
+        all the features in the list.
 
-    User could specify a list of the available time series vectors and
-    featureList, which will output all the features in the List that
-    use the available data.
+    exclude : array-like, optional, default ``None``
+        List of features, which will not output
 
-    Additional parameters are used for individual features.
-    Format is featurename = [parameters]
+    kwargs
+        Extra configuration for the feature extractors.
+        format is ``Feature_name={param1: value, param2: value, ...}``
 
-    usage:
-    data = np.random.randint(0,10000, 100000000)
-    # automean is the featurename and [0,0] is the parameter for the feature
-    a = FeatureSpace(category='all', automean=[0,0])
-    print a.featureList
-    a=a.calculateFeature(data)
-    print a.result(method='array')
-    print a.result(method='dict')
+    Examples
+    --------
+
+    **List of features as an input:**
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['Std'])
+        >>> features, values = fs.extract(*lc)
+        >>> dict(zip(features, values))
+        {"Std": .42}
+
+    **Available data as an input:**
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(data=['magnitude','time'])
+        >>> features, values = fs.extract(*lc)
+        >>> dict(zip(features, values))
+        {...}
+
+    **List of features and available data as an input:**
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(
+        ...     only=['Mean','Beyond1Std', 'CAR_sigma','Color'],
+        ...     data=['magnitude', 'error'])
+        >>> features, values = fs.extract(*lc)
+        >>> dict(zip(features, values))
+        {"Beyond1Std": ..., "Mean": ...}
+
+    **Excluding list as an input**
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(
+        ...     only=['Mean','Beyond1Std','CAR_sigma','Color'],
+        ...     data=['magnitude', 'error'],
+        ...     exclude=["Beyond1Std"])
+        >>> features, values = fs.extract(**lc)
+        >>> dict(zip(features, values))
+        {"Mean": 23}
 
     """
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
@@ -111,7 +181,7 @@ class FeatureSpace(object):
         if data:
             fbdata = []
             for fname, f in exts.items():
-                if not f._conf.data.difference(data):
+                if not f.get_data().difference(data):
                     fbdata.append(fname)
         else:
             fbdata = exts.keys()
@@ -122,35 +192,66 @@ class FeatureSpace(object):
         if only:
             for f in only:
                 if f not in exts:
-                    raise err.FeatureNotFound(f)
+                    raise FeatureNotFound(f)
         self._only = frozenset(only or exts.keys())
 
         # select the features to exclude or not exclude anything
         if exclude:
             for f in exclude:
                 if f not in exts:
-                    raise err.FeatureNotFound(f)
+                    raise FeatureNotFound(f)
         self._exclude = frozenset(exclude or ())
 
-        # TODO: remove by dependencies
-
-        # final list of features
-        self._features = self._features_by_data.intersection(
+        # the candidate to be the features to be extracted
+        candidates = self._features_by_data.intersection(
             self._only).difference(self._exclude)
+
+        # remove by dependencies
+        if only or exclude:
+            final = set()
+            for f in candidates:
+                fcls = exts[f]
+                dependencies = fcls.get_dependencies()
+                if dependencies.issubset(candidates):
+                    final.add(f)
+        else:
+            final = candidates
+
+        # the final features
+        self._features = frozenset(final)
 
         # create a ndarray for all the results
         self._features_as_array = np.array(sorted(self._features))
 
-        # initialize the extractors
-        features_extractors = set()
+        # initialize the extractors and determine the required data only
+        features_extractors, features_extractors_names = set(), set()
+        required_data = set()
         for fcls in set(exts.values()):
-            if fcls._conf.features.intersection(self._features):
-                features_extractors.add(fcls(self))
+            if fcls.get_features().intersection(self._features):
+
+                params = self._kwargs.get(fcls.__name__, {})
+                fext = fcls(**params)
+
+                features_extractors.add(fext)
+                features_extractors_names.add(fext.name)
+                required_data.update(fext.get_data())
+
         self._features_extractors = frozenset(features_extractors)
+        self._features_extractors_names = frozenset(features_extractors_names)
+        self._required_data = frozenset(required_data)
 
         # excecution order by dependencies
         self._execution_plan = extractors.sort_by_dependencies(
             features_extractors)
+
+        not_found = set(self._kwargs).difference(
+            self._features_extractors_names)
+        if not_found:
+            msg = (
+                "This space not found feature(s) extractor(s) {} "
+                "to assign the given parameter(s)"
+            ).format(", ".join(not_found))
+            raise FeatureNotFound(msg)
 
     def __repr__(self):
         return str(self)
@@ -162,28 +263,39 @@ class FeatureSpace(object):
             self.__str = "<FeatureSpace: {}>".format(space)
         return self.__str
 
-    def params_by_features(self, features):
-        params = {}
-        for f in features:
-            params.update(self._kwargs.get(f, {}))
-        return params
+    def dict_data_as_array(self, d):
+        array_data = {}
+        for k, v in d.items():
+            if k in self._required_data and v is None:
+                raise DataRequiredError(k)
+            array_data[k] = v if v is None else np.asarray(v)
+        return array_data
 
-    def _extract_one(self, data):
-        data, features = np.asarray(data), {}
+    def extract(self, time=None, magnitude=None, error=None,
+                magnitude2=None, aligned_time=None,
+                aligned_magnitude=None, aligned_magnitude2=None,
+                aligned_error=None, aligned_error2=None):
+
+        kwargs = self.dict_data_as_array({
+            DATA_TIME: time,
+            DATA_MAGNITUDE: magnitude,
+            DATA_ERROR: error,
+            DATA_MAGNITUDE2: magnitude2,
+            DATA_ALIGNED_TIME: aligned_time,
+            DATA_ALIGNED_MAGNITUDE: aligned_magnitude,
+            DATA_ALIGNED_MAGNITUDE2: aligned_magnitude2,
+            DATA_ALIGNED_ERROR: aligned_error,
+            DATA_ALIGNED_ERROR2: aligned_error2})
+
+        features = {}
         for fextractor in self._execution_plan:
-            features.update(fextractor.extract(data, features))
+            result = fextractor.extract(features=features, **kwargs)
+            features.update(result)
+
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
-        return fvalues
 
-    def extract_one(self, data):
-        return self._features_as_array, self._extract_one(data)
-
-    def extract(self, data):
-        result = []
-        for chunk in data:
-            result.append(self._extract_one(chunk))
-        return self._features_as_array, np.asarray(result)
+        return self._features_as_array, fvalues
 
     @property
     def kwargs(self):
@@ -221,87 +333,6 @@ class FeatureSpace(object):
     def excecution_plan_(self):
         return self._execution_plan
 
-
-# =============================================================================
-# MULTIPROCESS
-# =============================================================================
-
-class FeatureSpaceProcess(mp.Process):
-
-    def __init__(self, space, data, **kwargs):
-        super(FeatureSpaceProcess, self).__init__(**kwargs)
-        self._space = space
-        self._data = data
-        self._queue = mp.Queue()
-
-    def run(self):
-        result = []
-        for data in self._data:
-            result.append(self._space._extract_one(data))
-        self._queue.put(result)
-
     @property
-    def space(self):
-        return self._space
-
-    @property
-    def data(self):
-        return self._data
-
-    @property
-    def queue(self):
-        return self._queue
-
-    @property
-    def result_(self):
-        if not hasattr(self, "_result"):
-            self._result = self._queue.get()
-        return self._result
-
-
-class MPFeatureSpace(FeatureSpace):
-    """Multiprocess version of FeatureSpace
-
-    """
-    def __init__(self, data=None, only=None, exclude=None,
-                 proccls=FeatureSpaceProcess, **kwargs):
-        super(MPFeatureSpace, self).__init__(
-            data=data, only=only, exclude=exclude, **kwargs)
-        self._proccls = proccls
-
-    def __str__(self):
-        if not hasattr(self, "__str"):
-            extractors = [str(extractor) for extractor in self._execution_plan]
-            space = ", ".join(extractors)
-            self.__str = "<MPFeatureSpace: {}>".format(space)
-        return self.__str
-
-    def chunk_it(self, seq, num):
-        avg = len(seq) / float(num)
-        out = []
-        last = 0.0
-        while last < len(seq):
-            out.append(seq[int(last):int(last + avg)])
-            last += avg
-        return sorted(out, reverse=True)
-
-    def extract(self, data, procn=CPU_COUNT, **kwargs):
-        procs, fvalues = [], []
-        for chunk in self.chunk_it(data, procn):
-            if chunk:
-                proc = self._proccls(self, chunk, **kwargs)
-                proc.start()
-                procs.append(proc)
-        for proc in procs:
-            proc.join()
-            fvalues.append(proc.result_)
-        return self._features_as_array, np.array(fvalues)
-
-    @property
-    def proccls(self):
-        return self._proccls
-
-
-# =============================================================================
-#
-# =============================================================================
+    def required_data_(self):
+        return self._required_data

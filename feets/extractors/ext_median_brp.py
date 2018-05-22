@@ -52,10 +52,28 @@ from .core import Extractor
 # =============================================================================
 
 class MedianBRP(Extractor):
-    """Median buffer range percentage
+    r"""
+    **MedianBRP** (Median buffer range percentage)
 
     Fraction (<= 1) of photometric points within amplitude/10
     of the median magnitude
+
+    .. code-block:: pycon
+
+        >>> fs = feets.FeatureSpace(only=['MedianBRP'])
+        >>> features, values = fs.extract(**lc_normal)
+        >>> dict(zip(features, values))
+        {'MedianBRP': 0.559}
+
+    References
+    ----------
+
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+       Rischard, M. (2011). On machine-learned classification of variable stars
+       with sparse and noisy time-series data.
+       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
     """
 
     data = ['magnitude']
@@ -69,4 +87,4 @@ class MedianBRP(Extractor):
         count = np.sum(np.logical_and(magnitude < median + amplitude,
                                       magnitude > median - amplitude))
 
-        return float(count) / n
+        return {"MedianBRP": float(count) / n}
