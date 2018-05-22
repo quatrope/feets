@@ -54,12 +54,12 @@ class Signature(Extractor):
 
     data = ['magnitude', 'time']
     dependencies = ['PeriodLS', 'Amplitude']
-    params = {"xbins": 18, "ybins": 12}
+    params = {"phase_bins": 18, "mag_bins": 12}
 
     features = []
-    for i in range(params["xbins"]):
-        for j in range(params["ybins"]):
-            features.append("Signature_x_{}_y_{}".format(i, j))
+    for i in range(params["phase_bins"]):
+        for j in range(params["mag_bins"]):
+            features.append("Signature_ph_{}_mag_{}".format(i, j))
 
     # this variable stores a sorted version of the features
     # because feets only stores a frozenset of the original features
@@ -68,7 +68,7 @@ class Signature(Extractor):
 
     del i, j
 
-    def fit(self, magnitude, time, PeriodLS, Amplitude, xbins, ybins):
+    def fit(self, magnitude, time, PeriodLS, Amplitude, phase_bins, mag_bins):
 
         lc_yaxis = (magnitude - np.min(magnitude)) / np.float(Amplitude)
 
@@ -76,9 +76,9 @@ class Signature(Extractor):
         loc = np.argmin(lc_yaxis)
         lc_phase = np.remainder(time - time[loc], PeriodLS) / PeriodLS
 
-        bins = (xbins, ybins)
+        bins = (phase_bins, mag_bins)
         counts = np.histogram2d(lc_phase, lc_yaxis, bins=bins, normed=True)[0]
 
-        result = zip(self.sorted_features, counts.reshape(xbins * ybins))
+        result = zip(self.sorted_features, counts.reshape(phase_bins * mag_bins))
 
         return dict(result)
