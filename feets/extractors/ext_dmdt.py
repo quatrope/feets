@@ -75,12 +75,11 @@ class DeltamDeltat(Extractor):
     data = ['magnitude', 'time']
     params = {"dt_bins": np.hstack([0., np.logspace(-3., 3.5, num=23)]),
               "dm_bins": np.hstack([-1.*np.logspace(1, -1, num=12), 0,
-                                    np.logspace(-1, 1, num=12)])
-             }
+                                    np.logspace(-1, 1, num=12)])}
 
     features = []
-    for i in range(len(params["dm_bins"])-1):
-        for j in range(len(params["dt_bins"])-1):
+    for i in range(len(params["dm_bins"]) - 1):
+        for j in range(len(params["dt_bins"]) - 1):
             features.append("DeltamDeltat_dt_{}_dm_{}".format(j, i))
 
     # this variable stores a sorted version of the features
@@ -93,7 +92,7 @@ class DeltamDeltat(Extractor):
     def fit(self, magnitude, time, dt_bins, dm_bins):
 
         lc_len = len(time)
-        n_vals = int(0.5*lc_len*(lc_len-1))
+        n_vals = int(0.5 * lc_len * (lc_len - 1))
         deltam = np.empty(n_vals)
         deltat = np.empty(n_vals)
 
@@ -101,7 +100,7 @@ class DeltamDeltat(Extractor):
         for i in range(lc_len):
             t0 = time[i]
             m0 = magnitude[i]
-            for j in range(i+1, lc_len):
+            for j in range(i + 1, lc_len):
                 tp = time[j]
                 mp = magnitude[j]
                 if tp > t0:
@@ -117,8 +116,8 @@ class DeltamDeltat(Extractor):
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
-        counts = np.fix(255.*counts/n_vals + 0.999)
+        counts = np.fix(255. * counts/n_vals + 0.999).astype(int)
         result = zip(self.sorted_features,
-                     counts.reshape((len(dt_bins)-1)*(len(dm_bins)-1)))
+                     counts.reshape((len(dt_bins) - 1) * (len(dm_bins) - 1)))
 
         return dict(result)

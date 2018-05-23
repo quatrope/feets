@@ -79,6 +79,7 @@ class Signature(Extractor):
         bins = (phase_bins, mag_bins)
         counts = np.histogram2d(lc_phase, lc_yaxis, bins=bins, normed=True)[0]
 
-        result = zip(self.sorted_features, counts.reshape(phase_bins * mag_bins))
+        result = zip(self.sorted_features,
+                     counts.reshape(phase_bins * mag_bins))
 
         return dict(result)
