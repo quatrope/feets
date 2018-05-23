@@ -79,9 +79,9 @@ class DeltamDeltat(Extractor):
              }
 
     features = []
-    for i in range(len(params["dt_bins"])-1):
-        for j in range(len(params["dm_bins"])-1):
-            features.append("DeltamDeltat_dt_{}_dm_{}".format(i, j))
+    for i in range(len(params["dm_bins"])-1):
+        for j in range(len(params["dt_bins"])-1):
+            features.append("DeltamDeltat_dt_{}_dm_{}".format(j, i))
 
     # this variable stores a sorted version of the features
     # because feets only stores a frozenset of the original features
@@ -92,16 +92,16 @@ class DeltamDeltat(Extractor):
 
     def fit(self, magnitude, time, dt_bins, dm_bins):
 
-        l = len(time)
-        n_vals = int(0.5*l*(l-1))
+        lc_len = len(time)
+        n_vals = int(0.5*lc_len*(lc_len-1))
         deltam = np.empty(n_vals)
         deltat = np.empty(n_vals)
 
         k = 0
-        for i in range(l):
+        for i in range(lc_len):
             t0 = time[i]
             m0 = magnitude[i]
-            for j in range(i+1, l):
+            for j in range(i+1, lc_len):
                 tp = time[j]
                 mp = magnitude[j]
                 if tp > t0:
@@ -116,7 +116,8 @@ class DeltamDeltat(Extractor):
                 k += 1
 
         bins = [dt_bins, dm_bins]
-        counts = np.histogram2d(deltat, deltam, bins=bins, normed=True)[0]
+        counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
+        counts = np.fix(255.*counts/n_vals + 0.999)
         result = zip(self.sorted_features,
                      counts.reshape((len(dt_bins)-1)*(len(dm_bins)-1)))
 
