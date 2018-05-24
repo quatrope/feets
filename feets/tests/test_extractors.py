@@ -246,5 +246,5 @@ class feetsExtractorsTestCases(FeetsTestCase):
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
             feats = ext.fit(magnitude=mags, time=time, **params)
-            values[idx] = np.sum(feats.values())
+            values[idx] = np.sum(list(feats.values()))
         self.assertAllClose(values.mean(), 424.56)
