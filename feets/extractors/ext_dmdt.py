@@ -102,16 +102,17 @@ class DeltamDeltat(Extractor):
             t0 = time[i]
             m0 = magnitude[i]
 
-            dtimes = time[i+1:lc_len] - t0
-            dmags = magnitude[i+1:lc_len] - m0
+            dtimes = time[i + 1:] - t0
+            dmags = magnitude[i + 1:] - m0
 
             deltat.append(dtimes)
             deltam.append(dmags)
+
         deltat = np.hstack(deltat)
         deltam = np.hstack(deltam)
 
-        deltat[np.where(deltat<0)] *= -1
-        deltam[np.where(deltat<0)] *= -1
+        deltat[np.where(deltat < 0)] *= -1
+        deltam[np.where(deltat < 0)] *= -1
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
