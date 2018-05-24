@@ -44,7 +44,7 @@ __doc__ = """"""
 
 import numpy as np
 
-import joblib
+from joblib import Parallel, delayed
 
 from .core import Extractor
 
@@ -53,17 +53,18 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
-def deltas (idx, time, magnitude):
+def deltas_t(idx, time):
     t0 = time[idx]
-    m0 = magnitude[idx]
     deltat = time[idx + 1:] - t0
+
+    return deltat
+
+def deltas_m(idx, magnitude):
+    m0 = magnitude[idx]
     deltam = magnitude[idx + 1:] - m0
-    
-    deltat[np.where(deltat < 0)] *= -1
-    deltam[np.where(deltat < 0)] *= -1
-    
-    return deltat, deltam
-    
+
+    return deltam
+
 
 class DeltamDeltat(Extractor):
     """
@@ -110,22 +111,25 @@ class DeltamDeltat(Extractor):
         lc_len = len(time)
         n_vals = int(0.5 * lc_len * (lc_len - 1))
 
-        deltam = []
-        deltat = []
-        for i in range(lc_len-1):
-            t0 = time[i]
-            m0 = magnitude[i]
+        #~ deltam = []
+        #~ deltat = []
 
-            dtimes, dmags = deltas(i, times, mags)
+        deltat = Parallel(n_jobs=-1)(delayed(deltas_t)(i, time)
+                                     for i in range(lc_len-1))
+        deltam = Parallel(n_jobs=-1)(delayed(deltas_m)(i, magnitude)
+                                     for i in range(lc_len-1))
 
-            deltat.append(dtimes)
-            deltam.append(dmags)
+        #~ for i in range(lc_len-1):
+            #~ dtimes, dmags = deltas(i, time, magnitude)
+
+            #~ deltat.append(dtimes)
+            #~ deltam.append(dmags)
 
         deltat = np.hstack(deltat)
         deltam = np.hstack(deltam)
 
-        #deltat[np.where(deltat < 0)] *= -1
-        #deltam[np.where(deltat < 0)] *= -1
+        deltat[np.where(deltat < 0)] *= -1
+        deltam[np.where(deltat < 0)] *= -1
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
