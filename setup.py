@@ -55,7 +55,7 @@ import feets
 REQUIREMENTS = [
     "numpy", "scipy", "six", "pytest",
     "statsmodels", "mock", "astropy",
-    "pandas", "requests", "attrs"]
+    "pandas", "requests", "attrs", "joblib"]
 
 
 # =============================================================================

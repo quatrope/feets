@@ -58,12 +58,12 @@ def deltas (idx, time, magnitude):
     m0 = magnitude[idx]
     deltat = time[idx + 1:] - t0
     deltam = magnitude[idx + 1:] - m0
-    
+
     deltat[np.where(deltat < 0)] *= -1
     deltam[np.where(deltat < 0)] *= -1
-    
+
     return deltat, deltam
-    
+
 
 class DeltamDeltat(Extractor):
     """
@@ -116,7 +116,7 @@ class DeltamDeltat(Extractor):
             t0 = time[i]
             m0 = magnitude[i]
 
-            dtimes, dmags = deltas(i, times, mags)
+            dtimes, dmags = deltas(i, time, magnitude)
 
             deltat.append(dtimes)
             deltam.append(dmags)
