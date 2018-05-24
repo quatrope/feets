@@ -95,30 +95,28 @@ class DeltamDeltat(Extractor):
 
         lc_len = len(time)
         n_vals = int(0.5 * lc_len * (lc_len - 1))
-        deltam = np.empty(n_vals)
-        deltat = np.empty(n_vals)
 
-        k = 0
-        for i in range(lc_len):
+        deltam = []
+        deltat = []
+        for i in range(lc_len-1):
             t0 = time[i]
             m0 = magnitude[i]
-            for j in range(i + 1, lc_len):
-                tp = time[j]
-                mp = magnitude[j]
-                if tp > t0:
-                    dt = tp - t0
-                    dm = mp - m0
-                else:
-                    dt = t0 - tp
-                    dm = m0 - mp
 
-                deltat[k] = dt
-                deltam[k] = dm
-                k += 1
+            dtimes = time[i+1:lc_len] - t0
+            dmags = magnitude[i+1:lc_len] - m0
+
+            deltat.append(dtimes)
+            deltam.append(dmags)
+        deltat = np.hstack(deltat)
+        deltam = np.hstack(deltam)
+
+        deltat[np.where(deltat<0)] *= -1
+        deltam[np.where(deltat<0)] *= -1
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
         counts = np.fix(255. * counts/n_vals + 0.999).astype(int)
+
         result = zip(self.sorted_features,
                      counts.reshape((len(dt_bins) - 1) * (len(dm_bins) - 1)))
 
