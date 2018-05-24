@@ -44,12 +44,26 @@ __doc__ = """"""
 
 import numpy as np
 
+import joblib
+
 from .core import Extractor
 
 
 # =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
+
+def deltas (idx, time, magnitude):
+    t0 = time[idx]
+    m0 = magnitude[idx]
+    deltat = time[idx + 1:] - t0
+    deltam = magnitude[idx + 1:] - m0
+    
+    deltat[np.where(deltat < 0)] *= -1
+    deltam[np.where(deltat < 0)] *= -1
+    
+    return deltat, deltam
+    
 
 class DeltamDeltat(Extractor):
     """
@@ -102,8 +116,7 @@ class DeltamDeltat(Extractor):
             t0 = time[i]
             m0 = magnitude[i]
 
-            dtimes = time[i + 1:] - t0
-            dmags = magnitude[i + 1:] - m0
+            dtimes, dmags = deltas(i, times, mags)
 
             deltat.append(dtimes)
             deltam.append(dmags)
@@ -111,8 +124,8 @@ class DeltamDeltat(Extractor):
         deltat = np.hstack(deltat)
         deltam = np.hstack(deltam)
 
-        deltat[np.where(deltat < 0)] *= -1
-        deltam[np.where(deltat < 0)] *= -1
+        #deltat[np.where(deltat < 0)] *= -1
+        #deltam[np.where(deltat < 0)] *= -1
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
