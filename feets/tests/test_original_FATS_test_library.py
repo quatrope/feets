@@ -362,6 +362,6 @@ class FATSTutorialTestCase(FeetsTestCase):
 
         original = pd.DataFrame([dict(zip(features, values))])
         result = original.apply(normalize)
-        # altered value Previously 0.09
+
         self.assertLess(np.abs(result.mean()), 0.12)
         self.assertLess(result.std(), 1.09)

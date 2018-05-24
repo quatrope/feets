@@ -110,7 +110,7 @@ class SortByFependenciesTest(FeetsTestCase):
                 self.fail("to many extractors in plan: {}".format(idx))
 
 
-class ExtractorsTestCases(FeetsTestCase):
+class FATSExtractorsTestCases(FeetsTestCase):
 
     def setUp(self):
         self.random = np.random.RandomState(42)
@@ -230,3 +230,21 @@ class ExtractorsTestCases(FeetsTestCase):
                 aligned_magnitude=mags, aligned_magnitude2=mags2,
                 aligned_error=errors, aligned_error2=errors2)['StetsonL']
         self.assertAllClose(values.mean(), -0.0470713296883)
+
+
+class feetsExtractorsTestCases(FeetsTestCase):
+
+    def setUp(self):
+        self.random = np.random.RandomState(42)
+
+    def test_feets_dmdt(self):
+        ext = extractors.DeltamDeltat()
+        params = ext.get_default_params()
+        time = np.arange(0, 1000)
+
+        values = np.empty(50)
+        for idx in range(values.size):
+            mags = self.random.normal(size=1000)
+            feats = ext.fit(magnitude=mags, time=time, **params)
+            values[idx] = np.sum(feats.values())
+        self.assertAllClose(values.mean(), 424.56)
