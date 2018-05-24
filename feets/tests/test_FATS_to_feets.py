@@ -46,8 +46,6 @@ import os
 
 import numpy as np
 
-import pandas as pd
-
 from .. import FeatureSpace, preprocess
 from .. datasets import macho
 

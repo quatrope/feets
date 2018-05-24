@@ -50,14 +50,18 @@ https://github.com/isadoranun/FATS/blob/b45b5c1/FATS/test_library.py
 # IMPORTS
 # =============================================================================
 
+import os
+
 import numpy as np
+
+import pandas as pd
 
 import pytest
 
 from six.moves import range
 
 from ..core import FeatureSpace
-from .core import FeetsTestCase,
+from .core import FeetsTestCase, DATA_PATH
 
 
 # =============================================================================
