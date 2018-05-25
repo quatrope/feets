@@ -44,27 +44,12 @@ __doc__ = """"""
 
 import numpy as np
 
-from joblib import Parallel, delayed
-
 from .core import Extractor
 
 
 # =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
-
-def deltas_t(idx, time):
-    t0 = time[idx]
-    deltat = time[idx + 1:] - t0
-
-    return deltat
-
-def deltas_m(idx, magnitude):
-    m0 = magnitude[idx]
-    deltam = magnitude[idx + 1:] - m0
-
-    return deltam
-
 
 class DeltamDeltat(Extractor):
     """
@@ -93,6 +78,7 @@ class DeltamDeltat(Extractor):
     params = {"dt_bins": np.hstack([0., np.logspace(-3., 3.5, num=23)]),
               "dm_bins": np.hstack([-1.*np.logspace(1, -1, num=12), 0,
                                     np.logspace(-1, 1, num=12)])}
+    parallel = True
 
     features = []
     for i in range(len(params["dm_bins"]) - 1):
@@ -108,28 +94,25 @@ class DeltamDeltat(Extractor):
 
     def fit(self, magnitude, time, dt_bins, dm_bins):
 
+        def delta_calc(idx):
+            t0 = time[idx]
+            m0 = magnitude[idx]
+            deltat = time[idx + 1:] - t0
+            deltam = magnitude[idx + 1:] - m0
+
+            deltat[np.where(deltat < 0)] *= -1
+            deltam[np.where(deltat < 0)] *= -1
+
+            return np.column_stack((deltat, deltam))
+
         lc_len = len(time)
         n_vals = int(0.5 * lc_len * (lc_len - 1))
 
-        #~ deltam = []
-        #~ deltat = []
+        deltas = np.vstack(
+            delta_calc(idx) for idx in range(lc_len - 1))
 
-        deltat = Parallel(n_jobs=-1)(delayed(deltas_t)(i, time)
-                                     for i in range(lc_len-1))
-        deltam = Parallel(n_jobs=-1)(delayed(deltas_m)(i, magnitude)
-                                     for i in range(lc_len-1))
-
-        #~ for i in range(lc_len-1):
-            #~ dtimes, dmags = deltas(i, time, magnitude)
-
-            #~ deltat.append(dtimes)
-            #~ deltam.append(dmags)
-
-        deltat = np.hstack(deltat)
-        deltam = np.hstack(deltam)
-
-        deltat[np.where(deltat < 0)] *= -1
-        deltam[np.where(deltat < 0)] *= -1
+        deltat = deltas[:, 0]
+        deltam = deltas[:, 1]
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
