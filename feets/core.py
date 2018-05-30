@@ -99,6 +99,29 @@ class DataRequiredError(ValueError):
 # FEATURE EXTRACTORS
 # =============================================================================
 
+class FeatureSet(object):
+
+    def __init__(self, fs, names, values):
+        self._fs = fs
+        self._names = names
+        self._values = values
+
+    def __dir__(self):
+        return super(FeatureSet, self) + list(self._names)
+
+    def as_array(self):
+        if not hasattr(self, "_arr"):
+            self._arr = self._fs.as_array(self._names, self._values)
+        return self._arr
+
+    @property
+    def names(self):
+        return self._names[:]
+
+    @property
+    def values(self):
+        return self._values[:]
+
 
 class FeatureSpace(object):
     """Wrapper class, to allow user select the
