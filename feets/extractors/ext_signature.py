@@ -58,9 +58,9 @@ class Signature(Extractor):
     params = {"phase_bins": 18, "mag_bins": 12}
 
     features = []
-    for i in range(params["mag_bins"]):
-        for j in range(params["phase_bins"]):
-            features.append("Signature_ph_{}_mag_{}".format(j, i))
+    for i in range(params["phase_bins"]):
+        for j in range(params["mag_bins"]):
+            features.append("Signature_ph_{:02d}_mag_{:02d}".format(i, j))
 
     # this variable stores a sorted version of the features
     # because feets only stores a frozenset of the original features

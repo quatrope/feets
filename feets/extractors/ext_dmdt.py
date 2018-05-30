@@ -81,9 +81,9 @@ class DeltamDeltat(Extractor):
     parallel = True
 
     features = []
-    for i in range(len(params["dm_bins"]) - 1):
-        for j in range(len(params["dt_bins"]) - 1):
-            features.append("DeltamDeltat_dt_{}_dm_{}".format(j, i))
+    for i in range(len(params["dt_bins"]) - 1):
+        for j in range(len(params["dm_bins"]) - 1):
+            features.append("DeltamDeltat_dt_{:02d}_dm_{:02d}".format(i, j))
 
     # this variable stores a sorted version of the features
     # because feets only stores a frozenset of the original features
