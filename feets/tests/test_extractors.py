@@ -266,7 +266,7 @@ class feetsExtractorsTestCases(FeetsTestCase):
         expected = np.fix(255. * sign/n_vals + 0.999).astype(int)
 
         with mock.patch("numpy.histogram2d", return_value=[sign]):
-            results = ext.fit(magnitude=mags, time=time, **paravms)
+            results = ext.fit(magnitude=mags, time=time, **params)
 
         flattened = np.zeros_like(expected) - 1
         for name, value in results.items():
