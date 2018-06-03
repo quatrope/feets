@@ -9,7 +9,11 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
 .. image:: https://badge.fury.io/py/feets.svg
     :target: https://badge.fury.io/py/feets
     :alt: PyPi Version
-
+    
+.. image:: https://img.shields.io/badge/ascl-1806.001-blue.svg?colorB=262255
+    :target: http://ascl.net/1806.001
+    :alt: ascl:1806.001
+ 
 .. image:: https://travis-ci.org/carpyncho/feets.svg?branch=master
     :target: https://travis-ci.org/carpyncho/feets
     :alt: Build Status
