@@ -96,7 +96,7 @@ class DataRequiredError(ValueError):
 
 
 # =============================================================================
-# FEATURE EXTRACTORS
+# FEATURE SET
 # =============================================================================
 
 class FeatureSet(object):
@@ -105,12 +105,20 @@ class FeatureSet(object):
         self._fs = fs
         self._names = names
         self._values = values
+        self._arr = None
 
     def __dir__(self):
         return super(FeatureSet, self) + list(self._names)
 
+    def __getattr__(self, name):
+        names, values = self.as_array()
+        try:
+            return values[np.argwhere(names == a)[0]][0]
+        except IndexError:
+            raise AttributeError(name)
+
     def as_array(self):
-        if not hasattr(self, "_arr"):
+        if self._arr is None:
             self._arr = self._fs.as_array(self._names, self._values)
         return self._arr
 
@@ -122,6 +130,10 @@ class FeatureSet(object):
     def values(self):
         return self._values[:]
 
+
+# =============================================================================
+# FEATURE SPACE
+# =============================================================================
 
 class FeatureSpace(object):
     """Wrapper class, to allow user select the
