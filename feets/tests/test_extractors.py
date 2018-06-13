@@ -274,6 +274,5 @@ class feetsExtractorsTestCases(FeetsTestCase):
             im = int(name.split('_')[-1])
             flattened[it][im] = value
 
-        np.testing.assert_array_equal(expected, flattened)# .T.reshape(23, 24))
-
-
+        # .T.reshape(23, 24))
+        np.testing.assert_array_equal(expected, flattened)
