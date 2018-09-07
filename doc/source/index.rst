@@ -8,6 +8,35 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
         :align: center
         :scale: 100 %
 
+
+.. image:: https://badge.fury.io/py/feets.svg
+    :target: https://badge.fury.io/py/feets
+    :alt: PyPi Version
+    
+.. image:: https://img.shields.io/badge/ascl-1806.001-blue.svg?colorB=262255
+    :target: http://ascl.net/1806.001
+    :alt: ascl:1806.001
+ 
+.. image:: https://travis-ci.org/carpyncho/feets.svg?branch=master
+    :target: https://travis-ci.org/carpyncho/feets
+    :alt: Build Status
+
+.. image:: https://img.shields.io/badge/docs-passing-brightgreen.svg
+    :target: http://feets.readthedocs.io
+    :alt: ReadTheDocs.org
+
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+   :target: https://tldrlegal.com/license/mit-license
+   :alt: License
+
+.. image:: https://img.shields.io/badge/python-2.7-blue.svg
+   :target: https://badge.fury.io/py/feets
+   :alt: Python 2.7
+
+.. image:: https://img.shields.io/badge/python-3.5+-blue.svg
+   :target: https://badge.fury.io/py/feets
+   :alt: Python 3.5+
+
 In time-domain astronomy, data gathered from the telescopes is usually
 represented in the form of light-curves. These are time series that show the
 brightness variation of an object through a period of time
