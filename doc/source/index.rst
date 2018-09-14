@@ -101,16 +101,39 @@ Citation
 If you use feets in a scientific publication, we would appreciate
 citations to the following paper:
 
-    Cabral, Juan B.,
+    Cabral, J. B., B. Sánchez, F. Ramos, et al. 2018
+    From FATS to Feets: Further Improvements to an Astronomical Feature Extraction Tool Based on Machine Learning. 
+    ArXiv E-Prints.
+
 
 
 Bibtex entry::
 
-    WORKING ON IT
+    @ARTICLE{
+        2018arXiv180902154C,
+        author = {
+            {Cabral}, J.~B. and 
+            {S{\'a}nchez}, B. and 
+            {Ramos}, F. and 
+            {Gurovich}, S. and 
+            {Granitto}, P. and 
+            {Vanderplas}, J.},
+        title = "{From FATS to feets: Further improvements to an astronomical feature extraction tool based on machine learning}",
+        journal = {ArXiv e-prints},
+        archivePrefix = "arXiv",
+        eprint = {1809.02154},
+        primaryClass = "astro-ph.IM",
+        keywords = {
+            Astrophysics - Instrumentation and Methods for Astrophysics, 
+            Computer Science - Machine Learning},
+        year = 2018,
+        month = sep,
+        adsurl = {http://adsabs.harvard.edu/abs/2018arXiv180902154C},
+        adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+    }
 
-**Full Publication:** FOO
 
-`Working paper <https://github.com/carpyncho/feets_paper>`_
+**Full Publication:** http://adsabs.harvard.edu/abs/2018arXiv180902154C
 
 
 Contents
