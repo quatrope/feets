@@ -8,6 +8,35 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
         :align: center
         :scale: 100 %
 
+
+.. image:: https://badge.fury.io/py/feets.svg
+    :target: https://badge.fury.io/py/feets
+    :alt: PyPi Version
+    
+.. image:: https://img.shields.io/badge/ascl-1806.001-blue.svg?colorB=262255
+    :target: http://ascl.net/1806.001
+    :alt: ascl:1806.001
+ 
+.. image:: https://travis-ci.org/carpyncho/feets.svg?branch=master
+    :target: https://travis-ci.org/carpyncho/feets
+    :alt: Build Status
+
+.. image:: https://img.shields.io/badge/docs-passing-brightgreen.svg
+    :target: http://feets.readthedocs.io
+    :alt: ReadTheDocs.org
+
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+   :target: https://tldrlegal.com/license/mit-license
+   :alt: License
+
+.. image:: https://img.shields.io/badge/python-2.7-blue.svg
+   :target: https://badge.fury.io/py/feets
+   :alt: Python 2.7
+
+.. image:: https://img.shields.io/badge/python-3.5+-blue.svg
+   :target: https://badge.fury.io/py/feets
+   :alt: Python 3.5+
+
 In time-domain astronomy, data gathered from the telescopes is usually
 represented in the form of light-curves. These are time series that show the
 brightness variation of an object through a period of time
@@ -72,16 +101,39 @@ Citation
 If you use feets in a scientific publication, we would appreciate
 citations to the following paper:
 
-    Cabral, Juan B.,
+    Cabral, J. B., B. Sánchez, F. Ramos, et al. 2018
+    From FATS to Feets: Further Improvements to an Astronomical Feature Extraction Tool Based on Machine Learning. 
+    ArXiv E-Prints.
+
 
 
 Bibtex entry::
 
-    WORKING ON IT
+    @ARTICLE{
+        2018arXiv180902154C,
+        author = {
+            {Cabral}, J.~B. and 
+            {S{\'a}nchez}, B. and 
+            {Ramos}, F. and 
+            {Gurovich}, S. and 
+            {Granitto}, P. and 
+            {Vanderplas}, J.},
+        title = "{From FATS to feets: Further improvements to an astronomical feature extraction tool based on machine learning}",
+        journal = {ArXiv e-prints},
+        archivePrefix = "arXiv",
+        eprint = {1809.02154},
+        primaryClass = "astro-ph.IM",
+        keywords = {
+            Astrophysics - Instrumentation and Methods for Astrophysics, 
+            Computer Science - Machine Learning},
+        year = 2018,
+        month = sep,
+        adsurl = {http://adsabs.harvard.edu/abs/2018arXiv180902154C},
+        adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+    }
 
-**Full Publication:** FOO
 
-`Working paper <https://github.com/carpyncho/feets_paper>`_
+**Full Publication:** http://adsabs.harvard.edu/abs/2018arXiv180902154C
 
 
 Contents
@@ -92,15 +144,8 @@ Contents
 
     install
     tutorial.ipynb
-    api/feets.rst
-
-
-Code of conduct
----------------
-
-feets endorse the
-`the Astropy Project code of conduct <http://www.astropy.org/code_of_conduct.html>`_.
-
+    extractors_tutorial.ipynb
+    api/modules.rst
 
 
 Indices and tables
@@ -109,3 +154,10 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+Code of conduct
+---------------
+
+feets endorse
+`the Astropy Project code of conduct <http://www.astropy.org/code_of_conduct.html>`_.

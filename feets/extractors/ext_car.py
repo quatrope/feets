@@ -175,6 +175,9 @@ class CAR(Extractor):
     References
     ----------
 
+    .. [brockwell2002introduction] Brockwell, P. J., & Davis, R. A. (2002).
+       Introduction toTime Seriesand Forecasting.
+
     .. [pichara2012improved] Pichara, K., Protopapas, P., Kim, D. W.,
        Marquette, J. B., & Tisserand, P. (2012). An improved quasar detection
        method in EROS-2 and MACHO LMC data sets. Monthly Notices of the Royal

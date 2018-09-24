@@ -70,8 +70,8 @@ allowing all residuals to be compared on an equal basis.
 
 import numpy as np
 
+from ..utils import indent
 from .core import Extractor
-
 from .ext_slotted_a_length import SlottedA_length
 
 
@@ -79,8 +79,9 @@ from .ext_slotted_a_length import SlottedA_length
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class StetsonJ(Extractor):
-    __doc__ = __doc__ + r"""
+    __doc__ = indent(__doc__) + r"""
 
     **StetsonJ**
 
@@ -147,7 +148,7 @@ class StetsonJ(Extractor):
 
 
 class StetsonK(Extractor):
-    __doc__ = __doc__ + r"""
+    __doc__ = indent(__doc__) + r"""
 
     **StetsonK**
 
@@ -200,7 +201,7 @@ class StetsonK(Extractor):
 
 
 class StetsonKAC(Extractor):
-    __doc__ = __doc__ + r"""
+    __doc__ = indent(__doc__) + r"""
 
     **StetsonK_AC**
 
@@ -251,7 +252,7 @@ class StetsonKAC(Extractor):
 
 
 class StetsonL(Extractor):
-    __doc__ = __doc__ + r"""
+    __doc__ = indent(__doc__) + r"""
 
     **StetsonL**
 

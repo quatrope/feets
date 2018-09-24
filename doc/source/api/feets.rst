@@ -1,4 +1,4 @@
-feets API
+feets package
 =============
 
 Subpackages

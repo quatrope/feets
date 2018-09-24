@@ -100,8 +100,8 @@ def create_random(magf, magf_params, errf, errf_params,
         data
             A Data object with a random lightcurves.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block:: pycon
 
@@ -167,8 +167,8 @@ def create_normal(mu=0., sigma=1., mu_err=0.,
     data
         A Data object with a random lightcurves.
 
-    Example
-    -------
+    Examples
+    --------
 
     .. code-block:: pycon
 
@@ -224,8 +224,8 @@ def create_uniform(low=0., high=1., mu_err=0., sigma_err=1.,
     data
         A Data object with a random lightcurves.
 
-    Example
-    -------
+    Examples
+    --------
 
     .. code-block:: pycon
 
@@ -270,8 +270,8 @@ def create_periodic(mu_err=0., sigma_err=1., seed=None, **kwargs):
     data
         A Data object with a random lightcurves.
 
-    Example
-    -------
+    Examples
+    --------
 
     .. code-block:: pycon
 

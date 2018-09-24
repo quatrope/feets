@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2017 Juan Cabral
+# Copyright (c) 2018 Bruno Sanchez
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -44,8 +44,6 @@ __doc__ = """"""
 
 import numpy as np
 
-from scipy import stats
-
 from .core import Extractor
 
 
@@ -53,38 +51,36 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
-class AndersonDarling(Extractor):
-    """
-    **AndersonDarling**
+class Signature(Extractor):
 
-    The Anderson-Darling test is a statistical test of whether a given
-    sample of data is drawn from a given probability distribution. When
-    applied to testing if a normal distribution adequately describes a set of
-    data, it is one of the most powerful statistical tools for detecting most
-    departures from normality.
+    data = ['magnitude', 'time']
+    dependencies = ['PeriodLS', 'Amplitude']
+    params = {"phase_bins": 18, "mag_bins": 12}
 
-    For a normal distribution the Anderson-Darling statistic should take values
-    close to 0.25.
+    features = []
+    for i in range(params["phase_bins"]):
+        for j in range(params["mag_bins"]):
+            features.append("Signature_ph_{:02d}_mag_{:02d}".format(i, j))
 
+    # this variable stores a sorted version of the features
+    # because feets only stores a frozenset of the original features
+    # for future validation.
+    sorted_features = tuple(features)
 
-    References
-    ----------
+    del i, j
 
-    .. [kim2009trending] Kim, D. W., Protopapas, P., Alcock, C.,
-       Byun, Y. I., & Bianco, F. (2009). De-Trending Time Series for
-       Astronomical Variability Surveys. Monthly Notices of the Royal
-       Astronomical Society, 397(1), 558-568.
-       Doi:10.1111/j.1365-2966.2009.14967.x.
+    def fit(self, magnitude, time, PeriodLS, Amplitude, phase_bins, mag_bins):
 
-    """
+        lc_yaxis = (magnitude - np.min(magnitude)) / np.float(Amplitude)
 
-    data = ['magnitude']
-    features = ["AndersonDarling"]
-    warnings = [
-        ("The original FATS documentation says that the result of "
-         "AndersonDarling must be ~0.25 for gausian distribution but the  "
-         "result is ~-0.60")]
+        # SHIFT TO BEGIN AT MINIMUM
+        loc = np.argmin(lc_yaxis)
+        lc_phase = np.remainder(time - time[loc], PeriodLS) / PeriodLS
 
-    def fit(self, magnitude):
-        ander = stats.anderson(magnitude)[0]
-        return {"AndersonDarling": 1 / (1.0 + np.exp(-10 * (ander - 0.3)))}
+        bins = (phase_bins, mag_bins)
+        counts = np.histogram2d(lc_phase, lc_yaxis, bins=bins, normed=True)[0]
+
+        result = zip(self.sorted_features,
+                     counts.reshape(phase_bins * mag_bins))
+
+        return dict(result)

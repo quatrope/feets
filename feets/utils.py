@@ -23,62 +23,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 # =============================================================================
-# FUTURE
-# =============================================================================
-
-from __future__ import unicode_literals
-
-
-# =============================================================================
-# DOC
+# DOCS
 # =============================================================================
 
-__doc__ = """"""
+__doc__ = """feets utilities"""
 
 
 # =============================================================================
-# IMPORTS
+# FUNCTIONS
 # =============================================================================
 
-import math
+def indent(s, c=" ", n=4):
+    """Indent the string 's' with the character 'c', 'n' times.
 
-import numpy as np
-
-from .core import Extractor
-
-
-# =============================================================================
-# EXTRACTOR CLASS
-# =============================================================================
-
-class Amplitude(Extractor):
-    """
-    **Amplitude**
-
-    The amplitude is defined as the half of the difference between the median
-    of the maximum 5% and the median of the minimum 5% magnitudes. For a
-    sequence of numbers from 0 to 1000 the amplitude should be equal to 475.5.
-
-    References
+    Parameters
     ----------
 
-    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
-       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
-       Rischard, M. (2011). On machine-learned classification of variable stars
-       with sparse and noisy time-series data.
-       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+    s : str
+        String to indent
+    c : str, default space
+        String to use as indentation
+    n : int, default 4
+        Number of chars to indent
 
     """
-
-    data = ['magnitude']
-    features = ['Amplitude']
-
-    def fit(self, magnitude):
-        N = len(magnitude)
-        sorted_mag = np.sort(magnitude)
-
-        amplitude = (np.median(sorted_mag[-int(math.ceil(0.05 * N)):]) -
-                     np.median(sorted_mag[0:int(math.ceil(0.05 * N))])) / 2.0
-        return {"Amplitude": amplitude}
+    indentation = c * n
+    return "\n".join([indentation + l for l in s.splitlines()])
