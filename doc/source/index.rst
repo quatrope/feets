@@ -13,6 +13,10 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
     :target: https://badge.fury.io/py/feets
     :alt: PyPi Version
     
+.. image:: https://img.shields.io/badge/Astropy-Affiliated-magenta.svg
+   :target: https://www.astropy.org/affiliated/index.html
+   :alt: Astropy Affiliated
+   
 .. image:: https://img.shields.io/badge/ascl-1806.001-blue.svg?colorB=262255
     :target: http://ascl.net/1806.001
     :alt: ascl:1806.001
