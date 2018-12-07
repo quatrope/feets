@@ -1,0 +1,14 @@
+
+Total iterations: 1000
+With PeriodLS:
+    - Total: 6525.18453836
+    - Minimun: 6.22640109062
+    - Maximun: 9.71483898163
+    - Mean: 6.52518453836
+    - Std: 0.205495699722
+Without PeriodLS:
+    - Total: 5166.43945622
+    - Minimun: 4.88766717911
+    - Maximun: 5.42107915878
+    - Mean: 5.16643945622
+    - Std: 0.125166909131

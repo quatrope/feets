@@ -1,0 +1,38 @@
+[COMMAND] git log --name-status HEAD^..HEAD
+
+commit 24fb73cd2193dce6203dc768ffc061d8676512ec
+Merge: c60d0bc 5ee05bf
+Author: Isadora Nun <isadoranun@seas.harvard.edu>
+Date:   Mon Dec 11 13:12:57 2017 -0800
+
+    Merge pull request #10 from juramaga/master
+    
+    Changed optimization method to Powell for calculate_CAR
+
+commit 5ee05bfeac28360f7951c879e07cce3dbda1d5d5
+Author: jmartine <jmartine@jmartines-MacBook-Pro.local>
+Date:   Mon Dec 11 16:01:37 2017 -0500
+
+    Changed optimization method to Powell for calculate_CAR
+
+M	FATS/FeatureFunctionLib.py
+
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+[COMMAND] cat requirements.txt
+
+matplotlib==2.1.0
+pandas==0.13.1
+statsmodels==0.8.0
+
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+[COMMAND] python --version
+
+Python 2.7.12
+
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+[COMMAND] uname -srvmoio
+
+Linux 4.4.0-112-generic #135-Ubuntu SMP Fri Jan 19 11:48:36 UTC 2018 x86_64 x86_64 GNU/Linux

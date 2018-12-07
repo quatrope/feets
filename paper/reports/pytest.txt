@@ -1,0 +1,75 @@
+[Command] coverage run --source=FATS/FATS -m py.test -v 
+
+============================= test session starts ==============================
+platform linux2 -- Python 2.7.12, pytest-3.0.7, py-1.4.33, pluggy-0.4.0 -- /home/juan/proyectos/carpyncho_FATS/bin/python2
+cachedir: .cache
+rootdir: /home/juan/proyectos/carpyncho_FATS/paper/FATS, inifile:
+collecting ... collected 19 items
+
+FATS/test_library.py::test_Beyond1Std PASSED
+FATS/test_library.py::test_Mean PASSED
+FATS/test_library.py::test_Con PASSED
+FATS/test_library.py::test_Eta_color PASSED
+FATS/test_library.py::test_Eta_e PASSED
+FATS/test_library.py::test_FluxPercentile PASSED
+FATS/test_library.py::test_LinearTrend PASSED
+FATS/test_library.py::test_Meanvariance PASSED
+FATS/test_library.py::test_MedianAbsDev PASSED
+FATS/test_library.py::test_PairSlopeTrend PASSED
+FATS/test_library.py::test_Period_Psi PASSED
+FATS/test_library.py::test_Q31 PASSED
+FATS/test_library.py::test_Rcs PASSED
+FATS/test_library.py::test_Skew PASSED
+FATS/test_library.py::test_SmallKurtosis PASSED
+FATS/test_library.py::test_Std PASSED
+FATS/test_library.py::test_Stetson FAILED
+FATS/test_library.py::test_Gskew PASSED
+FATS/test_library.py::test_StructureFunction PASSED
+
+=================================== FAILURES ===================================
+_________________________________ test_Stetson _________________________________
+
+white_noise = array([[  9.40082417e-01,   9.05846593e-01,  -1.65033614e+00, ...,
+         -3...00000e+00, ...,
+          9.99700000e+03,   9.99800000e+03,   9.99900000e+03]])
+
+    def test_Stetson(white_noise):
+    	# data, mjd, error, second_data, aligned_data, aligned_second_data, aligned_mjd = white_noise()
+    
+    	a = FeatureSpace(featureList=['SlottedA_length','StetsonK', 'StetsonK_AC', 'StetsonJ', 'StetsonL'])
+>   	a=a.calculateFeature(white_noise)
+
+FATS/test_library.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+FATS/Feature.py:142: in calculateFeature
+    self.__result.append(f(self._X))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <FATS.FeatureFunctionLib.StetsonJ instance at 0x7ff0d904b518>
+data = array([[  9.40082417e-01,   9.05846593e-01,  -1.65033614e+00, ...,
+         -3...00000e+00, ...,
+          9.99700000e+03,   9.99800000e+03,   9.99900000e+03]])
+
+    def fit(self, data):
+        aligned_magnitude = data[4]
+        aligned_magnitude2 = data[5]
+>       aligned_error = data[7]
+E       IndexError: index 7 is out of bounds for axis 0 with size 7
+
+FATS/FeatureFunctionLib.py:429: IndexError
+===================== 1 failed, 18 passed in 36.72 seconds =====================
+Name                         Stmts   Miss  Cover
+------------------------------------------------
+FATS/Base.py                     7      2    71%
+FATS/Feature.py                 97     61    37%
+FATS/FeatureFunctionLib.py     814    306    62%
+FATS/PreprocessLC.py            21     17    19%
+FATS/__init__.py                 4      0   100%
+FATS/alignLC.py                 43     41     5%
+FATS/featureFunction.py          6      0   100%
+FATS/import_lc_cluster.py       17     13    24%
+FATS/import_lightcurve.py       20     16    20%
+FATS/lomb.py                    83     12    86%
+FATS/test_library.py           137      4    97%
+------------------------------------------------
+TOTAL                         1249    472    62%

@@ -1,0 +1,79 @@
+\begin{minted}[]{bash}
+$ git rev-parse HEAD
+ddedb00b527cea2e2ccd760a460bea23029a8dce
+
+$ flake8 --version
+3.5.0 (mccabe: 0.6.1, pycodestyle: 2.3.1, pyflakes: 1.6.0) CPython 2.7.6 on Linux
+
+$ flake8 setup.py FATS/ --statistics --count | tail -n 36
+6     E101 indentation contains mixed spaces and tabs
+63    E111 indentation is not a multiple of four
+14    E114 indentation is not a multiple of four (comment)
+1     E127 continuation line over-indented for visual indent
+7     E201 whitespace after '('
+6     E202 whitespace before ')'
+7     E203 whitespace before ','
+9     E221 multiple spaces before operator
+1     E222 multiple spaces after operator
+33    E225 missing whitespace around operator
+50    E231 missing whitespace after ','
+6     E251 unexpected spaces around keyword / parameter equals
+1     E262 inline comment should start with '# '
+18    E265 block comment should start with '# '
+1     E301 expected 1 blank line, found 0
+24    E302 expected 2 blank lines, found 0
+7     E303 too many blank lines (2)
+1     E305 expected 2 blank lines after class or function definition, found 1
+2     E401 multiple imports on one line
+118   E501 line too long (81 > 79 characters)
+1     E701 multiple statements on one line (colon)
+2     E711 comparison to None should be 'if cond is None:'
+3     E712 comparison to True should be 'if cond is True:' or 'if cond:'
+2     E713 test for membership should be 'not in'
+34    E722 do not use bare except'
+35    F401 'sys' imported but unused
+3     F403 'from FeatureFunctionLib import *' used; unable to detect undefined names
+10    F405 'zeros' may be undefined, or defined from star imports: numpy, numpy.fft
+11    F811 redefinition of unused 'time' from line 3
+4     F841 local variable 'time' is assigned to but never used
+145   W191 indentation contains tabs
+175   W291 trailing whitespace
+2     W292 no newline at end of file
+41    W293 blank line contains whitespace
+3     W391 blank line at end of file
+846
+
+$ sloccount --version
+2.26
+
+$ sloccount FATS/ setup.py 
+Creating filelist for FATS
+Have a non-directory at the top, so creating directory top_dir
+Adding /home/jbcabral/projects/FATS/src/setup.py to top_dir
+Categorizing files.
+Finding a working MD5 command....
+Found a working MD5 command.
+Computing results.
+
+SLOC	Directory	SLOC-by-Language (Sorted)
+1334    FATS            python=1334
+34      top_dir         python=34
+
+Totals grouped by language (dominant language first):
+python:        1368 (100.00%)
+
+Total Physical Source Lines of Code (SLOC)                = 1,368
+Development Effort Estimate, Person-Years (Person-Months) = 0.28 (3.34)
+ (Basic COCOMO model, Person-Months = 2.4 * (KSLOC**1.05))
+Schedule Estimate, Years (Months)                         = 0.33 (3.95)
+ (Basic COCOMO model, Months = 2.5 * (person-months**0.38))
+Estimated Average Number of Developers (Effort/Schedule)  = 0.84
+Total Estimated Cost to Develop                           = $ 37,543
+ (average salary = $56,286/year, overhead = 2.40).
+SLOCCount, Copyright (C) 2001-2004 David A. Wheeler
+SLOCCount is Open Source Software/Free Software, licensed under the GNU GPL.
+SLOCCount comes with ABSOLUTELY NO WARRANTY, and you are welcome to
+redistribute it under certain conditions as specified by the GNU GPL license;
+see the documentation for details.
+Please credit this data as "generated using David A. Wheeler's 'SLOCCount'."
+\end{minted}

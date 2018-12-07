@@ -1,0 +1,777 @@
+[Command] flake8 version 
+
+2.5.4 (pep8: 1.7.0, mccabe: 0.2.1, pyflakes: 1.1.0) CPython 3.5.2 on Linux
+
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+[Command] flake8 FATS --count 
+
+Errors: 767
+
+FATS/Base.py:1:10: E231 missing whitespace after ','
+FATS/Base.py:1:10: E401 multiple imports on one line
+FATS/Base.py:1:14: E231 missing whitespace after ','
+FATS/Base.py:3:1: E302 expected 2 blank lines, found 0
+FATS/Base.py:5:1: E101 indentation contains mixed spaces and tabs
+FATS/Base.py:5:1: W191 indentation contains tabs
+FATS/Base.py:5:15: E225 missing whitespace around operator
+FATS/Base.py:5:22: E901 TabError: inconsistent use of tabs and spaces in indentation
+FATS/Base.py:6:1: E101 indentation contains mixed spaces and tabs
+FATS/Base.py:6:5: E301 expected 1 blank line, found 0
+FATS/Feature.py:56:32: E711 comparison to None should be 'if cond is None:'
+FATS/Feature.py:58:36: E711 comparison to None should be 'if cond is None:'
+FATS/Feature.py:61:80: E501 line too long (81 > 79 characters)
+FATS/Feature.py:63:80: E501 line too long (99 > 79 characters)
+FATS/Feature.py:67:76: E713 test for membership should be 'not in'
+FATS/Feature.py:67:80: E501 line too long (99 > 79 characters)
+FATS/Feature.py:68:80: E501 line too long (81 > 79 characters)
+FATS/Feature.py:70:80: E501 line too long (99 > 79 characters)
+FATS/Feature.py:84:72: E713 test for membership should be 'not in'
+FATS/Feature.py:84:80: E501 line too long (95 > 79 characters)
+FATS/Feature.py:87:80: E501 line too long (87 > 79 characters)
+FATS/Feature.py:88:80: E501 line too long (103 > 79 characters)
+FATS/Feature.py:93:80: E501 line too long (103 > 79 characters)
+FATS/Feature.py:96:69: E901 SyntaxError: invalid syntax
+FATS/Feature.py:96:80: E501 line too long (136 > 79 characters)
+FATS/Feature.py:106:80: E501 line too long (136 > 79 characters)
+FATS/Feature.py:111:80: E501 line too long (83 > 79 characters)
+FATS/Feature.py:147:26: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+FATS/Feature.py:152:26: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+FATS/Feature.py:153:80: E501 line too long (123 > 79 characters)
+FATS/Feature.py:157:26: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+FATS/Feature.py:163:1: W391 blank line at end of file
+FATS/FeatureFunctionLib.py:237:80: E501 line too long (95 > 79 characters)
+FATS/FeatureFunctionLib.py:237:96: E901 SyntaxError: invalid syntax
+FATS/FeatureFunctionLib.py:255:80: E501 line too long (81 > 79 characters)
+FATS/FeatureFunctionLib.py:302:80: E501 line too long (89 > 79 characters)
+FATS/FeatureFunctionLib.py:436:80: E501 line too long (83 > 79 characters)
+FATS/FeatureFunctionLib.py:807:80: E501 line too long (80 > 79 characters)
+FATS/FeatureFunctionLib.py:826:80: E501 line too long (86 > 79 characters)
+FATS/FeatureFunctionLib.py:849:80: E501 line too long (82 > 79 characters)
+FATS/FeatureFunctionLib.py:874:80: E501 line too long (83 > 79 characters)
+FATS/FeatureFunctionLib.py:885:80: E501 line too long (83 > 79 characters)
+FATS/FeatureFunctionLib.py:1004:80: E501 line too long (84 > 79 characters)
+FATS/FeatureFunctionLib.py:1020:80: E501 line too long (85 > 79 characters)
+FATS/FeatureFunctionLib.py:1064:80: E501 line too long (86 > 79 characters)
+FATS/FeatureFunctionLib.py:1073:80: E501 line too long (124 > 79 characters)
+FATS/FeatureFunctionLib.py:1091:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1104:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1116:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1128:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1140:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1152:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1164:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1176:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1188:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1200:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1212:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1224:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1236:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1248:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1260:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1273:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1285:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1297:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1309:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1321:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1333:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1345:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1357:80: E501 line too long (108 > 79 characters)
+FATS/FeatureFunctionLib.py:1374:17: W503 line break before binary operator
+FATS/FeatureFunctionLib.py:1401:80: E501 line too long (93 > 79 characters)
+FATS/FeatureFunctionLib.py:1401:86: E203 whitespace before ','
+FATS/FeatureFunctionLib.py:1402:80: E501 line too long (101 > 79 characters)
+FATS/FeatureFunctionLib.py:1402:93: E203 whitespace before ','
+FATS/FeatureFunctionLib.py:1403:80: E501 line too long (101 > 79 characters)
+FATS/FeatureFunctionLib.py:1403:93: E203 whitespace before ','
+FATS/FeatureFunctionLib.py:1424:80: E501 line too long (116 > 79 characters)
+FATS/FeatureFunctionLib.py:1436:80: E501 line too long (116 > 79 characters)
+FATS/PreprocessLC.py:3:1: E302 expected 2 blank lines, found 1
+FATS/PreprocessLC.py:5:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:7:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:8:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:9:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:10:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:11:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:13:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:15:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:16:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:17:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:17:17: W291 trailing whitespace
+FATS/PreprocessLC.py:19:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:19:12: F821 undefined name 'xrange'
+FATS/PreprocessLC.py:20:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:20:1: W293 blank line contains whitespace
+FATS/PreprocessLC.py:21:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:21:80: E501 line too long (115 > 79 characters)
+FATS/PreprocessLC.py:21:114: E203 whitespace before ':'
+FATS/PreprocessLC.py:22:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:22:1: W293 blank line contains whitespace
+FATS/PreprocessLC.py:23:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:24:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:25:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:28:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:28:3: E303 too many blank lines (2)
+FATS/PreprocessLC.py:28:34: W291 trailing whitespace
+FATS/PreprocessLC.py:29:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:29:32: W291 trailing whitespace
+FATS/PreprocessLC.py:30:1: W191 indentation contains tabs
+FATS/PreprocessLC.py:30:36: W291 trailing whitespace
+FATS/PreprocessLC.py:32:1: W191 indentation contains tabs
+FATS/__init__.py:1:1: F401 'ReadLC_MACHO' imported but unused
+FATS/__init__.py:2:1: F401 'FeatureSpace' imported but unused
+FATS/__init__.py:3:1: F401 'Align_LC' imported but unused
+FATS/__init__.py:4:1: F401 'Preprocess_LC' imported but unused
+FATS/alignLC.py:16:22: F821 undefined name 'xrange'
+FATS/alignLC.py:35:5: E303 too many blank lines (2)
+FATS/alignLC.py:44:22: F821 undefined name 'xrange'
+FATS/alignLC.py:59:20: E222 multiple spaces after operator
+FATS/alignLC.py:62:5: E265 block comment should start with '# '
+FATS/featureFunction.py:1:1: F401 'os' imported but unused
+FATS/featureFunction.py:1:1: F401 'sys' imported but unused
+FATS/featureFunction.py:1:1: F401 'time' imported but unused
+FATS/featureFunction.py:1:10: E231 missing whitespace after ','
+FATS/featureFunction.py:1:10: E401 multiple imports on one line
+FATS/featureFunction.py:1:14: E231 missing whitespace after ','
+FATS/featureFunction.py:2:1: F401 'np' imported but unused
+FATS/featureFunction.py:3:1: F401 'pd' imported but unused
+FATS/featureFunction.py:4:1: F401 'plt' imported but unused
+FATS/featureFunction.py:5:1: F401 'Base' imported but unused
+FATS/featureFunction.py:6:1: F401 'FeatureFunctionLib.*' imported but unused
+FATS/featureFunction.py:6:1: F403 'from FeatureFunctionLib import *' used; unable to detect undefined names
+FATS/featureFunction.py:6:33: W292 no newline at end of file
+FATS/import_lc_cluster.py:2:1: E265 block comment should start with '# '
+FATS/import_lc_cluster.py:3:1: F401 'np' imported but unused
+FATS/import_lc_cluster.py:5:1: E302 expected 2 blank lines, found 1
+FATS/import_lc_cluster.py:8:5: E303 too many blank lines (2)
+FATS/import_lc_cluster.py:8:22: E231 missing whitespace after ','
+FATS/import_lc_cluster.py:10:22: E225 missing whitespace around operator
+FATS/import_lc_cluster.py:18:9: E265 block comment should start with '# '
+FATS/import_lc_cluster.py:23:9: E303 too many blank lines (2)
+FATS/import_lc_cluster.py:23:18: F821 undefined name 'xrange'
+FATS/import_lc_cluster.py:36:1: W293 blank line contains whitespace
+FATS/import_lc_cluster.py:36:1: W391 blank line at end of file
+FATS/import_lightcurve.py:2:1: E265 block comment should start with '# '
+FATS/import_lightcurve.py:5:1: E302 expected 2 blank lines, found 1
+FATS/import_lightcurve.py:8:5: E303 too many blank lines (2)
+FATS/import_lightcurve.py:8:22: E231 missing whitespace after ','
+FATS/import_lightcurve.py:10:16: E225 missing whitespace around operator
+FATS/import_lightcurve.py:15:27: E231 missing whitespace after ','
+FATS/import_lightcurve.py:18:9: F841 local variable 'delimiter' is assigned to but never used
+FATS/import_lightcurve.py:19:25: E231 missing whitespace after ','
+FATS/import_lightcurve.py:26:13: E265 block comment should start with '# '
+FATS/import_lightcurve.py:31:13: E221 multiple spaces before operator
+FATS/import_lightcurve.py:31:21: E231 missing whitespace after ','
+FATS/import_lightcurve.py:32:21: E231 missing whitespace after ','
+FATS/import_lightcurve.py:33:19: E231 missing whitespace after ','
+FATS/import_lightcurve.py:39:1: W293 blank line contains whitespace
+FATS/import_lightcurve.py:39:1: W391 blank line at end of file
+FATS/lomb.py:1:22: W291 trailing whitespace
+FATS/lomb.py:2:66: W291 trailing whitespace
+FATS/lomb.py:3:1: W293 blank line contains whitespace
+FATS/lomb.py:4:71: W291 trailing whitespace
+FATS/lomb.py:5:61: W291 trailing whitespace
+FATS/lomb.py:6:71: W291 trailing whitespace
+FATS/lomb.py:7:73: W291 trailing whitespace
+FATS/lomb.py:8:71: W291 trailing whitespace
+FATS/lomb.py:9:70: W291 trailing whitespace
+FATS/lomb.py:10:61: W291 trailing whitespace
+FATS/lomb.py:11:39: W291 trailing whitespace
+FATS/lomb.py:12:1: W293 blank line contains whitespace
+FATS/lomb.py:13:10: W291 trailing whitespace
+FATS/lomb.py:14:47: W291 trailing whitespace
+FATS/lomb.py:15:40: W291 trailing whitespace
+FATS/lomb.py:16:1: W293 blank line contains whitespace
+FATS/lomb.py:17:9: W291 trailing whitespace
+FATS/lomb.py:18:17: W291 trailing whitespace
+FATS/lomb.py:19:16: W291 trailing whitespace
+FATS/lomb.py:20:25: W291 trailing whitespace
+FATS/lomb.py:21:21: W291 trailing whitespace
+FATS/lomb.py:22:55: W291 trailing whitespace
+FATS/lomb.py:23:1: W293 blank line contains whitespace
+FATS/lomb.py:24:11: W291 trailing whitespace
+FATS/lomb.py:25:37: W291 trailing whitespace
+FATS/lomb.py:26:28: W291 trailing whitespace
+FATS/lomb.py:27:64: W291 trailing whitespace
+FATS/lomb.py:28:32: W291 trailing whitespace
+FATS/lomb.py:29:1: W293 blank line contains whitespace
+FATS/lomb.py:30:4: W291 trailing whitespace
+FATS/lomb.py:31:20: W291 trailing whitespace
+FATS/lomb.py:32:24: W291 trailing whitespace
+FATS/lomb.py:33:1: W293 blank line contains whitespace
+FATS/lomb.py:34:1: E302 expected 2 blank lines, found 1
+FATS/lomb.py:34:32: W291 trailing whitespace
+FATS/lomb.py:35:3: E111 indentation is not a multiple of four
+FATS/lomb.py:35:4: W291 trailing whitespace
+FATS/lomb.py:36:64: W291 trailing whitespace
+FATS/lomb.py:37:64: W291 trailing whitespace
+FATS/lomb.py:38:66: W291 trailing whitespace
+FATS/lomb.py:39:65: W291 trailing whitespace
+FATS/lomb.py:40:13: W291 trailing whitespace
+FATS/lomb.py:41:8: W291 trailing whitespace
+FATS/lomb.py:42:9: W291 trailing whitespace
+FATS/lomb.py:43:8: W291 trailing whitespace
+FATS/lomb.py:44:8: W291 trailing whitespace
+FATS/lomb.py:45:8: W291 trailing whitespace
+FATS/lomb.py:46:11: W291 trailing whitespace
+FATS/lomb.py:47:1: W293 blank line contains whitespace
+FATS/lomb.py:48:6: W291 trailing whitespace
+FATS/lomb.py:49:3: E111 indentation is not a multiple of four
+FATS/lomb.py:49:7: E225 missing whitespace around operator
+FATS/lomb.py:49:10: E231 missing whitespace after ','
+FATS/lomb.py:49:12: E231 missing whitespace after ','
+FATS/lomb.py:49:14: E231 missing whitespace after ','
+FATS/lomb.py:49:16: E231 missing whitespace after ','
+FATS/lomb.py:49:18: E231 missing whitespace after ','
+FATS/lomb.py:49:21: E231 missing whitespace after ','
+FATS/lomb.py:49:25: E231 missing whitespace after ','
+FATS/lomb.py:49:29: E231 missing whitespace after ','
+FATS/lomb.py:49:34: E231 missing whitespace after ','
+FATS/lomb.py:49:40: E231 missing whitespace after ','
+FATS/lomb.py:49:48: W291 trailing whitespace
+FATS/lomb.py:50:3: E111 indentation is not a multiple of four
+FATS/lomb.py:50:13: E203 whitespace before ':'
+FATS/lomb.py:50:15: W291 trailing whitespace
+FATS/lomb.py:51:48: E901 SyntaxError: invalid syntax
+FATS/lomb.py:51:48: W291 trailing whitespace
+FATS/lomb.py:52:11: W291 trailing whitespace
+FATS/lomb.py:53:1: W293 blank line contains whitespace
+FATS/lomb.py:54:3: E111 indentation is not a multiple of four
+FATS/lomb.py:54:5: E225 missing whitespace around operator
+FATS/lomb.py:54:13: W291 trailing whitespace
+FATS/lomb.py:55:3: E111 indentation is not a multiple of four
+FATS/lomb.py:55:21: W291 trailing whitespace
+FATS/lomb.py:56:11: E225 missing whitespace around operator
+FATS/lomb.py:56:20: W291 trailing whitespace
+FATS/lomb.py:57:3: E111 indentation is not a multiple of four
+FATS/lomb.py:57:8: W291 trailing whitespace
+FATS/lomb.py:58:35: W291 trailing whitespace
+FATS/lomb.py:59:15: E201 whitespace after '('
+FATS/lomb.py:59:20: E201 whitespace after '('
+FATS/lomb.py:59:24: E203 whitespace before ','
+FATS/lomb.py:59:28: E202 whitespace before ')'
+FATS/lomb.py:59:37: E202 whitespace before ')'
+FATS/lomb.py:59:39: W291 trailing whitespace
+FATS/lomb.py:60:18: W291 trailing whitespace
+FATS/lomb.py:61:19: W291 trailing whitespace
+FATS/lomb.py:62:8: E225 missing whitespace around operator
+FATS/lomb.py:62:14: W291 trailing whitespace
+FATS/lomb.py:63:25: E231 missing whitespace after ','
+FATS/lomb.py:63:32: E701 multiple statements on one line (colon)
+FATS/lomb.py:63:49: W291 trailing whitespace
+FATS/lomb.py:64:45: W291 trailing whitespace
+FATS/lomb.py:65:25: E231 missing whitespace after ','
+FATS/lomb.py:65:31: E231 missing whitespace after ','
+FATS/lomb.py:65:36: W291 trailing whitespace
+FATS/lomb.py:66:7: E111 indentation is not a multiple of four
+FATS/lomb.py:66:11: E225 missing whitespace around operator
+FATS/lomb.py:66:36: W291 trailing whitespace
+FATS/lomb.py:67:7: E111 indentation is not a multiple of four
+FATS/lomb.py:67:41: W291 trailing whitespace
+FATS/lomb.py:68:1: W293 blank line contains whitespace
+FATS/lomb.py:69:1: E302 expected 2 blank lines, found 1
+FATS/lomb.py:69:13: E231 missing whitespace after ','
+FATS/lomb.py:69:15: E231 missing whitespace after ','
+FATS/lomb.py:69:20: E231 missing whitespace after ','
+FATS/lomb.py:69:36: W291 trailing whitespace
+FATS/lomb.py:70:3: E111 indentation is not a multiple of four
+FATS/lomb.py:70:20: W291 trailing whitespace
+FATS/lomb.py:71:71: W291 trailing whitespace
+FATS/lomb.py:72:69: W291 trailing whitespace
+FATS/lomb.py:73:65: W291 trailing whitespace
+FATS/lomb.py:74:70: W291 trailing whitespace
+FATS/lomb.py:75:67: W291 trailing whitespace
+FATS/lomb.py:76:71: W291 trailing whitespace
+FATS/lomb.py:77:64: W291 trailing whitespace
+FATS/lomb.py:78:65: W291 trailing whitespace
+FATS/lomb.py:79:70: W291 trailing whitespace
+FATS/lomb.py:80:74: W291 trailing whitespace
+FATS/lomb.py:81:61: W291 trailing whitespace
+FATS/lomb.py:82:1: W293 blank line contains whitespace
+FATS/lomb.py:83:13: W291 trailing whitespace
+FATS/lomb.py:84:39: W291 trailing whitespace
+FATS/lomb.py:85:30: W291 trailing whitespace
+FATS/lomb.py:86:66: W291 trailing whitespace
+FATS/lomb.py:87:26: W291 trailing whitespace
+FATS/lomb.py:88:1: W293 blank line contains whitespace
+FATS/lomb.py:89:13: W291 trailing whitespace
+FATS/lomb.py:90:55: W291 trailing whitespace
+FATS/lomb.py:91:58: W291 trailing whitespace
+FATS/lomb.py:92:34: W291 trailing whitespace
+FATS/lomb.py:93:70: W291 trailing whitespace
+FATS/lomb.py:94:68: W291 trailing whitespace
+FATS/lomb.py:95:26: W291 trailing whitespace
+FATS/lomb.py:96:1: W293 blank line contains whitespace
+FATS/lomb.py:97:12: W291 trailing whitespace
+FATS/lomb.py:98:54: W291 trailing whitespace
+FATS/lomb.py:99:70: W291 trailing whitespace
+FATS/lomb.py:100:69: W291 trailing whitespace
+FATS/lomb.py:101:62: W291 trailing whitespace
+FATS/lomb.py:102:70: W291 trailing whitespace
+FATS/lomb.py:103:58: W291 trailing whitespace
+FATS/lomb.py:104:33: W291 trailing whitespace
+FATS/lomb.py:105:1: W293 blank line contains whitespace
+FATS/lomb.py:106:11: W291 trailing whitespace
+FATS/lomb.py:107:25: W291 trailing whitespace
+FATS/lomb.py:108:57: W291 trailing whitespace
+FATS/lomb.py:109:6: W291 trailing whitespace
+FATS/lomb.py:110:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:110:3: E265 block comment should start with '# '
+FATS/lomb.py:110:36: W291 trailing whitespace
+FATS/lomb.py:111:3: E111 indentation is not a multiple of four
+FATS/lomb.py:111:19: W291 trailing whitespace
+FATS/lomb.py:112:3: E111 indentation is not a multiple of four
+FATS/lomb.py:112:18: W291 trailing whitespace
+FATS/lomb.py:113:33: W291 trailing whitespace
+FATS/lomb.py:114:11: W291 trailing whitespace
+FATS/lomb.py:115:1: W293 blank line contains whitespace
+FATS/lomb.py:116:3: E111 indentation is not a multiple of four
+FATS/lomb.py:116:7: E221 multiple spaces before operator
+FATS/lomb.py:116:27: W291 trailing whitespace
+FATS/lomb.py:117:3: E111 indentation is not a multiple of four
+FATS/lomb.py:119:3: E111 indentation is not a multiple of four
+FATS/lomb.py:120:3: E111 indentation is not a multiple of four
+FATS/lomb.py:120:38: E262 inline comment should start with '# '
+FATS/lomb.py:120:65: W291 trailing whitespace
+FATS/lomb.py:121:3: E111 indentation is not a multiple of four
+FATS/lomb.py:121:47: W291 trailing whitespace
+FATS/lomb.py:122:1: W293 blank line contains whitespace
+FATS/lomb.py:123:3: E111 indentation is not a multiple of four
+FATS/lomb.py:123:24: W291 trailing whitespace
+FATS/lomb.py:124:20: W291 trailing whitespace
+FATS/lomb.py:125:1: W293 blank line contains whitespace
+FATS/lomb.py:126:3: E111 indentation is not a multiple of four
+FATS/lomb.py:126:23: W291 trailing whitespace
+FATS/lomb.py:127:1: W293 blank line contains whitespace
+FATS/lomb.py:128:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:128:3: E265 block comment should start with '# '
+FATS/lomb.py:128:30: W291 trailing whitespace
+FATS/lomb.py:129:3: E111 indentation is not a multiple of four
+FATS/lomb.py:129:17: W291 trailing whitespace
+FATS/lomb.py:130:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:130:3: E265 block comment should start with '# '
+FATS/lomb.py:130:47: W291 trailing whitespace
+FATS/lomb.py:131:3: E111 indentation is not a multiple of four
+FATS/lomb.py:131:43: W291 trailing whitespace
+FATS/lomb.py:132:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:132:27: W291 trailing whitespace
+FATS/lomb.py:133:3: E111 indentation is not a multiple of four
+FATS/lomb.py:133:17: W291 trailing whitespace
+FATS/lomb.py:134:3: E111 indentation is not a multiple of four
+FATS/lomb.py:134:17: W291 trailing whitespace
+FATS/lomb.py:135:3: E111 indentation is not a multiple of four
+FATS/lomb.py:135:19: W291 trailing whitespace
+FATS/lomb.py:136:1: W293 blank line contains whitespace
+FATS/lomb.py:137:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:137:3: E265 block comment should start with '# '
+FATS/lomb.py:137:44: W291 trailing whitespace
+FATS/lomb.py:138:3: E111 indentation is not a multiple of four
+FATS/lomb.py:138:37: W291 trailing whitespace
+FATS/lomb.py:139:3: E111 indentation is not a multiple of four
+FATS/lomb.py:139:37: W291 trailing whitespace
+FATS/lomb.py:140:1: W293 blank line contains whitespace
+FATS/lomb.py:141:3: E111 indentation is not a multiple of four
+FATS/lomb.py:141:6: E221 multiple spaces before operator
+FATS/lomb.py:141:26: W291 trailing whitespace
+FATS/lomb.py:142:3: E111 indentation is not a multiple of four
+FATS/lomb.py:142:15: W291 trailing whitespace
+FATS/lomb.py:143:3: E111 indentation is not a multiple of four
+FATS/lomb.py:143:5: E221 multiple spaces before operator
+FATS/lomb.py:143:31: W291 trailing whitespace
+FATS/lomb.py:144:3: E111 indentation is not a multiple of four
+FATS/lomb.py:144:6: E221 multiple spaces before operator
+FATS/lomb.py:144:26: W291 trailing whitespace
+FATS/lomb.py:145:1: W293 blank line contains whitespace
+FATS/lomb.py:146:3: E111 indentation is not a multiple of four
+FATS/lomb.py:146:25: W291 trailing whitespace
+FATS/lomb.py:147:24: E231 missing whitespace after ','
+FATS/lomb.py:147:28: E231 missing whitespace after ','
+FATS/lomb.py:147:33: E231 missing whitespace after ','
+FATS/lomb.py:147:39: E231 missing whitespace after ','
+FATS/lomb.py:147:45: W291 trailing whitespace
+FATS/lomb.py:148:19: E231 missing whitespace after ','
+FATS/lomb.py:148:23: E231 missing whitespace after ','
+FATS/lomb.py:148:28: E231 missing whitespace after ','
+FATS/lomb.py:148:35: E231 missing whitespace after ','
+FATS/lomb.py:148:41: W291 trailing whitespace
+FATS/lomb.py:149:1: W293 blank line contains whitespace
+FATS/lomb.py:150:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:150:3: E265 block comment should start with '# '
+FATS/lomb.py:150:36: W291 trailing whitespace
+FATS/lomb.py:151:3: E111 indentation is not a multiple of four
+FATS/lomb.py:151:14: E201 whitespace after '('
+FATS/lomb.py:151:18: E202 whitespace before ')'
+FATS/lomb.py:151:29: W291 trailing whitespace
+FATS/lomb.py:152:3: E111 indentation is not a multiple of four
+FATS/lomb.py:152:14: E201 whitespace after '('
+FATS/lomb.py:152:18: E202 whitespace before ')'
+FATS/lomb.py:152:29: W291 trailing whitespace
+FATS/lomb.py:153:1: W293 blank line contains whitespace
+FATS/lomb.py:154:3: E111 indentation is not a multiple of four
+FATS/lomb.py:154:22: W291 trailing whitespace
+FATS/lomb.py:155:3: E111 indentation is not a multiple of four
+FATS/lomb.py:155:22: W291 trailing whitespace
+FATS/lomb.py:156:3: E111 indentation is not a multiple of four
+FATS/lomb.py:156:18: W291 trailing whitespace
+FATS/lomb.py:157:3: E111 indentation is not a multiple of four
+FATS/lomb.py:157:18: W291 trailing whitespace
+FATS/lomb.py:158:3: E111 indentation is not a multiple of four
+FATS/lomb.py:158:18: W291 trailing whitespace
+FATS/lomb.py:159:3: E111 indentation is not a multiple of four
+FATS/lomb.py:159:18: W291 trailing whitespace
+FATS/lomb.py:160:1: W293 blank line contains whitespace
+FATS/lomb.py:161:3: E111 indentation is not a multiple of four
+FATS/lomb.py:161:5: E221 multiple spaces before operator
+FATS/lomb.py:161:24: W291 trailing whitespace
+FATS/lomb.py:162:1: W293 blank line contains whitespace
+FATS/lomb.py:163:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:163:3: E265 block comment should start with '# '
+FATS/lomb.py:163:45: W291 trailing whitespace
+FATS/lomb.py:164:3: E111 indentation is not a multiple of four
+FATS/lomb.py:164:21: E201 whitespace after '('
+FATS/lomb.py:164:25: E202 whitespace before ')'
+FATS/lomb.py:164:27: W291 trailing whitespace
+FATS/lomb.py:165:3: E111 indentation is not a multiple of four
+FATS/lomb.py:165:21: W291 trailing whitespace
+FATS/lomb.py:166:3: E111 indentation is not a multiple of four
+FATS/lomb.py:166:21: W291 trailing whitespace
+FATS/lomb.py:167:1: W293 blank line contains whitespace
+FATS/lomb.py:168:3: E111 indentation is not a multiple of four
+FATS/lomb.py:168:6: E221 multiple spaces before operator
+FATS/lomb.py:168:25: W291 trailing whitespace
+FATS/lomb.py:169:3: E111 indentation is not a multiple of four
+FATS/lomb.py:169:6: E221 multiple spaces before operator
+FATS/lomb.py:169:39: W291 trailing whitespace
+FATS/lomb.py:170:3: E111 indentation is not a multiple of four
+FATS/lomb.py:170:6: E221 multiple spaces before operator
+FATS/lomb.py:170:37: W291 trailing whitespace
+FATS/lomb.py:171:3: E111 indentation is not a multiple of four
+FATS/lomb.py:171:38: W291 trailing whitespace
+FATS/lomb.py:172:3: E111 indentation is not a multiple of four
+FATS/lomb.py:172:42: W291 trailing whitespace
+FATS/lomb.py:173:1: W293 blank line contains whitespace
+FATS/lomb.py:174:3: E111 indentation is not a multiple of four
+FATS/lomb.py:174:44: W291 trailing whitespace
+FATS/lomb.py:175:3: E111 indentation is not a multiple of four
+FATS/lomb.py:175:32: W291 trailing whitespace
+FATS/lomb.py:176:3: E111 indentation is not a multiple of four
+FATS/lomb.py:176:19: W291 trailing whitespace
+FATS/lomb.py:177:3: E111 indentation is not a multiple of four
+FATS/lomb.py:177:22: W291 trailing whitespace
+FATS/lomb.py:178:1: W293 blank line contains whitespace
+FATS/lomb.py:179:1: W293 blank line contains whitespace
+FATS/lomb.py:180:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:180:3: E265 block comment should start with '# '
+FATS/lomb.py:180:3: E303 too many blank lines (2)
+FATS/lomb.py:180:27: W291 trailing whitespace
+FATS/lomb.py:181:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:181:3: E265 block comment should start with '# '
+FATS/lomb.py:181:20: W291 trailing whitespace
+FATS/lomb.py:182:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:182:3: E265 block comment should start with '# '
+FATS/lomb.py:182:26: W291 trailing whitespace
+FATS/lomb.py:183:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:183:3: E265 block comment should start with '# '
+FATS/lomb.py:183:19: W291 trailing whitespace
+FATS/lomb.py:184:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:184:3: E265 block comment should start with '# '
+FATS/lomb.py:184:32: W291 trailing whitespace
+FATS/lomb.py:185:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:185:3: E265 block comment should start with '# '
+FATS/lomb.py:185:40: W291 trailing whitespace
+FATS/lomb.py:186:1: W293 blank line contains whitespace
+FATS/lomb.py:187:3: E114 indentation is not a multiple of four (comment)
+FATS/lomb.py:187:3: E265 block comment should start with '# '
+FATS/lomb.py:187:47: W291 trailing whitespace
+FATS/lomb.py:188:3: E111 indentation is not a multiple of four
+FATS/lomb.py:188:20: W291 trailing whitespace
+FATS/lomb.py:189:3: E111 indentation is not a multiple of four
+FATS/lomb.py:189:25: W291 trailing whitespace
+FATS/lomb.py:190:3: E111 indentation is not a multiple of four
+FATS/lomb.py:190:19: W291 trailing whitespace
+FATS/lomb.py:191:1: W293 blank line contains whitespace
+FATS/lomb.py:192:3: E111 indentation is not a multiple of four
+FATS/lomb.py:192:18: W291 trailing whitespace
+FATS/lomb.py:193:32: W291 trailing whitespace
+FATS/lomb.py:194:1: W293 blank line contains whitespace
+FATS/lomb.py:195:3: E111 indentation is not a multiple of four
+FATS/lomb.py:195:13: E231 missing whitespace after ','
+FATS/lomb.py:195:17: E231 missing whitespace after ','
+FATS/lomb.py:195:22: E231 missing whitespace after ','
+FATS/lomb.py:195:27: E231 missing whitespace after ','
+FATS/lomb.py:195:32: W291 trailing whitespace
+FATS/lomb.py:196:1: W293 blank line contains whitespace
+FATS/lomb.py:197:1: E302 expected 2 blank lines, found 1
+FATS/lomb.py:197:43: W291 trailing whitespace
+FATS/lomb.py:198:3: E111 indentation is not a multiple of four
+FATS/lomb.py:198:47: W291 trailing whitespace
+FATS/lomb.py:199:74: W291 trailing whitespace
+FATS/lomb.py:200:6: W291 trailing whitespace
+FATS/lomb.py:201:3: E111 indentation is not a multiple of four
+FATS/lomb.py:201:19: W291 trailing whitespace
+FATS/lomb.py:202:3: E111 indentation is not a multiple of four
+FATS/lomb.py:202:25: W291 trailing whitespace
+FATS/lomb.py:203:3: E111 indentation is not a multiple of four
+FATS/lomb.py:203:18: W291 trailing whitespace
+FATS/lomb.py:204:3: E111 indentation is not a multiple of four
+FATS/lomb.py:204:31: W291 trailing whitespace
+FATS/lomb.py:205:3: E111 indentation is not a multiple of four
+FATS/lomb.py:205:39: W291 trailing whitespace
+FATS/lomb.py:206:3: E111 indentation is not a multiple of four
+FATS/lomb.py:206:13: W291 trailing whitespace
+FATS/test_library.py:5:1: F401 'ReadLC_MACHO' imported but unused
+FATS/test_library.py:6:1: F401 'Preprocess_LC' imported but unused
+FATS/test_library.py:7:1: F401 'Align_LC' imported but unused
+FATS/test_library.py:8:1: F401 'os' imported but unused
+FATS/test_library.py:9:1: F401 'tarfile' imported but unused
+FATS/test_library.py:10:1: F401 'sys' imported but unused
+FATS/test_library.py:11:1: F401 'pd' imported but unused
+FATS/test_library.py:14:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:16:1: W191 indentation contains tabs
+FATS/test_library.py:17:1: W191 indentation contains tabs
+FATS/test_library.py:17:5: E225 missing whitespace around operator
+FATS/test_library.py:18:1: W191 indentation contains tabs
+FATS/test_library.py:18:42: E251 unexpected spaces around keyword / parameter equals
+FATS/test_library.py:19:1: W191 indentation contains tabs
+FATS/test_library.py:20:1: W191 indentation contains tabs
+FATS/test_library.py:20:2: F841 local variable 'mjd2' is assigned to but never used
+FATS/test_library.py:20:6: E225 missing whitespace around operator
+FATS/test_library.py:21:1: W191 indentation contains tabs
+FATS/test_library.py:21:2: F841 local variable 'error2' is assigned to but never used
+FATS/test_library.py:21:43: E251 unexpected spaces around keyword / parameter equals
+FATS/test_library.py:22:1: W191 indentation contains tabs
+FATS/test_library.py:23:1: W191 indentation contains tabs
+FATS/test_library.py:24:1: W191 indentation contains tabs
+FATS/test_library.py:25:1: W191 indentation contains tabs
+FATS/test_library.py:25:80: E501 line too long (95 > 79 characters)
+FATS/test_library.py:26:1: W191 indentation contains tabs
+FATS/test_library.py:28:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:30:1: W191 indentation contains tabs
+FATS/test_library.py:30:3: E225 missing whitespace around operator
+FATS/test_library.py:31:1: W191 indentation contains tabs
+FATS/test_library.py:32:1: W191 indentation contains tabs
+FATS/test_library.py:33:1: W191 indentation contains tabs
+FATS/test_library.py:33:19: E231 missing whitespace after ','
+FATS/test_library.py:34:1: W191 indentation contains tabs
+FATS/test_library.py:35:1: W191 indentation contains tabs
+FATS/test_library.py:36:1: W191 indentation contains tabs
+FATS/test_library.py:36:2: E101 indentation contains mixed spaces and tabs
+FATS/test_library.py:37:1: W191 indentation contains tabs
+FATS/test_library.py:37:2: E101 indentation contains mixed spaces and tabs
+FATS/test_library.py:37:15: E231 missing whitespace after ','
+FATS/test_library.py:37:28: E201 whitespace after '('
+FATS/test_library.py:37:38: E201 whitespace after '('
+FATS/test_library.py:37:55: E225 missing whitespace around operator
+FATS/test_library.py:38:1: W191 indentation contains tabs
+FATS/test_library.py:38:15: E225 missing whitespace around operator
+FATS/test_library.py:39:1: W191 indentation contains tabs
+FATS/test_library.py:40:1: W191 indentation contains tabs
+FATS/test_library.py:45:1: W191 indentation contains tabs
+FATS/test_library.py:45:13: E225 missing whitespace around operator
+FATS/test_library.py:46:1: W191 indentation contains tabs
+FATS/test_library.py:46:14: E225 missing whitespace around operator
+FATS/test_library.py:47:1: W191 indentation contains tabs
+FATS/test_library.py:48:1: W191 indentation contains tabs
+FATS/test_library.py:50:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:52:1: W191 indentation contains tabs
+FATS/test_library.py:53:1: W191 indentation contains tabs
+FATS/test_library.py:54:1: W191 indentation contains tabs
+FATS/test_library.py:55:1: W191 indentation contains tabs
+FATS/test_library.py:55:23: E231 missing whitespace after ','
+FATS/test_library.py:56:1: W191 indentation contains tabs
+FATS/test_library.py:57:1: W191 indentation contains tabs
+FATS/test_library.py:57:12: F821 undefined name 'xrange'
+FATS/test_library.py:58:1: W191 indentation contains tabs
+FATS/test_library.py:59:1: W191 indentation contains tabs
+FATS/test_library.py:60:1: W191 indentation contains tabs
+FATS/test_library.py:60:28: E231 missing whitespace after ','
+FATS/test_library.py:61:1: W191 indentation contains tabs
+FATS/test_library.py:62:1: W191 indentation contains tabs
+FATS/test_library.py:63:1: W191 indentation contains tabs
+FATS/test_library.py:66:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:71:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:74:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:79:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:82:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:87:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:90:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:95:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:97:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:98:1: W191 indentation contains tabs
+FATS/test_library.py:98:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:100:1: W191 indentation contains tabs
+FATS/test_library.py:101:1: W191 indentation contains tabs
+FATS/test_library.py:101:3: E225 missing whitespace around operator
+FATS/test_library.py:103:1: W191 indentation contains tabs
+FATS/test_library.py:105:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:107:1: W191 indentation contains tabs
+FATS/test_library.py:108:1: W191 indentation contains tabs
+FATS/test_library.py:108:3: E225 missing whitespace around operator
+FATS/test_library.py:110:1: W191 indentation contains tabs
+FATS/test_library.py:113:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:115:80: E501 line too long (95 > 79 characters)
+FATS/test_library.py:118:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:122:1: W191 indentation contains tabs
+FATS/test_library.py:122:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:124:1: W191 indentation contains tabs
+FATS/test_library.py:124:38: E203 whitespace before ','
+FATS/test_library.py:125:1: W191 indentation contains tabs
+FATS/test_library.py:125:3: E225 missing whitespace around operator
+FATS/test_library.py:127:1: W191 indentation contains tabs
+FATS/test_library.py:129:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:130:1: W191 indentation contains tabs
+FATS/test_library.py:130:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:132:1: W191 indentation contains tabs
+FATS/test_library.py:133:1: W191 indentation contains tabs
+FATS/test_library.py:133:3: E225 missing whitespace around operator
+FATS/test_library.py:135:1: W191 indentation contains tabs
+FATS/test_library.py:137:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:138:1: W191 indentation contains tabs
+FATS/test_library.py:138:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:140:1: W191 indentation contains tabs
+FATS/test_library.py:141:1: W191 indentation contains tabs
+FATS/test_library.py:141:3: E225 missing whitespace around operator
+FATS/test_library.py:143:1: W191 indentation contains tabs
+FATS/test_library.py:145:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:146:1: W191 indentation contains tabs
+FATS/test_library.py:146:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:148:1: W191 indentation contains tabs
+FATS/test_library.py:148:58: E231 missing whitespace after ','
+FATS/test_library.py:148:80: E501 line too long (168 > 79 characters)
+FATS/test_library.py:148:85: E231 missing whitespace after ','
+FATS/test_library.py:148:112: E231 missing whitespace after ','
+FATS/test_library.py:148:139: E231 missing whitespace after ','
+FATS/test_library.py:148:167: E202 whitespace before ')'
+FATS/test_library.py:149:1: W191 indentation contains tabs
+FATS/test_library.py:149:3: E225 missing whitespace around operator
+FATS/test_library.py:151:1: W191 indentation contains tabs
+FATS/test_library.py:151:80: E501 line too long (86 > 79 characters)
+FATS/test_library.py:152:1: W191 indentation contains tabs
+FATS/test_library.py:152:80: E501 line too long (86 > 79 characters)
+FATS/test_library.py:153:1: W191 indentation contains tabs
+FATS/test_library.py:153:80: E501 line too long (86 > 79 characters)
+FATS/test_library.py:154:1: W191 indentation contains tabs
+FATS/test_library.py:154:80: E501 line too long (86 > 79 characters)
+FATS/test_library.py:155:1: W191 indentation contains tabs
+FATS/test_library.py:155:80: E501 line too long (86 > 79 characters)
+FATS/test_library.py:159:1: E303 too many blank lines (3)
+FATS/test_library.py:160:1: W191 indentation contains tabs
+FATS/test_library.py:160:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:162:1: W191 indentation contains tabs
+FATS/test_library.py:163:1: W191 indentation contains tabs
+FATS/test_library.py:163:3: E225 missing whitespace around operator
+FATS/test_library.py:165:1: W191 indentation contains tabs
+FATS/test_library.py:168:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:173:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:175:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:176:1: W191 indentation contains tabs
+FATS/test_library.py:176:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:178:1: W191 indentation contains tabs
+FATS/test_library.py:179:1: W191 indentation contains tabs
+FATS/test_library.py:179:3: E225 missing whitespace around operator
+FATS/test_library.py:181:1: W191 indentation contains tabs
+FATS/test_library.py:181:80: E501 line too long (80 > 79 characters)
+FATS/test_library.py:183:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:184:1: W191 indentation contains tabs
+FATS/test_library.py:184:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:186:1: W191 indentation contains tabs
+FATS/test_library.py:187:1: W191 indentation contains tabs
+FATS/test_library.py:187:3: E225 missing whitespace around operator
+FATS/test_library.py:189:1: W191 indentation contains tabs
+FATS/test_library.py:189:80: E501 line too long (80 > 79 characters)
+FATS/test_library.py:192:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:197:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:199:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:200:1: W191 indentation contains tabs
+FATS/test_library.py:200:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:202:1: W191 indentation contains tabs
+FATS/test_library.py:203:1: W191 indentation contains tabs
+FATS/test_library.py:203:3: E225 missing whitespace around operator
+FATS/test_library.py:205:1: W191 indentation contains tabs
+FATS/test_library.py:208:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:213:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:216:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:221:80: E501 line too long (82 > 79 characters)
+FATS/test_library.py:223:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:224:1: W191 indentation contains tabs
+FATS/test_library.py:224:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:226:1: W191 indentation contains tabs
+FATS/test_library.py:226:56: E231 missing whitespace after ','
+FATS/test_library.py:226:65: E231 missing whitespace after ','
+FATS/test_library.py:227:1: W191 indentation contains tabs
+FATS/test_library.py:227:3: E225 missing whitespace around operator
+FATS/test_library.py:228:1: W191 indentation contains tabs
+FATS/test_library.py:229:1: W191 indentation contains tabs
+FATS/test_library.py:229:80: E501 line too long (80 > 79 characters)
+FATS/test_library.py:231:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:232:1: W191 indentation contains tabs
+FATS/test_library.py:232:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:234:1: W191 indentation contains tabs
+FATS/test_library.py:235:1: W191 indentation contains tabs
+FATS/test_library.py:235:3: E225 missing whitespace around operator
+FATS/test_library.py:236:1: W191 indentation contains tabs
+FATS/test_library.py:239:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:241:80: E501 line too long (89 > 79 characters)
+FATS/test_library.py:244:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:245:1: W191 indentation contains tabs
+FATS/test_library.py:245:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:247:1: W191 indentation contains tabs
+FATS/test_library.py:248:1: W191 indentation contains tabs
+FATS/test_library.py:248:3: E225 missing whitespace around operator
+FATS/test_library.py:249:1: W191 indentation contains tabs
+FATS/test_library.py:251:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:252:1: W191 indentation contains tabs
+FATS/test_library.py:252:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:254:1: W191 indentation contains tabs
+FATS/test_library.py:255:1: W191 indentation contains tabs
+FATS/test_library.py:255:3: E225 missing whitespace around operator
+FATS/test_library.py:256:1: W191 indentation contains tabs
+FATS/test_library.py:260:80: E501 line too long (98 > 79 characters)
+FATS/test_library.py:266:1: W191 indentation contains tabs
+FATS/test_library.py:266:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:268:1: W191 indentation contains tabs
+FATS/test_library.py:269:1: W191 indentation contains tabs
+FATS/test_library.py:269:3: E225 missing whitespace around operator
+FATS/test_library.py:270:1: W191 indentation contains tabs
+FATS/test_library.py:274:1: W191 indentation contains tabs
+FATS/test_library.py:274:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:276:1: W191 indentation contains tabs
+FATS/test_library.py:277:1: W191 indentation contains tabs
+FATS/test_library.py:277:3: E225 missing whitespace around operator
+FATS/test_library.py:279:1: W191 indentation contains tabs
+FATS/test_library.py:283:1: W191 indentation contains tabs
+FATS/test_library.py:283:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:285:1: W191 indentation contains tabs
+FATS/test_library.py:285:49: E231 missing whitespace after ','
+FATS/test_library.py:285:80: E501 line too long (100 > 79 characters)
+FATS/test_library.py:286:1: W191 indentation contains tabs
+FATS/test_library.py:286:3: E225 missing whitespace around operator
+FATS/test_library.py:288:1: W191 indentation contains tabs
+FATS/test_library.py:288:80: E501 line too long (85 > 79 characters)
+FATS/test_library.py:289:1: W191 indentation contains tabs
+FATS/test_library.py:289:80: E501 line too long (84 > 79 characters)
+FATS/test_library.py:290:1: W191 indentation contains tabs
+FATS/test_library.py:290:80: E501 line too long (83 > 79 characters)
+FATS/test_library.py:291:1: W191 indentation contains tabs
+FATS/test_library.py:291:80: E501 line too long (83 > 79 characters)
+FATS/test_library.py:295:1: W191 indentation contains tabs
+FATS/test_library.py:295:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:297:1: W191 indentation contains tabs
+FATS/test_library.py:298:1: W191 indentation contains tabs
+FATS/test_library.py:298:3: E225 missing whitespace around operator
+FATS/test_library.py:299:1: W191 indentation contains tabs
+FATS/test_library.py:301:1: E302 expected 2 blank lines, found 1
+FATS/test_library.py:302:1: W191 indentation contains tabs
+FATS/test_library.py:302:80: E501 line too long (96 > 79 characters)
+FATS/test_library.py:304:1: W191 indentation contains tabs
+FATS/test_library.py:304:80: E501 line too long (90 > 79 characters)
+FATS/test_library.py:305:1: E101 indentation contains mixed spaces and tabs
+FATS/test_library.py:305:37: E127 continuation line over-indented for visual indent
+FATS/test_library.py:306:1: E101 indentation contains mixed spaces and tabs
+FATS/test_library.py:306:1: W191 indentation contains tabs
+FATS/test_library.py:307:1: W191 indentation contains tabs
+FATS/test_library.py:307:80: E501 line too long (86 > 79 characters)
+FATS/test_library.py:308:1: W191 indentation contains tabs
+FATS/test_library.py:308:80: E501 line too long (86 > 79 characters)
+FATS/test_library.py:309:1: W191 indentation contains tabs
+FATS/test_library.py:309:80: E501 line too long (86 > 79 characters)
