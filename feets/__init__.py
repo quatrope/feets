@@ -78,7 +78,7 @@ open way as this library.
 # CONSTANTS
 # =============================================================================
 
-__version__ = ("0", "4")
+__version__ = ("0", "5dev")
 
 NAME = "feets"
 

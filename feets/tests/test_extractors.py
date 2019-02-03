@@ -118,7 +118,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
     def test_FATS_doc_Amplitude(self):
         ext = extractors.Amplitude()
         value = ext.fit(np.arange(0, 1001))["Amplitude"]
-        self.assertEquals(value, 475)
+        self.assertEqual(value, 475)
 
     @unittest.skip("FATS say must be 0.2, but actual is -0.60")
     def test_FATS_doc_AndersonDarling(self):

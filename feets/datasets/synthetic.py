@@ -64,75 +64,75 @@ def create_random(magf, magf_params, errf, errf_params,
                   timef=np.linspace, timef_params=None, size=DEFAULT_SIZE,
                   id=None, ds_name=DS_NAME, description=DESCRIPTION,
                   bands=BANDS, metadata=METADATA):
-        """Generate a data with any given random function.
+    """Generate a data with any given random function.
 
-        Parameters
-        ----------
+    Parameters
+    ----------
 
-        magf : callable
-            Function to generate the magnitudes.
-        magf_params : dict-like
-            Parameters to feed the `magf` function.
-        errf : callable
-            Function to generate the magnitudes.
-        errf_params : dict-like
-            Parameters to feed the `errf` function.
-        timef : callable, (default=numpy.linspace)
-            Function to generate the times.
-        timef_params : dict-like or None, (default={"start": 0., "stop": 1.})
-            Parameters to feed the `timef` callable.
-        size : int (default=10000)
-            Number of obervation of the light curves
-        id : object (default=None)
-            Id of the created data.
-        ds_name : str (default="feets-synthetic")
-            Name of the dataset
-        description : str (default="Lightcurve created with random numbers")
-            Description of the data
-        bands : tuple of strings (default=("B", "V"))
-            The bands to be created
-        metadata : dict-like or None (default=None)
-            The metadata of the created data
+    magf : callable
+        Function to generate the magnitudes.
+    magf_params : dict-like
+        Parameters to feed the `magf` function.
+    errf : callable
+        Function to generate the magnitudes.
+    errf_params : dict-like
+        Parameters to feed the `errf` function.
+    timef : callable, (default=numpy.linspace)
+        Function to generate the times.
+    timef_params : dict-like or None, (default={"start": 0., "stop": 1.})
+        Parameters to feed the `timef` callable.
+    size : int (default=10000)
+        Number of obervation of the light curves
+    id : object (default=None)
+        Id of the created data.
+    ds_name : str (default="feets-synthetic")
+        Name of the dataset
+    description : str (default="Lightcurve created with random numbers")
+        Description of the data
+    bands : tuple of strings (default=("B", "V"))
+        The bands to be created
+    metadata : dict-like or None (default=None)
+        The metadata of the created data
 
-        Returns
-        -------
+    Returns
+    -------
 
-        data
-            A Data object with a random lightcurves.
+    data
+        A Data object with a random lightcurves.
 
-        Examples
-        --------
+    Examples
+    --------
 
-        .. code-block:: pycon
+    .. code-block:: pycon
 
-            >>> from numpy import random
-            >>>  create_random(
-            ...     magf=random.normal, magf_params={"loc": 0, "scale": 1},
-            ...     errf=random.normal, errf_params={"loc": 0, "scale": 0.008})
-            Data(id=None, ds_name='feets-synthetic', bands=('B', 'V'))
+        >>> from numpy import random
+        >>>  create_random(
+        ...     magf=random.normal, magf_params={"loc": 0, "scale": 1},
+        ...     errf=random.normal, errf_params={"loc": 0, "scale": 0.008})
+        Data(id=None, ds_name='feets-synthetic', bands=('B', 'V'))
 
-        """
-        timef_params = (
-            {"start": 0., "stop": 1.}
-            if timef_params is None else
-            timef_params.copy())
-        timef_params.update(num=size)
+    """
+    timef_params = (
+        {"start": 0., "stop": 1.}
+        if timef_params is None else
+        timef_params.copy())
+    timef_params.update(num=size)
 
-        magf_params = magf_params.copy()
-        magf_params.update(size=size)
+    magf_params = magf_params.copy()
+    magf_params.update(size=size)
 
-        errf_params = errf_params.copy()
-        errf_params.update(size=size)
+    errf_params = errf_params.copy()
+    errf_params.update(size=size)
 
-        data = {}
-        for band in bands:
-            data[band] = {
-                "time": timef(**timef_params),
-                "magnitude": magf(**magf_params),
-                "error":  errf(**errf_params)}
-        return Data(
-            id=id, ds_name=ds_name, description=description,
-            bands=bands, metadata=metadata, data=data)
+    data = {}
+    for band in bands:
+        data[band] = {
+            "time": timef(**timef_params),
+            "magnitude": magf(**magf_params),
+            "error":  errf(**errf_params)}
+    return Data(
+        id=id, ds_name=ds_name, description=description,
+        bands=bands, metadata=metadata, data=data)
 
 
 def create_normal(mu=0., sigma=1., mu_err=0.,
