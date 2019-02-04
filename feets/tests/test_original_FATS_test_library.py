@@ -58,8 +58,6 @@ import pandas as pd
 
 import pytest
 
-from six.moves import range
-
 from ..core import FeatureSpace
 from .core import FeetsTestCase, DATA_PATH
 

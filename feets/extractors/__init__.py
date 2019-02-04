@@ -54,9 +54,6 @@ __all__ = [
 # =============================================================================
 
 import inspect
-
-import six
-
 from .core import (
     Extractor, ExtractorBadDefinedError, ExtractorContractError,
     ExtractorWarning, DATAS)  # noqa
@@ -87,7 +84,7 @@ def registered_extractors():
 
 
 def is_registered(obj):
-    if isinstance(obj, six.string_types):
+    if isinstance(obj, str):
         features = [obj]
     elif not inspect.isclass(obj) or not issubclass(obj, Extractor):
         msg = "'cls' must be a subclass of Extractor. Found: {}"

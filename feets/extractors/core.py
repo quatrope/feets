@@ -44,8 +44,6 @@ __doc__ = """Features extractors base classes classes"""
 import warnings
 from collections import namedtuple
 
-import six
-
 
 # =============================================================================
 # CONSTANTS
@@ -147,7 +145,7 @@ class ExtractorMeta(type):
             msg = "'features' can't be empty"
             raise ExtractorBadDefinedError(msg)
         for f in cls.features:
-            if not isinstance(f, six.string_types):
+            if not isinstance(f, str):
                 msg = "Feature name must be an instance of string. Found {}"
                 raise ExtractorBadDefinedError(msg.format(type(f)))
             if f in DATAS:
@@ -165,7 +163,7 @@ class ExtractorMeta(type):
         if not hasattr(cls, "dependencies"):
             cls.dependencies = ()
         for d in cls.dependencies:
-            if not isinstance(d, six.string_types):
+            if not isinstance(d, str):
                 msg = (
                     "All Dependencies must be an instance of string. Found {}")
                 raise ExtractorBadDefinedError(msg.format(type(d)))
@@ -173,7 +171,7 @@ class ExtractorMeta(type):
         if not hasattr(cls, "params"):
             cls.params = {}
         for p, default in cls.params.items():
-            if not isinstance(p, six.string_types):
+            if not isinstance(p, str):
                 msg = "Params names must be an instance of string. Found {}"
                 raise ExtractorBadDefinedError(msg.format(type(p)))
             if p in DATAS:
@@ -202,8 +200,7 @@ class ExtractorMeta(type):
         return cls
 
 
-@six.add_metaclass(ExtractorMeta)
-class Extractor(object):
+class Extractor(metaclass=ExtractorMeta):
 
     _conf = None
 

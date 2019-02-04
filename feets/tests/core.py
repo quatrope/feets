@@ -49,9 +49,6 @@ import os
 import numpy as np
 import numpy.testing as npt
 
-import six
-from six.moves import range
-
 
 # =============================================================================
 # CONSTANTS
@@ -77,7 +74,3 @@ class FeetsTestCase(unittest.TestCase):
 
     def rrange(self, a, b):
         return range(random.randint(a, b))
-
-    if six.PY2:
-        assertRaisesRegex = six.assertRaisesRegex
-        assertCountEqual = six.assertCountEqual
