@@ -24,17 +24,10 @@
 # SOFTWARE.
 
 # =============================================================================
-# FUTURE
-# =============================================================================
-
-from __future__ import unicode_literals, print_function
-
-
-# =============================================================================
 # DOCS
 # =============================================================================
 
-__doc__ = """core functionalities of feets"""
+"""core functionalities of feets"""
 
 __all__ = [
     "FeatureNotFound",
@@ -98,7 +91,6 @@ class DataRequiredError(ValueError):
 # =============================================================================
 # FEATURE EXTRACTORS
 # =============================================================================
-
 
 class FeatureSpace(object):
     """Wrapper class, to allow user select the
