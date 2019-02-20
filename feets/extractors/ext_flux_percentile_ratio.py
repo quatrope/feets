@@ -99,7 +99,7 @@ class FluxPercentileRatioMid20(Extractor):
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
-        lc_length = len(sorted_data)
+        lc_length = len(sorted_data) - 1
 
         F_60_index = int(math.ceil(0.60 * lc_length))
         F_40_index = int(math.ceil(0.40 * lc_length))
@@ -121,7 +121,7 @@ class FluxPercentileRatioMid35(Extractor):
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
-        lc_length = len(sorted_data)
+        lc_length = len(sorted_data) - 1
 
         F_325_index = int(math.ceil(0.325 * lc_length))
         F_675_index = int(math.ceil(0.675 * lc_length))
@@ -143,7 +143,7 @@ class FluxPercentileRatioMid50(Extractor):
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
-        lc_length = len(sorted_data)
+        lc_length = len(sorted_data) - 1
 
         F_25_index = int(math.ceil(0.25 * lc_length))
         F_75_index = int(math.ceil(0.75 * lc_length))
@@ -165,7 +165,7 @@ class FluxPercentileRatioMid65(Extractor):
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
-        lc_length = len(sorted_data)
+        lc_length = len(sorted_data) - 1
 
         F_175_index = int(math.ceil(0.175 * lc_length))
         F_825_index = int(math.ceil(0.825 * lc_length))
@@ -187,7 +187,7 @@ class FluxPercentileRatioMid80(Extractor):
 
     def fit(self, magnitude):
         sorted_data = np.sort(magnitude)
-        lc_length = len(sorted_data)
+        lc_length = len(sorted_data) - 1
 
         F_10_index = int(math.ceil(0.10 * lc_length))
         F_90_index = int(math.ceil(0.90 * lc_length))
