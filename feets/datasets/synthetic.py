@@ -129,7 +129,7 @@ def create_random(magf, magf_params, errf, errf_params,
         data[band] = {
             "time": timef(**timef_params),
             "magnitude": magf(**magf_params),
-            "error":  errf(**errf_params)}
+            "error": errf(**errf_params)}
     return Data(
         id=id, ds_name=ds_name, description=description,
         bands=bands, metadata=metadata, data=data)
