@@ -59,8 +59,6 @@ import pandas as pd
 
 import pytest
 
-from six.moves import range
-
 from ..core import FeatureSpace
 from .core import FeetsTestCase, DATA_PATH
 
@@ -145,31 +143,31 @@ def random_walk():
 
 def test_Beyond1Std(white_noise):
     fs = FeatureSpace(only=['Beyond1Std'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= 0.30 and result <= 0.40
 
 
 def test_Mean(white_noise):
     fs = FeatureSpace(only=['Mean'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= -0.1 and result <= 0.1
 
 
 def test_Con(white_noise):
     fs = FeatureSpace(only=['Con'], Con={"consecutiveStar": 1})
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= 0.04 and result <= 0.05
 
 
 def test_Eta_color(white_noise):
     fs = FeatureSpace(only=['Eta_color'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= 1.9 and result <= 2.1
 
 
 def test_Eta_e(white_noise):
     fs = FeatureSpace(only=['Eta_e'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= 1.9 and result <= 2.1
 
 
@@ -178,7 +176,7 @@ def test_FluxPercentile(white_noise):
         'FluxPercentileRatioMid20', 'FluxPercentileRatioMid35',
         'FluxPercentileRatioMid50', 'FluxPercentileRatioMid65',
         'FluxPercentileRatioMid80'])
-    result = fs.extract(**white_noise)[1]
+    result = fs.extract(**white_noise).as_arrays()[1]
     assert result[0] >= 0.145 and result[0] <= 0.160
     assert result[1] >= 0.260 and result[1] <= 0.290
     assert result[2] >= 0.350 and result[2] <= 0.450
@@ -188,25 +186,25 @@ def test_FluxPercentile(white_noise):
 
 def test_LinearTrend(white_noise):
     fs = FeatureSpace(only=['LinearTrend'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= -0.1 and result <= 0.1
 
 
 def test_Meanvariance(uniform_lc):
     fs = FeatureSpace(only=['Meanvariance'])
-    result = fs.extract(**uniform_lc)[1][0]
+    result = fs.extract(**uniform_lc).as_arrays()[1][0]
     assert result >= 0.575 and result <= 0.580
 
 
 def test_MedianAbsDev(white_noise):
     fs = FeatureSpace(only=['MedianAbsDev'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= 0.630 and result <= 0.700
 
 
 def test_PairSlopeTrend(white_noise):
     fs = FeatureSpace(only=['PairSlopeTrend'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= -0.25 and result <= 0.25
 
 
@@ -221,43 +219,43 @@ def test_Period_Psi(periodic_lc):
     }
 
     fs = FeatureSpace(only=['PeriodLS'], LombScargle=params)
-    result = fs.extract(**periodic_lc)[1][0]
+    result = fs.extract(**periodic_lc).as_arrays()[1][0]
     assert result >= 19 and result <= 21
 
 
 def test_Q31(white_noise):
     fs = FeatureSpace(only=['Q31'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= 1.30 and result <= 1.38
 
 
 def test_Rcs(white_noise):
     fs = FeatureSpace(only=['Rcs'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= 0 and result <= 0.1
 
 
 def test_Skew(white_noise):
     fs = FeatureSpace(only=['Skew'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= -0.1 and result <= 0.1
 
 
 def test_SmallKurtosis(white_noise):
     fs = FeatureSpace(only=['SmallKurtosis'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= -0.2 and result <= 0.2
 
 
 def test_Std(white_noise):
     fs = FeatureSpace(only=['Std'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= 0.9 and result <= 1.1
 
 
 def test_Gskew(white_noise):
     fs = FeatureSpace(only=['Gskew'])
-    result = fs.extract(**white_noise)[1][0]
+    result = fs.extract(**white_noise).as_arrays()[1][0]
     assert result >= -0.2 and result <= 0.2
 
 
@@ -266,7 +264,7 @@ def test_StructureFunction(random_walk):
         'StructureFunction_index_21',
         'StructureFunction_index_31',
         'StructureFunction_index_32'])
-    result = fs.extract(**random_walk)[1]
+    result = fs.extract(**random_walk).as_arrays()[1]
     assert(result[0] >= 1.520 and result[0] <= 2.067)
     assert(result[1] >= 1.821 and result[1] <= 3.162)
     assert(result[2] >= 1.243 and result[2] <= 1.562)

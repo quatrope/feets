@@ -24,17 +24,10 @@
 # SOFTWARE.
 
 # =============================================================================
-# FUTURE
-# =============================================================================
-
-from __future__ import unicode_literals, print_function
-
-
-# =============================================================================
 # DOCS
 # =============================================================================
 
-__doc__ = """core functionalities of feets"""
+"""core functionalities of feets"""
 
 __all__ = [
     "FeatureNotFound",
@@ -49,6 +42,8 @@ __all__ = [
 import logging
 
 import numpy as np
+
+import attr
 
 from . import extractors
 from .extractors.core import (
@@ -96,11 +91,27 @@ class DataRequiredError(ValueError):
 
 
 # =============================================================================
+# FEATURE RESULT
+# =============================================================================
+
+@attr.s(frozen=True, auto_attribs=True)
+class ResultSet:
+
+    features: np.ndarray = attr.ib(repr=True)
+    values: np.ndarray = attr.ib(repr=False)
+
+    def __iter__(self):
+        return iter(self.as_arrays())
+
+    def as_arrays(self):
+        return self.features, self.values
+
+
+# =============================================================================
 # FEATURE EXTRACTORS
 # =============================================================================
 
-
-class FeatureSpace(object):
+class FeatureSpace:
     """Wrapper class, to allow user select the
     features based on the available time series vectors (magnitude, time,
     error, second magnitude, etc.) or specify a list of features.
@@ -295,7 +306,8 @@ class FeatureSpace(object):
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
 
-        return self._features_as_array, fvalues
+        rs = ResultSet(features=self._features_as_array, values=fvalues)
+        return rs
 
     @property
     def kwargs(self):

@@ -32,8 +32,6 @@ import numpy as np
 
 import pandas as pd
 
-from six.moves import range
-
 __all__ = [
     "remove_noise",
     "align"]

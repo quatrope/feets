@@ -25,17 +25,10 @@
 
 
 # =============================================================================
-# FUTURE
-# =============================================================================
-
-from __future__ import unicode_literals
-
-
-# =============================================================================
 # DOC
 # =============================================================================
 
-__doc__ = """All feets base tests"""
+"""All feets base tests"""
 
 
 # =============================================================================
@@ -48,9 +41,6 @@ import os
 
 import numpy as np
 import numpy.testing as npt
-
-import six
-from six.moves import range
 
 
 # =============================================================================
@@ -77,7 +67,3 @@ class FeetsTestCase(unittest.TestCase):
 
     def rrange(self, a, b):
         return range(random.randint(a, b))
-
-    if six.PY2:
-        assertRaisesRegex = six.assertRaisesRegex
-        assertCountEqual = six.assertCountEqual

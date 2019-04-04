@@ -25,17 +25,10 @@
 
 
 # =============================================================================
-# FUTURE
-# =============================================================================
-
-from __future__ import unicode_literals
-
-
-# =============================================================================
 # DOC
 # =============================================================================
 
-__doc__ = r"""These three features are based on the Welch/Stetson variability
+r"""These three features are based on the Welch/Stetson variability
 index :math:`I` (Stetson, 1996) defined by the equation:
 
 .. math::
