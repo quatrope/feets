@@ -126,11 +126,12 @@ class StetsonJ(Extractor):
 
         N = len(aligned_magnitude)
 
-        mean_mag = (np.sum(aligned_magnitude/(aligned_error*aligned_error)) /
-                    np.sum(1.0 / (aligned_error * aligned_error)))
+        mean_mag = (
+            np.sum(aligned_magnitude / (aligned_error * aligned_error)) /
+            np.sum(1.0 / (aligned_error * aligned_error)))
 
         mean_mag2 = (
-            np.sum(aligned_magnitude2 / (aligned_error2*aligned_error2)) /
+            np.sum(aligned_magnitude2 / (aligned_error2 * aligned_error2)) /
             np.sum(1.0 / (aligned_error2 * aligned_error2)))
 
         sigmap = (np.sqrt(N * 1.0 / (N - 1)) *
@@ -187,7 +188,7 @@ class StetsonK(Extractor):
          "must be 2/pi=0.798 for gausian distribution but the result is ~0.2")]
 
     def fit(self, magnitude, error):
-        mean_mag = (np.sum(magnitude/(error*error)) /
+        mean_mag = (np.sum(magnitude / (error * error)) /
                     np.sum(1.0 / (error * error)))
 
         N = len(magnitude)
@@ -296,9 +297,9 @@ class StetsonL(Extractor):
 
         N = len(magnitude)
 
-        mean_mag = (np.sum(magnitude/(error*error)) /
+        mean_mag = (np.sum(magnitude / (error * error)) /
                     np.sum(1.0 / (error * error)))
-        mean_mag2 = (np.sum(magnitude2/(error2*error2)) /
+        mean_mag2 = (np.sum(magnitude2 / (error2 * error2)) /
                      np.sum(1.0 / (error2 * error2)))
 
         sigmap = (np.sqrt(N * 1.0 / (N - 1)) *

@@ -87,7 +87,7 @@ def fap(power, fmax, time, mag, method, normalization, method_kwds=None):
 # =============================================================================
 
 class LombScargle(Extractor):
-    """
+    r"""
     **PeriodLS**
 
     The Lomb-Scargle (L-S) algorithm (Scargle, 1982) is a variation of the
@@ -149,12 +149,10 @@ class LombScargle(Extractor):
         "lscargle_kwds": {
             "autopower_kwds": {
                 "normalization": "standard",
-                "nyquist_factor": 100,
-                }},
+                "nyquist_factor": 100}},
         "fap_kwds": {
             "normalization": "standard",
-            "method": "simple"}
-    }
+            "method": "simple"}}
 
     def _compute_ls(self, magnitude, time, lscargle_kwds):
         frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)

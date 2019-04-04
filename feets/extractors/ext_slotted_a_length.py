@@ -151,7 +151,7 @@ class SlottedA_length(Extractor):
         if T is None:
             deltaT = time[1:] - time[:-1]
             sorted_deltaT = np.sort(deltaT)
-            T = sorted_deltaT[int(N * 0.05)+1]
+            T = sorted_deltaT[int(N * 0.05) + 1]
 
         K = 100
 
@@ -172,7 +172,7 @@ class SlottedA_length(Extractor):
                 break
             else:
                 SAC, slots = self.slotted_autocorrelation(
-                    magnitude, time, T, K, second_round=True, K1=int(K/2))
+                    magnitude, time, T, K, second_round=True, K1=int(K / 2))
                 SAC2 = SAC[slots]
                 k = next((index for index, value in
                          enumerate(SAC2) if value < np.exp(-1)), None)

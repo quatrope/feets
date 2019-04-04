@@ -52,7 +52,7 @@ from .core import Extractor
 # =============================================================================
 
 class DeltamDeltat(Extractor):
-    """
+    r"""
     Deltas features described in
     Configure the bins as desired.
 
@@ -76,7 +76,7 @@ class DeltamDeltat(Extractor):
     """
     data = ['magnitude', 'time']
     params = {"dt_bins": np.hstack([0., np.logspace(-3., 3.5, num=23)]),
-              "dm_bins": np.hstack([-1.*np.logspace(1, -1, num=12), 0,
+              "dm_bins": np.hstack([-1. * np.logspace(1, -1, num=12), 0,
                                     np.logspace(-1, 1, num=12)])}
     parallel = True
 
@@ -109,14 +109,14 @@ class DeltamDeltat(Extractor):
         n_vals = int(0.5 * lc_len * (lc_len - 1))
 
         deltas = np.vstack(
-            delta_calc(idx) for idx in range(lc_len - 1))
+            tuple(delta_calc(idx) for idx in range(lc_len - 1)))
 
         deltat = deltas[:, 0]
         deltam = deltas[:, 1]
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
-        counts = np.fix(255. * counts/n_vals + 0.999).astype(int)
+        counts = np.fix(255. * counts / n_vals + 0.999).astype(int)
 
         result = zip(self.sorted_features,
                      counts.reshape((len(dt_bins) - 1) * (len(dm_bins) - 1)))

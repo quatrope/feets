@@ -223,7 +223,7 @@ class FourierComponents(Extractor):
 
                 model = self._model(
                     time, popt0, popt1, popt2,
-                    (j+1) * fundamental_Freq)
+                    (j + 1) * fundamental_Freq)
                 magnitude = np.array(magnitude) - model
 
             A.append(Atemp)

@@ -118,7 +118,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
     def test_FATS_doc_Amplitude(self):
         ext = extractors.Amplitude()
         value = ext.fit(np.arange(0, 1001))["Amplitude"]
-        self.assertEquals(value, 475)
+        self.assertEqual(value, 475)
 
     @unittest.skip("FATS say must be 0.2, but actual is -0.60")
     def test_FATS_doc_AndersonDarling(self):
@@ -262,8 +262,8 @@ class feetsExtractorsTestCases(FeetsTestCase):
         lc_len = len(time)
         n_vals = int(0.5 * lc_len * (lc_len - 1))
 
-        sign = 5000.*self.random.rand(dtbins, dmbins)
-        expected = np.fix(255. * sign/n_vals + 0.999).astype(int)
+        sign = 5000. * self.random.rand(dtbins, dmbins)
+        expected = np.fix(255. * sign / n_vals + 0.999).astype(int)
 
         with mock.patch("numpy.histogram2d", return_value=[sign]):
             results = ext.fit(magnitude=mags, time=time, **params)

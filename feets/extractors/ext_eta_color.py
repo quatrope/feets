@@ -52,7 +52,7 @@ from .core import Extractor
 # =============================================================================
 
 class EtaColor(Extractor):
-    """
+    r"""
 
     **Eta_color** (:math:`\eta_{color}`)
 

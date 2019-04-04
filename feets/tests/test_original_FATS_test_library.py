@@ -36,7 +36,7 @@ Removed:
 -   Commented ones
 -   The Stetson test because don't work anyway (the original test not provides
     all the data required for the Stetson indexes.
--   Added the one from the tutorial
+-   Added the test from the tutorial
 
 
 Orignal Version:
@@ -51,6 +51,7 @@ https://github.com/isadoranun/FATS/blob/b45b5c1/FATS/test_library.py
 # =============================================================================
 
 import os
+import warnings
 
 import numpy as np
 
@@ -101,7 +102,7 @@ def periodic_lc():
     mean = np.zeros(N)
     for i in np.arange(N):
         for j in np.arange(N):
-            cov[i, j] = np.exp(-(np.sin((np.pi/Period) * (i-j)) ** 2))
+            cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
     data_periodic = random.multivariate_normal(mean, cov)
     lc = {
         "magnitude": data_periodic,
@@ -128,7 +129,8 @@ def random_walk():
     data_rw[0] = 1
     time_rw = range(1, N)
     for t in time_rw:
-        data_rw[t] = alpha * data_rw[t-1] + random.normal(loc=0.0, scale=sigma)
+        data_rw[t] = (
+            alpha * data_rw[t - 1] + random.normal(loc=0.0, scale=sigma))
     time_rw = np.array(range(0, N)) + 1 * random.uniform(size=N)
     data_rw = data_rw.squeeze()
     lc = {
@@ -282,7 +284,7 @@ class FATSTutorialTestCase(FeetsTestCase):
         N = len(mag)
         shuffle = np.arange(0, N)
         index = self.random.permutation(shuffle)
-        index = np.sort(index[0:int(N/2)])
+        index = np.sort(index[0:int(N / 2)])
 
         mag_test = mag[index]
         time_test = time[index]
@@ -291,14 +293,14 @@ class FATSTutorialTestCase(FeetsTestCase):
         N2 = len(mag2)
         shuffle2 = np.arange(0, N2)
         index2 = self.random.permutation(shuffle2)
-        index2 = np.sort(index2[0:int(N2/2)])
+        index2 = np.sort(index2[0:int(N2 / 2)])
 
         mag2_test = mag2[index2]
 
         N3 = len(aligned_mag)
         shuffle3 = np.arange(0, N3)
         index3 = self.random.permutation(shuffle3)
-        index3 = np.sort(index3[0:int(N3/2)])
+        index3 = np.sort(index3[0:int(N3 / 2)])
 
         aligned_mag_test = aligned_mag[index3]
         aligned_mag2_test = aligned_mag2[index3]
@@ -308,11 +310,11 @@ class FATSTutorialTestCase(FeetsTestCase):
 
         return {
             "magnitude": mag_test,
-            "time":  time_test,
+            "time": time_test,
             "error": error_test,
             "magnitude2": mag2_test,
             "aligned_magnitude": aligned_mag_test,
-            "aligned_magnitude2":  aligned_mag2_test,
+            "aligned_magnitude2": aligned_mag2_test,
             "aligned_time": aligned_time_test,
             "aligned_error": aligned_error_test,
             "aligned_error2": aligned_error2_test}
@@ -358,10 +360,15 @@ class FATSTutorialTestCase(FeetsTestCase):
         def normalize(c):
             name, value = c.name, c[0]
             mean, std = stats[name]["mean"], stats[name]["std"]
-            return (value - mean) / std
+            normalized = (value - mean) / std
+            return normalized
 
         original = pd.DataFrame([dict(zip(features, values))])
-        result = original.apply(normalize)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action='ignore',
+                message="invalid value encountered in double_scalars")
+            result = original.apply(normalize)
 
         self.assertLess(np.abs(result.mean()), 0.12)
         self.assertLess(result.std(), 1.09)

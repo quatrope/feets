@@ -83,14 +83,14 @@ class StructureFunctions(Extractor):
         mag_int = f(time_int)
 
         for tau in np.arange(1, Nsf):
-            sf1[tau-1] = np.mean(
-                np.power(np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 1.0))
-            sf2[tau-1] = np.mean(
+            sf1[tau - 1] = np.mean(
+                np.power(np.abs(mag_int[0:Np - tau] - mag_int[tau:Np]), 1.0))
+            sf2[tau - 1] = np.mean(
                 np.abs(np.power(
-                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 2.0)))
-            sf3[tau-1] = np.mean(
+                    np.abs(mag_int[0:Np - tau] - mag_int[tau:Np]), 2.0)))
+            sf3[tau - 1] = np.mean(
                 np.abs(np.power(
-                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 3.0)))
+                    np.abs(mag_int[0:Np - tau] - mag_int[tau:Np]), 3.0)))
         sf1_log = np.log10(np.trim_zeros(sf1))
         sf2_log = np.log10(np.trim_zeros(sf2))
         sf3_log = np.log10(np.trim_zeros(sf3))

@@ -64,14 +64,14 @@ class LoadOGLE3CatalogTestCase(FeetsTestCase):
 
     def test_load_OGLE3_catalog(self):
         df = pd.DataFrame({"# ID": [1, 2, 3]})
-        with mock.patch("pandas.read_table", return_value=df), \
-                mock.patch("bz2.BZ2File") as BZ2File:
-                    self.assertNotIn("ID", df.columns)
-                    self.assertIn("# ID", df.columns)
-                    ogle3.load_OGLE3_catalog()
-                    self.assertIn("ID", df.columns)
-                    self.assertNotIn("# ID", df.columns)
-                    BZ2File.assert_called_with(ogle3.CATALOG_PATH)
+        with mock.patch("pandas.read_table", return_value=df):
+            with mock.patch("bz2.BZ2File") as BZ2File:
+                self.assertNotIn("ID", df.columns)
+                self.assertIn("# ID", df.columns)
+                ogle3.load_OGLE3_catalog()
+                self.assertIn("ID", df.columns)
+                self.assertNotIn("# ID", df.columns)
+                BZ2File.assert_called_with(ogle3.CATALOG_PATH)
 
 
 class LoadFetchOGLE3(FeetsTestCase):
@@ -83,15 +83,15 @@ class LoadFetchOGLE3(FeetsTestCase):
         url = ogle3.URL.format(oid)
         file_path = os.path.join(store_path, "{}.tar".format(oid))
 
-        with mock.patch("feets.datasets.base.fetch") as fetch, \
-                mock.patch("tarfile.TarFile"):
-                    data = ogle3.fetch_OGLE3(oid)
-                    self.assertEquals(data["id"], oid)
-                    fetch.assert_called_with(url, file_path)
+        with mock.patch("feets.datasets.base.fetch") as fetch:
+            with mock.patch("tarfile.TarFile"):
+                data = ogle3.fetch_OGLE3(oid)
+                self.assertEquals(data["id"], oid)
+                fetch.assert_called_with(url, file_path)
 
     def test_fetch_OGLE3_real_TAR(self):
         file_path = os.path.join(DATA_PATH, "OGLE-BLG-LPV-232406.tar")
         with tarfile.TarFile(file_path) as tfp:
-            with mock.patch("feets.datasets.base.fetch"), \
-                    mock.patch("tarfile.TarFile", return_value=tfp):
-                        ogle3.fetch_OGLE3("OGLE-BLG-LPV-232406")
+            with mock.patch("feets.datasets.base.fetch"):
+                with mock.patch("tarfile.TarFile", return_value=tfp):
+                    ogle3.fetch_OGLE3("OGLE-BLG-LPV-232406")
