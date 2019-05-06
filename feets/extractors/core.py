@@ -102,7 +102,7 @@ warnings.simplefilter("always", FeatureExtractionWarning)
 
 ExtractorConf = namedtuple(
     "ExtractorConf",
-    ["data", "dependencies", "params", "features", "warnings"])
+    ["data", "dependencies", "params", "features", "warnings", "plotters"])
 
 
 class ExtractorMeta(type):
@@ -174,12 +174,26 @@ class ExtractorMeta(type):
         if not hasattr(cls, "warnings"):
             cls.warnings = []
 
+        plotters = {}
+        for an in dir(cls):
+            for feature in cls.features:
+                name_check = f"plot_{feature}"
+                if an == name_check:
+                    break
+                plotter = getattr(cls, an)
+                if callable(plotter):
+                    break
+            else:
+                break
+            plotters[an] = plotter
+
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),
             dependencies=frozenset(cls.dependencies),
             params=tuple(cls.params.items()),
             features=frozenset(cls.features),
-            warnings=tuple(cls.warnings))
+            warnings=tuple(cls.warnings),
+            plotters=tuple(plotters.items()))
 
         if not cls.__doc__:
             cls.__doc__ = ""
@@ -220,6 +234,10 @@ class Extractor(metaclass=ExtractorMeta):
     @classmethod
     def has_warnings(cls):
         return not cls._conf.warnings
+
+    @classmethod
+    def get_plotters(cls):
+        return dict(cls._conf.plotters)
 
     def __init__(self, **cparams):
         for w in self.get_warnings():
@@ -264,7 +282,7 @@ class Extractor(metaclass=ExtractorMeta):
         """This method will be executed after the feature is calculated"""
         pass
 
-    def extract(self, **kwargs):
+    def get_fit_params(self, **kwargs):
         # create the besel for the parameters
         fit_kwargs = {}
 
@@ -278,6 +296,11 @@ class Extractor(metaclass=ExtractorMeta):
 
         # add the configured parameters as parameters to fit()
         fit_kwargs.update(self.params)
+
+        return fit_kwargs
+
+    def extract(self, **kwargs):
+        fit_kwargs = self.get_fit_params(**kwargs)
         try:
             # setup & run te extractor
             self.setup()
@@ -298,3 +321,24 @@ class Extractor(metaclass=ExtractorMeta):
             return dict(result)
         finally:
             self.teardown()
+
+    def plot_setup(self):
+        """This method will be executed before the plot is created"""
+        pass
+
+    def make_plot(self, feature_name, feature_value, ax=None, **kwargs):
+        plotter_name = f"plot_{feature_name}"
+        plotters = self.get_plotters()
+        if plotter_name not in plotters:
+            raise AttributeError(f"Feature '{feature_name}' can't be plotted")
+        fit_kwargs = self.get_fit_params(**kwargs)
+        plotter = plotters[plotter_name]
+        try:
+            self.plot_setup()
+            return plotter(feature_value, ax=ax, **fit_kwargs)
+        finally:
+            return self.plot_teardown()
+
+    def plot_teardown(self):
+        """This method will be executed after the plot is created"""
+        pass

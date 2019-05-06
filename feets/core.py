@@ -99,12 +99,21 @@ class ResultSet:
 
     features: np.ndarray = attr.ib(repr=True)
     values: np.ndarray = attr.ib(repr=False)
+    data: dict = attr.ib(repr=False)
 
     def __iter__(self):
         return iter(self.as_arrays())
 
     def as_arrays(self):
         return self.features, self.values
+
+    def plot(self, feature, ax=None, **kwargs):
+        if feature not in self.features:
+            raise FeatureNotFound(feature)
+        fcls = extractors.extractor_of(feature)
+        params = self.kwargs.get(fcls.__name__, {})
+        fex = fcls(**params)
+        return fex
 
 
 # =============================================================================
@@ -188,7 +197,7 @@ class FeatureSpace:
         # store all the parameters for the extractors
         self._kwargs = kwargs
 
-        # get all posible features by data
+        # get all possible features by data
         if data:
             fbdata = []
             for fname, f in exts.items():
@@ -306,7 +315,8 @@ class FeatureSpace:
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
 
-        rs = ResultSet(features=self._features_as_array, values=fvalues)
+        rs = ResultSet(
+            features=self._features_as_array, values=fvalues, data=kwargs)
         return rs
 
     @property
