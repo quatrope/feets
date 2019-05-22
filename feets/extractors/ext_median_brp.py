@@ -79,5 +79,6 @@ class MedianBRP(Extractor):
 
         count = np.sum(np.logical_and(magnitude < median + amplitude,
                                       magnitude > median - amplitude))
+        median_brp = float(count) / n
 
-        return {"MedianBRP": float(count) / n}
+        return {"MedianBRP": median_brp}

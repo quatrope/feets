@@ -73,4 +73,5 @@ class Color(Extractor):
     features = ["Color"]
 
     def fit(self, magnitude, magnitude2):
-        return {"Color": np.mean(magnitude) - np.mean(magnitude2)}
+        color = np.mean(magnitude) - np.mean(magnitude2)
+        return {"Color": color}

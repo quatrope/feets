@@ -155,30 +155,10 @@ class FourierComponents(Extractor):
     """
 
     data = ['magnitude', 'time']
-    features = ['Freq1_harmonics_amplitude_0',
-                'Freq1_harmonics_amplitude_1',
-                'Freq1_harmonics_amplitude_2',
-                'Freq1_harmonics_amplitude_3',
-                'Freq2_harmonics_amplitude_0',
-                'Freq2_harmonics_amplitude_1',
-                'Freq2_harmonics_amplitude_2',
-                'Freq2_harmonics_amplitude_3',
-                'Freq3_harmonics_amplitude_0',
-                'Freq3_harmonics_amplitude_1',
-                'Freq3_harmonics_amplitude_2',
-                'Freq3_harmonics_amplitude_3',
-                'Freq1_harmonics_rel_phase_0',
-                'Freq1_harmonics_rel_phase_1',
-                'Freq1_harmonics_rel_phase_2',
-                'Freq1_harmonics_rel_phase_3',
-                'Freq2_harmonics_rel_phase_0',
-                'Freq2_harmonics_rel_phase_1',
-                'Freq2_harmonics_rel_phase_2',
-                'Freq2_harmonics_rel_phase_3',
-                'Freq3_harmonics_rel_phase_0',
-                'Freq3_harmonics_rel_phase_1',
-                'Freq3_harmonics_rel_phase_2',
-                'Freq3_harmonics_rel_phase_3']
+    features = [
+        "Freq1_harmonics",
+        "Freq2_harmonics",
+        "Freq3_harmonics"]
     params = {
         "lscargle_kwds": {
             "autopower_kwds": {
@@ -227,38 +207,24 @@ class FourierComponents(Extractor):
 
         return A, scaledPH
 
+    def flatten(self, feature, value):
+        amps, phases = value
+        flatten_value = {}
+        for idx, ap in enumerate(zip(*value)):
+            a, p = ap
+            flatten_value.update({
+                f"{feature}_amplitude_{idx}": a,
+                f"{feature}_rel_phase_{idx}": p})
+        return flatten_value
+
     def fit(self, magnitude, time, lscargle_kwds):
         lscargle_kwds = lscargle_kwds or {}
 
         A, sPH = self._components(magnitude, time, lscargle_kwds)
+
         result = {
-            "Freq1_harmonics_amplitude_0": A[0][0],
-            "Freq1_harmonics_amplitude_1": A[0][1],
-            "Freq1_harmonics_amplitude_2": A[0][2],
-            "Freq1_harmonics_amplitude_3": A[0][3],
+            "Freq1_harmonics": (A[0], sPH[0]),
+            "Freq2_harmonics": (A[1], sPH[1]),
+            "Freq3_harmonics": (A[2], sPH[2])}
 
-            "Freq2_harmonics_amplitude_0": A[1][0],
-            "Freq2_harmonics_amplitude_1": A[1][1],
-            "Freq2_harmonics_amplitude_2": A[1][2],
-            "Freq2_harmonics_amplitude_3": A[1][3],
-
-            "Freq3_harmonics_amplitude_0": A[2][0],
-            "Freq3_harmonics_amplitude_1": A[2][1],
-            "Freq3_harmonics_amplitude_2": A[2][2],
-            "Freq3_harmonics_amplitude_3": A[2][3],
-
-            "Freq1_harmonics_rel_phase_0": sPH[0][0],
-            "Freq1_harmonics_rel_phase_1": sPH[0][1],
-            "Freq1_harmonics_rel_phase_2": sPH[0][2],
-            "Freq1_harmonics_rel_phase_3": sPH[0][3],
-
-            "Freq2_harmonics_rel_phase_0": sPH[1][0],
-            "Freq2_harmonics_rel_phase_1": sPH[1][1],
-            "Freq2_harmonics_rel_phase_2": sPH[1][2],
-            "Freq2_harmonics_rel_phase_3": sPH[1][3],
-
-            "Freq3_harmonics_rel_phase_0": sPH[2][0],
-            "Freq3_harmonics_rel_phase_1": sPH[2][1],
-            "Freq3_harmonics_rel_phase_2": sPH[2][2],
-            "Freq3_harmonics_rel_phase_3": sPH[2][3]}
         return result

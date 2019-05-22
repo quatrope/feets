@@ -82,4 +82,5 @@ class Skew(Extractor):
     features = ["Skew"]
 
     def fit(self, magnitude):
-        return {"Skew": stats.skew(magnitude)}
+        skew = stats.skew(magnitude)
+        return {"Skew": skew}

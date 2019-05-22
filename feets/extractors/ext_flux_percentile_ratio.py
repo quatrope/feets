@@ -199,3 +199,6 @@ class FluxPercentileRatioMid80(Extractor):
         F_mid80 = F_10_90 / F_5_95
 
         return {"FluxPercentileRatioMid80": F_mid80}
+
+
+del COMMON_DOC

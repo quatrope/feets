@@ -37,6 +37,8 @@
 import warnings
 from collections import namedtuple
 
+import numpy as np
+
 
 # =============================================================================
 # CONSTANTS
@@ -102,7 +104,8 @@ warnings.simplefilter("always", FeatureExtractionWarning)
 
 ExtractorConf = namedtuple(
     "ExtractorConf",
-    ["data", "dependencies", "params", "features", "warnings", "plotters"])
+    ["data", "dependencies", "params", "features", "warnings",
+     "plotters", "flatteners"])
 
 
 class ExtractorMeta(type):
@@ -174,18 +177,20 @@ class ExtractorMeta(type):
         if not hasattr(cls, "warnings"):
             cls.warnings = []
 
-        plotters = {}
+        plotters, flatteners = {}, {}
+
         for an in dir(cls):
             for feature in cls.features:
-                name_check = f"plot_{feature}"
-                if an == name_check:
-                    break
-                plotter = getattr(cls, an)
-                if callable(plotter):
-                    break
-            else:
-                break
-            plotters[an] = plotter
+                if an == f"plot_{feature}":
+                    store_to = plotters
+                elif an == f"flatten_{feature}":
+                    store_to = flatteners
+                else:
+                    continue
+                metthod = getattr(cls, an)
+                if callable(method):
+                    store_to[an] = method
+
 
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),
@@ -193,7 +198,8 @@ class ExtractorMeta(type):
             params=tuple(cls.params.items()),
             features=frozenset(cls.features),
             warnings=tuple(cls.warnings),
-            plotters=tuple(plotters.items()))
+            plotters=tuple(plotters.items()),
+            flatteners=tuple(flatteners.items()))
 
         if not cls.__doc__:
             cls.__doc__ = ""
@@ -202,7 +208,9 @@ class ExtractorMeta(type):
             cls.__doc__ += "\n    Warnings\n    ---------\n" + "\n".join([
                 "    " + w for w in cls.warnings])
 
-        del cls.data, cls.dependencies, cls.params, cls.features, cls.warnings
+        del (
+            cls.data, cls.dependencies, cls.params,
+            cls.features, cls.warnings)
 
         return cls
 
@@ -239,6 +247,10 @@ class Extractor(metaclass=ExtractorMeta):
     def get_plotters(cls):
         return dict(cls._conf.plotters)
 
+    @classmethod
+    def get_flatteners(cls):
+        return dict(cls._conf.flatteners)
+
     def __init__(self, **cparams):
         for w in self.get_warnings():
             warnings.warn(w, ExtractorWarning)
@@ -271,17 +283,6 @@ class Extractor(metaclass=ExtractorMeta):
             self.__str = "{}({})".format(self.name, params)
         return self.__str
 
-    def setup(self):
-        """This method will be executed before the feature is calculated"""
-        pass
-
-    def fit(self):
-        raise NotImplementedError()
-
-    def teardown(self):
-        """This method will be executed after the feature is calculated"""
-        pass
-
     def get_fit_params(self, **kwargs):
         # create the besel for the parameters
         fit_kwargs = {}
@@ -298,6 +299,21 @@ class Extractor(metaclass=ExtractorMeta):
         fit_kwargs.update(self.params)
 
         return fit_kwargs
+
+    # =========================================================================
+    # FIT
+    # =========================================================================
+
+    def setup(self):
+        """This method will be executed before the feature is calculated"""
+        pass
+
+    def fit(self):
+        raise NotImplementedError()
+
+    def teardown(self):
+        """This method will be executed after the feature is calculated"""
+        pass
 
     def extract(self, **kwargs):
         fit_kwargs = self.get_fit_params(**kwargs)
@@ -322,17 +338,94 @@ class Extractor(metaclass=ExtractorMeta):
         finally:
             self.teardown()
 
+    # =========================================================================
+    # ¡FLATTENS!
+    # =========================================================================
+
+    def flatten(self, feature_name, value):
+        if np.ndim(value) == 0:
+            return {feature_name: value}
+        flatten_values = {}
+        for idx, v in enumerate(value):
+            flatten_name = f"feature_name_{idx}"
+            flatten_values.update(self.flatten(flatten_name, v))
+        return flatten_values
+
+    def flatten_setup(self):
+        """This method will be executed before the flattent method"""
+        pass
+
+    def flatten_feature(self, feature, value):
+        """Convert any arbitrary features object into a dictionary of
+        individual values.
+
+        Parameters
+        ----------
+        feature : str
+            The name of the feature to flatten.
+
+        value : object
+            The object to be "flattened"
+
+        Returns
+        -------
+
+        dict :
+            A dict of values
+
+        """
+        flatteners = self.get_flatteners()
+        flattener = flatteners.get(f"flatten_{feature}", self.flatten)
+
+        try:
+            self.flatten_setup()
+            flatten_value = flattener(feature, value)
+        finally:
+            self.flatten_teardown()
+        return flatten_value
+
+    def flatten_teardown(self):
+        """This method will be executed after the flatten is executed"""
+        pass
+
+    # =========================================================================
+    # PLOTTER
+    # =========================================================================
+
     def plot_setup(self):
         """This method will be executed before the plot is created"""
         pass
 
-    def make_plot(self, feature_name, feature_value, ax=None, **kwargs):
-        plotter_name = f"plot_{feature_name}"
+    def make_plot(self, feature, value, lc, ax=None, **plot_kwargs):
+        """Create a plot of a given `feature_name`
+
+        Parameters
+        ----------
+
+        feature : str
+            The name of the feature to plot.
+        value : dict
+           Value of the feature.
+        lc : dict
+            Light curve as a dictionary.
+        ax : matplotlib axes object, default None
+        ***plot_kwargs : dict
+            Extra parameter to send to the plot function
+
+        """
         plotters = self.get_plotters()
-        if plotter_name not in plotters:
+        plotter = plotters.get(f"plot_{feature}")
+        if plotter is None:
             raise AttributeError(f"Feature '{feature_name}' can't be plotted")
-        fit_kwargs = self.get_fit_params(**kwargs)
-        plotter = plotters[plotter_name]
+
+        kwargs = {"features": features}
+        kwargs.update(lc)
+
+        raise Exception()
+
+        fit_kwargs = self.get_fit_params(kwargs)
+
+
         try:
             self.plot_setup()
             return plotter(feature_value, ax=ax, **fit_kwargs)

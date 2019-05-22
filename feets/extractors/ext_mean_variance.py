@@ -80,4 +80,5 @@ class MeanVariance(Extractor):
     features = ['Meanvariance']
 
     def fit(self, magnitude):
-        return {"Meanvariance": np.std(magnitude) / np.mean(magnitude)}
+        mean_variance = np.std(magnitude) / np.mean(magnitude)
+        return {"Meanvariance": mean_variance}

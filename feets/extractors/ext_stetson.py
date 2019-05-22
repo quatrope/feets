@@ -310,4 +310,6 @@ class StetsonL(Extractor):
         K = (1 / np.sqrt(N * 1.0) *
              np.sum(np.abs(sigma_i)) / np.sqrt(np.sum(sigma_i ** 2)))
 
-        return {"StetsonL": J * K / 0.798}
+        L = J * K / 0.798
+
+        return {"StetsonL": L}

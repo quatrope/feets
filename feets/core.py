@@ -99,21 +99,52 @@ class ResultSet:
 
     features: np.ndarray = attr.ib(repr=True)
     values: np.ndarray = attr.ib(repr=False)
-    data: dict = attr.ib(repr=False)
+    extractors_conf: dict = attr.ib(repr=False)
+    lc: dict = attr.ib(repr=False)
 
     def __iter__(self):
         return iter(self.as_arrays())
 
-    def as_arrays(self):
-        return self.features, self.values
-
-    def plot(self, feature, ax=None, **kwargs):
-        if feature not in self.features:
-            raise FeatureNotFound(feature)
+    def extractor_of(self, feature):
+        # regenerate the extractor
         fcls = extractors.extractor_of(feature)
-        params = self.kwargs.get(fcls.__name__, {})
-        fex = fcls(**params)
-        return fex
+        extractor_params = self.extractors_conf.get(fcls.__name__, {})
+        extractor = fcls(**extractor_params)
+        return extractor
+
+    def as_arrays(self):
+        flatten_features = {}
+        for feature, value in zip(self.features, self.values):
+            extractor = self.extractor_of(feature)
+            flatten_value = extractor.flatten_feature(feature, value)
+            flatten_features.update(flatten_value)
+
+        features = np.empty(len(flatten_features))
+        values = np.empty(len(flatten_features))
+        for idx, fv in enumerate(flatten_features.items()):
+            features[idx], values[idx] = fv
+
+        return features, values
+
+    def __getitem__(self, feature):
+        idx, = np.where(self.features == feature)
+        if not len(idx):
+            raise KeyError(f"{feature}")
+        return self.values[idx[0]]
+
+    def as_dict(self):
+        return dict(zip(self.features, self.values))
+
+
+    # def plot(self, feature, ax=None, **kwargs):
+    #     if feature not in self.features:
+    #         raise FeatureNotFound(feature)
+
+
+
+    #     plot = fex.make_plot(
+    #         feature_name=feature, features=features,
+    #         lc=self.data, ax=ax, plot_kwargs=kwargs)
 
 
 # =============================================================================
@@ -296,7 +327,7 @@ class FeatureSpace:
                 aligned_magnitude=None, aligned_magnitude2=None,
                 aligned_error=None, aligned_error2=None):
 
-        kwargs = self.dict_data_as_array({
+        lc = self.dict_data_as_array({
             DATA_TIME: time,
             DATA_MAGNITUDE: magnitude,
             DATA_ERROR: error,
@@ -309,18 +340,19 @@ class FeatureSpace:
 
         features = {}
         for fextractor in self._execution_plan:
-            result = fextractor.extract(features=features, **kwargs)
+            result = fextractor.extract(features=features, **lc)
             features.update(result)
 
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
 
         rs = ResultSet(
-            features=self._features_as_array, values=fvalues, data=kwargs)
+            features=self._features_as_array, values=fvalues,
+            lc=lc, extractors_conf=self.extractors_conf)
         return rs
 
     @property
-    def kwargs(self):
+    def extractors_conf(self):
         return dict(self._kwargs)
 
     @property
