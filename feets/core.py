@@ -119,7 +119,7 @@ class ResultSet:
             flatten_value = extractor.flatten_feature(feature, value)
             flatten_features.update(flatten_value)
 
-        features = np.empty(len(flatten_features))
+        features = np.empty(len(flatten_features), dtype=object)
         values = np.empty(len(flatten_features))
         for idx, fv in enumerate(flatten_features.items()):
             features[idx], values[idx] = fv
