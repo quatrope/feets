@@ -35,7 +35,7 @@ Removed:
 
 -   Commented ones
 -   The Stetson test because don't work anyway (the original test not provides
-    all the data required for the Stetson indexes.
+    all the data required for the Stetson indexes).
 -   Added the test from the tutorial
 
 
@@ -329,44 +329,64 @@ class FATSTutorialTestCase(FeetsTestCase):
         # light-curve and compare the resulting features with the ones obtained
         # from the original data.
 
-        fs = FeatureSpace()
+        # this preamble is added by the feets team <<<<<<<<<<<<<<<<<<<<
+        original_FATS_features = [
+            'Mean', 'Skew', 'Eta_e', 'SmallKurtosis',
+            'StetsonJ', 'PercentAmplitude', 'AndersonDarling',
+            'FluxPercentileRatioMid80', 'Period_fit', 'Freq1_harmonics',
+            'PercentDifferenceFluxPercentile', 'LinearTrend', 'MedianAbsDev',
+            'Beyond1Std', 'Psi_eta', 'MedianBRP', 'Q31_color', 'Con',
+            'StructureFunction_index_31', 'MaxSlope', 'StetsonK', 'Color',
+            'StructureFunction_index_32', 'CAR_tau', 'Q31', 'Autocor_length',
+            'StetsonL', 'CAR_sigma', 'PairSlopeTrend',
+            'FluxPercentileRatioMid35', 'Gskew', 'StructureFunction_index_21',
+            'StetsonK_AC', 'FluxPercentileRatioMid65', 'PeriodLS',
+            'Freq3_harmonics', 'Amplitude', 'CAR_mean', 'SlottedA_length',
+            'Std', 'Freq2_harmonics', 'Psi_CS', 'FluxPercentileRatioMid20',
+            'FluxPercentileRatioMid50', 'Eta_color', 'Meanvariance', 'Rcs']
 
-        # We calculate the features values for fifty random samples of the
-        # original light-curve:
-        features_values = []
-        for i in range(50):
-            sample = self.shuffle(**self.lc)
-            features, values = fs.extract(**sample)
-            result = dict(zip(features, values))
-            features_values.append(result)
-
-        # We obtain the mean and standard deviation of each calculated feature:
-        stats = pd.DataFrame(features_values).aggregate([np.mean, np.std])
-
-        # Original light-curve:
-        features, values = fs.extract(
-            magnitude=self.lc["mag"],
-            time=self.lc["time"],
-            error=self.lc["error"],
-            magnitude2=self.lc["mag2"],
-            aligned_magnitude=self.lc["aligned_mag"],
-            aligned_magnitude2=self.lc["aligned_mag2"],
-            aligned_time=self.lc["aligned_time"],
-            aligned_error=self.lc["aligned_error"],
-            aligned_error2=self.lc["aligned_error2"])
-
-        def normalize(c):
-            name, value = c.name, c[0]
-            mean, std = stats[name]["mean"], stats[name]["std"]
-            normalized = (value - mean) / std
-            return normalized
-
-        original = pd.DataFrame([dict(zip(features, values))])
         with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action='ignore',
-                message="invalid value encountered in double_scalars")
-            result = original.apply(normalize)
+            warnings.simplefilter("ignore") # i don't care about warning here
+            fs = FeatureSpace(only=original_FATS_features)  # only FATS
+            # END feets team mods
 
-        self.assertLess(np.abs(result.mean()), 0.12)
-        self.assertLess(result.std(), 1.09)
+            # We calculate the features values for fifty random samples of the
+            # original light-curve:
+            features_values = []
+            for i in range(50):
+                sample = self.shuffle(**self.lc)
+                features, values = fs.extract(**sample)
+                result = dict(zip(features, values))
+                features_values.append(result)
+
+            # We obtain the mean and standard deviation of each calculated
+            # feature:
+            stats = pd.DataFrame(features_values).aggregate([np.mean, np.std])
+
+            # Original light-curve:
+            features, values = fs.extract(
+                magnitude=self.lc["mag"],
+                time=self.lc["time"],
+                error=self.lc["error"],
+                magnitude2=self.lc["mag2"],
+                aligned_magnitude=self.lc["aligned_mag"],
+                aligned_magnitude2=self.lc["aligned_mag2"],
+                aligned_time=self.lc["aligned_time"],
+                aligned_error=self.lc["aligned_error"],
+                aligned_error2=self.lc["aligned_error2"])
+
+            def normalize(c):
+                name, value = c.name, c[0]
+                mean, std = stats[name]["mean"], stats[name]["std"]
+                normalized = (value - mean) / std
+                return normalized
+
+            original = pd.DataFrame([dict(zip(features, values))])
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    action='ignore',
+                    message="invalid value encountered in double_scalars")
+                result = original.apply(normalize)
+
+            self.assertLess(np.abs(result.mean()), 0.12)
+            self.assertLess(result.std(), 1.09)

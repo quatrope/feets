@@ -239,33 +239,5 @@ class feetsExtractorsTestCases(FeetsTestCase):
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
             feats = ext.fit(magnitude=mags, time=time, **params)
-            values[idx] = np.sum(list(feats.values()))
+            values[idx] = feats["DMDT"].sum()
         self.assertAllClose(values.mean(), 424.56)
-
-    def test_flatten_dmdt(self):
-        ext = extractors.DeltamDeltat()
-        params = ext.get_default_params()
-
-        dmbins = len(params["dm_bins"]) - 1
-        dtbins = len(params["dt_bins"]) - 1
-
-        mags = self.random.normal(size=100)
-        time = np.arange(0, 100)
-
-        lc_len = len(time)
-        n_vals = int(0.5 * lc_len * (lc_len - 1))
-
-        sign = 5000. * self.random.rand(dtbins, dmbins)
-        expected = np.fix(255. * sign / n_vals + 0.999).astype(int)
-
-        with mock.patch("numpy.histogram2d", return_value=[sign]):
-            results = ext.fit(magnitude=mags, time=time, **params)
-
-        flattened = np.zeros_like(expected) - 1
-        for name, value in results.items():
-            it = int(name.split('_')[2])
-            im = int(name.split('_')[-1])
-            flattened[it][im] = value
-
-        # .T.reshape(23, 24))
-        np.testing.assert_array_equal(expected, flattened)
