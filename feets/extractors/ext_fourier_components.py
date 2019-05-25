@@ -49,7 +49,7 @@ from .core import Extractor
 
 class FourierComponents(Extractor):
     r"""
-    **Periodic features extracted from light-curves using Lomb–Scargle**
+    **Periodic features extracted from light-curves using Lomb-Scargle**
     **(Richards et al., 2011)**
 
     Here, we adopt a model where the time series of the photometric magnitudes

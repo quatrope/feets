@@ -60,8 +60,8 @@ class Con(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Con'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Con': 0.0476}
 
     References

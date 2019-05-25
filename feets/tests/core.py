@@ -56,6 +56,12 @@ DATA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
 
 class FeetsTestCase(unittest.TestCase):
 
+    @classmethod
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if hasattr(cls, "setUpCompile"):
+            cls.setUpCompile()
+
     def assertAllClose(self, a, b, **kwargs):
         return npt.assert_allclose(a, b, **kwargs)
 

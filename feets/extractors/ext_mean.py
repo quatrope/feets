@@ -54,8 +54,8 @@ class Mean(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Mean'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Mean': 0.0082611563419413246}
 
     References

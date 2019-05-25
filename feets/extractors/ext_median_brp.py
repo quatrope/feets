@@ -54,8 +54,8 @@ class MedianBRP(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['MedianBRP'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'MedianBRP': 0.559}
 
     References

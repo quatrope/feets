@@ -178,7 +178,6 @@ class ExtractorMeta(type):
             cls.warnings = []
 
         plotters, flatteners = {}, {}
-
         for an in dir(cls):
             for feature in cls.features:
                 if an == f"plot_{feature}":
@@ -187,10 +186,9 @@ class ExtractorMeta(type):
                     store_to = flatteners
                 else:
                     continue
-                metthod = getattr(cls, an)
+                method = getattr(cls, an)
                 if callable(method):
                     store_to[an] = method
-
 
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),
@@ -342,12 +340,12 @@ class Extractor(metaclass=ExtractorMeta):
     # ¡FLATTENS!
     # =========================================================================
 
-    def flatten(self, feature_name, value):
+    def flatten(self, feature, value):
         if np.ndim(value) == 0:
-            return {feature_name: value}
+            return {feature: value}
         flatten_values = {}
         for idx, v in enumerate(value):
-            flatten_name = f"feature_name_{idx}"
+            flatten_name = f"{feature}_{idx}"
             flatten_values.update(self.flatten(flatten_name, v))
         return flatten_values
 
@@ -416,19 +414,18 @@ class Extractor(metaclass=ExtractorMeta):
         plotters = self.get_plotters()
         plotter = plotters.get(f"plot_{feature}")
         if plotter is None:
-            raise AttributeError(f"Feature '{feature_name}' can't be plotted")
+            raise AttributeError(f"Feature '{feature}' can't be plotted")
 
-        kwargs = {"features": features}
+        kwargs = {}
         kwargs.update(lc)
 
         raise Exception()
 
         fit_kwargs = self.get_fit_params(kwargs)
 
-
         try:
             self.plot_setup()
-            return plotter(feature_value, ax=ax, **fit_kwargs)
+            return plotter(feature, ax=ax, **fit_kwargs)
         finally:
             return self.plot_teardown()
 

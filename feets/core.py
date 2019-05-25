@@ -94,16 +94,29 @@ class DataRequiredError(ValueError):
 # FEATURE RESULT
 # =============================================================================
 
-@attr.s(frozen=True, auto_attribs=True)
+@attr.s(frozen=True, auto_attribs=True, repr=False, cmp=False)
 class ResultSet:
 
-    features: np.ndarray = attr.ib(repr=True)
-    values: np.ndarray = attr.ib(repr=False)
-    extractors_conf: dict = attr.ib(repr=False)
-    lc: dict = attr.ib(repr=False)
+    features: np.ndarray = attr.ib()
+    values: np.ndarray = attr.ib()
+    extractors_conf: dict = attr.ib()
+    lc: dict = attr.ib()
 
     def __iter__(self):
         return iter(self.as_arrays())
+
+    def __repr__(self):
+        feats = ", ".join(self.features)
+        return f"ResultSet({feats})"
+
+    def __getitem__(self, feature):
+        idx, = np.where(self.features == feature)
+        if not len(idx):
+            raise KeyError(f"{feature}")
+        return self.values[idx[0]]
+
+    def __len__(self):
+        return len(self.features)
 
     def extractor_of(self, feature):
         # regenerate the extractor
@@ -126,25 +139,8 @@ class ResultSet:
 
         return features, values
 
-    def __getitem__(self, feature):
-        idx, = np.where(self.features == feature)
-        if not len(idx):
-            raise KeyError(f"{feature}")
-        return self.values[idx[0]]
-
     def as_dict(self):
         return dict(zip(self.features, self.values))
-
-
-    # def plot(self, feature, ax=None, **kwargs):
-    #     if feature not in self.features:
-    #         raise FeatureNotFound(feature)
-
-
-
-    #     plot = fex.make_plot(
-    #         feature_name=feature, features=features,
-    #         lc=self.data, ax=ax, plot_kwargs=kwargs)
 
 
 # =============================================================================

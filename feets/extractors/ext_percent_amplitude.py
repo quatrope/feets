@@ -54,8 +54,8 @@ class PercentAmplitude(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['PercentAmplitude'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'PercentAmplitude': -168.991253993057}
 
     References

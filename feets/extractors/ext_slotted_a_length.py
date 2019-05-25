@@ -68,8 +68,8 @@ class SlottedA_length(Extractor):
 
         >>> fs = feets.FeatureSpace(
         ...     only=['SlottedA_length'], SlottedA_length={"t": 1})
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'SlottedA_length': 1.}
 
     **Parameters**

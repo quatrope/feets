@@ -346,7 +346,7 @@ class FATSTutorialTestCase(FeetsTestCase):
             'FluxPercentileRatioMid50', 'Eta_color', 'Meanvariance', 'Rcs']
 
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore") # i don't care about warning here
+            warnings.simplefilter("ignore")  # i don't care about warning here
             fs = FeatureSpace(only=original_FATS_features)  # only FATS
             # END feets team mods
 

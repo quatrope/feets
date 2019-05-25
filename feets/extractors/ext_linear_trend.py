@@ -53,8 +53,8 @@ class LinearTrend(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['LinearTrend'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'LinearTrend': -3.2084065290292509e-06}
 
     References

@@ -61,8 +61,8 @@ class MedianAbsDev(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['MedianAbsDev'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'MedianAbsDev': 0.66332131466690614}
 
     References

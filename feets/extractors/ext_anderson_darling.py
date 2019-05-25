@@ -59,7 +59,6 @@ class AndersonDarling(Extractor):
     For a normal distribution the Anderson-Darling statistic should take values
     close to 0.25.
 
-
     References
     ----------
 

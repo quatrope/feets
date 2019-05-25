@@ -56,8 +56,8 @@ class MaxSlope(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['MaxSlope'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'MaxSlope': 5.4943105823904741}
 
     References

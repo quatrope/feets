@@ -60,8 +60,8 @@ class MeanVariance(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Meanvariance'])
-        >>> features, values = fs.extract(**lc_uniform)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_uniform)
+        >>> rs.as_dict()
         {'Meanvariance': 0.5816791217381897}
 
     References

@@ -54,8 +54,8 @@ class Beyond1Std(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Beyond1Std'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> ts = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Beyond1Std': 0.317}
 
     References

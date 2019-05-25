@@ -41,9 +41,10 @@ import numpy as np
 
 import mock
 
-from .. import Extractor, register_extractor, extractors
+from .. import Extractor, register_extractor, extractors, FeatureSpace
 
 from .core import FeetsTestCase
+from .test_original_FATS_test_library import FATSTutorialTestCase
 
 
 # =============================================================================
@@ -225,13 +226,50 @@ class FATSExtractorsTestCases(FeetsTestCase):
         self.assertAllClose(values.mean(), -0.0470713296883)
 
 
+class TestFlatteners(FeetsTestCase):
+
+    @classmethod
+    def setUpCompile(cls):
+        # lests reuse some code from FATSTutorialTestCase
+        tc = FATSTutorialTestCase()
+        tc.setUp()
+        lc = tc.shuffle(**tc.lc)
+
+        # execute all the extractors
+        fs = FeatureSpace()
+        rs = fs.extract(**lc)
+
+        class FakeFunction:
+
+            def __init__(self, resultset, feat):
+                self.resultset = resultset
+                self.feat = feat
+
+            def __call__(self, *args, **kwargs):
+                extractor = self.resultset.extractor_of(self.feat)
+
+                fo = self.resultset[self.feat]
+                ff = extractor.flatten_feature(self.feat, fo)
+
+                lfo, lff = np.size(fo), len(ff)
+                emsg = (
+                    f"Feature '{feat}' flatten fail: "
+                    f"Len {lff}, expected {lfo}")
+                if lfo != lff:
+                    raise AssertionError(emsg)
+
+        for feat in rs.features:
+            test = FakeFunction(rs, feat)
+            setattr(cls, f"test_flatten_{feat}", test)
+
+
 class feetsExtractorsTestCases(FeetsTestCase):
 
     def setUp(self):
         self.random = np.random.RandomState(42)
 
     def test_feets_dmdt(self):
-        ext = extractors.DeltamDeltat()
+        ext = extractors.DeltaMDeltaT()
         params = ext.get_default_params()
         time = np.arange(0, 1000)
 

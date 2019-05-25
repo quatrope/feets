@@ -45,7 +45,9 @@ from .core import Extractor
 # =============================================================================
 
 class Gskew(Extractor):
-    """Median-of-magnitudes based measure of the skew.
+    """
+
+    **Median-of-magnitudes based measure of the skew**
 
     .. math::
 

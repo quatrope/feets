@@ -65,8 +65,8 @@ class RCS(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Rcs'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Rcs': 0.0094459606901065168}
 
     References

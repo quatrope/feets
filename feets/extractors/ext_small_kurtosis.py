@@ -62,8 +62,8 @@ class SmallKurtosis(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['SmallKurtosis'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'SmallKurtosis': 0.044451779515607193}
 
     See http://www.xycoon.com/peakedness_small_sample_test_1.htm

@@ -55,8 +55,8 @@ class EtaColor(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Eta_color'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Eta_color': 1.991749074648397}
 
     References

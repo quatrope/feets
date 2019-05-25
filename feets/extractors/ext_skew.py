@@ -63,8 +63,8 @@ class Skew(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Skew'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Skew': -0.00023325826785278685}
 
     References

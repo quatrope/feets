@@ -55,8 +55,8 @@ class PairSlopeTrend(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['PairSlopeTrend'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'PairSlopeTrend': -0.16666666666666666}
 
     References

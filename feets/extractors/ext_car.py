@@ -159,8 +159,8 @@ class CAR(Extractor):
 
         >>> fs = feets.FeatureSpace(
         ...     only=['CAR_sigma', 'CAR_tau','CAR_mean'])
-        >>> features, values = fs.extract(**lc_periodic)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_periodic)
+        >>> rs.as_dict()
         {'CAR_mean': -9.230698873903961,
          'CAR_sigma': -0.21928049298842511,
          'CAR_tau': 0.64112037377348619}

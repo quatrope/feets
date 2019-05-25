@@ -92,8 +92,8 @@ class StetsonJ(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['StetsonJ'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'StetsonJ': 0.010765631555204736}
 
     References
@@ -112,7 +112,7 @@ class StetsonJ(Extractor):
     features = ["StetsonJ"]
     warnings = [
         ("The original FATS documentation says that the result of StetsonJ "
-         "must be ~0 for gausian distribution but the result is ~-0.41")]
+         "must be ~0 for gaussian distribution but the result is ~-0.41")]
 
     def fit(self, aligned_magnitude, aligned_magnitude2,
             aligned_error, aligned_error2):
@@ -159,8 +159,8 @@ class StetsonK(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['StetsonK'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'StetsonK': 0.79914938521401002}
 
     References
@@ -178,7 +178,8 @@ class StetsonK(Extractor):
     features = ['StetsonK']
     warnings = [
         ("The original FATS documentation says that the result of StetsonK "
-         "must be 2/pi=0.798 for gausian distribution but the result is ~0.2")]
+         "must be 2/pi=0.798 for gaussian distribution but the "
+         "result is ~0.2")]
 
     def fit(self, magnitude, error):
         mean_mag = (np.sum(magnitude / (error * error)) /
@@ -205,8 +206,8 @@ class StetsonKAC(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['SlottedA_length','StetsonK_AC'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'SlottedA_length': 1.0, 'StetsonK_AC': 0.20917402545294403}
 
     **Parameters**
@@ -263,8 +264,8 @@ class StetsonL(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['SlottedL'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'StetsonL': 0.0085957106316273714}
 
     References

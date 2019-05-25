@@ -86,8 +86,8 @@ class Eta_e(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Eta_e'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Eta_e': 2.0028592616231866}
 
 

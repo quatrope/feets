@@ -60,8 +60,8 @@ class Std(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Std'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Std': 0.99320419310116881}
 
     References

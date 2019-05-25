@@ -55,8 +55,8 @@ class PercentDifferenceFluxPercentile(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['PercentDifferenceFluxPercentile'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'PercentDifferenceFluxPercentile': -134.93590403825007}
 
     References

@@ -88,8 +88,8 @@ class Q31Color(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Q31_color'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
         {'Q31_color': 1.8840489594535512}
 
     References

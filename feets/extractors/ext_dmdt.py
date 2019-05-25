@@ -44,7 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
-class DeltamDeltat(Extractor):
+class DeltaMDeltaT(Extractor):
     r"""
 
     **DMDT (Delta Magnitude - Delta Time Mapping)**
@@ -65,18 +65,18 @@ class DeltamDeltat(Extractor):
 
     .. code-block:: pycon
 
-        >>> fs = feets.FeatureSpace(only=['Eta_color'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Eta_color': 1.991749074648397}
+        >>> fs = feets.FeatureSpace(only=['DMDT'])
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
+        {'DMDT': array([[0, 0, 1, 1, ..., ]])},
 
     References
     ----------
 
-    .. [Mahabal2017] Mahabal, A., Sheth, K., Gieseke, F., Pai, A., Djorgovski, S.
-       G., Drake, A. J., & Graham, M. J. (2017, November). Deep-learnt
-       classification of light curves. In 2017 IEEE Symposium Series on
-       Computational Intelligence (SSCI) (pp. 1-8). IEEE.
+    .. [Mahabal2017] Mahabal, A., Sheth, K., Gieseke, F., Pai, A.,
+       Djorgovski, S.G., Drake, A. J., & Graham, M. J. (2017, November).
+       Deep-learnt classification of light curves. In 2017 IEEE Symposium
+       Series on Computational Intelligence (SSCI) (pp. 1-8). IEEE.
 
     """
     data = ['magnitude', 'time']
@@ -112,5 +112,3 @@ class DeltamDeltat(Extractor):
         counts = np.fix(255. * counts / n_vals + 0.999).astype(int)
 
         return {"DMDT": counts}
-
-

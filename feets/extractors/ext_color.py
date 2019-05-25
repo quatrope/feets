@@ -54,8 +54,8 @@ class Color(Extractor):
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Color'])
-        >>> features, values = fs.extract(**lc)
-        >>> dict(zip(features, values))
+        >>> rs = fs.extract(**lc)
+        >>> rs.as_dict()
         {'Color': -0.33325502453332145}
 
     References
