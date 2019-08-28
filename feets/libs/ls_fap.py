@@ -4,7 +4,7 @@ Utilities for computing periodogram statistics.
 import numpy as np
 from scipy.special import gammaln
 
-from astropy.stats.lombscargle import LombScargle
+from astropy.timeseries import LombScargle
 
 
 def _weighted_sum(val, dy):

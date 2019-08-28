@@ -54,7 +54,7 @@ import feets
 
 REQUIREMENTS = [
     "numpy", "scipy", "pytest",
-    "statsmodels", "mock", "astropy",
+    "statsmodels", "mock", "astropy>=3.2.1",
     "pandas", "requests", "attrs", "joblib"]
 
 

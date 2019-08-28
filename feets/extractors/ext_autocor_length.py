@@ -86,13 +86,13 @@ class AutocorLength(Extractor):
 
     def fit(self, magnitude, nlags):
 
-        AC = stattools.acf(magnitude, nlags=nlags)
+        AC = stattools.acf(magnitude, nlags=nlags, fft=False)
         k = next((index for index, value in
                  enumerate(AC) if value < np.exp(-1)), None)
 
         while k is None:
             nlags = nlags + 100
-            AC = stattools.acf(magnitude, nlags=nlags)
+            AC = stattools.acf(magnitude, nlags=nlags, fft=False)
             k = next((index for index, value in
                       enumerate(AC) if value < np.exp(-1)), None)
 

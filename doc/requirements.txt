@@ -8,4 +8,3 @@ Sphinx==1.6.3
 sphinx-autobuild==0.7.1
 sphinx-bootstrap-theme==0.6.0
 sphinxcontrib-websupport==1.0.1
-six

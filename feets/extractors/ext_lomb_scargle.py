@@ -37,7 +37,7 @@
 
 import numpy as np
 
-from astropy.stats import lombscargle
+from astropy.timeseries import lombscargle
 
 from ..libs import ls_fap
 
