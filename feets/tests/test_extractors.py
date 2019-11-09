@@ -306,6 +306,7 @@ class LombScargleTests(FeetsTestCase):
             # "pure" lomb scargle (without the entire feets pipeline)
             frequency, power, fmax = ext_lomb_scargle.lscargle(
                 time=time, magnitude=magnitude, error=error, **lscargle_kwds)
+            print(fmax)
             ls_periods.append(1 / frequency[fmax])
 
             # extract the period from the feets pipele

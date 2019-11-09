@@ -148,6 +148,7 @@ class LombScargle(Extractor):
             "method": "simple"}}
 
     def _compute_ls(self, magnitude, time, lscargle_kwds):
+        import ipdb; ipdb.set_trace()
         frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)
         best_period = 1 / frequency[fmax]
         return frequency, power, fmax, best_period
