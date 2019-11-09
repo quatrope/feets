@@ -75,7 +75,7 @@ class DeltaMDeltaT(Extractor):
 
     .. [Mahabal2017] Mahabal, A., Sheth, K., Gieseke, F., Pai, A.,
        Djorgovski, S.G., Drake, A. J., & Graham, M. J. (2017, November).
-       Deep-learnt classification of light curves. In 2017 IEEE Symposium
+       Deep-learn classification of light curves. In 2017 IEEE Symposium
        Series on Computational Intelligence (SSCI) (pp. 1-8). IEEE.
 
     """
