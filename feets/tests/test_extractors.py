@@ -35,15 +35,19 @@
 # IMPORTS
 # =============================================================================
 
+import os
 import unittest
 
 import numpy as np
 
+import pandas as pd
+
 import mock
 
+from .. import FeatureSpace
 from .. import Extractor, register_extractor, extractors
 
-from .core import FeetsTestCase
+from .core import FeetsTestCase, DATA_PATH
 
 
 # =============================================================================
@@ -269,3 +273,43 @@ class feetsExtractorsTestCases(FeetsTestCase):
 
         # .T.reshape(23, 24))
         np.testing.assert_array_equal(expected, flattened)
+
+
+class LombScargleTests(FeetsTestCase):
+
+    def test_lscargle_vs_feets(self):
+
+        # extract the module for make short code
+        ext_lomb_scargle = extractors.ext_lomb_scargle
+
+        # load the data
+        path = os.path.join(
+            DATA_PATH, "bad_results.pandas.pkl")
+        tseries = pd.read_pickle(path)
+
+        # the ls params
+        ext_params = ext_lomb_scargle.LombScargle.get_default_params()
+        lscargle_kwds = ext_params["lscargle_kwds"]
+
+        # create the feature space
+        fs = FeatureSpace(only=["PeriodLS"])
+
+        ls_periods, feets_periods = [], []
+        for src_id in tseries.bm_src_id.unique():
+
+            # extract the timeseries
+            sobs = tseries[tseries.bm_src_id == src_id]
+            time = sobs.pwp_stack_src_hjd.values
+            magnitude = sobs.pwp_stack_src_mag3.values
+            error = sobs.pwp_stack_src_mag_err3.values
+
+            # "pure" lomb scargle (without the entire feets pipeline)
+            frequency, power, fmax = ext_lomb_scargle.lscargle(
+                time=time, magnitude=magnitude, error=error, **lscargle_kwds)
+            ls_periods.append(1 / frequency[fmax])
+
+            # extract the period from the feets pipele
+            rs = fs.extract(time=time, magnitude=magnitude, error=error)
+            feets_periods.append(rs.values[0])
+
+        self.assertArrayEqual(ls_periods, feets_periods)
