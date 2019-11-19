@@ -32,6 +32,7 @@
 __all__ = [
     "FeatureNotFound",
     "DataRequiredError",
+    "FeatureSpaceError",
     "FeatureSpace"]
 
 
@@ -90,6 +91,10 @@ class DataRequiredError(ValueError):
     pass
 
 
+class FeatureSpaceError(ValueError):
+    pass
+
+
 # =============================================================================
 # FEATURE RESULT
 # =============================================================================
@@ -103,8 +108,20 @@ class ResultSet:
     def __iter__(self):
         return iter(self.as_arrays())
 
+    def __getitem__(self, k):
+
+        if k not in self.features:
+            raise KeyError("Feature not found {}".format(k))
+
+        where = np.where(self.features == k)[0][0]
+        value = self.values[where]
+        return np.copy(value)
+
     def as_arrays(self):
         return self.features, self.values
+
+    def as_dict(self):
+        return dict(zip(self.features, self.values))
 
 
 # =============================================================================
@@ -192,7 +209,7 @@ class FeatureSpace:
         if data:
             fbdata = []
             for fname, f in exts.items():
-                if not f.get_data().difference(data):
+                if not f.get_required_data().difference(data):
                     fbdata.append(fname)
         else:
             fbdata = exts.keys()
@@ -245,7 +262,10 @@ class FeatureSpace:
 
                 features_extractors.add(fext)
                 features_extractors_names.add(fext.name)
-                required_data.update(fext.get_data())
+                required_data.update(fext.get_required_data())
+
+        if not features_extractors:
+            raise FeatureSpaceError("No feature extractor was selected")
 
         self._features_extractors = frozenset(features_extractors)
         self._features_extractors_names = frozenset(features_extractors_names)

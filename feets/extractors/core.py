@@ -102,7 +102,8 @@ warnings.simplefilter("always", FeatureExtractionWarning)
 
 ExtractorConf = namedtuple(
     "ExtractorConf",
-    ["data", "dependencies", "params", "features", "warnings"])
+    ["data", "optional", "required_data",
+     "dependencies", "params", "features", "warnings"])
 
 
 class ExtractorMeta(type):
@@ -129,6 +130,19 @@ class ExtractorMeta(type):
         if len(set(cls.data)) != len(cls.data):
             msg = "'data' has duplicated values: {}"
             raise ExtractorBadDefinedError(msg.format(cls.data))
+
+        if not hasattr(cls, "optional"):
+            cls.optional = ()
+        for o in cls.optional:
+            if o not in cls.data:
+                msg = "'optional' data '{}' must be defined in 'data'"
+                raise ExtractorBadDefinedError(msg.format(o))
+
+        required_data = frozenset(
+            d for d in cls.data if d not in cls.optional)
+        if not required_data:
+            msg = "All data can't be defined as 'optional'"
+            raise ExtractorBadDefinedError(msg)
 
         if not hasattr(cls, "features"):
             msg = "'{}' must redefine {}"
@@ -176,6 +190,8 @@ class ExtractorMeta(type):
 
         cls._conf = ExtractorConf(
             data=frozenset(cls.data),
+            optional=frozenset(cls.optional),
+            required_data=required_data,
             dependencies=frozenset(cls.dependencies),
             params=tuple(cls.params.items()),
             features=frozenset(cls.features),
@@ -188,7 +204,9 @@ class ExtractorMeta(type):
             cls.__doc__ += "\n    Warnings\n    ---------\n" + "\n".join([
                 "    " + w for w in cls.warnings])
 
-        del cls.data, cls.dependencies, cls.params, cls.features, cls.warnings
+        del (
+            cls.data, cls.optional, cls.dependencies,
+            cls.params, cls.features, cls.warnings)
 
         return cls
 
@@ -200,6 +218,14 @@ class Extractor(metaclass=ExtractorMeta):
     @classmethod
     def get_data(cls):
         return cls._conf.data
+
+    @classmethod
+    def get_optional(cls):
+        return cls._conf.optional
+
+    @classmethod
+    def get_required_data(cls):
+        return cls._conf.required_data
 
     @classmethod
     def get_dependencies(cls):

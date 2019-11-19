@@ -54,7 +54,7 @@ from .core import FeetsTestCase, DATA_PATH
 # BASE CLASS
 # =============================================================================
 
-class SortByFependenciesTest(FeetsTestCase):
+class SortByDependenciesTestCases(FeetsTestCase):
 
     @mock.patch("feets.extractors._extractors", {})
     def test_sort_by_dependencies(self):
@@ -105,6 +105,63 @@ class SortByFependenciesTest(FeetsTestCase):
                 self.assertIs(ext, c)
             else:
                 self.fail("to many extractors in plan: {}".format(idx))
+
+
+class RequiredDataTestCases(FeetsTestCase):
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_required_data_fail(self):
+        with self.assertRaises(extractors.ExtractorBadDefinedError):
+
+            class A(Extractor):
+                data = ["magnitude", "time"]
+                optional = ["error"]
+                features = ["test_a"]
+
+                def fit(self, *args):
+                    pass
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_required_data(self):
+
+        class A(Extractor):
+            data = ["magnitude", "time"]
+            optional = ["magnitude"]
+            features = ["test_a"]
+
+            def fit(self, *args):
+                pass
+
+        self.assertCountEqual(A.get_optional(), ["magnitude"])
+        self.assertCountEqual(A.get_data(), ["magnitude", "time"])
+        self.assertCountEqual(A.get_required_data(), ["time"])
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_all_required_data(self):
+
+        class A(Extractor):
+            data = ["magnitude", "time"]
+            features = ["test_a"]
+
+            def fit(self, *args):
+                pass
+
+        self.assertCountEqual(A.get_optional(), [])
+        self.assertCountEqual(A.get_data(), ["magnitude", "time"])
+        self.assertCountEqual(A.get_required_data(), ["time", "magnitude"])
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_fail_on_all_optional_data(self):
+        with self.assertRaises(extractors.ExtractorBadDefinedError):
+
+            @register_extractor
+            class A(Extractor):
+                data = ["magnitude", "time"]
+                optional = ["magnitude", "time"]
+                features = ["test_a"]
+
+                def fit(self, *args):
+                    pass
 
 
 class FATSExtractorsTestCases(FeetsTestCase):
@@ -306,7 +363,6 @@ class LombScargleTests(FeetsTestCase):
             # "pure" lomb scargle (without the entire feets pipeline)
             frequency, power, fmax = ext_lomb_scargle.lscargle(
                 time=time, magnitude=magnitude, error=error, **lscargle_kwds)
-            print(fmax)
             ls_periods.append(1 / frequency[fmax])
 
             # extract the period from the feets pipele

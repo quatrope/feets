@@ -40,7 +40,8 @@ import numpy as np
 import mock
 
 from .. import (
-    FeatureSpace, Extractor, register_extractor, ExtractorContractError)
+    FeatureSpace, FeatureSpaceError,
+    Extractor, register_extractor, ExtractorContractError)
 
 from .core import FeetsTestCase
 
@@ -132,3 +133,49 @@ class FeatureSpaceTestCase(FeetsTestCase):
 
         fs = FeatureSpace(exclude=["test_a"])
         self.assertCountEqual(fs.features_, ["test_c", "test_a2"])
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_with_optional_data(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude", "time"]
+            optional = ["magnitude"]
+            features = ["test_a"]
+
+            def fit(self, *args):
+                pass
+
+        fs = FeatureSpace(data=["time"])
+        self.assertEqual(len(fs.features_extractors_), 1)
+        self.assertIsInstance(list(fs.features_extractors_)[0], A)
+
+        fs = FeatureSpace(data=["time", "magnitude"])
+        self.assertEqual(len(fs.features_extractors_), 1)
+        self.assertIsInstance(list(fs.features_extractors_)[0], A)
+
+        with self.assertRaises(FeatureSpaceError):
+            fs = FeatureSpace(data=["magnitude"])
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_with_optional_data_call(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude", "time"]
+            optional = ["magnitude"]
+            features = ["time_arg", "magnitude_arg"]
+
+            def fit(self, time, magnitude):
+                return {"time_arg": time, "magnitude_arg": magnitude}
+
+        time, magnitude = [1, 2, 3], [4, 5, 6]
+
+        fs = FeatureSpace(data=["time"])
+        result = fs.extract(time=time, magnitude=magnitude)
+        self.assertArrayEqual(result["time_arg"], time)
+        self.assertArrayEqual(result["magnitude_arg"], magnitude)
+
+        result = fs.extract(time=time)
+        self.assertArrayEqual(result["time_arg"], time)
+        self.assertArrayEqual(result["magnitude_arg"], None)
