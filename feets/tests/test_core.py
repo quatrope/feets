@@ -46,6 +46,7 @@ from ..core import ResultSet
 
 from .core import FeetsTestCase
 
+
 # =============================================================================
 # RESULTS
 # =============================================================================
@@ -73,8 +74,6 @@ class ResultSetTestCase(FeetsTestCase):
     def test_as_dict(self):
         rs = ResultSet(features=["foo"], values=[1])
         self.assertDictEqual(rs.as_dict(), {"foo": 1})
-
-
 
 
 # =============================================================================
