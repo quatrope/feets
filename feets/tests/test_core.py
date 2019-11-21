@@ -42,12 +42,43 @@ import mock
 from .. import (
     FeatureSpace, FeatureSpaceError,
     Extractor, register_extractor, ExtractorContractError)
+from ..core import ResultSet
 
 from .core import FeetsTestCase
 
+# =============================================================================
+# RESULTS
+# =============================================================================
+
+class ResultSetTestCase(FeetsTestCase):
+
+    def test_iter(self):
+        rs = ResultSet(features=["foo"], values=[1])
+        feats, values = rs
+        self.assertCountEqual(feats, ["foo"])
+        self.assertCountEqual(values, [1])
+
+    def test_getitem(self):
+        rs = ResultSet(features=["foo"], values=[1])
+        self.assertEqual(rs["foo"], 1)
+        with self.assertRaises(KeyError):
+            rs["faaa"]
+
+    def test_as_array(self):
+        rs = ResultSet(features=["foo"], values=[1])
+        feats, values = rs.as_arrays()
+        self.assertCountEqual(feats, ["foo"])
+        self.assertCountEqual(values, [1])
+
+    def test_as_dict(self):
+        rs = ResultSet(features=["foo"], values=[1])
+        self.assertDictEqual(rs.as_dict(), {"foo": 1})
+
+
+
 
 # =============================================================================
-# BASE CLASS
+# SPACE
 # =============================================================================
 
 class FeatureSpaceTestCase(FeetsTestCase):

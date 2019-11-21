@@ -102,8 +102,8 @@ class FeatureSpaceError(ValueError):
 @attr.s(frozen=True, auto_attribs=True)
 class ResultSet:
 
-    features: np.ndarray = attr.ib(repr=True)
-    values: np.ndarray = attr.ib(repr=False)
+    features: np.ndarray = attr.ib(repr=True, converter=np.asarray)
+    values: np.ndarray = attr.ib(repr=False, converter=np.asarray)
 
     def __iter__(self):
         return iter(self.as_arrays())
