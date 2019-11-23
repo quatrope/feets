@@ -40,7 +40,7 @@ import numpy as np
 import mock
 
 from .. import (
-    FeatureSpace, FeatureSpaceError,
+    FeatureSpace, FeatureSpaceError, FeatureNotFound,
     Extractor, register_extractor, ExtractorContractError)
 from ..core import ResultSet
 
@@ -53,25 +53,46 @@ from .core import FeetsTestCase
 
 class ResultSetTestCase(FeetsTestCase):
 
+    def register_foo(self):
+        @register_extractor
+        class MockExtractor(Extractor):
+            data = ["magnitude"]
+            features = ["foo"]
+
+            def fit(self, magnitude):
+                return {"foo": magnitude}
+
+    def test_invalid_feature(self):
+        with self.assertRaises(FeatureNotFound):
+            ResultSet(features=["Fail"], values=[1])
+
+    @mock.patch("feets.extractors._extractors", {})
     def test_iter(self):
+        self.register_foo()
         rs = ResultSet(features=["foo"], values=[1])
         feats, values = rs
         self.assertCountEqual(feats, ["foo"])
         self.assertCountEqual(values, [1])
 
+    @mock.patch("feets.extractors._extractors", {})
     def test_getitem(self):
+        self.register_foo()
         rs = ResultSet(features=["foo"], values=[1])
         self.assertEqual(rs["foo"], 1)
         with self.assertRaises(KeyError):
             rs["faaa"]
 
+    @mock.patch("feets.extractors._extractors", {})
     def test_as_array(self):
+        self.register_foo()
         rs = ResultSet(features=["foo"], values=[1])
         feats, values = rs.as_arrays()
         self.assertCountEqual(feats, ["foo"])
         self.assertCountEqual(values, [1])
 
+    @mock.patch("feets.extractors._extractors", {})
     def test_as_dict(self):
+        self.register_foo()
         rs = ResultSet(features=["foo"], values=[1])
         self.assertDictEqual(rs.as_dict(), {"foo": 1})
 

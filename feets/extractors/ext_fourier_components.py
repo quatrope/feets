@@ -49,7 +49,7 @@ from .core import Extractor
 
 class FourierComponents(Extractor):
     r"""
-    **Periodic features extracted from light-curves using Lomb–Scargle**
+    **Periodic features extracted from light-curves using Lomb-Scargle**
     **(Richards et al., 2011)**
 
     Here, we adopt a model where the time series of the photometric magnitudes
@@ -154,32 +154,11 @@ class FourierComponents(Extractor):
 
     """
 
-    data = ['magnitude', 'time', "error"]
-    optional = ["error"]
-    features = ['Freq1_harmonics_amplitude_0',
-                'Freq1_harmonics_amplitude_1',
-                'Freq1_harmonics_amplitude_2',
-                'Freq1_harmonics_amplitude_3',
-                'Freq2_harmonics_amplitude_0',
-                'Freq2_harmonics_amplitude_1',
-                'Freq2_harmonics_amplitude_2',
-                'Freq2_harmonics_amplitude_3',
-                'Freq3_harmonics_amplitude_0',
-                'Freq3_harmonics_amplitude_1',
-                'Freq3_harmonics_amplitude_2',
-                'Freq3_harmonics_amplitude_3',
-                'Freq1_harmonics_rel_phase_0',
-                'Freq1_harmonics_rel_phase_1',
-                'Freq1_harmonics_rel_phase_2',
-                'Freq1_harmonics_rel_phase_3',
-                'Freq2_harmonics_rel_phase_0',
-                'Freq2_harmonics_rel_phase_1',
-                'Freq2_harmonics_rel_phase_2',
-                'Freq2_harmonics_rel_phase_3',
-                'Freq3_harmonics_rel_phase_0',
-                'Freq3_harmonics_rel_phase_1',
-                'Freq3_harmonics_rel_phase_2',
-                'Freq3_harmonics_rel_phase_3']
+    data = ['magnitude', 'time']
+    features = [
+        "Freq1_harmonics",
+        "Freq2_harmonics",
+        "Freq3_harmonics"]
     params = {
         "lscargle_kwds": {
             "autopower_kwds": {
@@ -197,12 +176,11 @@ class FourierComponents(Extractor):
                     b * np.cos(2 * np.pi * Freq * x) + c)
         return func
 
-    def _components(self, magnitude, time, error, lscargle_kwds):
+    def _components(self, magnitude, time, lscargle_kwds):
         time = time - np.min(time)
         A, PH = [], []
         for i in range(3):
-            frequency, power, fmax = lscargle(
-                time, magnitude, error, **lscargle_kwds)
+            frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)
 
             fundamental_Freq = frequency[fmax]
             Atemp, PHtemp = [], []
@@ -229,38 +207,25 @@ class FourierComponents(Extractor):
 
         return A, scaledPH
 
-    def fit(self, magnitude, time, error, lscargle_kwds):
+    def fit(self, magnitude, time, lscargle_kwds):
         lscargle_kwds = lscargle_kwds or {}
 
-        A, sPH = self._components(magnitude, time, error, lscargle_kwds)
+        A, sPH = self._components(magnitude, time, lscargle_kwds)
+
         result = {
-            "Freq1_harmonics_amplitude_0": A[0][0],
-            "Freq1_harmonics_amplitude_1": A[0][1],
-            "Freq1_harmonics_amplitude_2": A[0][2],
-            "Freq1_harmonics_amplitude_3": A[0][3],
+            "Freq1_harmonics": (A[0], sPH[0]),
+            "Freq2_harmonics": (A[1], sPH[1]),
+            "Freq3_harmonics": (A[2], sPH[2])}
 
-            "Freq2_harmonics_amplitude_0": A[1][0],
-            "Freq2_harmonics_amplitude_1": A[1][1],
-            "Freq2_harmonics_amplitude_2": A[1][2],
-            "Freq2_harmonics_amplitude_3": A[1][3],
-
-            "Freq3_harmonics_amplitude_0": A[2][0],
-            "Freq3_harmonics_amplitude_1": A[2][1],
-            "Freq3_harmonics_amplitude_2": A[2][2],
-            "Freq3_harmonics_amplitude_3": A[2][3],
-
-            "Freq1_harmonics_rel_phase_0": sPH[0][0],
-            "Freq1_harmonics_rel_phase_1": sPH[0][1],
-            "Freq1_harmonics_rel_phase_2": sPH[0][2],
-            "Freq1_harmonics_rel_phase_3": sPH[0][3],
-
-            "Freq2_harmonics_rel_phase_0": sPH[1][0],
-            "Freq2_harmonics_rel_phase_1": sPH[1][1],
-            "Freq2_harmonics_rel_phase_2": sPH[1][2],
-            "Freq2_harmonics_rel_phase_3": sPH[1][3],
-
-            "Freq3_harmonics_rel_phase_0": sPH[2][0],
-            "Freq3_harmonics_rel_phase_1": sPH[2][1],
-            "Freq3_harmonics_rel_phase_2": sPH[2][2],
-            "Freq3_harmonics_rel_phase_3": sPH[2][3]}
         return result
+
+    def flatten_feature(self, feature, value):
+        """Custom flatten for fourier components"""
+        amps, phases = value
+        flatten_value = {}
+        for idx, ap in enumerate(zip(*value)):
+            a, p = ap
+            flatten_value.update({
+                f"{feature}_amplitude_{idx}": a,
+                f"{feature}_rel_phase_{idx}": p})
+        return flatten_value

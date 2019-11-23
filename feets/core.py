@@ -40,6 +40,7 @@ __all__ = [
 # IMPORTS
 # =============================================================================
 
+import copy
 import logging
 
 import numpy as np
@@ -104,21 +105,47 @@ class ResultSet:
 
     features: np.ndarray = attr.ib(repr=True, converter=np.asarray)
     values: np.ndarray = attr.ib(repr=False, converter=np.asarray)
+    extractors_conf: dict = attr.ib(converter=dict, factory=dict)
+
+    def __attrs_post_init__(self):
+        diff = set(self.features).difference(extractors.available_features())
+        if diff:
+            joined_diff = ", ".join(diff)
+            raise FeatureNotFound(
+                f"The features '{joined_diff}' are not registered in feets")
 
     def __iter__(self):
         return iter(self.as_arrays())
 
     def __getitem__(self, k):
-
+        """x.__getitem__(y) <==> x[y]"""
         if k not in self.features:
             raise KeyError("Feature not found {}".format(k))
 
         where = np.where(self.features == k)[0][0]
         value = self.values[where]
-        return np.copy(value)
+        return copy.deepcopy(value)
+
+    def extractor_of(self, feature):
+        # regenerate the extractor
+        fcls = extractors.extractor_of(feature)
+        extractor_params = self.extractors_conf.get(fcls.__name__, {})
+        extractor = fcls(**extractor_params)
+        return extractor
 
     def as_arrays(self):
-        return self.features, self.values
+        flatten_features = {}
+        for feature, value in zip(self.features, self.values):
+            extractor = self.extractor_of(feature)
+            flatten_value = extractor.flatten_feature(feature, value)
+            flatten_features.update(flatten_value)
+
+        features = np.empty(len(flatten_features), dtype=object)
+        values = np.empty(len(flatten_features))
+        for idx, fv in enumerate(flatten_features.items()):
+            features[idx], values[idx] = fv
+
+        return features, values
 
     def as_dict(self):
         return dict(zip(self.features, self.values))
@@ -161,8 +188,8 @@ class FeatureSpace:
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(only=['Std'])
-        >>> features, values = fs.extract(*lc)
-        >>> dict(zip(features, values))
+        >>> features = fs.extract(*lc)
+        >>> features.as_dict()
         {"Std": .42}
 
     **Available data as an input:**
@@ -170,8 +197,8 @@ class FeatureSpace:
     .. code-block:: pycon
 
         >>> fs = feets.FeatureSpace(data=['magnitude','time'])
-        >>> features, values = fs.extract(*lc)
-        >>> dict(zip(features, values))
+        >>> features = fs.extract(**lc)
+        >>> features.as_dict()
         {...}
 
     **List of features and available data as an input:**
@@ -181,8 +208,8 @@ class FeatureSpace:
         >>> fs = feets.FeatureSpace(
         ...     only=['Mean','Beyond1Std', 'CAR_sigma','Color'],
         ...     data=['magnitude', 'error'])
-        >>> features, values = fs.extract(*lc)
-        >>> dict(zip(features, values))
+        >>> features = fs.extract(**lc)
+        >>> features.as_dict()
         {"Beyond1Std": ..., "Mean": ...}
 
     **Excluding list as an input**
@@ -193,8 +220,8 @@ class FeatureSpace:
         ...     only=['Mean','Beyond1Std','CAR_sigma','Color'],
         ...     data=['magnitude', 'error'],
         ...     exclude=["Beyond1Std"])
-        >>> features, values = fs.extract(**lc)
-        >>> dict(zip(features, values))
+        >>> features = fs.extract(**lc)
+        >>> features.as_dict()
         {"Mean": 23}
 
     """
@@ -278,11 +305,10 @@ class FeatureSpace:
         not_found = set(self._kwargs).difference(
             self._features_extractors_names)
         if not_found:
-            msg = (
-                "This space not found feature(s) extractor(s) {} "
-                "to assign the given parameter(s)"
-            ).format(", ".join(not_found))
-            raise FeatureNotFound(msg)
+            joined_not_found = ", ".join(not_found)
+            raise FeatureNotFound(
+                "This space not found feature(s) extractor(s) "
+                f"{joined_not_found} to assign the given parameter(s)")
 
     def __repr__(self):
         return str(self)
@@ -326,12 +352,15 @@ class FeatureSpace:
         fvalues = np.array([
             features[fname] for fname in self._features_as_array])
 
-        rs = ResultSet(features=self._features_as_array, values=fvalues)
+        rs = ResultSet(
+            features=self._features_as_array,
+            values=fvalues,
+            extractors_conf=self.extractors_conf)
         return rs
 
     @property
-    def kwargs(self):
-        return dict(self._kwargs)
+    def extractors_conf(self):
+        return copy.deepcopy(self._kwargs)
 
     @property
     def data(self):

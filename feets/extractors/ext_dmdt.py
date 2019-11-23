@@ -46,44 +46,44 @@ from .core import Extractor
 
 class DeltamDeltat(Extractor):
     r"""
-    Deltas features described in
-    Configure the bins as desired.
+    **DMDT (Delta Magnitude - Delta Time Mapping)**
 
-    It is a map of n observations to n chosen 2 dupla of observations.
-    **Eta_color** (:math:`\eta_{color}`)
+    The 2D representations - called dmdt-images hereafter -
+    reflect the underlying structure from variability of the source.
 
-    Variability index Eta_e (:math:`\eta^e`)
-    calculated from the color light-curve.
+    The dmdt-images are translation independent as they consider
+    only the differences in time.
+
+    For each pair of points in a light curve we determine
+    the difference in magnitude (dm) and the difference in
+    time (dt). This gives us $p = n/2 = n ∗ (n − 1)/2$ points
+    for a light curve of length $n$. . These points
+    are then binned for a range of dm and dt values. The
+    resulting binned 2D representation is our 2D mapping from
+    the light curve.
 
     .. code-block:: pycon
 
-        >>> fs = feets.FeatureSpace(only=['Eta_color'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Eta_color': 1.991749074648397}
+        >>> fs = feets.FeatureSpace(only=['DMDT'])
+        >>> rs = fs.extract(**lc_normal)
+        >>> rs.as_dict()
+        {'DMDT': array([[0, 0, 1, 1, ..., ]])},
+
 
     References
     ----------
-    Mahabal et. al 2017 (arxiv:1709.06257)
+    .. [Mahabal2017] Mahabal, A., Sheth, K., Gieseke, F., Pai, A.,
+       Djorgovski, S.G., Drake, A. J., & Graham, M. J. (2017, November).
+       Deep-learn classification of light curves. In 2017 IEEE Symposium
+       Series on Computational Intelligence (SSCI) (pp. 1-8). IEEE.
 
     """
     data = ['magnitude', 'time']
     params = {"dt_bins": np.hstack([0., np.logspace(-3., 3.5, num=23)]),
               "dm_bins": np.hstack([-1. * np.logspace(1, -1, num=12), 0,
                                     np.logspace(-1, 1, num=12)])}
-    parallel = True
 
-    features = []
-    for i in range(len(params["dt_bins"]) - 1):
-        for j in range(len(params["dm_bins"]) - 1):
-            features.append("DeltamDeltat_dt_{:02d}_dm_{:02d}".format(i, j))
-
-    # this variable stores a sorted version of the features
-    # because feets only stores a frozenset of the original features
-    # for future validation.
-    sorted_features = tuple(features)
-
-    del i, j
+    features = ["DMDT"]
 
     def fit(self, magnitude, time, dt_bins, dm_bins):
 
@@ -109,9 +109,6 @@ class DeltamDeltat(Extractor):
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
-        counts = np.fix(255. * counts / n_vals + 0.999).astype(int)
+        result = np.fix(255. * counts / n_vals + 0.999).astype(int)
 
-        result = zip(self.sorted_features,
-                     counts.reshape((len(dt_bins) - 1) * (len(dm_bins) - 1)))
-
-        return dict(result)
+        return {"DMDT": result}

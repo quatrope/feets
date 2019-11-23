@@ -37,6 +37,8 @@
 import warnings
 from collections import namedtuple
 
+import numpy as np
+
 
 # =============================================================================
 # CONSTANTS
@@ -311,16 +313,49 @@ class Extractor(metaclass=ExtractorMeta):
 
             # validate if the extractors generates the expected features
             expected = self.get_features()  # the expected features
+
             diff = (
                 expected.difference(result.keys()) or
                 set(result).difference(expected))  # some diff
             if diff:
                 cls = type(self)
                 estr, fstr = ", ".join(expected), ", ".join(result.keys())
-                msg = (
-                    "The extractor '{}' expect the features [{}], "
-                    "and found: [{}]").format(cls, estr, fstr)
-                raise ExtractorContractError(msg)
+                raise ExtractorContractError(
+                    f"The extractor '{cls}' expect the features [{estr}], "
+                    f"and found: [{fstr}]")
+
             return dict(result)
         finally:
             self.teardown()
+
+    def flatten_feature(self, feature, value):
+        """Convert the features into a dict of 1 dimension values.
+
+        The methods check if the dimension of the value is 1 then a
+        dictionary with key the feature name, and the value the value.
+        In other cases an recursive approach is taken where every feature
+        has as name `feature_<N>` as name, where N is the current dimension.
+
+        Example
+        -------
+
+        .. code-block:: pycon
+
+            >>> e.flatten("name", 1)
+            {'name': 1}
+            >>> e.flatten("name", [1, 2, 3])
+            {'name_0': 1, 'name_1': 2, 'name_2': 3}
+            >>> e.flatten("name", [1, [2, 3]])
+            {'name_0': 1, 'name_1_0': 2, 'name_1_1': 3}
+            >>> flatten("name", [[1, 2], [3, 4]])
+            {'name_0_0': 1, 'name_0_1': 2, 'name_1_0': 3, 'name_1_1': 4}
+
+        """
+
+        if np.ndim(value) == 0:
+            return {feature: value}
+        flatten_values = {}
+        for idx, v in enumerate(value):
+            flatten_name = f"{feature}_{idx}"
+            flatten_values.update(self.flatten_feature(flatten_name, v))
+        return flatten_values
