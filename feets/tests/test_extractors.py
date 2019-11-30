@@ -44,8 +44,9 @@ import pandas as pd
 
 import mock
 
-from .. import FeatureSpace
-from .. import Extractor, register_extractor, extractors
+from .. import (
+    FeatureSpace,
+    Extractor, register_extractor, extractors, ExtractorContractError)
 
 from .core import FeetsTestCase, DATA_PATH
 
@@ -105,6 +106,122 @@ class SortByDependenciesTestCases(FeetsTestCase):
                 self.assertIs(ext, c)
             else:
                 self.fail("to many extractors in plan: {}".format(idx))
+
+
+class FlattenTestCase(FeetsTestCase):
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_default_flatten_invalid_feature_for_the_extracor(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+        ext = A()
+        with self.assertRaises(ExtractorContractError):
+            ext.flatten("foo", 1)
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_default_flatten_scalar(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+        ext = A()
+        expected = {"feat": 1}
+        self.assertDictEqual(ext.flatten("feat", 1), expected)
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_default_flatten_1D(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+        ext = A()
+        expected = {"feat_0": 1, "feat_1": 2}
+        self.assertDictEqual(ext.flatten("feat", [1, 2]), expected)
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_default_flatten_2D(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+        ext = A()
+        expected = {'feat_0_0': 1, 'feat_0_1': 2,
+                    'feat_1_0': 3, 'feat_1_1': 4}
+        self.assertDictEqual(ext.flatten("feat", [[1, 2], [3, 4]]), expected)
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_default_flatten_3D(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+        ext = A()
+
+        value = [
+            [[1, 2], [3, 4]],
+            [[5, 6], [7, 8]]]
+
+        expected = {
+            'feat_0_0_0': 1,
+            'feat_0_0_1': 2,
+            'feat_0_1_0': 3,
+            'feat_0_1_1': 4,
+            'feat_1_0_0': 5,
+            'feat_1_0_1': 6,
+            'feat_1_1_0': 7,
+            'feat_1_1_1': 8}
+
+        self.assertDictEqual(ext.flatten("feat", value), expected)
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_default_flatten_4D(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+        ext = A()
+
+        value = [[[[1, 2], [3, 4]]]]
+
+        expected = {
+            'feat_0_0_0_0': 1,
+            'feat_0_0_0_1': 2,
+            'feat_0_0_1_0': 3,
+            'feat_0_0_1_1': 4}
+
+        self.assertDictEqual(ext.flatten("feat", value), expected)
 
 
 class RequiredDataTestCases(FeetsTestCase):
@@ -306,6 +423,26 @@ class DMDTTestCases(FeetsTestCase):
 
 class LombScargleTests(FeetsTestCase):
 
+    def setUp(self):
+        self.random = np.random.RandomState(42)
+
+    def periodic_lc(self):
+        N = 100
+        mjd_periodic = np.arange(N)
+        Period = 20
+        cov = np.zeros([N, N])
+        mean = np.zeros(N)
+        for i in np.arange(N):
+            for j in np.arange(N):
+                cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
+        data_periodic = self.random.multivariate_normal(mean, cov)
+        error = self.random.normal(size=100, loc=0.001)
+        lc = {
+            "magnitude": data_periodic,
+            "time": mjd_periodic,
+            "error": error}
+        return lc
+
     def test_lscargle_vs_feets(self):
 
         # extract the module for make short code
@@ -333,12 +470,23 @@ class LombScargleTests(FeetsTestCase):
             error = sobs.pwp_stack_src_mag_err3.values
 
             # "pure" lomb scargle (without the entire feets pipeline)
-            frequency, power, fmax = ext_lomb_scargle.lscargle(
+            frequency, power = ext_lomb_scargle.lscargle(
                 time=time, magnitude=magnitude, error=error, **lscargle_kwds)
+            fmax = np.argmax(power)
             ls_periods.append(1 / frequency[fmax])
 
             # extract the period from the feets pipele
             rs = fs.extract(time=time, magnitude=magnitude, error=error)
             feets_periods.append(rs.values[0])
 
+        feets_periods = np.array(feets_periods).flatten()
         self.assertArrayEqual(ls_periods, feets_periods)
+
+    def test_lscargle_peaks(self):
+        lc = self.periodic_lc()
+
+        for peaks in [1, 2, 3, 10]:
+            ext = extractors.LombScargle(peaks=peaks)
+            feats = ext.extract(features={}, **lc)
+            for v in feats.values():
+                self.assertEqual(len(v), peaks)

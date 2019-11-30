@@ -54,7 +54,7 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 
 def run(argv=None):
     argv = argv or []
-    return pytest.main(['-x', PATH] + argv)
+    return pytest.main([PATH] + argv)
 
 
 # =============================================================================

@@ -180,8 +180,9 @@ class FourierComponents(Extractor):
         time = time - np.min(time)
         A, PH = [], []
         for i in range(3):
-            frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)
+            frequency, power = lscargle(time, magnitude, **lscargle_kwds)
 
+            fmax = np.argmax(power)
             fundamental_Freq = frequency[fmax]
             Atemp, PHtemp = [], []
             omagnitude = magnitude

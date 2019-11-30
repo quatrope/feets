@@ -37,7 +37,7 @@
 
 import numpy as np
 
-from astropy.stats import lombscargle
+from astropy.timeseries import lombscargle
 
 from ..libs import ls_fap
 
@@ -55,6 +55,12 @@ EPS = np.finfo(float).eps
 # FUNCTIONS
 # =============================================================================
 
+def argmaxes(arr, n):
+    arr = -np.asarray(arr)
+    sort = np.argsort(arr)
+    return sort[:n]
+
+
 def lscargle(time, magnitude, error=None,
              model_kwds=None, autopower_kwds=None):
 
@@ -63,9 +69,7 @@ def lscargle(time, magnitude, error=None,
     model = lombscargle.LombScargle(time, magnitude, error, **model_kwds)
     frequency, power = model.autopower(**autopower_kwds)
 
-    fmax = np.argmax(power)
-
-    return frequency, power, fmax
+    return frequency, power
 
 
 def fap(max_power, fmax, time, magnitude, error,
@@ -103,23 +107,19 @@ class LombScargle(Extractor):
     optimal for detecting signals from transiting exoplanets, where the shape
     of the periodic light-curve is not sinusoidal.
 
-    Next, we perform a test on the synthetic periodic light-curve we created
-    (which period is 20) to confirm the accuracy of the period found by the
-    L-S method
-
     **Period_fit**
 
-    The false alarm probability of the largest periodogram value. Let's
+    The false alarm probability of the `peaks`-largest periodogram value. Let's
     test it for a normal distributed data and for a periodic one.
 
     **Psi_CS** (:math:`\Psi_{CS}`)
 
     :math:`R_{CS}` applied to the phase-folded light curve (generated using
-    the period estimated from the Lomb-Scargle method).
+    the periods estimated from the Lomb-Scargle method).
 
     **Psi_eta** (:math:`\Psi_{\eta}`)
 
-    :math:`\eta^e`  index calculated from the folded light curve.
+    :math:`\eta^e` index calculated from the folded light curve.
 
 
     References
@@ -143,6 +143,7 @@ class LombScargle(Extractor):
     optional = ["error"]
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
     params = {
+        "peaks": 1,
         "lscargle_kwds": {
             "autopower_kwds": {
                 "normalization": "standard",
@@ -151,15 +152,18 @@ class LombScargle(Extractor):
             "normalization": "standard",
             "method": "simple"}}
 
-    def _compute_ls(self, magnitude, time, error, lscargle_kwds):
-        frequency, power, fmax = lscargle(
+    def _compute_ls(self, magnitude, time, error, peaks, lscargle_kwds):
+        frequency, power = lscargle(
             time=time, magnitude=magnitude, error=error, **lscargle_kwds)
-        best_period = 1 / frequency[fmax]
-        return frequency, power, fmax, best_period
 
-    def _compute_fap(self, power, fmax, time, magnitude, error, fap_kwds):
+        fmaxs = argmaxes(power, peaks)
+        best_periods = 1 / frequency[fmaxs]
+
+        return frequency, power, fmaxs, best_periods
+
+    def _compute_fap(self, max_power, fmax, time, magnitude, error, fap_kwds):
         return fap(
-            max_power=np.max(power), fmax=fmax, time=time,
+            max_power=max_power, fmax=fmax, time=time,
             magnitude=magnitude, error=error, **fap_kwds)
 
     def _compute_cs(self, folded_data, N):
@@ -175,26 +179,30 @@ class LombScargle(Extractor):
                    np.sum(np.power(folded_data[1:] - folded_data[:-1], 2)))
         return Psi_eta
 
-    def fit(self, magnitude, time, error, lscargle_kwds, fap_kwds):
+    def fit(self, magnitude, time, error, peaks, lscargle_kwds, fap_kwds):
         # first we retrieve the frequencies, power,
-        # max frequency and best_period
-        frequency, power, fmax, best_period = self._compute_ls(
-            magnitude=magnitude, time=time, error=error,
+        # max frequencies and best_periods
+        frequency, power, fmaxs, best_periods = self._compute_ls(
+            magnitude=magnitude, time=time, error=error, peaks=peaks,
             lscargle_kwds=lscargle_kwds)
 
-        # false alarm probability
-        fap = self._compute_fap(
-            power=power, fmax=fmax, time=time,
-            magnitude=magnitude, error=error, fap_kwds=fap_kwds)
+        faps, Rs, Psi_etas = np.empty(peaks), np.empty(peaks), np.empty(peaks)
+        for idx, fmax in enumerate(fmaxs):
+            # false alarm probability
+            faps[idx] = self._compute_fap(
+                max_power=power[fmax], fmax=fmax, time=time,
+                magnitude=magnitude, error=error, fap_kwds=fap_kwds)
 
-        # fold the data
-        new_time = np.mod(time, 2 * best_period) / (2 * best_period)
-        folded_data = magnitude[np.argsort(new_time)]
-        N = len(folded_data)
+            # fold the data
+            best_period = best_periods[idx]
 
-        # CS and Psi_eta
-        R = self._compute_cs(folded_data, N)
-        Psi_eta = self._compute_eta(folded_data, N)
+            new_time = np.mod(time, 2 * best_period) / (2 * best_period)
+            folded_data = magnitude[np.argsort(new_time)]
+            N = len(folded_data)
 
-        return {"PeriodLS": best_period, "Period_fit": fap,
-                "Psi_CS": R, "Psi_eta": Psi_eta}
+            # CS and Psi_eta
+            Rs[idx] = self._compute_cs(folded_data, N)
+            Psi_etas[idx] = self._compute_eta(folded_data, N)
+
+        return {"PeriodLS": best_periods, "Period_fit": faps,
+                "Psi_CS": Rs, "Psi_eta": Psi_etas}

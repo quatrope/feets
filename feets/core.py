@@ -137,7 +137,7 @@ class ResultSet:
         flatten_features = {}
         for feature, value in zip(self.features, self.values):
             extractor = self.extractor_of(feature)
-            flatten_value = extractor.flatten_feature(feature, value)
+            flatten_value = extractor.flatten(feature, value)
             flatten_features.update(flatten_value)
 
         features = np.empty(len(flatten_features), dtype=object)

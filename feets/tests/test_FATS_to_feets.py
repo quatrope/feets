@@ -157,4 +157,11 @@ class FATSRegressionTestCase(FeetsTestCase):
             StetsonKAC={"T": None})
         result = fs.extract(*self.lc)
         feets_result = dict(zip(*result))
+
+        feets_result.update({
+            "PeriodLS": feets_result.pop("PeriodLS_0"),
+            "Period_fit": feets_result.pop("Period_fit_0"),
+            "Psi_eta": feets_result.pop("Psi_eta_0"),
+            "Psi_CS": feets_result.pop("Psi_CS_0")})
+
         self.assertFATS(feets_result)

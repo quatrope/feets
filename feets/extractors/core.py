@@ -72,13 +72,13 @@ DATAS = (
 # =============================================================================
 
 class ExtractorBadDefinedError(Exception):
-    """The extractor are not properly defined."""
+    """The extractor class are not properly defined."""
     pass
 
 
 class ExtractorContractError(ValueError):
-    """The extractor dont get the expected features, data, parameters
-    or wathever.
+    """The extractor don't get the expected features, data, parameters
+    or whatever.
 
     """
     pass
@@ -359,3 +359,16 @@ class Extractor(metaclass=ExtractorMeta):
             flatten_name = f"{feature}_{idx}"
             flatten_values.update(self.flatten_feature(flatten_name, v))
         return flatten_values
+
+    def flatten(self, feature, value):
+        """Convert the features into a dict of 1 dimension values.
+
+        Internally this method use the ``flatten_feature`` method but check
+        if the given feature is defined in this extractor.
+
+        """
+        feats = self.get_features()
+        if feature not in feats:
+            raise ExtractorContractError(
+                f"Feature {feature} are not defined for the extractor {self}")
+        return self.flatten_feature(feature, value)
