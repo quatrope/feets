@@ -154,7 +154,8 @@ class FourierComponents(Extractor):
 
     """
 
-    data = ['magnitude', 'time']
+    data = ['magnitude', 'time', "error"]
+    optional = ["error"]
     features = [
         "Freq1_harmonics",
         "Freq2_harmonics",
@@ -176,11 +177,12 @@ class FourierComponents(Extractor):
                     b * np.cos(2 * np.pi * Freq * x) + c)
         return func
 
-    def _components(self, magnitude, time, lscargle_kwds):
+    def _components(self, magnitude, time, error, lscargle_kwds):
         time = time - np.min(time)
         A, PH = [], []
         for i in range(3):
-            frequency, power = lscargle(time, magnitude, **lscargle_kwds)
+            frequency, power = lscargle(
+                time=time, magnitude=magnitude, error=error, **lscargle_kwds)
 
             fmax = np.argmax(power)
             fundamental_Freq = frequency[fmax]
@@ -208,10 +210,12 @@ class FourierComponents(Extractor):
 
         return A, scaledPH
 
-    def fit(self, magnitude, time, lscargle_kwds):
+    def fit(self, magnitude, time, error, lscargle_kwds):
         lscargle_kwds = lscargle_kwds or {}
 
-        A, sPH = self._components(magnitude, time, lscargle_kwds)
+        A, sPH = self._components(
+            magnitude=magnitude, time=time,
+            error=error, lscargle_kwds=lscargle_kwds)
 
         result = {
             "Freq1_harmonics": (A[0], sPH[0]),
