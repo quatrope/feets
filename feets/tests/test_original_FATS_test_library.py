@@ -208,7 +208,7 @@ def test_PairSlopeTrend(white_noise):
     assert result >= -0.25 and result <= 0.25
 
 
-def test_Period_Psi(periodic_lc):
+def test_Period(periodic_lc):
     params = {
         "lscargle_kwds": {
             "autopower_kwds": {

@@ -224,7 +224,7 @@ class FourierComponents(Extractor):
 
         return result
 
-    def flatten_feature(self, feature, value):
+    def flatten_feature(self, feature, value, **kwargs):
         """Custom flatten for fourier components"""
         amps, phases = value
         flatten_value = {}

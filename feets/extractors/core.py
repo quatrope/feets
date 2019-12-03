@@ -281,54 +281,53 @@ class Extractor(metaclass=ExtractorMeta):
             self.__str = "{}({})".format(self.name, params)
         return self.__str
 
-    def setup(self):
-        """This method will be executed before the feature is calculated"""
-        pass
+    def preprocess_arguments(self, **kwargs):
+        """Preprocess all the incoming argument
+        (timeserie + dependencies + parameters) to feed the `fit`,
+        `flatten_feature` and `plot_feature` methods.
+
+        """
+        # create the bessel for the parameters
+        new_kwargs = {}
+
+        # add the required features
+        dependencies = kwargs["features"]
+        new_kwargs = {k: dependencies[k] for k in self.get_dependencies()}
+
+        # add the required data
+        for d in self.get_data():
+            new_kwargs[d] = kwargs[d]
+
+        # add the configured parameters as parameters
+        new_kwargs.update(self.params)
+
+        return new_kwargs
 
     def fit(self):
         raise NotImplementedError()
 
-    def teardown(self):
-        """This method will be executed after the feature is calculated"""
-        pass
-
     def extract(self, **kwargs):
-        # create the besel for the parameters
-        fit_kwargs = {}
+        fit_kwargs = self.preprocess_arguments(**kwargs)
 
-        # add the required features as parameters to fit()
-        dependencies = kwargs["features"]
-        fit_kwargs = {k: dependencies[k] for k in self.get_dependencies()}
+        # run te extractor
+        result = self.fit(**fit_kwargs)
 
-        # add the required data as parameters to fit()
-        for d in self.get_data():
-            fit_kwargs[d] = kwargs[d]
+        # validate if the extractors generates the expected features
+        expected = self.get_features()  # the expected features
 
-        # add the configured parameters as parameters to fit()
-        fit_kwargs.update(self.params)
-        try:
-            # setup & run te extractor
-            self.setup()
-            result = self.fit(**fit_kwargs)
+        diff = (
+            expected.difference(result.keys()) or
+            set(result).difference(expected))  # some diff
+        if diff:
+            cls = type(self)
+            estr, fstr = ", ".join(expected), ", ".join(result.keys())
+            raise ExtractorContractError(
+                f"The extractor '{cls}' expect the features [{estr}], "
+                f"and found: [{fstr}]")
 
-            # validate if the extractors generates the expected features
-            expected = self.get_features()  # the expected features
+        return dict(result)
 
-            diff = (
-                expected.difference(result.keys()) or
-                set(result).difference(expected))  # some diff
-            if diff:
-                cls = type(self)
-                estr, fstr = ", ".join(expected), ", ".join(result.keys())
-                raise ExtractorContractError(
-                    f"The extractor '{cls}' expect the features [{estr}], "
-                    f"and found: [{fstr}]")
-
-            return dict(result)
-        finally:
-            self.teardown()
-
-    def flatten_feature(self, feature, value):
+    def flatten_feature(self, feature, value, **kwargs):
         """Convert the features into a dict of 1 dimension values.
 
         The methods check if the dimension of the value is 1 then a
@@ -357,18 +356,23 @@ class Extractor(metaclass=ExtractorMeta):
         flatten_values = {}
         for idx, v in enumerate(value):
             flatten_name = f"{feature}_{idx}"
-            flatten_values.update(self.flatten_feature(flatten_name, v))
+            flatten_values.update(
+                self.flatten_feature(flatten_name, v, **kwargs))
         return flatten_values
 
-    def flatten(self, feature, value):
+    def flatten(self, feature, value, **kwargs):
         """Convert the features into a dict of 1 dimension values.
-
-        Internally this method use the ``flatten_feature`` method but check
-        if the given feature is defined in this extractor.
 
         """
         feats = self.get_features()
         if feature not in feats:
             raise ExtractorContractError(
                 f"Feature {feature} are not defined for the extractor {self}")
-        return self.flatten_feature(feature, value)
+        plot_kwargs = self.preprocess_arguments(**kwargs)
+
+        all_features = kwargs["features"] or {}
+        efeatures = {k: v for k, v in all_features.items() if k in feats}
+
+        return self.flatten_feature(
+            feature=feature, value=value,
+            extractor_features=efeatures, **plot_kwargs)

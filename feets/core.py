@@ -105,7 +105,8 @@ class ResultSet:
 
     features: np.ndarray = attr.ib(repr=True, converter=np.asarray)
     values: np.ndarray = attr.ib(repr=False, converter=np.asarray)
-    extractors_conf: dict = attr.ib(converter=dict, factory=dict)
+    timeserie: dict = attr.ib(converter=dict)
+    extractors_conf: dict = attr.ib(converter=dict)
 
     def __attrs_post_init__(self):
         diff = set(self.features).difference(extractors.available_features())
@@ -134,10 +135,14 @@ class ResultSet:
         return extractor
 
     def as_arrays(self):
+        flatten_params = {"features": self.as_dict()}
+        flatten_params.update(self.timeserie)
+
         flatten_features = {}
         for feature, value in zip(self.features, self.values):
             extractor = self.extractor_of(feature)
-            flatten_value = extractor.flatten(feature, value)
+            flatten_value = extractor.flatten(
+                feature=feature, value=value, **flatten_params)
             flatten_features.update(flatten_value)
 
         features = np.empty(len(flatten_features), dtype=object)
@@ -320,7 +325,7 @@ class FeatureSpace:
             self.__str = "<FeatureSpace: {}>".format(space)
         return self.__str
 
-    def dict_data_as_array(self, d):
+    def preprocess_timeserie(self, d):
         array_data = {}
         for k, v in d.items():
             if k in self._required_data and v is None:
@@ -333,7 +338,7 @@ class FeatureSpace:
                 aligned_magnitude=None, aligned_magnitude2=None,
                 aligned_error=None, aligned_error2=None):
 
-        kwargs = self.dict_data_as_array({
+        timeserie = self.preprocess_timeserie({
             DATA_TIME: time,
             DATA_MAGNITUDE: magnitude,
             DATA_ERROR: error,
@@ -346,7 +351,7 @@ class FeatureSpace:
 
         features = {}
         for fextractor in self._execution_plan:
-            result = fextractor.extract(features=features, **kwargs)
+            result = fextractor.extract(features=features, **timeserie)
             features.update(result)
 
         fvalues = np.array([
@@ -355,7 +360,8 @@ class FeatureSpace:
         rs = ResultSet(
             features=self._features_as_array,
             values=fvalues,
-            extractors_conf=self.extractors_conf)
+            extractors_conf=self.extractors_conf,
+            timeserie=timeserie)
         return rs
 
     @property

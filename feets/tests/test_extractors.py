@@ -110,6 +110,9 @@ class SortByDependenciesTestCases(FeetsTestCase):
 
 class FlattenTestCase(FeetsTestCase):
 
+    def setUp(self):
+        self.params = dict.fromkeys(extractors.DATAS + ("features", ))
+
     @mock.patch("feets.extractors._extractors", {})
     def test_default_flatten_invalid_feature_for_the_extracor(self):
 
@@ -123,7 +126,7 @@ class FlattenTestCase(FeetsTestCase):
 
         ext = A()
         with self.assertRaises(ExtractorContractError):
-            ext.flatten("foo", 1)
+            ext.flatten("foo", 1, **self.params)
 
     @mock.patch("feets.extractors._extractors", {})
     def test_default_flatten_scalar(self):
@@ -138,7 +141,8 @@ class FlattenTestCase(FeetsTestCase):
 
         ext = A()
         expected = {"feat": 1}
-        self.assertDictEqual(ext.flatten("feat", 1), expected)
+        self.assertDictEqual(
+            ext.flatten("feat", 1, **self.params), expected)
 
     @mock.patch("feets.extractors._extractors", {})
     def test_default_flatten_1D(self):
@@ -153,7 +157,8 @@ class FlattenTestCase(FeetsTestCase):
 
         ext = A()
         expected = {"feat_0": 1, "feat_1": 2}
-        self.assertDictEqual(ext.flatten("feat", [1, 2]), expected)
+        self.assertDictEqual(
+            ext.flatten("feat", [1, 2], **self.params), expected)
 
     @mock.patch("feets.extractors._extractors", {})
     def test_default_flatten_2D(self):
@@ -169,7 +174,8 @@ class FlattenTestCase(FeetsTestCase):
         ext = A()
         expected = {'feat_0_0': 1, 'feat_0_1': 2,
                     'feat_1_0': 3, 'feat_1_1': 4}
-        self.assertDictEqual(ext.flatten("feat", [[1, 2], [3, 4]]), expected)
+        self.assertDictEqual(
+            ext.flatten("feat", [[1, 2], [3, 4]], **self.params), expected)
 
     @mock.patch("feets.extractors._extractors", {})
     def test_default_flatten_3D(self):
@@ -198,7 +204,8 @@ class FlattenTestCase(FeetsTestCase):
             'feat_1_1_0': 7,
             'feat_1_1_1': 8}
 
-        self.assertDictEqual(ext.flatten("feat", value), expected)
+        self.assertDictEqual(
+            ext.flatten("feat", value, **self.params), expected)
 
     @mock.patch("feets.extractors._extractors", {})
     def test_default_flatten_4D(self):
@@ -221,7 +228,8 @@ class FlattenTestCase(FeetsTestCase):
             'feat_0_0_1_0': 3,
             'feat_0_0_1_1': 4}
 
-        self.assertDictEqual(ext.flatten("feat", value), expected)
+        self.assertDictEqual(
+            ext.flatten("feat", value, **self.params), expected)
 
 
 class RequiredDataTestCases(FeetsTestCase):
