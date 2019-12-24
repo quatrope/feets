@@ -42,6 +42,8 @@ __all__ = [
 
 import copy
 import logging
+import itertools as it
+from collections import Counter
 
 import numpy as np
 
@@ -100,49 +102,54 @@ class FeatureSpaceError(ValueError):
 # FEATURE RESULT
 # =============================================================================
 
-@attr.s(frozen=True, auto_attribs=True)
+@attr.s(frozen=True, auto_attribs=True, repr=False)
 class ResultSet:
+    """Container of features.
 
-    features: np.ndarray = attr.ib(repr=True, converter=np.asarray)
-    values: np.ndarray = attr.ib(repr=False, converter=np.asarray)
+    The ResultSet object is capable of convert the features into
+    dictionaties, numpy arrays, pandas dataframes and also provides
+    analysis capabilities like plots thorught the matplotlib
+    and seaborn library.
+
+    """
+    features_names: np.ndarray = attr.ib(converter=np.array)
+    values: dict = attr.ib(converter=dict)
+    extractors: dict = attr.ib(converter=dict)
     timeserie: dict = attr.ib(converter=dict)
-    extractors_conf: dict = attr.ib(converter=dict)
 
     def __attrs_post_init__(self):
-        diff = set(self.features).difference(extractors.available_features())
+        cnt = Counter(
+            it.chain(self.features_names, self.values, self.extractors))
+        diff = set(k for k, v in cnt.items() if v < 3)
         if diff:
             joined_diff = ", ".join(diff)
             raise FeatureNotFound(
-                f"The features '{joined_diff}' are not registered in feets")
+                f"The features '{joined_diff}' must be in 'features_names' "
+                "'values' and 'extractors'")
 
     def __iter__(self):
+        """x.__iter__(y) <==> iter(x)"""
         return iter(self.as_arrays())
 
     def __getitem__(self, k):
         """x.__getitem__(y) <==> x[y]"""
-        if k not in self.features:
-            raise KeyError("Feature not found {}".format(k))
-
-        where = np.where(self.features == k)[0][0]
-        value = self.values[where]
-        return copy.deepcopy(value)
+        return copy.deepcopy(self.values[k])
 
     def extractor_of(self, feature):
-        # regenerate the extractor
-        fcls = extractors.extractor_of(feature)
-        extractor_params = self.extractors_conf.get(fcls.__name__, {})
-        extractor = fcls(**extractor_params)
-        return extractor
+        """Retrieve the  extractor instance used for create the given feature.
+
+        """
+        return copy.deepcopy(self.extractors[feature])
 
     def as_arrays(self):
         flatten_params = {"features": self.as_dict()}
         flatten_params.update(self.timeserie)
 
         flatten_features = {}
-        for feature, value in zip(self.features, self.values):
-            extractor = self.extractor_of(feature)
+        for fname, fvalue in self.values.items():
+            extractor = self.extractor_of(fname)
             flatten_value = extractor.flatten(
-                feature=feature, value=value, **flatten_params)
+                feature=fname, value=fvalue, **flatten_params)
             flatten_features.update(flatten_value)
 
         features = np.empty(len(flatten_features), dtype=object)
@@ -153,7 +160,7 @@ class ResultSet:
         return features, values
 
     def as_dict(self):
-        return dict(zip(self.features, self.values))
+        return copy.deepcopy(self.values)
 
 
 # =============================================================================
@@ -326,6 +333,12 @@ class FeatureSpace:
         return self.__str
 
     def preprocess_timeserie(self, d):
+        """Validate if the required values of the time-serie exist with
+        non ``None`` values in the dict ``d``. Finally returns a
+        new dictionary whose non-null values have been converted to
+        ``np.ndarray``
+
+        """
         array_data = {}
         for k, v in d.items():
             if k in self._required_data and v is None:
@@ -337,7 +350,29 @@ class FeatureSpace:
                 magnitude2=None, aligned_time=None,
                 aligned_magnitude=None, aligned_magnitude2=None,
                 aligned_error=None, aligned_error2=None):
+        """Extract the features from a given time-series.
 
+        This method must be provided with the required timeseries data
+        specified in the attribute ``required_data_``.
+
+        Parameters
+        ----------
+        time : iterable, optional
+        magnitude : iterable, optional
+        error : iterable, optional
+        magnitude2 : iterable, optional
+        aligned_time : iterable, optional
+        aligned_magnitude : iterable, optional
+        aligned_magnitude2 : iterable, optional
+        aligned_error : iterable, optional
+        aligned_error2 : iterable, optional
+
+        Returns
+        -------
+        feets.core.ResultSet
+            Container of a calculated features.
+
+        """
         timeserie = self.preprocess_timeserie({
             DATA_TIME: time,
             DATA_MAGNITUDE: magnitude,
@@ -349,18 +384,23 @@ class FeatureSpace:
             DATA_ALIGNED_ERROR: aligned_error,
             DATA_ALIGNED_ERROR2: aligned_error2})
 
-        features = {}
+        features, extractors = {}, {}
         for fextractor in self._execution_plan:
             result = fextractor.extract(features=features, **timeserie)
-            features.update(result)
+            for fname, fvalue in result.items():
+                features[fname] = fvalue
+                extractors[fname] = copy.deepcopy(fextractor)
 
-        fvalues = np.array([
-            features[fname] for fname in self._features_as_array])
+        # remove all the not needed features and extractors
+        flt_features, flt_extractors = {}, {}
+        for fname in self._features_as_array:
+            flt_features[fname] = features[fname]
+            flt_extractors[fname] = extractors[fname]
 
         rs = ResultSet(
-            features=self._features_as_array,
-            values=fvalues,
-            extractors_conf=self.extractors_conf,
+            features_names=self._features_as_array,
+            values=flt_features,
+            extractors=flt_extractors,
             timeserie=timeserie)
         return rs
 

@@ -56,7 +56,8 @@ class ResultSetTestCase(FeetsTestCase):
     def setUp(self):
         self.timeserie = dict.fromkeys(extractors.DATAS)
 
-    def register_foo(self):
+    def foo_extractor(self):
+
         @register_extractor
         class MockExtractor(Extractor):
             data = ["magnitude"]
@@ -65,48 +66,50 @@ class ResultSetTestCase(FeetsTestCase):
             def fit(self, magnitude):
                 return {"foo": magnitude}
 
+        return MockExtractor()
+
     def test_invalid_feature(self):
         with self.assertRaises(FeatureNotFound):
             ResultSet(
-                features=["Fail"], values=[1],
-                timeserie=self.timeserie, extractors_conf={})
+                features_names=["Fail"], values={"fail": 1},
+                timeserie=self.timeserie, extractors={})
 
     @mock.patch("feets.extractors._extractors", {})
     def test_iter(self):
-        self.register_foo()
+        foo_extractor = self.foo_extractor()
         rs = ResultSet(
-            features=["foo"], values=[1],
-            timeserie=self.timeserie, extractors_conf={})
+            features_names=["foo"], values={"foo": 1},
+            timeserie=self.timeserie, extractors={"foo": foo_extractor})
         feats, values = rs
         self.assertCountEqual(feats, ["foo"])
         self.assertCountEqual(values, [1])
 
     @mock.patch("feets.extractors._extractors", {})
     def test_getitem(self):
-        self.register_foo()
+        foo_extractor = self.foo_extractor()
         rs = ResultSet(
-            features=["foo"], values=[1],
-            timeserie=self.timeserie, extractors_conf={})
+            features_names=["foo"], values={"foo": 1},
+            timeserie=self.timeserie, extractors={"foo": foo_extractor})
         self.assertEqual(rs["foo"], 1)
         with self.assertRaises(KeyError):
             rs["faaa"]
 
     @mock.patch("feets.extractors._extractors", {})
     def test_as_array(self):
-        self.register_foo()
+        foo_extractor = self.foo_extractor()
         rs = ResultSet(
-            features=["foo"], values=[1],
-            timeserie=self.timeserie, extractors_conf={})
+            features_names=["foo"], values={"foo": 1},
+            timeserie=self.timeserie, extractors={"foo": foo_extractor})
         feats, values = rs.as_arrays()
         self.assertCountEqual(feats, ["foo"])
         self.assertCountEqual(values, [1])
 
     @mock.patch("feets.extractors._extractors", {})
     def test_as_dict(self):
-        self.register_foo()
+        foo_extractor = self.foo_extractor()
         rs = ResultSet(
-            features=["foo"], values=[1],
-            timeserie=self.timeserie, extractors_conf={})
+            features_names=["foo"], values={"foo": 1},
+            timeserie=self.timeserie, extractors={"foo": foo_extractor})
         self.assertDictEqual(rs.as_dict(), {"foo": 1})
 
 

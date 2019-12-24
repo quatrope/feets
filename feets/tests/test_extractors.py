@@ -485,7 +485,7 @@ class LombScargleTests(FeetsTestCase):
 
             # extract the period from the feets pipele
             rs = fs.extract(time=time, magnitude=magnitude, error=error)
-            feets_periods.append(rs.values[0])
+            feets_periods.append(rs.values['PeriodLS'])
 
         feets_periods = np.array(feets_periods).flatten()
         self.assertArrayEqual(ls_periods, feets_periods)
@@ -531,5 +531,5 @@ class FourierTests(FeetsTestCase):
         ext = extractors.FourierComponents()
 
         self.assertNotEqual(
-            ext.extract(**lc, features={}),
-            ext.extract(**lc_error, features={}))
+            ext.extract(features={}, **lc),
+            ext.extract(features={}, **lc_error))

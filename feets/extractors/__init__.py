@@ -60,6 +60,7 @@ _extractors = {}
 
 
 def register_extractor(cls):
+    """Register a given extractor class into the feets insfrastructure."""
     if not inspect.isclass(cls) or not issubclass(cls, Extractor):
         msg = "'cls' must be a subclass of Extractor. Found: {}"
         raise TypeError(msg.format(cls))
@@ -73,10 +74,19 @@ def register_extractor(cls):
 
 
 def registered_extractors():
+    """Returns all the available extractor classes as a dicctionries where
+    the key is the feature extracted for the extractor on the *value*.
+
+    Notes
+    -----
+    Multiple features can be extracted with the same extractor
+
+    """
     return dict(_extractors)
 
 
 def is_registered(obj):
+    """Check if a given extractor class is already registered."""
     if isinstance(obj, str):
         features = [obj]
     elif not inspect.isclass(obj) or not issubclass(obj, Extractor):
@@ -88,10 +98,12 @@ def is_registered(obj):
 
 
 def available_features():
+    """Retrieve all the current available features in feets."""
     return sorted(_extractors.keys())
 
 
 def extractor_of(feature):
+    """Retrieve the current register extractor class for the given feature."""
     return _extractors[feature]
 
 
