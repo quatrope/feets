@@ -65,17 +65,6 @@ from .extractors.core import (
 
 
 # =============================================================================
-# CONSTANTS
-# =============================================================================
-
-TABULATE_PARAMS = {
-    "headers": "firstrow",
-    "numalign": "center",
-    "stralign": "center",
-}
-
-
-# =============================================================================
 # LOG
 # =============================================================================
 
@@ -89,15 +78,22 @@ logger.setLevel(logging.WARNING)
 # =============================================================================
 
 class FeatureNotFound(ValueError):
-    pass
+    """Raises when a non-available feature are requested.
+
+    A non-available feature can be:
+
+    - The feature don't exist in any of the registered extractor.
+    - The feature can't be requested with the available data.
+
+    """
 
 
 class DataRequiredError(ValueError):
-    pass
+    """Raised when the feature-space required another data."""
 
 
 class FeatureSpaceError(ValueError):
-    pass
+    """The FeatureSpace can't be configured with the given parameters."""
 
 
 # =============================================================================
