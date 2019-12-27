@@ -112,6 +112,18 @@ class ResultSetTestCase(FeetsTestCase):
             timeserie=self.timeserie, extractors={"foo": foo_extractor})
         self.assertDictEqual(rs.as_dict(), {"foo": 1})
 
+    @mock.patch("feets.extractors._extractors", {})
+    def test_repr(self):
+        foo_extractor = self.foo_extractor()
+        timeserie = self.timeserie
+        timeserie.update(time=1, error=2)
+
+        rs = ResultSet(
+            features_names=["foo"], values={"foo": 1},
+            timeserie=timeserie, extractors={"foo": foo_extractor})
+        expected = "ResultSet(features=<foo>, timeserie=<time, error>)"
+        assert repr(rs) == str(rs) == expected
+
 
 # =============================================================================
 # SPACE

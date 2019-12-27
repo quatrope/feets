@@ -44,6 +44,7 @@ import copy
 import logging
 import itertools as it
 from collections import Counter
+from collections.abc import Mapping
 
 import numpy as np
 
@@ -51,6 +52,7 @@ import attr
 
 from . import extractors
 from .extractors.core import (
+    DATAS,
     DATA_MAGNITUDE,
     DATA_TIME,
     DATA_ERROR,
@@ -99,8 +101,28 @@ class FeatureSpaceError(ValueError):
 
 
 # =============================================================================
-# FEATURE RESULT
+# RESULTSET
 # =============================================================================
+
+class _ResultMap(Mapping):
+    """Internal representation of a immutable dict"""
+
+    def __init__(self, d):
+        self._keys = tuple(d.keys())
+        self._values = tuple(d.values())
+
+    def __getitem__(self, k):
+        if k not in self._keys:
+            raise KeyError(k)
+        idx = self._keys.index(k)
+        return self._values[idx]
+
+    def __iter__(self):
+        return iter(self._keys)
+
+    def __len__(self):
+        return len(self._keys)
+
 
 @attr.s(frozen=True, auto_attribs=True, repr=False)
 class ResultSet:
@@ -112,10 +134,10 @@ class ResultSet:
     and seaborn library.
 
     """
-    features_names: np.ndarray = attr.ib(converter=np.array)
-    values: dict = attr.ib(converter=dict)
-    extractors: dict = attr.ib(converter=dict)
-    timeserie: dict = attr.ib(converter=dict)
+    features_names: np.ndarray = attr.ib(converter=tuple)
+    values: dict = attr.ib(converter=_ResultMap)
+    extractors: dict = attr.ib(converter=_ResultMap)
+    timeserie: dict = attr.ib(converter=_ResultMap)
 
     def __attrs_post_init__(self):
         cnt = Counter(
@@ -128,12 +150,18 @@ class ResultSet:
                 "'values' and 'extractors'")
 
     def __iter__(self):
-        """x.__iter__(y) <==> iter(x)"""
+        """x.__iter__() <==> iter(x)"""
         return iter(self.as_arrays())
 
     def __getitem__(self, k):
         """x.__getitem__(y) <==> x[y]"""
         return copy.deepcopy(self.values[k])
+
+    def __repr__(self):
+        """x.__repr__() <==> repr(x)"""
+        feats = ", ".join(self.features_names)
+        ts = ", ".join(d for d in DATAS if self.timeserie.get(d) is not None)
+        return f"ResultSet(features=<{feats}>, timeserie=<{ts}>)"
 
     def extractor_of(self, feature):
         """Retrieve the  extractor instance used for create the given feature.
@@ -147,7 +175,7 @@ class ResultSet:
 
         flatten_features = {}
         for fname, fvalue in self.values.items():
-            extractor = self.extractor_of(fname)
+            extractor = self.extractors[fname]
             flatten_value = extractor.flatten(
                 feature=fname, value=fvalue, **flatten_params)
             flatten_features.update(flatten_value)
@@ -160,7 +188,8 @@ class ResultSet:
         return features, values
 
     def as_dict(self):
-        return copy.deepcopy(self.values)
+        """Return a copy of values"""
+        return dict(self.values)
 
 
 # =============================================================================
@@ -323,9 +352,11 @@ class FeatureSpace:
                 f"{joined_not_found} to assign the given parameter(s)")
 
     def __repr__(self):
+        """x.__repr__() <==> repr(x)"""
         return str(self)
 
     def __str__(self):
+        """x.__str__() <==> str(x)"""
         if not hasattr(self, "__str"):
             extractors = [str(extractor) for extractor in self._execution_plan]
             space = ", ".join(extractors)
