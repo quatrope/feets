@@ -373,6 +373,23 @@ class Extractor(metaclass=ExtractorMeta):
         all_features = kwargs["features"] or {}
         efeatures = {k: v for k, v in all_features.items() if k in feats}
 
-        return self.flatten_feature(
+        flat_feature = self.flatten_feature(
             feature=feature, value=value,
             extractor_features=efeatures, **plot_kwargs)
+
+        if not isinstance(flat_feature, dict):
+            raise ExtractorContractError(
+                "flatten_feature() must return a dict instance")
+
+        for k, v in flat_feature.items():
+            if not k.startswith(feature):
+                raise ExtractorContractError(
+                    "All flatten features keys must start wih the "
+                    f"feature name ('{feature}')'. Found {k}")
+            dim = np.ndim(v)
+            if dim:
+                raise ExtractorContractError(
+                    f"Flattened feature {k} are not dimensionless. "
+                    f"Dims: {dim}")
+
+        return flat_feature

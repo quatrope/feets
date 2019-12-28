@@ -231,6 +231,66 @@ class FlattenTestCase(FeetsTestCase):
         self.assertDictEqual(
             ext.flatten("feat", value, **self.params), expected)
 
+    @mock.patch("feets.extractors._extractors", {})
+    def test_flatten_return_ndim_gt_0(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+            def flatten_feature(self, feature, value, **kwargs):
+                return {feature: value}
+
+        ext = A()
+        value = [1, 2]
+
+        with self.assertRaises(ExtractorContractError):
+            ext.flatten("feat", value, **self.params)
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_flatten_return_not_dict_instance(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+            def flatten_feature(self, feature, value, **kwargs):
+                return None
+
+        ext = A()
+        value = [1, 2]
+
+        with self.assertRaises(ExtractorContractError):
+            ext.flatten("feat", value, **self.params)
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_flatten_return_invalid_name(self):
+
+        @register_extractor
+        class A(Extractor):
+            data = ["magnitude"]
+            features = ["feat"]
+
+            def fit(self, *args):
+                pass
+
+            def flatten_feature(self, feature, value, **kwargs):
+                return {"foo": 1}
+
+        ext = A()
+        value = [1, 2]
+
+        with self.assertRaises(ExtractorContractError):
+            ext.flatten("feat", value, **self.params)
+
 
 class RequiredDataTestCases(FeetsTestCase):
 
