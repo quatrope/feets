@@ -108,15 +108,18 @@ class _ResultMap(Mapping):
         self._values = tuple(d.values())
 
     def __getitem__(self, k):
+        """x.__getitem__(y) <==> x[y]"""
         if k not in self._keys:
             raise KeyError(k)
         idx = self._keys.index(k)
         return self._values[idx]
 
     def __iter__(self):
+        """x.__iter__() <==> iter(x)"""
         return iter(self._keys)
 
     def __len__(self):
+        """x.__len__() <==> len(x)"""
         return len(self._keys)
 
 
@@ -126,7 +129,7 @@ class ResultSet:
 
     The ResultSet object is capable of convert the features into
     dictionaties, numpy arrays, pandas dataframes and also provides
-    analysis capabilities like plots thorught the matplotlib
+    analysis capabilities like plots thought the matplotlib
     and seaborn library.
 
     """
@@ -166,6 +169,14 @@ class ResultSet:
         return copy.deepcopy(self.extractors[feature])
 
     def as_arrays(self):
+        """Convert the feature spaces into two 1D numpy arrays.
+
+        The first one contains all the names of the features (with suffixes
+        if the array was flattened). And the second one the values.
+
+        Internally this method uses the ``flatten_feature()`` method.
+
+        """
         flatten_params = {"features": self.as_dict()}
         flatten_params.update(self.timeserie)
 

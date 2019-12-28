@@ -73,7 +73,6 @@ DATAS = (
 
 class ExtractorBadDefinedError(Exception):
     """The extractor class are not properly defined."""
-    pass
 
 
 class ExtractorContractError(ValueError):
@@ -81,17 +80,14 @@ class ExtractorContractError(ValueError):
     or whatever.
 
     """
-    pass
 
 
 class ExtractorWarning(UserWarning):
     """Warn about the Extractor behavior."""
-    pass
 
 
 class FeatureExtractionWarning(UserWarning):
     """Warn about calculation of some feature"""
-    pass
 
 
 warnings.simplefilter("always", ExtractorWarning)
@@ -214,11 +210,14 @@ class ExtractorMeta(type):
 
 
 class Extractor(metaclass=ExtractorMeta):
+    """Base class to implement your own Feature-Extractor."""
 
+    # This is only a place holder
     _conf = None
 
     @classmethod
     def get_data(cls):
+        """Retrieve the set of data used for this extractor."""
         return cls._conf.data
 
     @classmethod
@@ -268,9 +267,11 @@ class Extractor(metaclass=ExtractorMeta):
         self.params.update(cparams)
 
     def __repr__(self):
+        """x.__repr__() <==> repr(x)."""
         return str(self)
 
     def __str__(self):
+        """x.__str__() <==> str(x)."""
         if not hasattr(self, "__str"):
             params = self.params
             if params:
@@ -350,7 +351,6 @@ class Extractor(metaclass=ExtractorMeta):
             {'name_0_0': 1, 'name_0_1': 2, 'name_1_0': 3, 'name_1_1': 4}
 
         """
-
         if np.ndim(value) == 0:
             return {feature: value}
         flatten_values = {}
