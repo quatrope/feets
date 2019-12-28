@@ -39,10 +39,10 @@ import numpy as np
 
 import mock
 
-from .. import (
+from feets import (
     extractors, FeatureSpace, FeatureSpaceError, FeatureNotFound,
     Extractor, register_extractor, ExtractorContractError)
-from ..core import ResultSet
+from feets.core import ResultSet
 
 from .core import FeetsTestCase
 

@@ -39,8 +39,8 @@ import os
 
 import numpy as np
 
-from .. import FeatureSpace, preprocess
-from .. datasets import macho
+from feets import FeatureSpace, preprocess
+from feets.datasets import macho
 
 from .core import FeetsTestCase, DATA_PATH
 

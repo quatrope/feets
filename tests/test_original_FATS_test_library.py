@@ -59,7 +59,8 @@ import pandas as pd
 
 import pytest
 
-from ..core import FeatureSpace
+from feets.core import FeatureSpace
+
 from .core import FeetsTestCase, DATA_PATH
 
 

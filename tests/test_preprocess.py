@@ -28,7 +28,7 @@
 # DOC
 # =============================================================================
 
-"""All ogle3 access tests"""
+"""All feets base tests"""
 
 
 # =============================================================================
@@ -37,54 +37,65 @@
 
 import numpy as np
 
-from ...datasets import synthetic as syn
+from feets import preprocess
 
-from ..core import FeetsTestCase
+from .core import FeetsTestCase
 
 
 # =============================================================================
 # BASE CLASS
 # =============================================================================
 
-class NormalTestCase(FeetsTestCase):
+class RemoveNoiseTestCase(FeetsTestCase):
 
-    def test_normal(self):
-        np.random.seed(42)
-
-        mag = np.random.normal(size=10000)
-        error = np.random.normal(size=10000)
-
-        ds = syn.create_normal(seed=42, bands=["N"])
-
-        self.assertArrayEqual(mag, ds.data.N.magnitude)
-        self.assertArrayEqual(error, ds.data.N.error)
+    def test_remove_noise(self):
+        time = np.arange(5)
+        mag = np.random.rand(5)
+        error = np.zeros(5)
+        preprocess.remove_noise(time, mag, error)
 
 
-class UniformTestCase(FeetsTestCase):
+class AlignTestCase(FeetsTestCase):
 
-    def test_uniform(self):
-        np.random.seed(42)
+    def test_align(self):
+        time = np.arange(5)
+        mag = np.random.rand(5)
+        error = np.random.rand(5)
 
-        mag = np.random.uniform(size=10000)
-        error = np.random.normal(size=10000)
+        time2 = np.arange(5)
+        np.random.shuffle(time2)
 
-        ds = syn.create_uniform(seed=42, bands=["U"])
+        mag2 = mag[time2]
+        error2 = error[time2]
 
-        self.assertArrayEqual(mag, ds.data.U.magnitude)
-        self.assertArrayEqual(error, ds.data.U.error)
+        atime, amag, amag2, aerror, aerror2 = preprocess.align(
+            time, time2, mag, mag2, error, error2)
 
+        self.assertArrayEqual(amag, amag2)
+        self.assertTrue(
+            np.array_equal(amag, mag) or np.array_equal(amag, mag2))
+        self.assertTrue(
+            np.array_equal(amag2, mag) or np.array_equal(amag2, mag2))
 
-class PeriodicTestCase(FeetsTestCase):
+        self.assertArrayEqual(aerror, aerror2)
+        self.assertTrue(
+            np.array_equal(aerror, error) or np.array_equal(aerror, error2))
+        self.assertTrue(
+            np.array_equal(aerror2, error) or np.array_equal(aerror2, error2))
 
-    def test_periodic(self):
-        np.random.seed(42)
+    def test_align_different_len(self):
+        time = np.arange(5)
+        mag = np.random.rand(5)
+        error = np.random.rand(5)
 
-        time = 100 * np.random.rand(10000)
-        error = np.random.normal(size=10000)
-        mag = np.sin(2 * np.pi * time) + error * np.random.randn(10000)
+        time2 = np.arange(6)
+        np.random.shuffle(time2)
 
-        ds = syn.create_periodic(seed=42, bands=["P"])
+        mag2 = np.hstack((mag, np.random.rand(1)))[time2]
+        error2 = np.hstack((error, np.random.rand(1)))[time2]
 
-        self.assertArrayEqual(time, ds.data.P.time)
-        self.assertArrayEqual(mag, ds.data.P.magnitude)
-        self.assertArrayEqual(error, ds.data.P.error)
+        atime, amag, amag2, aerror, aerror2 = preprocess.align(
+            time, time2, mag, mag2, error, error2)
+
+        self.assertArrayEqual(amag, amag2)
+        self.assertArrayEqual(aerror, aerror2)

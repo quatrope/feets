@@ -44,7 +44,7 @@ import pandas as pd
 
 import mock
 
-from .. import (
+from feets import (
     FeatureSpace,
     Extractor, register_extractor, extractors, ExtractorContractError)
 

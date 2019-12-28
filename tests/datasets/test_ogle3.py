@@ -44,7 +44,7 @@ import pandas as pd
 
 import mock
 
-from ...datasets import ogle3
+from feets.datasets import ogle3
 
 from ..core import FeetsTestCase, DATA_PATH
 
