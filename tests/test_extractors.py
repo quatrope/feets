@@ -37,6 +37,7 @@
 
 import os
 import unittest
+import warnings
 
 import numpy as np
 
@@ -593,3 +594,40 @@ class FourierTests(FeetsTestCase):
         self.assertNotEqual(
             ext.extract(features={}, **lc),
             ext.extract(features={}, **lc_error))
+
+
+class GSKewTest(FeetsTestCase):
+
+    def setUp(self):
+        self.random = np.random.RandomState(42)
+
+    def test_gskew_linear_interpolation_problem(self):
+        magnitude = [
+            13.859, 13.854, 13.844, 13.881, 13.837, 13.885, 13.865, 13.9,
+            13.819, 13.889, 13.89, 13.831, 13.869, 13.893, 13.825, 13.844,
+            13.862, 13.853, 13.844, 13.85, 13.843, 13.839, 13.885, 13.859,
+            13.865, 13.867, 13.874, 13.906, 13.819, 13.854, 13.891, 13.896,
+            13.847, 13.862, 13.827, 13.849, 13.881, 13.871, 13.862, 13.846,
+            13.865, 13.837, 13.819, 13.867, 13.833, 13.88, 13.868, 13.819,
+            13.846, 13.842, 13.9, 13.88, 13.851, 13.885, 13.898, 13.824, 13.83,
+            13.865, 13.823, 13.845, 13.874]
+
+        lc = {
+            "magnitude": np.array(magnitude),
+            "time": np.arange(len(magnitude)),
+            "error": self.random.rand(len(magnitude))}
+
+        with warnings.catch_warnings():  # this launch mean of empty
+            warnings.filterwarnings('ignore')
+
+            ext = extractors.Gskew(interpolation="linear")
+            result = ext.extract(features={}, **lc)
+            assert np.isnan(result["Gskew"])
+
+        ext = extractors.Gskew()  # by default interpolation is nearest
+        result = ext.extract(features={}, **lc)
+        assert not np.isnan(result["Gskew"])
+
+        ext = extractors.Gskew(interpolation="nearest")
+        result = ext.extract(features={}, **lc)
+        assert not np.isnan(result["Gskew"])

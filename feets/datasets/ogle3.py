@@ -87,11 +87,6 @@ More Info: http://ogledb.astrouw.edu.pl/~ogle/CVS/
 
 """
 
-# This is for add as descr in every Data instance
-DESCR = "LightCurve from OGLE-3\n\n{}".format(
-    "\n".join(__doc__.splitlines()[2:]))
-
-
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -112,6 +107,11 @@ from .base import Data
 # =============================================================================
 # CONSTANTS
 # =============================================================================
+
+# This is for add as descr in every Data instance
+DESCR = "LightCurve from OGLE-3\n\n{}".format(
+    "\n".join(__doc__.splitlines()[2:]))
+
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 

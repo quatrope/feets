@@ -41,6 +41,13 @@ from .core import Extractor
 
 
 # =============================================================================
+# CONSTANTS
+# =============================================================================
+
+INTERPOLATION_ORDER = ('linear', 'lower' 'higher', 'midpoint', 'nearest')
+
+
+# =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
 
@@ -63,12 +70,14 @@ class Gskew(Extractor):
 
     data = ['magnitude']
     features = ["Gskew"]
+    params = {"interpolation": "nearest"}
 
-    def fit(self, magnitude):
+    def fit(self, magnitude, interpolation):
         median_mag = np.median(magnitude)
-        F_3_value = np.percentile(magnitude, 3)
-        F_97_value = np.percentile(magnitude, 97)
+        F_3_value = np.percentile(magnitude, 3, interpolation=interpolation)
+        F_97_value = np.percentile(magnitude, 97, interpolation=interpolation)
 
         skew = (np.median(magnitude[magnitude <= F_3_value]) +
                 np.median(magnitude[magnitude >= F_97_value]) - 2 * median_mag)
+
         return {"Gskew": skew}
