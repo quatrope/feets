@@ -59,4 +59,5 @@ target/
 # feets
 .ipynb_checkpoints*
 .pytest_cache
-.vscode/settings.json
+.vscode/
+.idea/

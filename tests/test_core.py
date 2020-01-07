@@ -42,7 +42,7 @@ import mock
 from feets import (
     extractors, FeatureSpace, FeatureSpaceError, FeatureNotFound,
     Extractor, register_extractor, ExtractorContractError)
-from feets.core import ResultSet
+from feets.core import FeatureSet
 
 from .core import FeetsTestCase
 
@@ -70,14 +70,14 @@ class ResultSetTestCase(FeetsTestCase):
 
     def test_invalid_feature(self):
         with self.assertRaises(FeatureNotFound):
-            ResultSet(
+            FeatureSet(
                 features_names=["Fail"], values={"fail": 1},
                 timeserie=self.timeserie, extractors={})
 
     @mock.patch("feets.extractors._extractors", {})
     def test_iter(self):
         foo_extractor = self.foo_extractor()
-        rs = ResultSet(
+        rs = FeatureSet(
             features_names=["foo"], values={"foo": 1},
             timeserie=self.timeserie, extractors={"foo": foo_extractor})
         feats, values = rs
@@ -87,7 +87,7 @@ class ResultSetTestCase(FeetsTestCase):
     @mock.patch("feets.extractors._extractors", {})
     def test_getitem(self):
         foo_extractor = self.foo_extractor()
-        rs = ResultSet(
+        rs = FeatureSet(
             features_names=["foo"], values={"foo": 1},
             timeserie=self.timeserie, extractors={"foo": foo_extractor})
         self.assertEqual(rs["foo"], 1)
@@ -97,7 +97,7 @@ class ResultSetTestCase(FeetsTestCase):
     @mock.patch("feets.extractors._extractors", {})
     def test_as_array(self):
         foo_extractor = self.foo_extractor()
-        rs = ResultSet(
+        rs = FeatureSet(
             features_names=["foo"], values={"foo": 1},
             timeserie=self.timeserie, extractors={"foo": foo_extractor})
         feats, values = rs.as_arrays()
@@ -107,7 +107,7 @@ class ResultSetTestCase(FeetsTestCase):
     @mock.patch("feets.extractors._extractors", {})
     def test_as_dict(self):
         foo_extractor = self.foo_extractor()
-        rs = ResultSet(
+        rs = FeatureSet(
             features_names=["foo"], values={"foo": 1},
             timeserie=self.timeserie, extractors={"foo": foo_extractor})
         self.assertDictEqual(rs.as_dict(), {"foo": 1})
@@ -118,10 +118,10 @@ class ResultSetTestCase(FeetsTestCase):
         timeserie = self.timeserie
         timeserie.update(time=1, error=2)
 
-        rs = ResultSet(
+        rs = FeatureSet(
             features_names=["foo"], values={"foo": 1},
             timeserie=timeserie, extractors={"foo": foo_extractor})
-        expected = "ResultSet(features=<foo>, timeserie=<time, error>)"
+        expected = "FeatureSet(features=<foo>, timeserie=<time, error>)"
         assert repr(rs) == str(rs) == expected
 
 

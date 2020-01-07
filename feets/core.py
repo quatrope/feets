@@ -100,7 +100,7 @@ class FeatureSpaceError(ValueError):
 # RESULTSET
 # =============================================================================
 
-class _ResultMap(Mapping):
+class _Map(Mapping):
     """Internal representation of a immutable dict"""
 
     def __init__(self, d):
@@ -124,19 +124,19 @@ class _ResultMap(Mapping):
 
 
 @attr.s(frozen=True, auto_attribs=True, repr=False)
-class ResultSet:
+class FeatureSet:
     """Container of features.
 
-    The ResultSet object is capable of convert the features into
-    dictionaties, numpy arrays, pandas dataframes and also provides
+    The FeatureSet object is capable of convert the features into
+    dicts, numpy arrays and also provides
     analysis capabilities like plots thought the matplotlib
     and seaborn library.
 
     """
-    features_names: np.ndarray = attr.ib(converter=tuple)
-    values: dict = attr.ib(converter=_ResultMap)
-    extractors: dict = attr.ib(converter=_ResultMap)
-    timeserie: dict = attr.ib(converter=_ResultMap)
+    features_names: tuple = attr.ib(converter=tuple)
+    values: dict = attr.ib(converter=_Map)
+    extractors: dict = attr.ib(converter=_Map)
+    timeserie: dict = attr.ib(converter=_Map)
 
     def __attrs_post_init__(self):
         cnt = Counter(
@@ -160,7 +160,7 @@ class ResultSet:
         """x.__repr__() <==> repr(x)"""
         feats = ", ".join(self.features_names)
         ts = ", ".join(d for d in DATAS if self.timeserie.get(d) is not None)
-        return f"ResultSet(features=<{feats}>, timeserie=<{ts}>)"
+        return f"FeatureSet(features=<{feats}>, timeserie=<{ts}>)"
 
     def extractor_of(self, feature):
         """Retrieve the  extractor instance used for create the given feature.
@@ -407,7 +407,7 @@ class FeatureSpace:
 
         Returns
         -------
-        feets.core.ResultSet
+        feets.core.FeatureSet
             Container of a calculated features.
 
         """
@@ -435,7 +435,7 @@ class FeatureSpace:
             flt_features[fname] = features[fname]
             flt_extractors[fname] = extractors[fname]
 
-        rs = ResultSet(
+        rs = FeatureSet(
             features_names=self._features_as_array,
             values=flt_features,
             extractors=flt_extractors,
