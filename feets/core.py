@@ -41,7 +41,6 @@ __all__ = [
 # =============================================================================
 
 import copy
-import logging
 import itertools as it
 from collections import Counter
 from collections.abc import Mapping
@@ -62,15 +61,6 @@ from .extractors.core import (
     DATA_ALIGNED_TIME,
     DATA_ALIGNED_ERROR,
     DATA_ALIGNED_ERROR2)
-
-
-# =============================================================================
-# LOG
-# =============================================================================
-
-logger = logging.getLogger("feets")
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.WARNING)
 
 
 # =============================================================================
