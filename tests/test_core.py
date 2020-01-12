@@ -37,7 +37,9 @@
 
 import numpy as np
 
-import mock
+import pandas as pd
+
+from unittest import mock
 
 from feets import (
     extractors, FeatureSpace, FeatureSpaceError, FeatureNotFound,
@@ -111,6 +113,16 @@ class ResultSetTestCase(FeetsTestCase):
             features_names=["foo"], values={"foo": 1},
             timeserie=self.timeserie, extractors={"foo": foo_extractor})
         self.assertDictEqual(rs.as_dict(), {"foo": 1})
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_as_dataframe(self):
+        foo_extractor = self.foo_extractor()
+        rs = FeatureSet(
+            features_names=["foo"], values={"foo": 1},
+            timeserie=self.timeserie, extractors={"foo": foo_extractor})
+
+        expected = pd.DataFrame([{"foo": 1.0}])
+        assert rs.as_dataframe().equals(expected)
 
     @mock.patch("feets.extractors._extractors", {})
     def test_repr(self):

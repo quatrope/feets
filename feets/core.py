@@ -45,6 +45,8 @@ import itertools as it
 from collections import Counter
 from collections.abc import Mapping
 
+import pandas as pd
+
 import numpy as np
 
 import attr
@@ -159,7 +161,7 @@ class FeatureSet:
         return copy.deepcopy(self.extractors[feature])
 
     def as_arrays(self):
-        """Convert the feature spaces into two 1D numpy arrays.
+        """Convert the feature values into two 1D numpy arrays.
 
         The first one contains all the names of the features (with suffixes
         if the array was flattened). And the second one the values.
@@ -187,6 +189,16 @@ class FeatureSet:
     def as_dict(self):
         """Return a copy of values"""
         return dict(self.values)
+
+    def as_dataframe(self):
+        """Convert the entire features into a ``pandas.DataFrame``.
+
+        The multimensional features are first *flattened* with the
+        ``flatten_feature()`` method.
+
+        """
+        features, values = self.as_arrays()
+        return pd.DataFrame([values], columns=features)
 
 
 # =============================================================================
