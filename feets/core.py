@@ -160,6 +160,34 @@ class FeatureSet:
         """
         return copy.deepcopy(self.extractors[feature])
 
+    def plot(self, feature, ax=None, **kwargs):
+        """If is available, draw the plot-representation of the given feature.
+
+        Parameters
+        ----------
+
+        feature : str
+            The feature to plot.
+        ax : matplotlib axes object, default None.
+        `**kwds` : keywords
+            Options to pass to extractor and matplotlib plotting method.
+
+        Returns
+        -------
+        axes : matplotlib.axes.Axes or np.ndarray of them
+
+        """
+        plot_params = {"features": self.as_dict()}
+        plot_params.update(self.timeserie)
+        plot_params.update(kwargs)
+
+        extractor = self.extractor_of(feature)
+        value = self[feature]
+
+        axes = extractor.plot(
+            feature=feature, value=value, ax=ax, **plot_params)
+        return axes
+
     def as_arrays(self):
         """Convert the feature values into two 1D numpy arrays.
 

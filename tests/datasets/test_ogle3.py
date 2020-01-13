@@ -42,7 +42,7 @@ import numpy as np
 
 import pandas as pd
 
-import mock
+from unittest import mock
 
 from feets.datasets import ogle3
 

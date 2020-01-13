@@ -43,7 +43,7 @@ import numpy as np
 
 import pandas as pd
 
-import mock
+from unittest import mock
 
 from feets import (
     FeatureSpace,

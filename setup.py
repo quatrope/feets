@@ -53,9 +53,9 @@ import feets
 # =============================================================================
 
 REQUIREMENTS = [
-    "numpy", "scipy",
-    "statsmodels", "mock", "astropy",
-    "pandas", "requests", "attrs", "joblib"]
+    "numpy", "scipy", "matplotlib", "pandas",
+    "statsmodels", "astropy",
+    "requests", "attrs", "joblib"]
 
 
 # =============================================================================

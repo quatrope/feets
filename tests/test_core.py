@@ -41,6 +41,8 @@ import pandas as pd
 
 from unittest import mock
 
+from matplotlib import axes
+
 from feets import (
     extractors, FeatureSpace, FeatureSpaceError, FeatureNotFound,
     Extractor, register_extractor, ExtractorContractError)
@@ -64,6 +66,9 @@ class ResultSetTestCase(FeetsTestCase):
         class MockExtractor(Extractor):
             data = ["magnitude"]
             features = ["foo"]
+
+            def plot_feature(self, **kwargs):
+                pass
 
             def fit(self, magnitude):
                 return {"foo": magnitude}
@@ -135,6 +140,16 @@ class ResultSetTestCase(FeetsTestCase):
             timeserie=timeserie, extractors={"foo": foo_extractor})
         expected = "FeatureSet(features=<foo>, timeserie=<time, error>)"
         assert repr(rs) == str(rs) == expected
+
+    @mock.patch("feets.extractors._extractors", {})
+    def test_plot(self):
+        foo_extractor = self.foo_extractor()
+
+        rs = FeatureSet(
+            features_names=["foo"], values={"foo": 1},
+            timeserie=self.timeserie, extractors={"foo": foo_extractor})
+
+        assert isinstance(rs.plot("foo"), axes.Axes)
 
 
 # =============================================================================
