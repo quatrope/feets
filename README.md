@@ -7,13 +7,11 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
 
 [![ascl:1806.001](https://img.shields.io/badge/ascl-1806.001-blue.svg?colorB=262255)](http://ascl.net/1806.001)
 
-[![Build Status](https://travis-ci.org/carpyncho/feets.svg?branch=master)](https://travis-ci.org/carpyncho/feets)
+[![Build Status](https://travis-ci.org/quatrope/feets.svg?branch=master)](https://travis-ci.org/quatrope/feets)
 
 [![ReadTheDocs.org](https://img.shields.io/badge/docs-passing-brightgreen.svg)](http://feets.readthedocs.io)
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
-
-[![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://badge.fury.io/py/feets)
 
 [![Python 3.5+](https://img.shields.io/badge/python-3.5+-blue.svg)](https://badge.fury.io/py/feets)
 
