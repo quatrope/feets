@@ -37,6 +37,8 @@
 
 import numpy as np
 
+import seaborn as sns
+
 from .core import Extractor
 
 
@@ -51,6 +53,14 @@ class Signature(Extractor):
     params = {"phase_bins": 18, "mag_bins": 12}
 
     features = ["SignaturePhMag"]
+
+    def plot_feature(self, feature, value, ax, plot_kws,
+                     phase_bins, mag_bins, **kwargs):
+
+        ax.set_title(f"SignaturePhMag - {phase_bins}x{mag_bins}")
+        ax.set_xlabel("Phase")
+        ax.set_ylabel("Magnitude")
+        sns.heatmap(value, ax=ax, **plot_kws)
 
     def fit(self, magnitude, time, PeriodLS, Amplitude, phase_bins, mag_bins):
 

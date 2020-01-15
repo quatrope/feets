@@ -43,6 +43,8 @@ import numpy as np
 
 import pandas as pd
 
+import matplotlib.pyplot as plt
+
 from unittest import mock
 
 from feets import (
@@ -631,3 +633,24 @@ class GSKewTest(FeetsTestCase):
         ext = extractors.Gskew(interpolation="nearest")
         result = ext.extract(features={}, **lc)
         assert not np.isnan(result["Gskew"])
+
+
+class SignatureTests(FeetsTestCase):
+
+    def test_plot_SignaturePhMag(self):
+        ext = extractors.Signature()
+
+        kwargs = ext.get_default_params()
+        kwargs.update(
+            feature="SignaturePhMag",
+            value=[[1, 2, 3, 4]],
+            ax=plt.gca(),
+            plot_kws={},
+
+            time=[1, 2, 3, 4],
+            magnitude=[1, 2, 3, 4],
+            error=[1, 2, 3, 4],
+
+            features={"PeriodLS": 1, "Amplitude": 10})
+
+        ext.plot(**kwargs)

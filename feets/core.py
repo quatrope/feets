@@ -49,6 +49,8 @@ import pandas as pd
 
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 import attr
 
 from . import extractors
@@ -160,7 +162,7 @@ class FeatureSet:
         """
         return copy.deepcopy(self.extractors[feature])
 
-    def plot(self, feature, ax=None, **kwargs):
+    def plot(self, feature, ax=None, **plot_kws):
         """If is available, draw the plot-representation of the given feature.
 
         Parameters
@@ -169,7 +171,7 @@ class FeatureSet:
         feature : str
             The feature to plot.
         ax : matplotlib axes object, default None.
-        `**kwds` : keywords
+        `**plot_kws` : keywords
             Options to pass to extractor and matplotlib plotting method.
 
         Returns
@@ -177,16 +179,18 @@ class FeatureSet:
         axes : matplotlib.axes.Axes or np.ndarray of them
 
         """
-        plot_params = {"features": self.as_dict()}
-        plot_params.update(self.timeserie)
-        plot_params.update(kwargs)
+        ax = plt.gca() if ax is None else ax
 
+        all_features = self.as_dict()
         extractor = self.extractor_of(feature)
         value = self[feature]
 
-        axes = extractor.plot(
-            feature=feature, value=value, ax=ax, **plot_params)
-        return axes
+        ax = extractor.plot(
+            feature=feature, value=value, ax=ax,
+            plot_kws=plot_kws, features=all_features,
+            **self.timeserie)
+
+        return ax
 
     def as_arrays(self):
         """Convert the feature values into two 1D numpy arrays.
@@ -197,14 +201,17 @@ class FeatureSet:
         Internally this method uses the ``flatten_feature()`` method.
 
         """
-        flatten_params = {"features": self.as_dict()}
-        flatten_params.update(self.timeserie)
 
-        flatten_features = {}
+        all_features, flatten_features = self.as_dict(), {}
+
         for fname, fvalue in self.values.items():
+
             extractor = self.extractors[fname]
+
             flatten_value = extractor.flatten(
-                feature=fname, value=fvalue, **flatten_params)
+                feature=fname, value=fvalue,
+                features=all_features, **self.timeserie)
+
             flatten_features.update(flatten_value)
 
         features = np.empty(len(flatten_features), dtype=object)

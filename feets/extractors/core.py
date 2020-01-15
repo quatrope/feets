@@ -37,8 +37,6 @@
 import warnings
 from collections import namedtuple
 
-import matplotlib.pyplot as plt
-
 import numpy as np
 
 
@@ -389,14 +387,14 @@ class Extractor(metaclass=ExtractorMeta):
             raise ExtractorContractError(
                 f"Feature {feature} are not defined for the extractor {self}")
 
-        flatten_kwargs = self.preprocess_arguments(**kwargs)
+        method_kwargs = self.preprocess_arguments(**kwargs)
 
         all_features = kwargs["features"] or {}
         efeatures = {k: v for k, v in all_features.items() if k in feats}
 
         flat_feature = self.flatten_feature(
             feature=feature, value=value,
-            extractor_features=efeatures, **flatten_kwargs)
+            extractor_features=efeatures, **method_kwargs)
 
         if not isinstance(flat_feature, dict):
             raise ExtractorContractError(
@@ -419,16 +417,7 @@ class Extractor(metaclass=ExtractorMeta):
         raise NotImplementedError(
             f"Feature '{feature}' does not have a defined plot routine")
 
-    def get_default_axis(self):
-        """Return the default axis for the extractor.
-
-        The default implementation returns the value of
-        ``matplotlib.pyplot.gca()`` function.
-
-        """
-        return plt.gca()
-
-    def plot(self, feature, value, ax, **kwargs):
+    def plot(self, feature, value, ax, plot_kws, **kwargs):
         """Plot a feature or raises an 'NotImplementedError'
 
         This function uses internally the ``plot_feature`` method but also
@@ -440,14 +429,14 @@ class Extractor(metaclass=ExtractorMeta):
             raise ExtractorContractError(
                 f"Feature {feature} are not defined for the extractor {self}")
 
-        plot_kwargs = self.preprocess_arguments(**kwargs)
+        method_kwargs = self.preprocess_arguments(**kwargs)
 
         all_features = kwargs["features"] or {}
         efeatures = {k: v for k, v in all_features.items() if k in feats}
 
-        ax = self.get_default_axis() if ax is None else ax
         self.plot_feature(
             feature=feature, value=value,
-            extractor_features=efeatures, ax=ax, **plot_kwargs)
+            extractor_features=efeatures,
+            ax=ax, plot_kws=plot_kws, **method_kwargs)
 
         return ax
