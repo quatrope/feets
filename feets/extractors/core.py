@@ -415,7 +415,7 @@ class Extractor(metaclass=ExtractorMeta):
 
     def plot_feature(self, feature, **kwargs):
         raise NotImplementedError(
-            f"Feature '{feature}' does not have a defined plot routine")
+            f"Plot for feature '{feature}' not implemeted")
 
     def plot(self, feature, value, ax, plot_kws, **kwargs):
         """Plot a feature or raises an 'NotImplementedError'

@@ -184,11 +184,14 @@ class FeatureSet:
         all_features = self.as_dict()
         extractor = self.extractor_of(feature)
         value = self[feature]
-
-        ax = extractor.plot(
-            feature=feature, value=value, ax=ax,
-            plot_kws=plot_kws, features=all_features,
-            **self.timeserie)
+        try:
+            ax = extractor.plot(
+                feature=feature, value=value, ax=ax,
+                plot_kws=plot_kws, features=all_features,
+                **self.timeserie)
+        except NotImplementedError:
+            ax.remove()
+            raise
 
         return ax
 
