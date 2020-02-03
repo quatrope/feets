@@ -491,6 +491,12 @@ class DMDTTestCases(FeetsTestCase):
             values[idx] = np.sum(list(feats.values()))
         self.assertAllClose(values.mean(), 424.56)
 
+    def test_dmdt_repr(self):
+        ext = extractors.DeltamDeltat()
+        assert (
+            repr(ext) ==
+            "DeltamDeltat(dt_bins=<numpy.ndarray>, dm_bins=<numpy.ndarray>)")
+
 
 class LombScargleTests(FeetsTestCase):
 

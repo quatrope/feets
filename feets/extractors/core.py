@@ -44,6 +44,8 @@ import numpy as np
 # CONSTANTS
 # =============================================================================
 
+MAX_VALUES_TO_REPR = 10
+
 DATA_MAGNITUDE = "magnitude"
 DATA_TIME = "time"
 DATA_ERROR = "error"
@@ -275,19 +277,25 @@ class Extractor(metaclass=ExtractorMeta):
 
     def __repr__(self):
         """x.__repr__() <==> repr(x)."""
-        return str(self)
+        if not hasattr(self, "__repr"):
+            params = self.params or {}
+            parsed_params = []
+            for k, v in params.items():
+                sk = str(k)
+                if np.ndim(v) != 0 and np.size(v) > MAX_VALUES_TO_REPR:
+                    tv = type(v)
+                    sv = f"<{tv.__module__}.{tv.__name__}>"
+                else:
+                    sv = str(v)
+                parsed_params.append(f"{sk}={sv}")
+            str_params = ", ".join(parsed_params)
+            self.__repr = f"{self.name}({str_params})"
+
+        return self.__repr
 
     def __str__(self):
         """x.__str__() <==> str(x)."""
-        if not hasattr(self, "__str"):
-            params = self.params
-            if params:
-                params = ", ".join([
-                    "{}={}".format(k, v) for k, v in params.items()])
-            else:
-                params = ""
-            self.__str = "{}({})".format(self.name, params)
-        return self.__str
+        return repr(self)
 
     def preprocess_arguments(self, **kwargs):
         """Preprocess all the incoming argument
