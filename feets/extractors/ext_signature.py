@@ -63,12 +63,12 @@ class Signature(Extractor):
         sns.heatmap(value, ax=ax, **plot_kws)
 
     def fit(self, magnitude, time, PeriodLS, Amplitude, phase_bins, mag_bins):
-
+        first_period = PeriodLS[0]
         lc_yaxis = (magnitude - np.min(magnitude)) / np.float(Amplitude)
 
         # SHIFT TO BEGIN AT MINIMUM
         loc = np.argmin(lc_yaxis)
-        lc_phase = np.remainder(time - time[loc], PeriodLS) / PeriodLS
+        lc_phase = np.remainder(time - time[loc], first_period) / first_period
 
         bins = (phase_bins, mag_bins)
         signature = np.histogram2d(
