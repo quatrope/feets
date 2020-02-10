@@ -39,57 +39,55 @@ import numpy as np
 
 from feets import extractors
 
-import matplotlib.pyplot as plt
-
-from ..core import FeetsTestCase
+from matplotlib.testing.decorators import check_figures_equal
 
 
 # =============================================================================
 # Test cases
 # =============================================================================
 
-class SignatureTests(FeetsTestCase):
+@check_figures_equal()
+def test_plot_SignaturePhMag(fig_test, fig_ref):
+    ext = extractors.Signature()
 
-    def test_plot_SignaturePhMag(self):
-        ext = extractors.Signature()
+    kwargs = ext.get_default_params()
+    kwargs.update(
+        feature="SignaturePhMag",
+        value=[[1, 2, 3, 4]],
+        ax=fig_test.subplots(),
+        plot_kws={},
 
-        kwargs = ext.get_default_params()
-        kwargs.update(
-            feature="SignaturePhMag",
-            value=[[1, 2, 3, 4]],
-            ax=plt.gca(),
-            plot_kws={},
+        time=[1, 2, 3, 4],
+        magnitude=[1, 2, 3, 4],
+        error=[1, 2, 3, 4],
 
-            time=[1, 2, 3, 4],
-            magnitude=[1, 2, 3, 4],
-            error=[1, 2, 3, 4],
+        features={"PeriodLS": 1, "Amplitude": 10})
 
-            features={"PeriodLS": 1, "Amplitude": 10})
+    ext.plot(**kwargs)
 
-        ext.plot(**kwargs)
 
-    def test_multiple_peaks_period_ls(self):
-        random = np.random.RandomState(54)
+def test_multiple_peaks_period_ls():
+    random = np.random.RandomState(54)
 
-        lc = {
-            "time": np.arange(100) + random.uniform(size=100),
-            "magnitude": random.normal(size=100),
-            "error": None}
+    lc = {
+        "time": np.arange(100) + random.uniform(size=100),
+        "magnitude": random.normal(size=100),
+        "error": None}
 
-        # one peak
-        ls_ext_1 = extractors.LombScargle()
-        ls_ext_2 = extractors.LombScargle(peaks=2)
-        amp_ext = extractors.Amplitude()
-        sig_ext = extractors.Signature()
+    # one peak
+    ls_ext_1 = extractors.LombScargle()
+    ls_ext_2 = extractors.LombScargle(peaks=2)
+    amp_ext = extractors.Amplitude()
+    sig_ext = extractors.Signature()
 
-        rs0 = ls_ext_1.extract(features={}, **lc)
-        rs0.update(amp_ext.extract(features=rs0, **lc))
-        rs0.update(sig_ext.extract(features=rs0, **lc))
+    rs0 = ls_ext_1.extract(features={}, **lc)
+    rs0.update(amp_ext.extract(features=rs0, **lc))
+    rs0.update(sig_ext.extract(features=rs0, **lc))
 
-        rs1 = ls_ext_2.extract(features={}, **lc)
-        rs1.update(amp_ext.extract(features=rs1, **lc))
-        rs1.update(sig_ext.extract(features=rs1, **lc))
+    rs1 = ls_ext_2.extract(features={}, **lc)
+    rs1.update(amp_ext.extract(features=rs1, **lc))
+    rs1.update(sig_ext.extract(features=rs1, **lc))
 
-        assert np.all(rs0["PeriodLS"][0] == rs1["PeriodLS"][0])
-        assert np.all(rs0["Amplitude"] == rs1["Amplitude"])
-        assert np.all(rs0["SignaturePhMag"] == rs1["SignaturePhMag"])
+    assert np.all(rs0["PeriodLS"][0] == rs1["PeriodLS"][0])
+    assert np.all(rs0["Amplitude"] == rs1["Amplitude"])
+    assert np.all(rs0["SignaturePhMag"] == rs1["SignaturePhMag"])
