@@ -39,6 +39,8 @@ import numpy as np
 
 from feets import extractors
 
+import seaborn as sns
+
 from matplotlib.testing.decorators import check_figures_equal
 
 
@@ -48,8 +50,9 @@ from matplotlib.testing.decorators import check_figures_equal
 
 @check_figures_equal()
 def test_plot_SignaturePhMag(fig_test, fig_ref):
-    ext = extractors.Signature()
 
+    # fig test
+    ext = extractors.Signature()
     kwargs = ext.get_default_params()
     kwargs.update(
         feature="SignaturePhMag",
@@ -62,8 +65,15 @@ def test_plot_SignaturePhMag(fig_test, fig_ref):
         error=[1, 2, 3, 4],
 
         features={"PeriodLS": 1, "Amplitude": 10})
-
     ext.plot(**kwargs)
+
+    # expected
+    eax = fig_ref.subplots()
+    eax.set_title(
+        f"SignaturePhMag - {kwargs['phase_bins']}x{kwargs['mag_bins']}")
+    eax.set_xlabel("Phase")
+    eax.set_ylabel("Magnitude")
+    sns.heatmap(kwargs["value"], ax=eax, **kwargs["plot_kws"])
 
 
 def test_multiple_peaks_period_ls():

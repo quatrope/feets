@@ -43,79 +43,85 @@ import pandas as pd
 
 from feets import extractors, FeatureSpace
 
-from ..core import FeetsTestCase, DATA_PATH
+import pytest
+
+from ..core import DATA_PATH
+
+
+# =============================================================================
+# FIXTURES
+# =============================================================================
+
+@pytest.fixture()
+def periodic_lc():
+    random = np.random.RandomState(42)
+
+    N = 100
+    mjd_periodic = np.arange(N)
+    Period = 20
+    cov = np.zeros([N, N])
+    mean = np.zeros(N)
+    for i in np.arange(N):
+        for j in np.arange(N):
+            cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
+    data_periodic = random.multivariate_normal(mean, cov)
+    error = random.normal(size=100, loc=0.001)
+    lc = {
+        "magnitude": data_periodic,
+        "time": mjd_periodic,
+        "error": error}
+    return lc
 
 
 # =============================================================================
 # Test cases
 # =============================================================================
 
-class LombScargleTests(FeetsTestCase):
+def test_lscargle_vs_feets():
 
-    def setUp(self):
-        self.random = np.random.RandomState(42)
+    # extract the module for make short code
+    ext_lomb_scargle = extractors.ext_lomb_scargle
 
-    def periodic_lc(self):
-        N = 100
-        mjd_periodic = np.arange(N)
-        Period = 20
-        cov = np.zeros([N, N])
-        mean = np.zeros(N)
-        for i in np.arange(N):
-            for j in np.arange(N):
-                cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
-        data_periodic = self.random.multivariate_normal(mean, cov)
-        error = self.random.normal(size=100, loc=0.001)
-        lc = {
-            "magnitude": data_periodic,
-            "time": mjd_periodic,
-            "error": error}
-        return lc
+    # load the data
+    path = os.path.join(
+        DATA_PATH, "bad_results.pandas.pkl")
+    tseries = pd.read_pickle(path)
 
-    def test_lscargle_vs_feets(self):
+    # the ls params
+    ext_params = ext_lomb_scargle.LombScargle.get_default_params()
+    lscargle_kwds = ext_params["lscargle_kwds"]
 
-        # extract the module for make short code
-        ext_lomb_scargle = extractors.ext_lomb_scargle
+    # create the feature space
+    fs = FeatureSpace(only=["PeriodLS"])
 
-        # load the data
-        path = os.path.join(
-            DATA_PATH, "bad_results.pandas.pkl")
-        tseries = pd.read_pickle(path)
+    ls_periods, feets_periods = [], []
+    for src_id in tseries.bm_src_id.unique():
 
-        # the ls params
-        ext_params = ext_lomb_scargle.LombScargle.get_default_params()
-        lscargle_kwds = ext_params["lscargle_kwds"]
+        # extract the timeseries
+        sobs = tseries[tseries.bm_src_id == src_id]
+        time = sobs.pwp_stack_src_hjd.values
+        magnitude = sobs.pwp_stack_src_mag3.values
+        error = sobs.pwp_stack_src_mag_err3.values
 
-        # create the feature space
-        fs = FeatureSpace(only=["PeriodLS"])
+        # "pure" lomb scargle (without the entire feets pipeline)
+        frequency, power = ext_lomb_scargle.lscargle(
+            time=time, magnitude=magnitude, error=error, **lscargle_kwds)
+        fmax = np.argmax(power)
+        ls_periods.append(1 / frequency[fmax])
 
-        ls_periods, feets_periods = [], []
-        for src_id in tseries.bm_src_id.unique():
+        # extract the period from the feets pipele
+        rs = fs.extract(time=time, magnitude=magnitude, error=error)
+        feets_periods.append(rs.values['PeriodLS'])
 
-            # extract the timeseries
-            sobs = tseries[tseries.bm_src_id == src_id]
-            time = sobs.pwp_stack_src_hjd.values
-            magnitude = sobs.pwp_stack_src_mag3.values
-            error = sobs.pwp_stack_src_mag_err3.values
+    feets_periods = np.array(feets_periods).flatten()
 
-            # "pure" lomb scargle (without the entire feets pipeline)
-            frequency, power = ext_lomb_scargle.lscargle(
-                time=time, magnitude=magnitude, error=error, **lscargle_kwds)
-            fmax = np.argmax(power)
-            ls_periods.append(1 / frequency[fmax])
+    np.testing.assert_array_equal(ls_periods, feets_periods)
 
-            # extract the period from the feets pipele
-            rs = fs.extract(time=time, magnitude=magnitude, error=error)
-            feets_periods.append(rs.values['PeriodLS'])
 
-        feets_periods = np.array(feets_periods).flatten()
-        self.assertArrayEqual(ls_periods, feets_periods)
+def test_lscargle_peaks(periodic_lc):
 
-    def test_lscargle_peaks(self):
-        lc = self.periodic_lc()
-
-        for peaks in [1, 2, 3, 10]:
-            ext = extractors.LombScargle(peaks=peaks)
-            feats = ext.extract(features={}, **lc)
-            for v in feats.values():
-                self.assertEqual(len(v), peaks)
+    for peaks in [1, 2, 3, 10]:
+        ext = extractors.LombScargle(peaks=peaks)
+        feats = ext.extract(features={}, **periodic_lc)
+        for v in feats.values():
+            assert len(v) == peaks

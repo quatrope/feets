@@ -39,33 +39,28 @@ import numpy as np
 
 from feets import extractors
 
-from ..core import FeetsTestCase
-
 
 # =============================================================================
 # Test cases
 # =============================================================================
 
+def test_feets_dmdt():
+    random = np.random.RandomState(42)
+    ext = extractors.DeltamDeltat()
+    params = ext.get_default_params()
+    time = np.arange(0, 1000)
 
-class DMDTTestCases(FeetsTestCase):
+    values = np.empty(50)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        feats = ext.fit(magnitude=mags, time=time, **params)
+        values[idx] = np.sum(list(feats.values()))
 
-    def setUp(self):
-        self.random = np.random.RandomState(42)
+    np.testing.assert_allclose(values.mean(), 424.56)
 
-    def test_feets_dmdt(self):
-        ext = extractors.DeltamDeltat()
-        params = ext.get_default_params()
-        time = np.arange(0, 1000)
 
-        values = np.empty(50)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            feats = ext.fit(magnitude=mags, time=time, **params)
-            values[idx] = np.sum(list(feats.values()))
-        self.assertAllClose(values.mean(), 424.56)
-
-    def test_dmdt_repr(self):
-        ext = extractors.DeltamDeltat()
-        assert (
-            repr(ext) ==
-            "DeltamDeltat(dt_bins=<numpy.ndarray>, dm_bins=<numpy.ndarray>)")
+def test_dmdt_repr():
+    ext = extractors.DeltamDeltat()
+    assert (
+        repr(ext) ==
+        "DeltamDeltat(dt_bins=<numpy.ndarray>, dm_bins=<numpy.ndarray>)")

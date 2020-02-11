@@ -39,44 +39,46 @@ import numpy as np
 
 from feets import extractors
 
+import pytest
 
-from ..core import FeetsTestCase
+
+# =============================================================================
+# FIXTURES
+# =============================================================================
+
+@pytest.fixture()
+def periodic_lc():
+    random = np.random.RandomState(42)
+
+    N = 100
+    mjd_periodic = np.arange(N)
+    Period = 20
+    cov = np.zeros([N, N])
+    mean = np.zeros(N)
+    for i in np.arange(N):
+        for j in np.arange(N):
+            cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
+    data_periodic = random.multivariate_normal(mean, cov)
+    error = random.normal(size=100, loc=0.001)
+    lc = {
+        "magnitude": data_periodic,
+        "time": mjd_periodic,
+        "error": error}
+    return lc
 
 
 # =============================================================================
 # Test cases
 # =============================================================================
 
-class FourierTests(FeetsTestCase):
+def test_fourier_optional_data(periodic_lc):
+    lc_error = periodic_lc
 
-    def setUp(self):
-        self.random = np.random.RandomState(42)
+    lc = lc_error.copy()
+    lc["error"] = None
 
-    def periodic_lc(self):
-        N = 100
-        mjd_periodic = np.arange(N)
-        Period = 20
-        cov = np.zeros([N, N])
-        mean = np.zeros(N)
-        for i in np.arange(N):
-            for j in np.arange(N):
-                cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
-        data_periodic = self.random.multivariate_normal(mean, cov)
-        error = self.random.normal(size=100, loc=0.001)
-        lc = {
-            "magnitude": data_periodic,
-            "time": mjd_periodic,
-            "error": error}
-        return lc
+    ext = extractors.FourierComponents()
 
-    def test_fourier_optional_data(self):
-        lc_error = self.periodic_lc()
-
-        lc = lc_error.copy()
-        lc["error"] = None
-
-        ext = extractors.FourierComponents()
-
-        self.assertNotEqual(
-            ext.extract(features={}, **lc),
-            ext.extract(features={}, **lc_error))
+    assert (
+        ext.extract(features={}, **lc) !=
+        ext.extract(features={}, **lc_error))
