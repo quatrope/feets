@@ -38,133 +38,165 @@ original FATS project was the same of feets.
 # IMPORTS
 # =============================================================================
 
-import unittest
-
 import numpy as np
 
+import pytest
 
 from feets import extractors
 
-from ..core import FeetsTestCase
+
+# =============================================================================
+# CASES
+# =============================================================================
+
+def test_FATS_doc_Amplitude():
+    ext = extractors.Amplitude()
+    value = ext.fit(np.arange(0, 1001))["Amplitude"]
+    assert value == 475
 
 
-class FATSExtractorsTestCases(FeetsTestCase):
+@pytest.mark.xfail(reason="FATS say must be 0.2, but actual is -0.60")
+def test_FATS_doc_AndersonDarling():
+    random = np.random.RandomState(42)
 
-    def setUp(self):
-        self.random = np.random.RandomState(42)
+    ext = extractors.AndersonDarling()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        values[idx] = ext.fit(mags)["AndersonDarling"]
+    np.testing.assert_allclose(values.mean(), 0.25)
 
-    def test_FATS_doc_Amplitude(self):
-        ext = extractors.Amplitude()
-        value = ext.fit(np.arange(0, 1001))["Amplitude"]
-        self.assertEqual(value, 475)
 
-    @unittest.skip("FATS say must be 0.2, but actual is -0.60")
-    def test_FATS_doc_AndersonDarling(self):
-        ext = extractors.AndersonDarling()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(mags)["AndersonDarling"]
-        self.assertAllClose(values.mean(), 0.25)
+def test_FATS_doc_Beyond1Std():
+    random = np.random.RandomState(42)
 
-    def test_FATS_doc_Beyond1Std(self):
-        ext = extractors.Beyond1Std()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            errors = self.random.normal(scale=0.001, size=1000)
-            values[idx] = ext.fit(mags, errors)["Beyond1Std"]
-        self.assertAllClose(values.mean(), 0.32972600000000002)
+    ext = extractors.Beyond1Std()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        errors = random.normal(scale=0.001, size=1000)
+        values[idx] = ext.fit(mags, errors)["Beyond1Std"]
+    np.testing.assert_allclose(values.mean(), 0.32972600000000002)
 
-    def test_FATS_doc_Con(self):
-        ext = extractors.Con()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(mags, consecutiveStar=1)["Con"]
-        self.assertAllClose(values.mean(), 0.045557)
 
-    def test_FATS_doc_MeanVariance(self):
-        ext = extractors.MeanVariance()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.uniform(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['Meanvariance']
-        self.assertAllClose(values.mean(), 0.57664232208148747)
+def test_FATS_doc_Con():
+    random = np.random.RandomState(42)
 
-    def test_FATS_doc_MedianAbsDev(self):
-        ext = extractors.MedianAbsDev()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['MedianAbsDev']
-        self.assertAllClose(values.mean(), 0.67490807679242459)
+    ext = extractors.Con()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        values[idx] = ext.fit(mags, consecutiveStar=1)["Con"]
+    np.testing.assert_allclose(values.mean(), 0.045557)
 
-    def test_FATS_doc_RCS(self):
-        ext = extractors.RCS()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.uniform(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['Rcs']
-        self.assertAllClose(values.mean(), 0.03902862976795655)
 
-    def test_FATS_doc_Skew(self):
-        ext = extractors.Skew()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['Skew']
-        self.assertAllClose(values.mean(), -0.0017170680368871292)
+def test_FATS_doc_MeanVariance():
+    random = np.random.RandomState(42)
 
-    def test_FATS_doc_SmallKurtosis(self):
-        ext = extractors.SmallKurtosis()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['SmallKurtosis']
-        self.assertAllClose(values.mean(), 0.00040502517673364258)
+    ext = extractors.MeanVariance()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.uniform(size=1000)
+        values[idx] = ext.fit(magnitude=mags)['Meanvariance']
+    np.testing.assert_allclose(values.mean(), 0.57664232208148747)
 
-    def test_FATS_doc_Std(self):
-        ext = extractors.Std()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['Std']
-        self.assertAllClose(values.mean(), 0.9994202277548033)
 
-    @unittest.skip("FATS say must be 0, but actual is -0.41")
-    def test_FATS_doc_StetsonJ(self):
-        ext = extractors.StetsonJ()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            mags2 = mags * self.random.uniform(0, 1.5, mags.size)
-            errors = self.random.normal(scale=0.001, size=1000)
-            errors2 = self.random.normal(scale=0.001, size=1000)
-            values[idx] = ext.fit(
-                aligned_magnitude=mags, aligned_magnitude2=mags2,
-                aligned_error=errors, aligned_error2=errors2)['StetsonJ']
-        self.assertAllClose(values.mean(), 0)
+def test_FATS_doc_MedianAbsDev():
+    random = np.random.RandomState(42)
 
-    @unittest.skip("FATS say must be 2/pi, but actual is -0.20")
-    def test_FATS_doc_StetsonK(self):
-        ext = extractors.StetsonK()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            errors = self.random.normal(scale=0.001, size=1000)
-            values[idx] = ext.fit(magnitude=mags, error=errors)['StetsonK']
-        self.assertAllClose(values.mean(), 0.798)
+    ext = extractors.MedianAbsDev()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        values[idx] = ext.fit(magnitude=mags)['MedianAbsDev']
+    np.testing.assert_allclose(values.mean(), 0.67490807679242459)
 
-    def test_FATS_doc_StetsonL(self):
-        ext = extractors.StetsonL()
-        values = np.empty(1000)
-        for idx in range(values.size):
-            mags = self.random.normal(size=1000)
-            mags2 = mags * self.random.uniform(0, 1.5, mags.size)
-            errors = self.random.normal(scale=0.001, size=1000)
-            errors2 = self.random.normal(scale=0.001, size=1000)
-            values[idx] = ext.fit(
-                aligned_magnitude=mags, aligned_magnitude2=mags2,
-                aligned_error=errors, aligned_error2=errors2)['StetsonL']
-        self.assertAllClose(values.mean(), -0.0470713296883)
+
+def test_FATS_doc_RCS():
+    random = np.random.RandomState(42)
+
+    ext = extractors.RCS()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.uniform(size=1000)
+        values[idx] = ext.fit(magnitude=mags)['Rcs']
+    np.testing.assert_allclose(values.mean(), 0.03902862976795655)
+
+
+def test_FATS_doc_Skew():
+    random = np.random.RandomState(42)
+
+    ext = extractors.Skew()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        values[idx] = ext.fit(magnitude=mags)['Skew']
+    np.testing.assert_allclose(values.mean(), -0.0017170680368871292)
+
+
+def test_FATS_doc_SmallKurtosis():
+    random = np.random.RandomState(42)
+
+    ext = extractors.SmallKurtosis()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        values[idx] = ext.fit(magnitude=mags)['SmallKurtosis']
+    np.testing.assert_allclose(values.mean(), 0.00040502517673364258)
+
+
+def test_FATS_doc_Std():
+    random = np.random.RandomState(42)
+
+    ext = extractors.Std()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        values[idx] = ext.fit(magnitude=mags)['Std']
+    np.testing.assert_allclose(values.mean(), 0.9994202277548033)
+
+
+@pytest.mark.xfail(reason="FATS say must be 0, but actual is -0.41")
+def test_FATS_doc_StetsonJ():
+    random = np.random.RandomState(42)
+
+    ext = extractors.StetsonJ()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        mags2 = mags * random.uniform(0, 1.5, mags.size)
+        errors = random.normal(scale=0.001, size=1000)
+        errors2 = random.normal(scale=0.001, size=1000)
+        values[idx] = ext.fit(
+            aligned_magnitude=mags, aligned_magnitude2=mags2,
+            aligned_error=errors, aligned_error2=errors2)['StetsonJ']
+    np.testing.assert_allclose(values.mean(), 0)
+
+
+@pytest.mark.xfail(reason="FATS say must be 2/pi, but actual is -0.20")
+def test_FATS_doc_StetsonK():
+    random = np.random.RandomState(42)
+
+    ext = extractors.StetsonK()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        errors = random.normal(scale=0.001, size=1000)
+        values[idx] = ext.fit(magnitude=mags, error=errors)['StetsonK']
+    np.testing.assert_allclose(values.mean(), 0.798)
+
+
+def test_FATS_doc_StetsonL():
+    random = np.random.RandomState(42)
+
+    ext = extractors.StetsonL()
+    values = np.empty(1000)
+    for idx in range(values.size):
+        mags = random.normal(size=1000)
+        mags2 = mags * random.uniform(0, 1.5, mags.size)
+        errors = random.normal(scale=0.001, size=1000)
+        errors2 = random.normal(scale=0.001, size=1000)
+        values[idx] = ext.fit(
+            aligned_magnitude=mags, aligned_magnitude2=mags2,
+            aligned_error=errors, aligned_error2=errors2)['StetsonL']
+    np.testing.assert_allclose(values.mean(), -0.0470713296883)
