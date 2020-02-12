@@ -28,8 +28,8 @@
 # DOC
 # =============================================================================
 
-"""This tests was meded to always check that the results given by the
-original FATS project was the same of feets.
+"""This tests was madded to always check that the results expected by the
+original FATS documentation are the same of feets.
 
 """
 

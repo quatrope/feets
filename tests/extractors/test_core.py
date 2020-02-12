@@ -49,9 +49,7 @@ from feets import (
 # FIXTURES
 # =============================================================================
 
-@pytest.fixture(scope="module")
-def flatten_params():
-    return dict.fromkeys(extractors.DATAS + ("features", ))
+FLATTEN_PARAMS = dict.fromkeys(extractors.DATAS + ("features", ))
 
 
 # =============================================================================
@@ -114,7 +112,7 @@ def test_sort_by_dependencies():
 # =============================================================================
 
 @mock.patch("feets.extractors._extractors", {})
-def test_default_flatten_invalid_feature_for_the_extracor(flatten_params):
+def test_default_flatten_invalid_feature_for_the_extracor():
 
     @register_extractor
     class A(Extractor):
@@ -126,11 +124,11 @@ def test_default_flatten_invalid_feature_for_the_extracor(flatten_params):
 
     ext = A()
     with pytest.raises(ExtractorContractError):
-        ext.flatten("foo", 1, **flatten_params)
+        ext.flatten("foo", 1, **FLATTEN_PARAMS)
 
 
 @mock.patch("feets.extractors._extractors", {})
-def test_default_flatten_scalar(flatten_params):
+def test_default_flatten_scalar():
 
     @register_extractor
     class A(Extractor):
@@ -142,11 +140,11 @@ def test_default_flatten_scalar(flatten_params):
 
     ext = A()
     expected = {"feat": 1}
-    assert ext.flatten("feat", 1, **flatten_params) == expected
+    assert ext.flatten("feat", 1, **FLATTEN_PARAMS) == expected
 
 
 @mock.patch("feets.extractors._extractors", {})
-def test_default_flatten_1D(flatten_params):
+def test_default_flatten_1D():
 
     @register_extractor
     class A(Extractor):
@@ -158,11 +156,11 @@ def test_default_flatten_1D(flatten_params):
 
     ext = A()
     expected = {"feat_0": 1, "feat_1": 2}
-    assert ext.flatten("feat", [1, 2], **flatten_params) == expected
+    assert ext.flatten("feat", [1, 2], **FLATTEN_PARAMS) == expected
 
 
 @mock.patch("feets.extractors._extractors", {})
-def test_default_flatten_2D(flatten_params):
+def test_default_flatten_2D():
 
     @register_extractor
     class A(Extractor):
@@ -175,11 +173,11 @@ def test_default_flatten_2D(flatten_params):
     ext = A()
     expected = {'feat_0_0': 1, 'feat_0_1': 2,
                 'feat_1_0': 3, 'feat_1_1': 4}
-    assert ext.flatten("feat", [[1, 2], [3, 4]], **flatten_params) == expected
+    assert ext.flatten("feat", [[1, 2], [3, 4]], **FLATTEN_PARAMS) == expected
 
 
 @mock.patch("feets.extractors._extractors", {})
-def test_default_flatten_3D(flatten_params):
+def test_default_flatten_3D():
 
     @register_extractor
     class A(Extractor):
@@ -205,11 +203,11 @@ def test_default_flatten_3D(flatten_params):
         'feat_1_1_0': 7,
         'feat_1_1_1': 8}
 
-    assert ext.flatten("feat", value, **flatten_params) == expected
+    assert ext.flatten("feat", value, **FLATTEN_PARAMS) == expected
 
 
 @mock.patch("feets.extractors._extractors", {})
-def test_default_flatten_4D(flatten_params):
+def test_default_flatten_4D():
 
     @register_extractor
     class A(Extractor):
@@ -229,11 +227,11 @@ def test_default_flatten_4D(flatten_params):
         'feat_0_0_1_0': 3,
         'feat_0_0_1_1': 4}
 
-    assert ext.flatten("feat", value, **flatten_params) == expected
+    assert ext.flatten("feat", value, **FLATTEN_PARAMS) == expected
 
 
 @mock.patch("feets.extractors._extractors", {})
-def test_flatten_return_ndim_gt_0(flatten_params):
+def test_flatten_return_ndim_gt_0():
 
     @register_extractor
     class A(Extractor):
@@ -250,11 +248,11 @@ def test_flatten_return_ndim_gt_0(flatten_params):
     value = [1, 2]
 
     with pytest.raises(ExtractorContractError):
-        ext.flatten("feat", value, **flatten_params)
+        ext.flatten("feat", value, **FLATTEN_PARAMS)
 
 
 @mock.patch("feets.extractors._extractors", {})
-def test_flatten_return_not_dict_instance(flatten_params):
+def test_flatten_return_not_dict_instance():
 
     @register_extractor
     class A(Extractor):
@@ -271,11 +269,11 @@ def test_flatten_return_not_dict_instance(flatten_params):
     value = [1, 2]
 
     with pytest.raises(ExtractorContractError):
-        ext.flatten("feat", value, **flatten_params)
+        ext.flatten("feat", value, **FLATTEN_PARAMS)
 
 
 @mock.patch("feets.extractors._extractors", {})
-def test_flatten_return_invalid_name(flatten_params):
+def test_flatten_return_invalid_name():
 
     @register_extractor
     class A(Extractor):
@@ -292,7 +290,7 @@ def test_flatten_return_invalid_name(flatten_params):
     value = [1, 2]
 
     with pytest.raises(ExtractorContractError):
-        ext.flatten("feat", value, **flatten_params)
+        ext.flatten("feat", value, **FLATTEN_PARAMS)
 
 
 # =============================================================================

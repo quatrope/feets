@@ -43,34 +43,7 @@ import pandas as pd
 
 from feets import extractors, FeatureSpace
 
-import pytest
-
 from ..core import DATA_PATH
-
-
-# =============================================================================
-# FIXTURES
-# =============================================================================
-
-@pytest.fixture()
-def periodic_lc():
-    random = np.random.RandomState(42)
-
-    N = 100
-    mjd_periodic = np.arange(N)
-    Period = 20
-    cov = np.zeros([N, N])
-    mean = np.zeros(N)
-    for i in np.arange(N):
-        for j in np.arange(N):
-            cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
-    data_periodic = random.multivariate_normal(mean, cov)
-    error = random.normal(size=100, loc=0.001)
-    lc = {
-        "magnitude": data_periodic,
-        "time": mjd_periodic,
-        "error": error}
-    return lc
 
 
 # =============================================================================
@@ -118,10 +91,9 @@ def test_lscargle_vs_feets():
     np.testing.assert_array_equal(ls_periods, feets_periods)
 
 
-def test_lscargle_peaks(periodic_lc):
-
+def test_lscargle_peaks(periodic_lc_werror):
     for peaks in [1, 2, 3, 10]:
         ext = extractors.LombScargle(peaks=peaks)
-        feats = ext.extract(features={}, **periodic_lc)
+        feats = ext.extract(features={}, **periodic_lc_werror)
         for v in feats.values():
             assert len(v) == peaks

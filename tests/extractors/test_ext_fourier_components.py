@@ -35,50 +35,19 @@
 # IMPORTS
 # =============================================================================
 
-import numpy as np
-
 from feets import extractors
-
-import pytest
-
-
-# =============================================================================
-# FIXTURES
-# =============================================================================
-
-@pytest.fixture()
-def periodic_lc():
-    random = np.random.RandomState(42)
-
-    N = 100
-    mjd_periodic = np.arange(N)
-    Period = 20
-    cov = np.zeros([N, N])
-    mean = np.zeros(N)
-    for i in np.arange(N):
-        for j in np.arange(N):
-            cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
-    data_periodic = random.multivariate_normal(mean, cov)
-    error = random.normal(size=100, loc=0.001)
-    lc = {
-        "magnitude": data_periodic,
-        "time": mjd_periodic,
-        "error": error}
-    return lc
 
 
 # =============================================================================
 # Test cases
 # =============================================================================
 
-def test_fourier_optional_data(periodic_lc):
-    lc_error = periodic_lc
-
-    lc = lc_error.copy()
+def test_fourier_optional_data(periodic_lc_werror):
+    lc = periodic_lc_werror.copy()
     lc["error"] = None
 
     ext = extractors.FourierComponents()
 
     assert (
-        ext.extract(features={}, **lc) !=
-        ext.extract(features={}, **lc_error))
+        ext.extract(features={}, **periodic_lc_werror) !=
+        ext.extract(features={}, **lc))
