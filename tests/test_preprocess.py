@@ -28,7 +28,7 @@
 # DOC
 # =============================================================================
 
-"""All feets base tests"""
+"""All feets preprocess tests"""
 
 
 # =============================================================================
@@ -39,63 +39,116 @@ import numpy as np
 
 from feets import preprocess
 
-from .core import FeetsTestCase
+
+# =============================================================================
+# NOISE
+# =============================================================================
+
+def test_remove_noise():
+    random = np.random.RandomState(42)
+
+    time = np.arange(5)
+
+    mag = random.rand(5)
+    mag[-1] = np.mean(mag) + 100 * np.std(mag)
+
+    error = np.zeros(5)
+    error[-1] = 10
+
+    ptime, pmag, perror = preprocess.remove_noise(time, mag, error)
+
+    assert len(ptime) == len(time) - 1
+    assert len(pmag) == len(mag) - 1
+    assert len(perror) == len(error) - 1
+
+    np.testing.assert_array_equal(ptime, time[:-1])
+    np.testing.assert_array_equal(pmag, mag[:-1])
+    np.testing.assert_array_equal(perror, error[:-1])
+
+
+def test_remove_noise_low_error():
+    random = np.random.RandomState(42)
+
+    time = np.arange(5)
+
+    mag = random.rand(5)
+    mag[-1] = np.mean(mag) + 100 * np.std(mag)
+
+    error = np.zeros(5)
+
+    ptime, pmag, perror = preprocess.remove_noise(time, mag, error)
+
+    assert len(ptime) == len(time)
+    assert len(pmag) == len(mag)
+    assert len(perror) == len(error)
+
+    np.testing.assert_array_equal(ptime, time)
+    np.testing.assert_array_equal(pmag, mag)
+    np.testing.assert_array_equal(perror, error)
+
+
+def test_remove_noise_no_outlier():
+    random = np.random.RandomState(42)
+
+    time = np.arange(5)
+    mag = random.rand(5)
+    error = np.zeros(5)
+
+    ptime, pmag, perror = preprocess.remove_noise(time, mag, error)
+
+    assert len(ptime) == len(time)
+    assert len(pmag) == len(mag)
+    assert len(perror) == len(error)
+
+    np.testing.assert_array_equal(ptime, time)
+    np.testing.assert_array_equal(pmag, mag)
+    np.testing.assert_array_equal(perror, error)
 
 
 # =============================================================================
-# BASE CLASS
+# ALIGN
 # =============================================================================
 
-class RemoveNoiseTestCase(FeetsTestCase):
+def test_align():
+    random = np.random.RandomState(42)
 
-    def test_remove_noise(self):
-        time = np.arange(5)
-        mag = np.random.rand(5)
-        error = np.zeros(5)
-        preprocess.remove_noise(time, mag, error)
+    time = np.arange(5)
+    mag = random.rand(5)
+    error = random.rand(5)
+
+    time2 = np.arange(5)
+    random.shuffle(time2)
+
+    mag2 = mag[time2]
+    error2 = error[time2]
+
+    atime, amag, amag2, aerror, aerror2 = preprocess.align(
+        time, time2, mag, mag2, error, error2)
+
+    np.testing.assert_array_equal(amag, amag2)
+    assert np.array_equal(amag, mag) or np.array_equal(amag, mag2)
+    assert np.array_equal(amag2, mag) or np.array_equal(amag2, mag2)
+
+    np.testing.assert_array_equal(aerror, aerror2)
+    assert np.array_equal(aerror, error) or np.array_equal(aerror, error2)
+    assert np.array_equal(aerror2, error) or np.array_equal(aerror2, error2)
 
 
-class AlignTestCase(FeetsTestCase):
+def test_align_different_len():
+    random = np.random.RandomState(42)
 
-    def test_align(self):
-        time = np.arange(5)
-        mag = np.random.rand(5)
-        error = np.random.rand(5)
+    time = np.arange(5)
+    mag = random.rand(5)
+    error = random.rand(5)
 
-        time2 = np.arange(5)
-        np.random.shuffle(time2)
+    time2 = np.arange(6)
+    random.shuffle(time2)
 
-        mag2 = mag[time2]
-        error2 = error[time2]
+    mag2 = np.hstack((mag, random.rand(1)))[time2]
+    error2 = np.hstack((error, random.rand(1)))[time2]
 
-        atime, amag, amag2, aerror, aerror2 = preprocess.align(
-            time, time2, mag, mag2, error, error2)
+    atime, amag, amag2, aerror, aerror2 = preprocess.align(
+        time, time2, mag, mag2, error, error2)
 
-        self.assertArrayEqual(amag, amag2)
-        self.assertTrue(
-            np.array_equal(amag, mag) or np.array_equal(amag, mag2))
-        self.assertTrue(
-            np.array_equal(amag2, mag) or np.array_equal(amag2, mag2))
-
-        self.assertArrayEqual(aerror, aerror2)
-        self.assertTrue(
-            np.array_equal(aerror, error) or np.array_equal(aerror, error2))
-        self.assertTrue(
-            np.array_equal(aerror2, error) or np.array_equal(aerror2, error2))
-
-    def test_align_different_len(self):
-        time = np.arange(5)
-        mag = np.random.rand(5)
-        error = np.random.rand(5)
-
-        time2 = np.arange(6)
-        np.random.shuffle(time2)
-
-        mag2 = np.hstack((mag, np.random.rand(1)))[time2]
-        error2 = np.hstack((error, np.random.rand(1)))[time2]
-
-        atime, amag, amag2, aerror, aerror2 = preprocess.align(
-            time, time2, mag, mag2, error, error2)
-
-        self.assertArrayEqual(amag, amag2)
-        self.assertArrayEqual(aerror, aerror2)
+    np.testing.assert_array_equal(amag, amag2)
+    np.testing.assert_array_equal(aerror, aerror2)
