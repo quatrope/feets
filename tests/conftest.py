@@ -177,3 +177,13 @@ def MACHO_example():
         time2=lc.data.B.time,
         mag2=lc.data.B.magnitude,
         error2=lc.data.B.error)
+
+
+@pytest.fixture(scope="session")
+def FATS_results():
+    # recreate the FATS result
+    FATS_result_path = os.path.join(DATA_PATH, "FATS_result.npz")
+    with np.load(FATS_result_path) as npz:
+        features = npz["features"].astype("U")
+        values = dict(zip(features, npz["values"]))
+    return Bunch(features=features, fvalues=values)

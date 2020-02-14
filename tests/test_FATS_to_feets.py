@@ -35,13 +35,11 @@
 # IMPORTS
 # =============================================================================
 
-import os
-
 import numpy as np
 
-from feets import FeatureSpace, preprocess
+import pytest
 
-from .core import FeetsTestCase, DATA_PATH
+from feets import FeatureSpace, preprocess
 
 
 # =============================================================================
@@ -76,70 +74,62 @@ def test_F2f_align(denoised_MACHO_by_FATS, aligned_MACHO_by_FATS):
     np.testing.assert_array_equal(a_error2, aMF.aligned_error2)
 
 
-class FATSRegressionTestCase(FeetsTestCase):
+# =============================================================================
+# CHECK IF OUR CHANGES DONT BREAK THE ORIGInaL FATS IMPLEMENTATION
+# =============================================================================
 
-    def setUp(self):
-        # the paths
-        self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
-        self.FATS_result_path = os.path.join(DATA_PATH, "FATS_result.npz")
+def get_feature_assert_params(feature):
+    feature_params = {
+        "PeriodLS": {"atol": 1e-04},
+        "Period_fit": {"atol": 1e-40},
+        "Psi_CS": {"atol": 1e-02},
+        "Psi_eta": {"atol": 1e-01}}
+    params = {"err_msg": f"Feature '{feature}' missmatch."}
+    params.update(feature_params.get(feature, {}))
+    return params
 
-        # recreate light curve
-        with np.load(self.lc_path) as npz:
-            self.lc = (
-                npz['time'],
-                npz['mag'],
-                npz['error'],
-                npz['mag2'],
-                npz['aligned_time'],
-                npz['aligned_mag'],
-                npz['aligned_mag2'],
-                npz['aligned_error'],
-                npz['aligned_error2'])
 
-        # recreate the FATS result
-        with np.load(self.FATS_result_path) as npz:
-            self.features = npz["features"]
-            self.features = self.features.astype("U")
-            self.FATS_result = dict(zip(self.features, npz["values"]))
+def assertFATS(feets_result, features, FATS_values):
+    for feature in features:
 
-        # creates an template for all error, messages
-        self.err_template = ("Feature '{feature}' missmatch.")
+        if feature not in feets_result:
+            pytest.fail("Missing feature {}".format(feature))
 
-    def exclude_value_feature_evaluation(self, feature):
-        return "_harmonics_" in feature
+        # some features changes the values explicity  and must
+        # not be evaluates
+        if "_harmonics_" in feature:
+            continue
 
-    def assert_feature_params(self, feature):
-        feature_params = {
-            "PeriodLS": {"atol": 1e-04},
-            "Period_fit": {"atol": 1e-40},
-            "Psi_CS": {"atol": 1e-02},
-            "Psi_eta": {"atol": 1e-01}}
-        params = {"err_msg": self.err_template.format(feature=feature)}
-        params.update(feature_params.get(feature, {}))
-        return params
+        feets_value = feets_result[feature]
+        FATS_value = FATS_values[feature]
+        params = get_feature_assert_params(feature)
+        np.testing.assert_allclose(feets_value, FATS_value, **params)
 
-    def assertFATS(self, feets_result):
-        for feature in self.features:
-            if feature not in feets_result:
-                self.fail("Missing feature {}".format(feature))
-            if self.exclude_value_feature_evaluation(feature):
-                continue
-            feets_value = feets_result[feature]
-            FATS_value = self.FATS_result[feature]
-            params = self.assert_feature_params(feature)
-            self.assertAllClose(feets_value, FATS_value, **params)
 
-    def test_FATS_to_feets_extract_one(self):
-        fs = FeatureSpace(
-            SlottedA_length={"T": None},
-            StetsonKAC={"T": None})
-        result = fs.extract(*self.lc)
-        feets_result = dict(zip(*result))
+def test_FATS_to_feets_extract_one(aligned_MACHO_by_FATS, FATS_results):
+    lc = (
+        aligned_MACHO_by_FATS.time,
+        aligned_MACHO_by_FATS.mag,
+        aligned_MACHO_by_FATS.error,
+        aligned_MACHO_by_FATS.mag2,
+        aligned_MACHO_by_FATS.aligned_time,
+        aligned_MACHO_by_FATS.aligned_mag,
+        aligned_MACHO_by_FATS.aligned_mag2,
+        aligned_MACHO_by_FATS.aligned_error,
+        aligned_MACHO_by_FATS.aligned_error2)
 
-        feets_result.update({
-            "PeriodLS": feets_result.pop("PeriodLS_0"),
-            "Period_fit": feets_result.pop("Period_fit_0"),
-            "Psi_eta": feets_result.pop("Psi_eta_0"),
-            "Psi_CS": feets_result.pop("Psi_CS_0")})
+    features, FATS_values = FATS_results.features, FATS_results.fvalues
 
-        self.assertFATS(feets_result)
+    fs = FeatureSpace(
+        SlottedA_length={"T": None},
+        StetsonKAC={"T": None})
+    result = fs.extract(*lc)
+    feets_result = dict(zip(*result))
+
+    feets_result.update({
+        "PeriodLS": feets_result.pop("PeriodLS_0"),
+        "Period_fit": feets_result.pop("Period_fit_0"),
+        "Psi_eta": feets_result.pop("Psi_eta_0"),
+        "Psi_CS": feets_result.pop("Psi_CS_0")})
+
+    assertFATS(feets_result, features, FATS_values)
