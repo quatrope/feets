@@ -35,8 +35,12 @@
 # IMPORTS
 # =============================================================================
 
+import os
+
 import numpy as np
 import pytest
+
+from feets.datasets import macho
 
 
 # =============================================================================
@@ -45,6 +49,18 @@ import pytest
 
 # FIX the random state
 random = np.random.RandomState(42)
+
+DATA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
+
+
+# =============================================================================
+# UTILS
+# =============================================================================
+
+class Bunch(dict):
+
+    def __getattr__(self, k):
+        return self[k]
 
 
 # =============================================================================
@@ -68,7 +84,7 @@ def white_noise():
         "aligned_magnitude": aligned_data,
         "aligned_magnitude2": aligned_second_data,
         "aligned_time": aligned_mjd}
-    return lc
+    return Bunch(lc)
 
 
 @pytest.fixture
@@ -85,7 +101,7 @@ def periodic_lc():
     lc = {
         "magnitude": data_periodic,
         "time": mjd_periodic}
-    return lc
+    return Bunch(lc)
 
 
 @pytest.fixture
@@ -105,7 +121,7 @@ def periodic_lc_werror():
         "magnitude": data_periodic,
         "time": mjd_periodic,
         "error": error}
-    return lc
+    return Bunch(lc)
 
 
 @pytest.fixture
@@ -115,7 +131,7 @@ def uniform_lc():
     lc = {
         "magnitude": data_uniform,
         "time": mjd_uniform}
-    return lc
+    return Bunch(lc)
 
 
 @pytest.fixture
@@ -134,4 +150,30 @@ def random_walk():
     lc = {
         "magnitude": data_rw,
         "time": time_rw}
-    return lc
+    return Bunch(lc)
+
+
+@pytest.fixture(scope="session")
+def denoised_MACHO_by_FATS():
+    preprc_path = os.path.join(DATA_PATH, "FATS_preprc.npz")
+    with np.load(preprc_path) as npz:
+        return Bunch(npz)
+
+
+@pytest.fixture(scope="session")
+def aligned_MACHO_by_FATS():
+    lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
+    with np.load(lc_path) as npz:
+        return Bunch(npz)
+
+
+@pytest.fixture(scope="session")
+def MACHO_example():
+    lc = macho.load_MACHO_example()
+    return Bunch(
+        time=lc.data.R.time,
+        mag=lc.data.R.magnitude,
+        error=lc.data.R.error,
+        time2=lc.data.B.time,
+        mag2=lc.data.B.magnitude,
+        error2=lc.data.B.error)

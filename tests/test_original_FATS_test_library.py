@@ -59,7 +59,7 @@ import pandas as pd
 
 from feets.core import FeatureSpace
 
-from .core import FeetsTestCase, DATA_PATH
+from .core import DATA_PATH
 
 
 # =============================================================================
@@ -199,99 +199,99 @@ def test_StructureFunction(random_walk):
 # TUTORIAL TEST CASE
 # =============================================================================
 
-class FATSTutorialTestCase(FeetsTestCase):
+def shuffle(random, mag, error, time, mag2, aligned_mag, aligned_mag2,
+            aligned_time, aligned_error, aligned_error2):
 
-    def shuffle(self, mag, error, time, mag2, aligned_mag, aligned_mag2,
-                aligned_time, aligned_error, aligned_error2):
+    N = len(mag)
+    shuffle = np.arange(0, N)
+    index = random.permutation(shuffle)
+    index = np.sort(index[0:int(N / 2)])
 
-        N = len(mag)
-        shuffle = np.arange(0, N)
-        index = self.random.permutation(shuffle)
-        index = np.sort(index[0:int(N / 2)])
+    mag_test = mag[index]
+    time_test = time[index]
+    error_test = error[index]
 
-        mag_test = mag[index]
-        time_test = time[index]
-        error_test = error[index]
+    N2 = len(mag2)
+    shuffle2 = np.arange(0, N2)
+    index2 = random.permutation(shuffle2)
+    index2 = np.sort(index2[0:int(N2 / 2)])
 
-        N2 = len(mag2)
-        shuffle2 = np.arange(0, N2)
-        index2 = self.random.permutation(shuffle2)
-        index2 = np.sort(index2[0:int(N2 / 2)])
+    mag2_test = mag2[index2]
 
-        mag2_test = mag2[index2]
+    N3 = len(aligned_mag)
+    shuffle3 = np.arange(0, N3)
+    index3 = random.permutation(shuffle3)
+    index3 = np.sort(index3[0:int(N3 / 2)])
 
-        N3 = len(aligned_mag)
-        shuffle3 = np.arange(0, N3)
-        index3 = self.random.permutation(shuffle3)
-        index3 = np.sort(index3[0:int(N3 / 2)])
+    aligned_mag_test = aligned_mag[index3]
+    aligned_mag2_test = aligned_mag2[index3]
+    aligned_time_test = aligned_time[index3]
+    aligned_error_test = aligned_error[index3]
+    aligned_error2_test = aligned_error2[index3]
 
-        aligned_mag_test = aligned_mag[index3]
-        aligned_mag2_test = aligned_mag2[index3]
-        aligned_time_test = aligned_time[index3]
-        aligned_error_test = aligned_error[index3]
-        aligned_error2_test = aligned_error2[index3]
+    return {
+        "magnitude": mag_test,
+        "time": time_test,
+        "error": error_test,
+        "magnitude2": mag2_test,
+        "aligned_magnitude": aligned_mag_test,
+        "aligned_magnitude2": aligned_mag2_test,
+        "aligned_time": aligned_time_test,
+        "aligned_error": aligned_error_test,
+        "aligned_error2": aligned_error2_test}
 
-        return {
-            "magnitude": mag_test,
-            "time": time_test,
-            "error": error_test,
-            "magnitude2": mag2_test,
-            "aligned_magnitude": aligned_mag_test,
-            "aligned_magnitude2": aligned_mag2_test,
-            "aligned_time": aligned_time_test,
-            "aligned_error": aligned_error_test,
-            "aligned_error2": aligned_error2_test}
 
-    def setUp(self):
-        self.random = np.random.RandomState(42)
-        self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
-        with np.load(self.lc_path) as npz:
-            self.lc = dict(npz)
+def test_invariance_to_unequal_sampling():
+    # setup
+    random = np.random.RandomState(42)
 
-    def test_invariance_to_unequal_sampling(self):
-        # tests performed to the features in order to check their invariance
-        # to unequal sampling. To do so, we take random observations of a
-        # light-curve and compare the resulting features with the ones obtained
-        # from the original data.
+    lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
+    with np.load(lc_path) as npz:
+        lc = dict(npz)
 
-        fs = FeatureSpace()
+    # tests performed to the features in order to check their invariance
+    # to unequal sampling. To do so, we take random observations of a
+    # light-curve and compare the resulting features with the ones obtained
+    # from the original data.
 
-        # We calculate the features values for fifty random samples of the
-        # original light-curve:
-        features_values = []
-        for i in range(50):
-            sample = self.shuffle(**self.lc)
-            features, values = fs.extract(**sample)
-            result = dict(zip(features, values))
-            features_values.append(result)
+    fs = FeatureSpace()
 
-        # We obtain the mean and standard deviation of each calculated feature:
-        stats = pd.DataFrame(features_values).aggregate([np.mean, np.std])
+    # We calculate the features values for fifty random samples of the
+    # original light-curve:
+    features_values = []
+    for i in range(50):
+        sample = shuffle(random=random, **lc)
+        features, values = fs.extract(**sample)
+        result = dict(zip(features, values))
+        features_values.append(result)
 
-        # Original light-curve:
-        features, values = fs.extract(
-            magnitude=self.lc["mag"],
-            time=self.lc["time"],
-            error=self.lc["error"],
-            magnitude2=self.lc["mag2"],
-            aligned_magnitude=self.lc["aligned_mag"],
-            aligned_magnitude2=self.lc["aligned_mag2"],
-            aligned_time=self.lc["aligned_time"],
-            aligned_error=self.lc["aligned_error"],
-            aligned_error2=self.lc["aligned_error2"])
+    # We obtain the mean and standard deviation of each calculated feature:
+    stats = pd.DataFrame(features_values).aggregate([np.mean, np.std])
 
-        def normalize(c):
-            name, value = c.name, c[0]
-            mean, std = stats[name]["mean"], stats[name]["std"]
-            normalized = (value - mean) / std
-            return normalized
+    # Original light-curve:
+    features, values = fs.extract(
+        magnitude=lc["mag"],
+        time=lc["time"],
+        error=lc["error"],
+        magnitude2=lc["mag2"],
+        aligned_magnitude=lc["aligned_mag"],
+        aligned_magnitude2=lc["aligned_mag2"],
+        aligned_time=lc["aligned_time"],
+        aligned_error=lc["aligned_error"],
+        aligned_error2=lc["aligned_error2"])
 
-        original = pd.DataFrame([dict(zip(features, values))])
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action='ignore',
-                message="invalid value encountered in double_scalars")
-            result = original.apply(normalize)
+    def normalize(c):
+        name, value = c.name, c[0]
+        mean, std = stats[name]["mean"], stats[name]["std"]
+        normalized = (value - mean) / std
+        return normalized
 
-        self.assertLess(np.abs(result.mean()), 0.12)
-        self.assertLess(result.std(), 1.09)
+    original = pd.DataFrame([dict(zip(features, values))])
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            action='ignore',
+            message="invalid value encountered in double_scalars")
+        result = original.apply(normalize)
+
+    assert np.abs(result.mean()) < 0.12
+    assert result.std() < 1.09

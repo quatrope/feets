@@ -40,62 +40,40 @@ import os
 import numpy as np
 
 from feets import FeatureSpace, preprocess
-from feets.datasets import macho
 
 from .core import FeetsTestCase, DATA_PATH
 
 
 # =============================================================================
-# CLASSES
+# CASES
 # =============================================================================
 
-class FATSPreprocessRegressionTestCase(FeetsTestCase):
+def test_F2f_remove_noise(MACHO_example, denoised_MACHO_by_FATS):
+    me, dMF = MACHO_example, denoised_MACHO_by_FATS
 
-    def setUp(self):
-        lc = macho.load_MACHO_example()
-        self.time = lc.data.R.time
-        self.mag = lc.data.R.magnitude
-        self.error = lc.data.R.error
-        self.time2 = lc.data.B.time
-        self.mag2 = lc.data.B.magnitude
-        self.error2 = lc.data.B.error
+    p_time, p_mag, p_error = preprocess.remove_noise(me.time, me.mag, me.error)
+    p_time2, p_mag2, p_error2 = preprocess.remove_noise(
+        me.time2, me.mag2, me.error2)
 
-        self.preprc_path = os.path.join(DATA_PATH, "FATS_preprc.npz")
-        with np.load(self.preprc_path) as npz:
-            self.pF_time, self.pF_time2 = npz["time"], npz["time2"]
-            self.pF_mag, self.pF_mag2 = npz["mag"], npz["mag2"]
-            self.pF_error, self.pF_error2 = npz["error"], npz["error2"]
+    np.testing.assert_array_equal(p_time, dMF.time)
+    np.testing.assert_array_equal(p_time2, dMF.time2)
+    np.testing.assert_array_equal(p_mag, dMF.mag)
+    np.testing.assert_array_equal(p_mag2, dMF.mag2)
+    np.testing.assert_array_equal(p_error, dMF.error)
+    np.testing.assert_array_equal(p_error2, dMF.error2)
 
-        self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
-        with np.load(self.lc_path) as npz:
-            self.aF_time = npz['aligned_time']
-            self.aF_mag = npz['aligned_mag']
-            self.aF_mag2 = npz['aligned_mag2']
-            self.aF_error = npz['aligned_error']
-            self.aF_error2 = npz['aligned_error2']
 
-    def test_remove_noise(self):
-        p_time, p_mag, p_error = preprocess.remove_noise(
-            self.time, self.mag, self.error)
-        p_time2, p_mag2, p_error2 = preprocess.remove_noise(
-            self.time2, self.mag2, self.error2)
-        self.assertArrayEqual(p_time, self.pF_time)
-        self.assertArrayEqual(p_time2, self.pF_time2)
-        self.assertArrayEqual(p_mag, self.pF_mag)
-        self.assertArrayEqual(p_mag2, self.pF_mag2)
-        self.assertArrayEqual(p_error, self.pF_error)
-        self.assertArrayEqual(p_error2, self.pF_error2)
-
-    def test_align(self):
-        a_time, a_mag, a_mag2, a_error, a_error2 = preprocess.align(
-            self.pF_time, self.pF_time2,
-            self.pF_mag, self.pF_mag2,
-            self.pF_error, self.pF_error2)
-        self.assertArrayEqual(a_time, self.aF_time)
-        self.assertArrayEqual(a_mag, self.aF_mag)
-        self.assertArrayEqual(a_mag2, self.aF_mag2)
-        self.assertArrayEqual(a_error, self.aF_error)
-        self.assertArrayEqual(a_error2, self.aF_error2)
+def test_F2f_align(denoised_MACHO_by_FATS, aligned_MACHO_by_FATS):
+    dMF, aMF = denoised_MACHO_by_FATS, aligned_MACHO_by_FATS
+    a_time, a_mag, a_mag2, a_error, a_error2 = preprocess.align(
+        dMF.time, dMF.time2,
+        dMF.mag, dMF.mag2,
+        dMF.error, dMF.error2)
+    np.testing.assert_array_equal(a_time, aMF.aligned_time)
+    np.testing.assert_array_equal(a_mag, aMF.aligned_mag)
+    np.testing.assert_array_equal(a_mag2, aMF.aligned_mag2)
+    np.testing.assert_array_equal(a_error, aMF.aligned_error)
+    np.testing.assert_array_equal(a_error2, aMF.aligned_error2)
 
 
 class FATSRegressionTestCase(FeetsTestCase):
@@ -137,7 +115,7 @@ class FATSRegressionTestCase(FeetsTestCase):
             "Psi_CS": {"atol": 1e-02},
             "Psi_eta": {"atol": 1e-01}}
         params = {"err_msg": self.err_template.format(feature=feature)}
-        params .update(feature_params.get(feature, {}))
+        params.update(feature_params.get(feature, {}))
         return params
 
     def assertFATS(self, feets_result):
