@@ -106,7 +106,7 @@ def assertFATS(feets_result, features, FATS_values):
         np.testing.assert_allclose(feets_value, FATS_value, **params)
 
 
-def test_FATS_to_feets_extract_one(aligned_MACHO_by_FATS, FATS_results):
+def test_F2f_extract_one_same_values(aligned_MACHO_by_FATS, FATS_results):
     lc = (
         aligned_MACHO_by_FATS.time,
         aligned_MACHO_by_FATS.mag,

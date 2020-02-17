@@ -40,6 +40,7 @@ import os
 import numpy as np
 import pytest
 
+import feets
 from feets.datasets import macho
 
 
@@ -187,3 +188,25 @@ def FATS_results():
         features = npz["features"].astype("U")
         values = dict(zip(features, npz["values"]))
     return Bunch(features=features, fvalues=values)
+
+
+@pytest.fixture
+def mock_extractors_register(monkeypatch):
+    monkeypatch.setattr(feets.extractors, "_extractors", {})
+
+
+@pytest.fixture
+def foo_extractor(mock_extractors_register):
+
+    @feets.register_extractor
+    class MockExtractor(feets.Extractor):
+        data = ["magnitude"]
+        features = ["foo"]
+
+        def plot_feature(self, **kwargs):
+            pass
+
+        def fit(self, magnitude):
+            return {"foo": magnitude}
+
+    return MockExtractor()

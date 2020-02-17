@@ -43,7 +43,7 @@ import pandas as pd
 
 from feets import extractors, FeatureSpace
 
-from ..core import DATA_PATH
+from ..conftest import DATA_PATH
 
 
 # =============================================================================

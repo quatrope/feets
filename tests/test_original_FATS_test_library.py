@@ -59,7 +59,7 @@ import pandas as pd
 
 from feets.core import FeatureSpace
 
-from .core import DATA_PATH
+from .conftest import DATA_PATH
 
 
 # =============================================================================
