@@ -89,23 +89,6 @@ def get_feature_assert_params(feature):
     return params
 
 
-def assertFATS(feets_result, features, FATS_values):
-    for feature in features:
-
-        if feature not in feets_result:
-            pytest.fail("Missing feature {}".format(feature))
-
-        # some features changes the values explicity  and must
-        # not be evaluates
-        if "_harmonics_" in feature:
-            continue
-
-        feets_value = feets_result[feature]
-        FATS_value = FATS_values[feature]
-        params = get_feature_assert_params(feature)
-        np.testing.assert_allclose(feets_value, FATS_value, **params)
-
-
 def test_F2f_extract_one_same_values(aligned_MACHO_by_FATS, FATS_results):
     lc = (
         aligned_MACHO_by_FATS.time,
@@ -132,4 +115,17 @@ def test_F2f_extract_one_same_values(aligned_MACHO_by_FATS, FATS_results):
         "Psi_eta": feets_result.pop("Psi_eta_0"),
         "Psi_CS": feets_result.pop("Psi_CS_0")})
 
-    assertFATS(feets_result, features, FATS_values)
+    for feature in features:
+
+        if feature not in feets_result:
+            pytest.fail("Missing feature {}".format(feature))
+
+        # some features changes the values explicity  and must
+        # not be evaluates
+        if "_harmonics_" in feature:
+            continue
+
+        feets_value = feets_result[feature]
+        FATS_value = FATS_values[feature]
+        params = get_feature_assert_params(feature)
+        np.testing.assert_allclose(feets_value, FATS_value, **params)
