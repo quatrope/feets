@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2017 Juan Cabral
+# Copyright (c) 2017-2020 Juan Cabral
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -68,10 +68,59 @@ class Amplitude(Extractor):
     data = ['magnitude']
     features = ['Amplitude']
 
-    def fit(self, magnitude):
+    def _median_min_max_5p(self, magnitude):
         N = len(magnitude)
         sorted_mag = np.sort(magnitude)
 
-        amplitude = (np.median(sorted_mag[-int(math.ceil(0.05 * N)):]) -
-                     np.median(sorted_mag[0:int(math.ceil(0.05 * N))])) / 2.0
+        max5p = np.median(sorted_mag[-int(math.ceil(0.05 * N)):])
+        min5p = np.median(sorted_mag[0:int(math.ceil(0.05 * N))])
+
+        return min5p, max5p
+
+    def plot_feature(self, feature, value, ax, plot_kws, magnitude, **kwargs):
+        # Code the plot here
+
+        # retrieve the amplitude limits
+        min5p, max5p = self._median_min_max_5p(magnitude)
+
+        # plot all the magnitudes
+        plot_magnitude_kws = plot_kws.get("plot_magnitude_kws", {})
+        plot_magnitude_kws.setdefault("marker", ".")
+        plot_magnitude_kws.setdefault("ls", "")
+        plot_magnitude_kws.setdefault("label", "Sample")
+
+        ax.plot(magnitude, **plot_magnitude_kws)
+
+        # plot the magnitude bar in the middle of the axis
+        plot_ampb_kws = plot_kws.get("plot_amplitude_bar_kws", {})
+        plot_ampb_kws.setdefault("marker", "o")
+        plot_ampb_kws.setdefault("ls", "-")
+        plot_ampb_kws.setdefault("label", "Amplitude")
+
+        sample_idx = range(len(magnitude))
+        msample = np.mean(sample_idx)
+
+        amplitude_line = ax.plot(
+            [msample, msample], [max5p, min5p], **plot_ampb_kws)[0]
+
+        # fill between the amplitude limits
+        plot_ampf_kws = plot_kws.get("plot_amplitude_fill_kws", {})
+        plot_ampf_kws.setdefault("alpha", 0.15)
+        plot_ampf_kws.setdefault("color", amplitude_line.get_color())
+        plot_ampf_kws.setdefault("label", "_no_legend_")
+        ax.fill_between(sample_idx, min5p, max5p, **plot_ampf_kws)
+
+        ax.set_ylabel("Magnitude")
+        ax.set_xlabel("Sample Index")
+
+        ax.set_title(f"Amplitude={value:.4f}")
+        ax.legend(loc="best")
+
+        ax.invert_yaxis()
+
+    def fit(self, magnitude):
+        # retrieve the amplitude limits
+        min5p, max5p = self._median_min_max_5p(magnitude)
+
+        amplitude = (max5p - min5p) / 2.0
         return {"Amplitude": amplitude}
