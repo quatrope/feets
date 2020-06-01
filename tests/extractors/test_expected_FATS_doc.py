@@ -49,6 +49,7 @@ from feets import extractors
 # CASES
 # =============================================================================
 
+
 def test_FATS_doc_Amplitude():
     ext = extractors.Amplitude()
     value = ext.fit(np.arange(0, 1001))["Amplitude"]
@@ -97,7 +98,7 @@ def test_FATS_doc_MeanVariance():
     values = np.empty(1000)
     for idx in range(values.size):
         mags = random.uniform(size=1000)
-        values[idx] = ext.fit(magnitude=mags)['Meanvariance']
+        values[idx] = ext.fit(magnitude=mags)["Meanvariance"]
     np.testing.assert_allclose(values.mean(), 0.57664232208148747)
 
 
@@ -108,7 +109,7 @@ def test_FATS_doc_MedianAbsDev():
     values = np.empty(1000)
     for idx in range(values.size):
         mags = random.normal(size=1000)
-        values[idx] = ext.fit(magnitude=mags)['MedianAbsDev']
+        values[idx] = ext.fit(magnitude=mags)["MedianAbsDev"]
     np.testing.assert_allclose(values.mean(), 0.67490807679242459)
 
 
@@ -119,7 +120,7 @@ def test_FATS_doc_RCS():
     values = np.empty(1000)
     for idx in range(values.size):
         mags = random.uniform(size=1000)
-        values[idx] = ext.fit(magnitude=mags)['Rcs']
+        values[idx] = ext.fit(magnitude=mags)["Rcs"]
     np.testing.assert_allclose(values.mean(), 0.03902862976795655)
 
 
@@ -130,7 +131,7 @@ def test_FATS_doc_Skew():
     values = np.empty(1000)
     for idx in range(values.size):
         mags = random.normal(size=1000)
-        values[idx] = ext.fit(magnitude=mags)['Skew']
+        values[idx] = ext.fit(magnitude=mags)["Skew"]
     np.testing.assert_allclose(values.mean(), -0.0017170680368871292)
 
 
@@ -141,7 +142,7 @@ def test_FATS_doc_SmallKurtosis():
     values = np.empty(1000)
     for idx in range(values.size):
         mags = random.normal(size=1000)
-        values[idx] = ext.fit(magnitude=mags)['SmallKurtosis']
+        values[idx] = ext.fit(magnitude=mags)["SmallKurtosis"]
     np.testing.assert_allclose(values.mean(), 0.00040502517673364258)
 
 
@@ -152,7 +153,7 @@ def test_FATS_doc_Std():
     values = np.empty(1000)
     for idx in range(values.size):
         mags = random.normal(size=1000)
-        values[idx] = ext.fit(magnitude=mags)['Std']
+        values[idx] = ext.fit(magnitude=mags)["Std"]
     np.testing.assert_allclose(values.mean(), 0.9994202277548033)
 
 
@@ -168,8 +169,11 @@ def test_FATS_doc_StetsonJ():
         errors = random.normal(scale=0.001, size=1000)
         errors2 = random.normal(scale=0.001, size=1000)
         values[idx] = ext.fit(
-            aligned_magnitude=mags, aligned_magnitude2=mags2,
-            aligned_error=errors, aligned_error2=errors2)['StetsonJ']
+            aligned_magnitude=mags,
+            aligned_magnitude2=mags2,
+            aligned_error=errors,
+            aligned_error2=errors2,
+        )["StetsonJ"]
     np.testing.assert_allclose(values.mean(), 0)
 
 
@@ -182,7 +186,7 @@ def test_FATS_doc_StetsonK():
     for idx in range(values.size):
         mags = random.normal(size=1000)
         errors = random.normal(scale=0.001, size=1000)
-        values[idx] = ext.fit(magnitude=mags, error=errors)['StetsonK']
+        values[idx] = ext.fit(magnitude=mags, error=errors)["StetsonK"]
     np.testing.assert_allclose(values.mean(), 0.798)
 
 
@@ -197,6 +201,9 @@ def test_FATS_doc_StetsonL():
         errors = random.normal(scale=0.001, size=1000)
         errors2 = random.normal(scale=0.001, size=1000)
         values[idx] = ext.fit(
-            aligned_magnitude=mags, aligned_magnitude2=mags2,
-            aligned_error=errors, aligned_error2=errors2)['StetsonL']
+            aligned_magnitude=mags,
+            aligned_magnitude2=mags2,
+            aligned_error=errors,
+            aligned_error2=errors2,
+        )["StetsonL"]
     np.testing.assert_allclose(values.mean(), -0.0470713296883)

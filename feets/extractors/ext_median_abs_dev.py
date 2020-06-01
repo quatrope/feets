@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class MedianAbsDev(Extractor):
     r"""
 
@@ -76,7 +77,7 @@ class MedianAbsDev(Extractor):
 
     """
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["MedianAbsDev"]
 
     def fit(self, magnitude):

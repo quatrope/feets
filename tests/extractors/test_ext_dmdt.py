@@ -44,6 +44,7 @@ from feets import extractors
 # Test cases
 # =============================================================================
 
+
 def test_feets_dmdt():
     random = np.random.RandomState(42)
     ext = extractors.DeltamDeltat()
@@ -62,5 +63,6 @@ def test_feets_dmdt():
 def test_dmdt_repr():
     ext = extractors.DeltamDeltat()
     assert (
-        repr(ext) ==
-        "DeltamDeltat(dt_bins=<numpy.ndarray>, dm_bins=<numpy.ndarray>)")
+        repr(ext)
+        == "DeltamDeltat(dt_bins=<numpy.ndarray>, dm_bins=<numpy.ndarray>)"
+    )

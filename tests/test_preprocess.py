@@ -44,6 +44,7 @@ from feets import preprocess
 # NOISE
 # =============================================================================
 
+
 def test_remove_noise():
     random = np.random.RandomState(42)
 
@@ -109,6 +110,7 @@ def test_remove_noise_no_outlier():
 # ALIGN
 # =============================================================================
 
+
 def test_align():
     random = np.random.RandomState(42)
 
@@ -123,7 +125,8 @@ def test_align():
     error2 = error[time2]
 
     atime, amag, amag2, aerror, aerror2 = preprocess.align(
-        time, time2, mag, mag2, error, error2)
+        time, time2, mag, mag2, error, error2
+    )
 
     np.testing.assert_array_equal(amag, amag2)
     assert np.array_equal(amag, mag) or np.array_equal(amag, mag2)
@@ -148,7 +151,8 @@ def test_align_different_len():
     error2 = np.hstack((error, random.rand(1)))[time2]
 
     atime, amag, amag2, aerror, aerror2 = preprocess.align(
-        time, time2, mag, mag2, error, error2)
+        time, time2, mag, mag2, error, error2
+    )
 
     np.testing.assert_array_equal(amag, amag2)
     np.testing.assert_array_equal(aerror, aerror2)

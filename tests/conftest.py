@@ -58,8 +58,8 @@ DATA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
 # UTILS
 # =============================================================================
 
-class Bunch(dict):
 
+class Bunch(dict):
     def __getattr__(self, k):
         return self[k]
 
@@ -67,6 +67,7 @@ class Bunch(dict):
 # =============================================================================
 # FIXTURES
 # =============================================================================
+
 
 @pytest.fixture
 def white_noise():
@@ -84,7 +85,8 @@ def white_noise():
         "magnitude2": second_data,
         "aligned_magnitude": aligned_data,
         "aligned_magnitude2": aligned_second_data,
-        "aligned_time": aligned_mjd}
+        "aligned_time": aligned_mjd,
+    }
     return Bunch(lc)
 
 
@@ -99,9 +101,7 @@ def periodic_lc():
         for j in np.arange(N):
             cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
     data_periodic = random.multivariate_normal(mean, cov)
-    lc = {
-        "magnitude": data_periodic,
-        "time": mjd_periodic}
+    lc = {"magnitude": data_periodic, "time": mjd_periodic}
     return Bunch(lc)
 
 
@@ -118,10 +118,7 @@ def periodic_lc_werror():
             cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
     data_periodic = random.multivariate_normal(mean, cov)
     error = random.normal(size=100, loc=0.001)
-    lc = {
-        "magnitude": data_periodic,
-        "time": mjd_periodic,
-        "error": error}
+    lc = {"magnitude": data_periodic, "time": mjd_periodic, "error": error}
     return Bunch(lc)
 
 
@@ -129,28 +126,25 @@ def periodic_lc_werror():
 def uniform_lc():
     mjd_uniform = np.arange(1000000)
     data_uniform = random.uniform(size=1000000)
-    lc = {
-        "magnitude": data_uniform,
-        "time": mjd_uniform}
+    lc = {"magnitude": data_uniform, "time": mjd_uniform}
     return Bunch(lc)
 
 
 @pytest.fixture
 def random_walk():
     N = 10000
-    alpha = 1.
+    alpha = 1.0
     sigma = 0.5
     data_rw = np.zeros([N, 1])
     data_rw[0] = 1
     time_rw = range(1, N)
     for t in time_rw:
-        data_rw[t] = (
-            alpha * data_rw[t - 1] + random.normal(loc=0.0, scale=sigma))
+        data_rw[t] = alpha * data_rw[t - 1] + random.normal(
+            loc=0.0, scale=sigma
+        )
     time_rw = np.array(range(0, N)) + 1 * random.uniform(size=N)
     data_rw = data_rw.squeeze()
-    lc = {
-        "magnitude": data_rw,
-        "time": time_rw}
+    lc = {"magnitude": data_rw, "time": time_rw}
     return Bunch(lc)
 
 
@@ -177,7 +171,8 @@ def MACHO_example():
         error=lc.data.R.error,
         time2=lc.data.B.time,
         mag2=lc.data.B.magnitude,
-        error2=lc.data.B.error)
+        error2=lc.data.B.error,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -197,7 +192,6 @@ def mock_extractors_register(monkeypatch):
 
 @pytest.fixture
 def foo_extractor(mock_extractors_register):
-
     @feets.register_extractor
     class MockExtractor(feets.Extractor):
         data = ["magnitude"]

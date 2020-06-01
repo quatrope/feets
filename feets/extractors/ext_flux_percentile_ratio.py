@@ -91,10 +91,11 @@ References
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class FluxPercentileRatioMid20(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["FluxPercentileRatioMid20"]
 
     def fit(self, magnitude):
@@ -116,7 +117,7 @@ class FluxPercentileRatioMid20(Extractor):
 class FluxPercentileRatioMid35(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["FluxPercentileRatioMid35"]
 
     def fit(self, magnitude):
@@ -138,7 +139,7 @@ class FluxPercentileRatioMid35(Extractor):
 class FluxPercentileRatioMid50(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["FluxPercentileRatioMid50"]
 
     def fit(self, magnitude):
@@ -160,7 +161,7 @@ class FluxPercentileRatioMid50(Extractor):
 class FluxPercentileRatioMid65(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["FluxPercentileRatioMid65"]
 
     def fit(self, magnitude):
@@ -182,7 +183,7 @@ class FluxPercentileRatioMid65(Extractor):
 class FluxPercentileRatioMid80(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["FluxPercentileRatioMid80"]
 
     def fit(self, magnitude):

@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class PercentAmplitude(Extractor):
     r"""
     **PercentAmplitude**
@@ -69,7 +70,7 @@ class PercentAmplitude(Extractor):
 
     """
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["PercentAmplitude"]
 
     def fit(self, magnitude):

@@ -40,7 +40,8 @@ __all__ = [
     "ExtractorBadDefinedError",
     "ExtractorContractError",
     "ExtractorWarning",
-    "Extractor"]
+    "Extractor",
+]
 
 # =============================================================================
 # IMPORTS
@@ -48,8 +49,12 @@ __all__ = [
 
 import inspect
 from .core import (
-    Extractor, ExtractorBadDefinedError, ExtractorContractError,
-    ExtractorWarning, DATAS)  # noqa
+    Extractor,
+    ExtractorBadDefinedError,
+    ExtractorContractError,
+    ExtractorWarning,
+    DATAS,
+)  # noqa
 
 
 # =============================================================================

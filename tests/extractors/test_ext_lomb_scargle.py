@@ -50,14 +50,14 @@ from ..conftest import DATA_PATH
 # Test cases
 # =============================================================================
 
+
 def test_lscargle_vs_feets():
 
     # extract the module for make short code
     ext_lomb_scargle = extractors.ext_lomb_scargle
 
     # load the data
-    path = os.path.join(
-        DATA_PATH, "bad_results.pandas.pkl")
+    path = os.path.join(DATA_PATH, "bad_results.pandas.pkl")
     tseries = pd.read_pickle(path)
 
     # the ls params
@@ -78,13 +78,14 @@ def test_lscargle_vs_feets():
 
         # "pure" lomb scargle (without the entire feets pipeline)
         frequency, power = ext_lomb_scargle.lscargle(
-            time=time, magnitude=magnitude, error=error, **lscargle_kwds)
+            time=time, magnitude=magnitude, error=error, **lscargle_kwds
+        )
         fmax = np.argmax(power)
         ls_periods.append(1 / frequency[fmax])
 
         # extract the period from the feets pipele
         rs = fs.extract(time=time, magnitude=magnitude, error=error)
-        feets_periods.append(rs.values['PeriodLS'])
+        feets_periods.append(rs.values["PeriodLS"])
 
     feets_periods = np.array(feets_periods).flatten()
 

@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class MaxSlope(Extractor):
     """
     **MaxSlope**
@@ -72,7 +73,7 @@ class MaxSlope(Extractor):
 
     """
 
-    data = ['magnitude', 'time']
+    data = ["magnitude", "time"]
     features = ["MaxSlope"]
     params = {"timesort": True}
 

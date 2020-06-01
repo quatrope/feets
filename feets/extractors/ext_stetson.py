@@ -74,7 +74,9 @@ from .ext_slotted_a_length import SlottedA_length
 
 
 class StetsonJ(Extractor):
-    __doc__ = indent(__doc__) + r"""
+    __doc__ = (
+        indent(__doc__)
+        + r"""
 
     **StetsonJ**
 
@@ -106,43 +108,65 @@ class StetsonJ(Extractor):
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
 
     """
+    )
 
-    data = ['aligned_magnitude', 'aligned_magnitude2',
-            'aligned_error', 'aligned_error2']
+    data = [
+        "aligned_magnitude",
+        "aligned_magnitude2",
+        "aligned_error",
+        "aligned_error2",
+    ]
     features = ["StetsonJ"]
     warnings = [
-        ("The original FATS documentation says that the result of StetsonJ "
-         "must be ~0 for gausian distribution but the result is ~-0.41")]
+        (
+            "The original FATS documentation says that the result of StetsonJ "
+            "must be ~0 for gausian distribution but the result is ~-0.41"
+        )
+    ]
 
-    def fit(self, aligned_magnitude, aligned_magnitude2,
-            aligned_error, aligned_error2):
+    def fit(
+        self,
+        aligned_magnitude,
+        aligned_magnitude2,
+        aligned_error,
+        aligned_error2,
+    ):
 
         N = len(aligned_magnitude)
 
-        mean_mag = (
-            np.sum(aligned_magnitude / (aligned_error * aligned_error)) /
-            np.sum(1.0 / (aligned_error * aligned_error)))
+        mean_mag = np.sum(
+            aligned_magnitude / (aligned_error * aligned_error)
+        ) / np.sum(1.0 / (aligned_error * aligned_error))
 
-        mean_mag2 = (
-            np.sum(aligned_magnitude2 / (aligned_error2 * aligned_error2)) /
-            np.sum(1.0 / (aligned_error2 * aligned_error2)))
+        mean_mag2 = np.sum(
+            aligned_magnitude2 / (aligned_error2 * aligned_error2)
+        ) / np.sum(1.0 / (aligned_error2 * aligned_error2))
 
-        sigmap = (np.sqrt(N * 1.0 / (N - 1)) *
-                  (aligned_magnitude[:N] - mean_mag) /
-                  aligned_error)
-        sigmaq = (np.sqrt(N * 1.0 / (N - 1)) *
-                  (aligned_magnitude2[:N] - mean_mag2) /
-                  aligned_error2)
+        sigmap = (
+            np.sqrt(N * 1.0 / (N - 1))
+            * (aligned_magnitude[:N] - mean_mag)
+            / aligned_error
+        )
+        sigmaq = (
+            np.sqrt(N * 1.0 / (N - 1))
+            * (aligned_magnitude2[:N] - mean_mag2)
+            / aligned_error2
+        )
         sigma_i = sigmap * sigmaq
 
-        J = (1.0 / len(sigma_i) * np.sum(np.sign(sigma_i) *
-             np.sqrt(np.abs(sigma_i))))
+        J = (
+            1.0
+            / len(sigma_i)
+            * np.sum(np.sign(sigma_i) * np.sqrt(np.abs(sigma_i)))
+        )
 
         return {"StetsonJ": J}
 
 
 class StetsonK(Extractor):
-    __doc__ = indent(__doc__) + r"""
+    __doc__ = (
+        indent(__doc__)
+        + r"""
 
     **StetsonK**
 
@@ -173,29 +197,40 @@ class StetsonK(Extractor):
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
 
     """
+    )
 
-    data = ['magnitude', 'error']
-    features = ['StetsonK']
+    data = ["magnitude", "error"]
+    features = ["StetsonK"]
     warnings = [
-        ("The original FATS documentation says that the result of StetsonK "
-         "must be 2/pi=0.798 for gausian distribution but the result is ~0.2")]
+        (
+            "The original FATS documentation says that the result of StetsonK "
+            "must be 2/pi=0.798 for gausian distribution "
+            "but the result is ~0.2"
+        )
+    ]
 
     def fit(self, magnitude, error):
-        mean_mag = (np.sum(magnitude / (error * error)) /
-                    np.sum(1.0 / (error * error)))
+        mean_mag = np.sum(magnitude / (error * error)) / np.sum(
+            1.0 / (error * error)
+        )
 
         N = len(magnitude)
-        sigmap = (np.sqrt(N * 1.0 / (N - 1)) *
-                  (magnitude - mean_mag) / error)
+        sigmap = np.sqrt(N * 1.0 / (N - 1)) * (magnitude - mean_mag) / error
 
-        K = (1 / np.sqrt(N * 1.0) *
-             np.sum(np.abs(sigmap)) / np.sqrt(np.sum(sigmap ** 2)))
+        K = (
+            1
+            / np.sqrt(N * 1.0)
+            * np.sum(np.abs(sigmap))
+            / np.sqrt(np.sum(sigmap ** 2))
+        )
 
         return {"StetsonK": K}
 
 
 class StetsonKAC(Extractor):
-    __doc__ = indent(__doc__) + r"""
+    __doc__ = (
+        indent(__doc__)
+        + r"""
 
     **StetsonK_AC**
 
@@ -224,29 +259,39 @@ class StetsonKAC(Extractor):
        Doi:10.1088/0004-637X/735/2/68.
 
     """
+    )
 
-    data = ['magnitude', 'time', 'error']
+    data = ["magnitude", "time", "error"]
     features = ["StetsonK_AC"]
     params = {"T": 1}
 
     def fit(self, magnitude, time, error, T):
         sal = SlottedA_length(T=T)
-        autocor_vector = sal.start_conditions(
-            magnitude, time, **sal.params)[-1]
+        autocor_vector = sal.start_conditions(magnitude, time, **sal.params)[
+            -1
+        ]
 
         N_autocor = len(autocor_vector)
-        sigmap = (np.sqrt(N_autocor * 1.0 / (N_autocor - 1)) *
-                  (autocor_vector - np.mean(autocor_vector)) /
-                  np.std(autocor_vector))
+        sigmap = (
+            np.sqrt(N_autocor * 1.0 / (N_autocor - 1))
+            * (autocor_vector - np.mean(autocor_vector))
+            / np.std(autocor_vector)
+        )
 
-        K = (1 / np.sqrt(N_autocor * 1.0) *
-             np.sum(np.abs(sigmap)) / np.sqrt(np.sum(sigmap ** 2)))
+        K = (
+            1
+            / np.sqrt(N_autocor * 1.0)
+            * np.sum(np.abs(sigmap))
+            / np.sqrt(np.sum(sigmap ** 2))
+        )
 
         return {"StetsonK_AC": K}
 
 
 class StetsonL(Extractor):
-    __doc__ = indent(__doc__) + r"""
+    __doc__ = (
+        indent(__doc__)
+        + r"""
 
     **StetsonL**
 
@@ -278,36 +323,55 @@ class StetsonL(Extractor):
        Doi:10.1088/0004-637X/735/2/68.
 
     """
+    )
 
-    data = ['aligned_magnitude', 'aligned_magnitude2',
-            'aligned_error', 'aligned_error2']
+    data = [
+        "aligned_magnitude",
+        "aligned_magnitude2",
+        "aligned_error",
+        "aligned_error2",
+    ]
     features = ["StetsonL"]
 
-    def fit(self, aligned_magnitude, aligned_magnitude2,
-            aligned_error, aligned_error2):
+    def fit(
+        self,
+        aligned_magnitude,
+        aligned_magnitude2,
+        aligned_error,
+        aligned_error2,
+    ):
         magnitude, magnitude2 = aligned_magnitude, aligned_magnitude2
         error, error2 = aligned_error, aligned_error2
 
         N = len(magnitude)
 
-        mean_mag = (np.sum(magnitude / (error * error)) /
-                    np.sum(1.0 / (error * error)))
-        mean_mag2 = (np.sum(magnitude2 / (error2 * error2)) /
-                     np.sum(1.0 / (error2 * error2)))
+        mean_mag = np.sum(magnitude / (error * error)) / np.sum(
+            1.0 / (error * error)
+        )
+        mean_mag2 = np.sum(magnitude2 / (error2 * error2)) / np.sum(
+            1.0 / (error2 * error2)
+        )
 
-        sigmap = (np.sqrt(N * 1.0 / (N - 1)) *
-                  (magnitude[:N] - mean_mag) /
-                  error)
+        sigmap = (
+            np.sqrt(N * 1.0 / (N - 1)) * (magnitude[:N] - mean_mag) / error
+        )
 
-        sigmaq = (np.sqrt(N * 1.0 / (N - 1)) *
-                  (magnitude2[:N] - mean_mag2) /
-                  error2)
+        sigmaq = (
+            np.sqrt(N * 1.0 / (N - 1)) * (magnitude2[:N] - mean_mag2) / error2
+        )
         sigma_i = sigmap * sigmaq
 
-        J = (1.0 / len(sigma_i) *
-             np.sum(np.sign(sigma_i) * np.sqrt(np.abs(sigma_i))))
+        J = (
+            1.0
+            / len(sigma_i)
+            * np.sum(np.sign(sigma_i) * np.sqrt(np.abs(sigma_i)))
+        )
 
-        K = (1 / np.sqrt(N * 1.0) *
-             np.sum(np.abs(sigma_i)) / np.sqrt(np.sum(sigma_i ** 2)))
+        K = (
+            1
+            / np.sqrt(N * 1.0)
+            * np.sum(np.abs(sigma_i))
+            / np.sqrt(np.sum(sigma_i ** 2))
+        )
 
         return {"StetsonL": J * K / 0.798}

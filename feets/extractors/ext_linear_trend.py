@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class LinearTrend(Extractor):
     r"""
     **LinearTrend**
@@ -68,7 +69,7 @@ class LinearTrend(Extractor):
 
     """
 
-    data = ['magnitude', 'time']
+    data = ["magnitude", "time"]
     features = ["LinearTrend"]
 
     def fit(self, magnitude, time):

@@ -65,13 +65,14 @@ DATAS = (
     DATA_ALIGNED_MAGNITUDE,
     DATA_ALIGNED_MAGNITUDE2,
     DATA_ALIGNED_ERROR,
-    DATA_ALIGNED_ERROR2
+    DATA_ALIGNED_ERROR2,
 )
 
 
 # =============================================================================
 # EXCEPTIONS
 # =============================================================================
+
 
 class ExtractorBadDefinedError(Exception):
     """The extractor class are not properly defined."""
@@ -102,12 +103,19 @@ warnings.simplefilter("always", FeatureExtractionWarning)
 
 ExtractorConf = namedtuple(
     "ExtractorConf",
-    ["data", "optional", "required_data",
-     "dependencies", "params", "features", "warnings"])
+    [
+        "data",
+        "optional",
+        "required_data",
+        "dependencies",
+        "params",
+        "features",
+        "warnings",
+    ],
+)
 
 
 class ExtractorMeta(type):
-
     def __new__(mcls, name, bases, namespace):
         cls = super(ExtractorMeta, mcls).__new__(mcls, name, bases, namespace)
 
@@ -118,8 +126,7 @@ class ExtractorMeta(type):
 
         if not hasattr(cls, "data"):
             msg = "'{}' must redefine {}"
-            raise ExtractorBadDefinedError(
-                msg.format(cls, "data attribute"))
+            raise ExtractorBadDefinedError(msg.format(cls, "data attribute"))
         if not cls.data:
             msg = "'data' can't be empty"
             raise ExtractorBadDefinedError(msg)
@@ -138,8 +145,7 @@ class ExtractorMeta(type):
                 msg = "'optional' data '{}' must be defined in 'data'"
                 raise ExtractorBadDefinedError(msg.format(o))
 
-        required_data = frozenset(
-            d for d in cls.data if d not in cls.optional)
+        required_data = frozenset(d for d in cls.data if d not in cls.optional)
         if not required_data:
             msg = "All data can't be defined as 'optional'"
             raise ExtractorBadDefinedError(msg)
@@ -147,7 +153,8 @@ class ExtractorMeta(type):
         if not hasattr(cls, "features"):
             msg = "'{}' must redefine {}"
             raise ExtractorBadDefinedError(
-                msg.format(cls, "features attribute"))
+                msg.format(cls, "features attribute")
+            )
         if not cls.features:
             msg = "'features' can't be empty"
             raise ExtractorBadDefinedError(msg)
@@ -172,7 +179,8 @@ class ExtractorMeta(type):
         for d in cls.dependencies:
             if not isinstance(d, str):
                 msg = (
-                    "All Dependencies must be an instance of string. Found {}")
+                    "All Dependencies must be an instance of string. Found {}"
+                )
                 raise ExtractorBadDefinedError(msg.format(type(d)))
 
         if not hasattr(cls, "params"):
@@ -195,18 +203,25 @@ class ExtractorMeta(type):
             dependencies=frozenset(cls.dependencies),
             params=tuple(cls.params.items()),
             features=frozenset(cls.features),
-            warnings=tuple(cls.warnings))
+            warnings=tuple(cls.warnings),
+        )
 
         if not cls.__doc__:
             cls.__doc__ = ""
 
         if cls.warnings:
-            cls.__doc__ += "\n    Warnings\n    ---------\n" + "\n".join([
-                "    " + w for w in cls.warnings])
+            cls.__doc__ += "\n    Warnings\n    ---------\n" + "\n".join(
+                ["    " + w for w in cls.warnings]
+            )
 
         del (
-            cls.data, cls.optional, cls.dependencies,
-            cls.params, cls.features, cls.warnings)
+            cls.data,
+            cls.optional,
+            cls.dependencies,
+            cls.params,
+            cls.features,
+            cls.warnings,
+        )
 
         return cls
 
@@ -269,7 +284,8 @@ class Extractor(metaclass=ExtractorMeta):
         not_allowed = set(cparams).difference(self.params)
         if not_allowed:
             msg = "Extractor '{}' not allow the parameters: {}".format(
-                type(self).__name__, ", ".join(not_allowed))
+                type(self).__name__, ", ".join(not_allowed)
+            )
             raise ExtractorContractError(msg)
 
         # here all is ok
@@ -339,15 +355,16 @@ class Extractor(metaclass=ExtractorMeta):
         # validate if the extractors generates the expected features
         expected = self.get_features()  # the expected features
 
-        diff = (
-            expected.difference(result.keys()) or
-            set(result).difference(expected))  # some diff
+        diff = expected.difference(result.keys()) or set(result).difference(
+            expected
+        )  # some diff
         if diff:
             cls = type(self)
             estr, fstr = ", ".join(expected), ", ".join(result.keys())
             raise ExtractorContractError(
                 f"The extractor '{cls}' expect the features [{estr}], "
-                f"and found: [{fstr}]")
+                f"and found: [{fstr}]"
+            )
 
         return dict(result)
 
@@ -380,7 +397,8 @@ class Extractor(metaclass=ExtractorMeta):
         for idx, v in enumerate(value):
             flatten_name = f"{feature}_{idx}"
             flatten_values.update(
-                self.flatten_feature(flatten_name, v, **kwargs))
+                self.flatten_feature(flatten_name, v, **kwargs)
+            )
         return flatten_values
 
     def flatten(self, feature, value, **kwargs):
@@ -393,7 +411,8 @@ class Extractor(metaclass=ExtractorMeta):
         feats = self.get_features()
         if feature not in feats:
             raise ExtractorContractError(
-                f"Feature {feature} are not defined for the extractor {self}")
+                f"Feature {feature} are not defined for the extractor {self}"
+            )
 
         method_kwargs = self.preprocess_arguments(**kwargs)
 
@@ -401,29 +420,36 @@ class Extractor(metaclass=ExtractorMeta):
         efeatures = {k: v for k, v in all_features.items() if k in feats}
 
         flat_feature = self.flatten_feature(
-            feature=feature, value=value,
-            extractor_features=efeatures, **method_kwargs)
+            feature=feature,
+            value=value,
+            extractor_features=efeatures,
+            **method_kwargs,
+        )
 
         if not isinstance(flat_feature, dict):
             raise ExtractorContractError(
-                "flatten_feature() must return a dict instance")
+                "flatten_feature() must return a dict instance"
+            )
 
         for k, v in flat_feature.items():
             if not k.startswith(feature):
                 raise ExtractorContractError(
                     "All flatten features keys must start wih the "
-                    f"feature name ('{feature}')'. Found {k}")
+                    f"feature name ('{feature}')'. Found {k}"
+                )
             dim = np.ndim(v)
             if dim:
                 raise ExtractorContractError(
                     f"Flattened feature {k} are not dimensionless. "
-                    f"Dims: {dim}")
+                    f"Dims: {dim}"
+                )
 
         return flat_feature
 
     def plot_feature(self, feature, **kwargs):
         raise NotImplementedError(
-            f"Plot for feature '{feature}' not implemeted")
+            f"Plot for feature '{feature}' not implemeted"
+        )
 
     def plot(self, feature, value, ax, plot_kws, **kwargs):
         """Plot a feature or raises an 'NotImplementedError'
@@ -435,7 +461,8 @@ class Extractor(metaclass=ExtractorMeta):
         feats = self.get_features()
         if feature not in feats:
             raise ExtractorContractError(
-                f"Feature {feature} are not defined for the extractor {self}")
+                f"Feature {feature} are not defined for the extractor {self}"
+            )
 
         method_kwargs = self.preprocess_arguments(**kwargs)
 
@@ -443,8 +470,12 @@ class Extractor(metaclass=ExtractorMeta):
         efeatures = {k: v for k, v in all_features.items() if k in feats}
 
         self.plot_feature(
-            feature=feature, value=value,
+            feature=feature,
+            value=value,
             extractor_features=efeatures,
-            ax=ax, plot_kws=plot_kws, **method_kwargs)
+            ax=ax,
+            plot_kws=plot_kws,
+            **method_kwargs,
+        )
 
         return ax

@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class SmallKurtosis(Extractor):
     r"""
 
@@ -80,7 +81,7 @@ class SmallKurtosis(Extractor):
 
     """
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["SmallKurtosis"]
 
     def fit(self, magnitude):

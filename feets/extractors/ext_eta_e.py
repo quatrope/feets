@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Eta_e(Extractor):
     r"""
 
@@ -101,7 +102,7 @@ class Eta_e(Extractor):
 
     """
 
-    data = ['magnitude', 'time']
+    data = ["magnitude", "time"]
     features = ["Eta_e"]
 
     def fit(self, magnitude, time):
@@ -114,7 +115,11 @@ class Eta_e(Extractor):
         S1 = sum(w * (magnitude[1:] - magnitude[:-1]) ** 2)
         S2 = sum(w)
 
-        eta_e = (w_mean * np.power(time[N - 1] -
-                 time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
+        eta_e = (
+            w_mean
+            * np.power(time[N - 1] - time[0], 2)
+            * S1
+            / (sigma2 * S2 * N ** 2)
+        )
 
         return {"Eta_e": eta_e}

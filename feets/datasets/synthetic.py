@@ -60,10 +60,21 @@ DEFAULT_SIZE = 10000
 # FUNCTIONS
 # =============================================================================
 
-def create_random(magf, magf_params, errf, errf_params,
-                  timef=np.linspace, timef_params=None, size=DEFAULT_SIZE,
-                  id=None, ds_name=DS_NAME, description=DESCRIPTION,
-                  bands=BANDS, metadata=METADATA):
+
+def create_random(
+    magf,
+    magf_params,
+    errf,
+    errf_params,
+    timef=np.linspace,
+    timef_params=None,
+    size=DEFAULT_SIZE,
+    id=None,
+    ds_name=DS_NAME,
+    description=DESCRIPTION,
+    bands=BANDS,
+    metadata=METADATA,
+):
     """Generate a data with any given random function.
 
     Parameters
@@ -113,9 +124,10 @@ def create_random(magf, magf_params, errf, errf_params,
 
     """
     timef_params = (
-        {"start": 0., "stop": 1.}
-        if timef_params is None else
-        timef_params.copy())
+        {"start": 0.0, "stop": 1.0}
+        if timef_params is None
+        else timef_params.copy()
+    )
     timef_params.update(num=size)
 
     magf_params = magf_params.copy()
@@ -129,14 +141,21 @@ def create_random(magf, magf_params, errf, errf_params,
         data[band] = {
             "time": timef(**timef_params),
             "magnitude": magf(**magf_params),
-            "error": errf(**errf_params)}
+            "error": errf(**errf_params),
+        }
     return Data(
-        id=id, ds_name=ds_name, description=description,
-        bands=bands, metadata=metadata, data=data)
+        id=id,
+        ds_name=ds_name,
+        description=description,
+        bands=bands,
+        metadata=metadata,
+        data=data,
+    )
 
 
-def create_normal(mu=0., sigma=1., mu_err=0.,
-                  sigma_err=1., seed=None, **kwargs):
+def create_normal(
+    mu=0.0, sigma=1.0, mu_err=0.0, sigma_err=1.0, seed=None, **kwargs
+):
     """Generate a data with magnitudes that follows a Gaussian
      distribution. Also their errors are gaussian.
 
@@ -185,13 +204,17 @@ def create_normal(mu=0., sigma=1., mu_err=0.,
 
     random = np.random.RandomState(seed)
     return create_random(
-        magf=random.normal, magf_params={"loc": mu, "scale": sigma},
-        errf=random.normal, errf_params={"loc": mu_err, "scale": sigma_err},
-        **kwargs)
+        magf=random.normal,
+        magf_params={"loc": mu, "scale": sigma},
+        errf=random.normal,
+        errf_params={"loc": mu_err, "scale": sigma_err},
+        **kwargs,
+    )
 
 
-def create_uniform(low=0., high=1., mu_err=0., sigma_err=1.,
-                   seed=None, **kwargs):
+def create_uniform(
+    low=0.0, high=1.0, mu_err=0.0, sigma_err=1.0, seed=None, **kwargs
+):
     """Generate a data with magnitudes that follows a uniform
      distribution; the error instead are gaussian.
 
@@ -239,12 +262,15 @@ def create_uniform(low=0., high=1., mu_err=0., sigma_err=1.,
     """
     random = np.random.RandomState(seed)
     return create_random(
-        magf=random.uniform, magf_params={"low": low, "high": high},
-        errf=random.normal, errf_params={"loc": mu_err, "scale": sigma_err},
-        **kwargs)
+        magf=random.uniform,
+        magf_params={"low": low, "high": high},
+        errf=random.normal,
+        errf_params={"loc": mu_err, "scale": sigma_err},
+        **kwargs,
+    )
 
 
-def create_periodic(mu_err=0., sigma_err=1., seed=None, **kwargs):
+def create_periodic(mu_err=0.0, sigma_err=1.0, seed=None, **kwargs):
     """Generate a data with magnitudes with periodic variability
      distribution; the error instead are gaussian.
 
@@ -300,6 +326,11 @@ def create_periodic(mu_err=0., sigma_err=1., seed=None, **kwargs):
     times, mags, errors = iter(times), iter(mags), iter(errors)
 
     return create_random(
-        magf=lambda **k: next(mags), magf_params={},
-        errf=lambda **k: next(errors), errf_params={},
-        timef=lambda **k: next(times), timef_params={}, **kwargs)
+        magf=lambda **k: next(mags),
+        magf_params={},
+        errf=lambda **k: next(errors),
+        errf_params={},
+        timef=lambda **k: next(times),
+        timef_params={},
+        **kwargs,
+    )

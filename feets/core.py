@@ -33,7 +33,8 @@ __all__ = [
     "FeatureNotFound",
     "DataRequiredError",
     "FeatureSpaceError",
-    "FeatureSpace"]
+    "FeatureSpace",
+]
 
 
 # =============================================================================
@@ -64,12 +65,14 @@ from .extractors.core import (
     DATA_ALIGNED_MAGNITUDE2,
     DATA_ALIGNED_TIME,
     DATA_ALIGNED_ERROR,
-    DATA_ALIGNED_ERROR2)
+    DATA_ALIGNED_ERROR2,
+)
 
 
 # =============================================================================
 # EXCEPTIONS
 # =============================================================================
+
 
 class FeatureNotFound(ValueError):
     """Raises when a non-available feature are requested.
@@ -93,6 +96,7 @@ class FeatureSpaceError(ValueError):
 # =============================================================================
 # RESULTSET
 # =============================================================================
+
 
 class _Map(Mapping):
     """Internal representation of a immutable dict"""
@@ -127,6 +131,7 @@ class FeatureSet:
     and seaborn library.
 
     """
+
     features_names: tuple = attr.ib(converter=tuple)
     values: dict = attr.ib(converter=_Map)
     extractors: dict = attr.ib(converter=_Map)
@@ -134,13 +139,15 @@ class FeatureSet:
 
     def __attrs_post_init__(self):
         cnt = Counter(
-            it.chain(self.features_names, self.values, self.extractors))
+            it.chain(self.features_names, self.values, self.extractors)
+        )
         diff = set(k for k, v in cnt.items() if v < 3)
         if diff:
             joined_diff = ", ".join(diff)
             raise FeatureNotFound(
                 f"The features '{joined_diff}' must be in 'features_names' "
-                "'values' and 'extractors'")
+                "'values' and 'extractors'"
+            )
 
     def __iter__(self):
         """x.__iter__() <==> iter(x)"""
@@ -186,9 +193,13 @@ class FeatureSet:
         value = self[feature]
         try:
             ax = extractor.plot(
-                feature=feature, value=value, ax=ax,
-                plot_kws=plot_kws, features=all_features,
-                **self.timeserie)
+                feature=feature,
+                value=value,
+                ax=ax,
+                plot_kws=plot_kws,
+                features=all_features,
+                **self.timeserie,
+            )
         except NotImplementedError:
             ax.remove()
             raise
@@ -212,8 +223,11 @@ class FeatureSet:
             extractor = self.extractors[fname]
 
             flatten_value = extractor.flatten(
-                feature=fname, value=fvalue,
-                features=all_features, **self.timeserie)
+                feature=fname,
+                value=fvalue,
+                features=all_features,
+                **self.timeserie,
+            )
 
             flatten_features.update(flatten_value)
 
@@ -242,6 +256,7 @@ class FeatureSet:
 # =============================================================================
 # FEATURE EXTRACTORS
 # =============================================================================
+
 
 class FeatureSpace:
     """Wrapper class, to allow user select the
@@ -313,6 +328,7 @@ class FeatureSpace:
         {"Mean": 23}
 
     """
+
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
         # retrieve all the extractors
         exts = extractors.registered_extractors()
@@ -347,7 +363,8 @@ class FeatureSpace:
 
         # the candidate to be the features to be extracted
         candidates = self._features_by_data.intersection(
-            self._only).difference(self._exclude)
+            self._only
+        ).difference(self._exclude)
 
         # remove by dependencies
         if only or exclude:
@@ -388,15 +405,18 @@ class FeatureSpace:
 
         # excecution order by dependencies
         self._execution_plan = extractors.sort_by_dependencies(
-            features_extractors)
+            features_extractors
+        )
 
         not_found = set(self._kwargs).difference(
-            self._features_extractors_names)
+            self._features_extractors_names
+        )
         if not_found:
             joined_not_found = ", ".join(not_found)
             raise FeatureNotFound(
                 "This space not found feature(s) extractor(s) "
-                f"{joined_not_found} to assign the given parameter(s)")
+                f"{joined_not_found} to assign the given parameter(s)"
+            )
 
     def __repr__(self):
         """x.__repr__() <==> repr(x)"""
@@ -424,10 +444,18 @@ class FeatureSpace:
             array_data[k] = v if v is None else np.asarray(v)
         return array_data
 
-    def extract(self, time=None, magnitude=None, error=None,
-                magnitude2=None, aligned_time=None,
-                aligned_magnitude=None, aligned_magnitude2=None,
-                aligned_error=None, aligned_error2=None):
+    def extract(
+        self,
+        time=None,
+        magnitude=None,
+        error=None,
+        magnitude2=None,
+        aligned_time=None,
+        aligned_magnitude=None,
+        aligned_magnitude2=None,
+        aligned_error=None,
+        aligned_error2=None,
+    ):
         """Extract the features from a given time-series.
 
         This method must be provided with the required timeseries data
@@ -451,16 +479,19 @@ class FeatureSpace:
             Container of a calculated features.
 
         """
-        timeserie = self.preprocess_timeserie({
-            DATA_TIME: time,
-            DATA_MAGNITUDE: magnitude,
-            DATA_ERROR: error,
-            DATA_MAGNITUDE2: magnitude2,
-            DATA_ALIGNED_TIME: aligned_time,
-            DATA_ALIGNED_MAGNITUDE: aligned_magnitude,
-            DATA_ALIGNED_MAGNITUDE2: aligned_magnitude2,
-            DATA_ALIGNED_ERROR: aligned_error,
-            DATA_ALIGNED_ERROR2: aligned_error2})
+        timeserie = self.preprocess_timeserie(
+            {
+                DATA_TIME: time,
+                DATA_MAGNITUDE: magnitude,
+                DATA_ERROR: error,
+                DATA_MAGNITUDE2: magnitude2,
+                DATA_ALIGNED_TIME: aligned_time,
+                DATA_ALIGNED_MAGNITUDE: aligned_magnitude,
+                DATA_ALIGNED_MAGNITUDE2: aligned_magnitude2,
+                DATA_ALIGNED_ERROR: aligned_error,
+                DATA_ALIGNED_ERROR2: aligned_error2,
+            }
+        )
 
         features, extractors = {}, {}
         for fextractor in self._execution_plan:
@@ -479,7 +510,8 @@ class FeatureSpace:
             features_names=self._features_as_array,
             values=flt_features,
             extractors=flt_extractors,
-            timeserie=timeserie)
+            timeserie=timeserie,
+        )
         return rs
 
     @property

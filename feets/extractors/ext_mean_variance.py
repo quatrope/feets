@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class MeanVariance(Extractor):
     r"""
     **Meanvariance** (:math:`\frac{\sigma}{\bar{m}}`)
@@ -76,8 +77,8 @@ class MeanVariance(Extractor):
 
     """
 
-    data = ['magnitude']
-    features = ['Meanvariance']
+    data = ["magnitude"]
+    features = ["Meanvariance"]
 
     def fit(self, magnitude):
         return {"Meanvariance": np.std(magnitude) / np.mean(magnitude)}

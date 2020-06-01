@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class DeltamDeltat(Extractor):
     r"""
     **DMDT (Delta Magnitude - Delta Time Mapping)**
@@ -78,20 +79,22 @@ class DeltamDeltat(Extractor):
        Series on Computational Intelligence (SSCI) (pp. 1-8). IEEE.
 
     """
-    data = ['magnitude', 'time']
-    params = {"dt_bins": np.hstack([0., np.logspace(-3., 3.5, num=23)]),
-              "dm_bins": np.hstack([-1. * np.logspace(1, -1, num=12), 0,
-                                    np.logspace(-1, 1, num=12)])}
+    data = ["magnitude", "time"]
+    params = {
+        "dt_bins": np.hstack([0.0, np.logspace(-3.0, 3.5, num=23)]),
+        "dm_bins": np.hstack(
+            [-1.0 * np.logspace(1, -1, num=12), 0, np.logspace(-1, 1, num=12)]
+        ),
+    }
 
     features = ["DMDT"]
 
     def fit(self, magnitude, time, dt_bins, dm_bins):
-
         def delta_calc(idx):
             t0 = time[idx]
             m0 = magnitude[idx]
-            deltat = time[idx + 1:] - t0
-            deltam = magnitude[idx + 1:] - m0
+            deltat = time[idx + 1 :] - t0
+            deltam = magnitude[idx + 1 :] - m0
 
             deltat[np.where(deltat < 0)] *= -1
             deltam[np.where(deltat < 0)] *= -1
@@ -101,14 +104,13 @@ class DeltamDeltat(Extractor):
         lc_len = len(time)
         n_vals = int(0.5 * lc_len * (lc_len - 1))
 
-        deltas = np.vstack(
-            tuple(delta_calc(idx) for idx in range(lc_len - 1)))
+        deltas = np.vstack(tuple(delta_calc(idx) for idx in range(lc_len - 1)))
 
         deltat = deltas[:, 0]
         deltam = deltas[:, 1]
 
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
-        result = np.fix(255. * counts / n_vals + 0.999).astype(int)
+        result = np.fix(255.0 * counts / n_vals + 0.999).astype(int)
 
         return {"DMDT": result}

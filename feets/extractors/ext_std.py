@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Std(Extractor):
     r"""
     **Std** - Standard deviation of the magnitudes
@@ -75,7 +76,7 @@ class Std(Extractor):
 
     """
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["Std"]
 
     def fit(self, magnitude):

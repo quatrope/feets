@@ -42,19 +42,24 @@ import pytest
 from pytest_unordered import unordered
 
 from feets import (
-    Extractor, register_extractor, extractors, ExtractorContractError)
+    Extractor,
+    register_extractor,
+    extractors,
+    ExtractorContractError,
+)
 
 
 # =============================================================================
 # FIXTURES
 # =============================================================================
 
-FLATTEN_PARAMS = dict.fromkeys(extractors.DATAS + ("features", ))
+FLATTEN_PARAMS = dict.fromkeys(extractors.DATAS + ("features",))
 
 
 # =============================================================================
 # DEPENDENCIES TEST CASES
 # =============================================================================
+
 
 @mock.patch("feets.extractors._extractors", {})
 def test_sort_by_dependencies():
@@ -111,9 +116,9 @@ def test_sort_by_dependencies():
 # FLATTEN TESTCASES
 # =============================================================================
 
+
 @mock.patch("feets.extractors._extractors", {})
 def test_default_flatten_invalid_feature_for_the_extracor():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -129,7 +134,6 @@ def test_default_flatten_invalid_feature_for_the_extracor():
 
 @mock.patch("feets.extractors._extractors", {})
 def test_default_flatten_scalar():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -145,7 +149,6 @@ def test_default_flatten_scalar():
 
 @mock.patch("feets.extractors._extractors", {})
 def test_default_flatten_1D():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -161,7 +164,6 @@ def test_default_flatten_1D():
 
 @mock.patch("feets.extractors._extractors", {})
 def test_default_flatten_2D():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -171,14 +173,12 @@ def test_default_flatten_2D():
             pass
 
     ext = A()
-    expected = {'feat_0_0': 1, 'feat_0_1': 2,
-                'feat_1_0': 3, 'feat_1_1': 4}
+    expected = {"feat_0_0": 1, "feat_0_1": 2, "feat_1_0": 3, "feat_1_1": 4}
     assert ext.flatten("feat", [[1, 2], [3, 4]], **FLATTEN_PARAMS) == expected
 
 
 @mock.patch("feets.extractors._extractors", {})
 def test_default_flatten_3D():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -189,26 +189,24 @@ def test_default_flatten_3D():
 
     ext = A()
 
-    value = [
-        [[1, 2], [3, 4]],
-        [[5, 6], [7, 8]]]
+    value = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
 
     expected = {
-        'feat_0_0_0': 1,
-        'feat_0_0_1': 2,
-        'feat_0_1_0': 3,
-        'feat_0_1_1': 4,
-        'feat_1_0_0': 5,
-        'feat_1_0_1': 6,
-        'feat_1_1_0': 7,
-        'feat_1_1_1': 8}
+        "feat_0_0_0": 1,
+        "feat_0_0_1": 2,
+        "feat_0_1_0": 3,
+        "feat_0_1_1": 4,
+        "feat_1_0_0": 5,
+        "feat_1_0_1": 6,
+        "feat_1_1_0": 7,
+        "feat_1_1_1": 8,
+    }
 
     assert ext.flatten("feat", value, **FLATTEN_PARAMS) == expected
 
 
 @mock.patch("feets.extractors._extractors", {})
 def test_default_flatten_4D():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -222,17 +220,17 @@ def test_default_flatten_4D():
     value = [[[[1, 2], [3, 4]]]]
 
     expected = {
-        'feat_0_0_0_0': 1,
-        'feat_0_0_0_1': 2,
-        'feat_0_0_1_0': 3,
-        'feat_0_0_1_1': 4}
+        "feat_0_0_0_0": 1,
+        "feat_0_0_0_1": 2,
+        "feat_0_0_1_0": 3,
+        "feat_0_0_1_1": 4,
+    }
 
     assert ext.flatten("feat", value, **FLATTEN_PARAMS) == expected
 
 
 @mock.patch("feets.extractors._extractors", {})
 def test_flatten_return_ndim_gt_0():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -253,7 +251,6 @@ def test_flatten_return_ndim_gt_0():
 
 @mock.patch("feets.extractors._extractors", {})
 def test_flatten_return_not_dict_instance():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -274,7 +271,6 @@ def test_flatten_return_not_dict_instance():
 
 @mock.patch("feets.extractors._extractors", {})
 def test_flatten_return_invalid_name():
-
     @register_extractor
     class A(Extractor):
         data = ["magnitude"]
@@ -297,6 +293,7 @@ def test_flatten_return_invalid_name():
 # RequiredDataTestCases
 # =============================================================================
 
+
 @mock.patch("feets.extractors._extractors", {})
 def test_required_data_fail():
     with pytest.raises(extractors.ExtractorBadDefinedError):
@@ -312,7 +309,6 @@ def test_required_data_fail():
 
 @mock.patch("feets.extractors._extractors", {})
 def test_required_data():
-
     class A(Extractor):
         data = ["magnitude", "time"]
         optional = ["magnitude"]
@@ -328,7 +324,6 @@ def test_required_data():
 
 @mock.patch("feets.extractors._extractors", {})
 def test_all_required_data():
-
     class A(Extractor):
         data = ["magnitude", "time"]
         features = ["test_a"]

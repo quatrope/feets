@@ -44,6 +44,7 @@ from feets.datasets import synthetic as syn
 # BASE CLASS
 # =============================================================================
 
+
 def test_normal():
     random = np.random.RandomState(42)
 

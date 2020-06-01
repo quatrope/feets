@@ -48,6 +48,7 @@ from matplotlib.testing.decorators import check_figures_equal
 # Test cases
 # =============================================================================
 
+
 @check_figures_equal()
 def test_plot_SignaturePhMag(fig_test, fig_ref):
 
@@ -59,18 +60,18 @@ def test_plot_SignaturePhMag(fig_test, fig_ref):
         value=[[1, 2, 3, 4]],
         ax=fig_test.subplots(),
         plot_kws={},
-
         time=[1, 2, 3, 4],
         magnitude=[1, 2, 3, 4],
         error=[1, 2, 3, 4],
-
-        features={"PeriodLS": 1, "Amplitude": 10})
+        features={"PeriodLS": 1, "Amplitude": 10},
+    )
     ext.plot(**kwargs)
 
     # expected
     eax = fig_ref.subplots()
     eax.set_title(
-        f"SignaturePhMag - {kwargs['phase_bins']}x{kwargs['mag_bins']}")
+        f"SignaturePhMag - {kwargs['phase_bins']}x{kwargs['mag_bins']}"
+    )
     eax.set_xlabel("Phase")
     eax.set_ylabel("Magnitude")
     sns.heatmap(kwargs["value"], ax=eax, **kwargs["plot_kws"])
@@ -82,7 +83,8 @@ def test_multiple_peaks_period_ls():
     lc = {
         "time": np.arange(100) + random.uniform(size=100),
         "magnitude": random.normal(size=100),
-        "error": None}
+        "error": None,
+    }
 
     # one peak
     ls_ext_1 = extractors.LombScargle()

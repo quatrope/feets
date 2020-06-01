@@ -46,12 +46,14 @@ from feets import FeatureSpace, preprocess
 # CASES
 # =============================================================================
 
+
 def test_F2f_remove_noise(MACHO_example, denoised_MACHO_by_FATS):
     me, dMF = MACHO_example, denoised_MACHO_by_FATS
 
     p_time, p_mag, p_error = preprocess.remove_noise(me.time, me.mag, me.error)
     p_time2, p_mag2, p_error2 = preprocess.remove_noise(
-        me.time2, me.mag2, me.error2)
+        me.time2, me.mag2, me.error2
+    )
 
     np.testing.assert_array_equal(p_time, dMF.time)
     np.testing.assert_array_equal(p_time2, dMF.time2)
@@ -64,9 +66,8 @@ def test_F2f_remove_noise(MACHO_example, denoised_MACHO_by_FATS):
 def test_F2f_align(denoised_MACHO_by_FATS, aligned_MACHO_by_FATS):
     dMF, aMF = denoised_MACHO_by_FATS, aligned_MACHO_by_FATS
     a_time, a_mag, a_mag2, a_error, a_error2 = preprocess.align(
-        dMF.time, dMF.time2,
-        dMF.mag, dMF.mag2,
-        dMF.error, dMF.error2)
+        dMF.time, dMF.time2, dMF.mag, dMF.mag2, dMF.error, dMF.error2
+    )
     np.testing.assert_array_equal(a_time, aMF.aligned_time)
     np.testing.assert_array_equal(a_mag, aMF.aligned_mag)
     np.testing.assert_array_equal(a_mag2, aMF.aligned_mag2)
@@ -78,12 +79,14 @@ def test_F2f_align(denoised_MACHO_by_FATS, aligned_MACHO_by_FATS):
 # CHECK IF OUR CHANGES DONT BREAK THE ORIGInaL FATS IMPLEMENTATION
 # =============================================================================
 
+
 def get_feature_assert_params(feature):
     feature_params = {
         "PeriodLS": {"atol": 1e-04},
         "Period_fit": {"atol": 1e-40},
         "Psi_CS": {"atol": 1e-02},
-        "Psi_eta": {"atol": 1e-01}}
+        "Psi_eta": {"atol": 1e-01},
+    }
     params = {"err_msg": f"Feature '{feature}' missmatch."}
     params.update(feature_params.get(feature, {}))
     return params
@@ -99,21 +102,23 @@ def test_F2f_extract_one_same_values(aligned_MACHO_by_FATS, FATS_results):
         aligned_MACHO_by_FATS.aligned_mag,
         aligned_MACHO_by_FATS.aligned_mag2,
         aligned_MACHO_by_FATS.aligned_error,
-        aligned_MACHO_by_FATS.aligned_error2)
+        aligned_MACHO_by_FATS.aligned_error2,
+    )
 
     features, FATS_values = FATS_results.features, FATS_results.fvalues
 
-    fs = FeatureSpace(
-        SlottedA_length={"T": None},
-        StetsonKAC={"T": None})
+    fs = FeatureSpace(SlottedA_length={"T": None}, StetsonKAC={"T": None})
     result = fs.extract(*lc)
     feets_result = dict(zip(*result))
 
-    feets_result.update({
-        "PeriodLS": feets_result.pop("PeriodLS_0"),
-        "Period_fit": feets_result.pop("Period_fit_0"),
-        "Psi_eta": feets_result.pop("Psi_eta_0"),
-        "Psi_CS": feets_result.pop("Psi_CS_0")})
+    feets_result.update(
+        {
+            "PeriodLS": feets_result.pop("PeriodLS_0"),
+            "Period_fit": feets_result.pop("Period_fit_0"),
+            "Psi_eta": feets_result.pop("Psi_eta_0"),
+            "Psi_CS": feets_result.pop("Psi_CS_0"),
+        }
+    )
 
     for feature in features:
 

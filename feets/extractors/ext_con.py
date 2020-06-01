@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Con(Extractor):
     r"""
 
@@ -75,7 +76,7 @@ class Con(Extractor):
        Doi:10.1088/0004-637X/735/2/68.
 
     """
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["Con"]
     params = {"consecutiveStar": 3}
 
@@ -91,8 +92,10 @@ class Con(Extractor):
         for i in range(N - consecutiveStar + 1):
             flag = 0
             for j in range(consecutiveStar):
-                if(magnitude[i + j] > m + 2 * sigma or
-                   magnitude[i + j] < m - 2 * sigma):
+                if (
+                    magnitude[i + j] > m + 2 * sigma
+                    or magnitude[i + j] < m - 2 * sigma
+                ):
                     flag = 1
                 else:
                     flag = 0

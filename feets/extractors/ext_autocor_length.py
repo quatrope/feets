@@ -45,6 +45,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class AutocorLength(Extractor):
     r"""
     **Autocor_length**
@@ -80,20 +81,28 @@ class AutocorLength(Extractor):
 
     """
 
-    data = ['magnitude']
-    features = ['Autocor_length']
+    data = ["magnitude"]
+    features = ["Autocor_length"]
     params = {"nlags": 100}
 
     def fit(self, magnitude, nlags):
 
         AC = stattools.acf(magnitude, nlags=nlags, fft=True)
-        k = next((index for index, value in
-                 enumerate(AC) if value < np.exp(-1)), None)
+        k = next(
+            (index for index, value in enumerate(AC) if value < np.exp(-1)),
+            None,
+        )
 
         while k is None:
             nlags = nlags + 100
             AC = stattools.acf(magnitude, nlags=nlags, fft=True)
-            k = next((index for index, value in
-                      enumerate(AC) if value < np.exp(-1)), None)
+            k = next(
+                (
+                    index
+                    for index, value in enumerate(AC)
+                    if value < np.exp(-1)
+                ),
+                None,
+            )
 
-        return {'Autocor_length': k}
+        return {"Autocor_length": k}

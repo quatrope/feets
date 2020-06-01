@@ -54,6 +54,7 @@ from ..extractors.core import DATAS
 # FUNCTIONS
 # =============================================================================
 
+
 def get_data_home(data_home=None):
     """Return the path of the feets data dir.
 
@@ -76,7 +77,8 @@ def get_data_home(data_home=None):
     """
     if data_home is None:
         data_home = os.environ.get(
-            'feets_DATA', os.path.join('~', 'feets_data'))
+            "feets_DATA", os.path.join("~", "feets_data")
+        )
     data_home = os.path.expanduser(data_home)
     if not os.path.exists(data_home):
         os.makedirs(data_home)
@@ -123,7 +125,7 @@ def fetch(url, dest, force=False):
         cached = False
         r = requests.get(url, stream=True)
         if r.status_code == 200:
-            with open(dest, 'wb') as f:
+            with open(dest, "wb") as f:
                 for chunk in r.iter_content(1024):
                     f.write(chunk)
     return cached, dest
@@ -132,6 +134,7 @@ def fetch(url, dest, force=False):
 # =============================================================================
 # CLASSES
 # =============================================================================
+
 
 class Bunch(Mapping):  # THANKS SKLEARN
     """Container object for datasets
@@ -154,7 +157,8 @@ class Bunch(Mapping):  # THANKS SKLEARN
     def __init__(self, data=None, **kwargs):
         if data and kwargs:
             raise ValueError(
-                "If 'data' is not none keywords aguments are not allowed")
+                "If 'data' is not none keywords aguments are not allowed"
+            )
         self._data = dict(data) if data else kwargs
 
     def __repr__(self):
@@ -187,14 +191,19 @@ class Bunch(Mapping):  # THANKS SKLEARN
 # and ad som validations and a custom repr, as
 
 LightCurveBase = attr.make_class(
-    'LightCurveBase', {
-        k: attr.ib(default=attr.NOTHING if k in DATAS[:2] else None,
-                   converter=attr.converters.optional(np.asarray))
-        for k in DATAS}, frozen=True)
+    "LightCurveBase",
+    {
+        k: attr.ib(
+            default=attr.NOTHING if k in DATAS[:2] else None,
+            converter=attr.converters.optional(np.asarray),
+        )
+        for k in DATAS
+    },
+    frozen=True,
+)
 
 
 class LightCurve(LightCurveBase, Mapping):
-
     def __repr__(self):
         fields = []
         for a in attr.fields(LightCurveBase):
@@ -219,6 +228,7 @@ class LightCurve(LightCurveBase, Mapping):
 
 # The real dataset object
 
+
 @attr.s(frozen=True)
 class Data(Mapping):
     """This object encapsulates a full data with their metadata.
@@ -240,15 +250,18 @@ class Data(Mapping):
         lightcurves collection in a dint-like object
 
     """
+
     id = attr.ib()
     ds_name = attr.ib(converter=str)
     description = attr.ib(converter=str, repr=False)
     bands = attr.ib(converter=tuple)
-    metadata = attr.ib(
-        repr=False, converter=attr.converters.optional(Bunch))
+    metadata = attr.ib(repr=False, converter=attr.converters.optional(Bunch))
     data = attr.ib(
-        repr=False, converter=lambda value: Bunch({
-            k: LightCurve(**v) for k, v in value.items()}))
+        repr=False,
+        converter=lambda value: Bunch(
+            {k: LightCurve(**v) for k, v in value.items()}
+        ),
+    )
 
     def __getitem__(self, k):
         try:

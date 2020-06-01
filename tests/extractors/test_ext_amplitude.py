@@ -28,7 +28,7 @@
 # DOC
 # =============================================================================
 
-""""""
+"""feets.extractors.ext_signature Tests"""
 
 
 # =============================================================================
@@ -37,41 +37,61 @@
 
 import numpy as np
 
-from .core import Extractor
+from feets import extractors
+
+from matplotlib.testing.decorators import check_figures_equal
 
 
 # =============================================================================
-# EXTRACTOR CLASS
+# Test cases
 # =============================================================================
 
 
-class Mean(Extractor):
-    r"""
-    **Mean**
+@check_figures_equal()
+def test_plot_Amplitude(fig_test, fig_ref):
 
-    Mean magnitude. For a normal distribution it should take a value
-    close to zero:
+    magnitude = [1, 2, 3, 4]
+    fvalue = 00.1
 
-    .. code-block:: pycon
+    # fig test
+    test_ax = fig_test.subplots()
+    ext = extractors.Amplitude()
+    kwargs = ext.get_default_params()
+    kwargs.update(
+        feature="Amplitude",
+        value=fvalue,
+        ax=test_ax,
+        plot_kws={},
+        features={},
+        magnitude=magnitude,
+    )
+    ext.plot(**kwargs)
 
-        >>> fs = feets.FeatureSpace(only=['Mean'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Mean': 0.0082611563419413246}
+    # expected
+    min5p, max5p = ext._median_min_max_5p(magnitude)
+    sample_idx = range(len(magnitude))
+    msample = np.mean(sample_idx)
 
-    References
-    ----------
+    exp_ax = fig_ref.subplots()
+    exp_ax.plot(magnitude, marker=".", ls="", label="Sample")
+    amplitude_line = exp_ax.plot(
+        [msample, msample],
+        [max5p, min5p],
+        marker="o",
+        ls="-",
+        label="Amplitude",
+    )[0]
+    exp_ax.fill_between(
+        sample_idx,
+        min5p,
+        max5p,
+        alpha=0.15,
+        color=amplitude_line.get_color(),
+        label="_no_legend_",
+    )
 
-    .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
-       Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
-       The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
-       Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
-
-    """
-
-    data = ["magnitude"]
-    features = ["Mean"]
-
-    def fit(self, magnitude):
-        B_mean = np.mean(magnitude)
-        return {"Mean": B_mean}
+    exp_ax.set_ylabel("Magnitude")
+    exp_ax.set_xlabel("Sample Index")
+    exp_ax.set_title(f"Amplitude={fvalue:.4f}")
+    exp_ax.legend(loc="best")
+    exp_ax.invert_yaxis()

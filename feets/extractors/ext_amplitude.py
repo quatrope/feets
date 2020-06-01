@@ -46,6 +46,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Amplitude(Extractor):
     """
     **Amplitude**
@@ -65,15 +66,15 @@ class Amplitude(Extractor):
 
     """
 
-    data = ['magnitude']
-    features = ['Amplitude']
+    data = ["magnitude"]
+    features = ["Amplitude"]
 
     def _median_min_max_5p(self, magnitude):
         N = len(magnitude)
         sorted_mag = np.sort(magnitude)
 
-        max5p = np.median(sorted_mag[-int(math.ceil(0.05 * N)):])
-        min5p = np.median(sorted_mag[0:int(math.ceil(0.05 * N))])
+        max5p = np.median(sorted_mag[-int(math.ceil(0.05 * N)) :])
+        min5p = np.median(sorted_mag[0 : int(math.ceil(0.05 * N))])
 
         return min5p, max5p
 
@@ -101,7 +102,8 @@ class Amplitude(Extractor):
         msample = np.mean(sample_idx)
 
         amplitude_line = ax.plot(
-            [msample, msample], [max5p, min5p], **plot_ampb_kws)[0]
+            [msample, msample], [max5p, min5p], **plot_ampb_kws
+        )[0]
 
         # fill between the amplitude limits
         plot_ampf_kws = plot_kws.get("plot_amplitude_fill_kws", {})

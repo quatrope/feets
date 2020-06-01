@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Q31(Extractor):
     r"""
     **Q31** (:math:`Q_{3-1}`)
@@ -70,7 +71,7 @@ class Q31(Extractor):
 
     """
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["Q31"]
 
     def fit(self, magnitude):
@@ -102,7 +103,7 @@ class Q31Color(Extractor):
 
     """
 
-    data = ['aligned_magnitude', 'aligned_magnitude2']
+    data = ["aligned_magnitude", "aligned_magnitude2"]
     features = ["Q31_color"]
 
     def fit(self, aligned_magnitude, aligned_magnitude2):

@@ -46,16 +46,18 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Signature(Extractor):
 
-    data = ['magnitude', 'time']
-    dependencies = ['PeriodLS', 'Amplitude']
+    data = ["magnitude", "time"]
+    dependencies = ["PeriodLS", "Amplitude"]
     params = {"phase_bins": 18, "mag_bins": 12}
 
     features = ["SignaturePhMag"]
 
-    def plot_feature(self, feature, value, ax, plot_kws,
-                     phase_bins, mag_bins, **kwargs):
+    def plot_feature(
+        self, feature, value, ax, plot_kws, phase_bins, mag_bins, **kwargs
+    ):
 
         ax.set_title(f"SignaturePhMag - {phase_bins}x{mag_bins}")
         ax.set_xlabel("Phase")
@@ -71,7 +73,8 @@ class Signature(Extractor):
         lc_phase = np.remainder(time - time[loc], first_period) / first_period
 
         bins = (phase_bins, mag_bins)
-        signature = np.histogram2d(
-            lc_phase, lc_yaxis, bins=bins, normed=True)[0]
+        signature = np.histogram2d(lc_phase, lc_yaxis, bins=bins, normed=True)[
+            0
+        ]
 
         return {"SignaturePhMag": signature}

@@ -47,6 +47,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class FourierComponents(Extractor):
     r"""
     **Periodic features extracted from light-curves using Lomb-Scargle**
@@ -154,27 +155,33 @@ class FourierComponents(Extractor):
 
     """
 
-    data = ['magnitude', 'time', "error"]
+    data = ["magnitude", "time", "error"]
     optional = ["error"]
-    features = [
-        "Freq1_harmonics",
-        "Freq2_harmonics",
-        "Freq3_harmonics"]
+    features = ["Freq1_harmonics", "Freq2_harmonics", "Freq3_harmonics"]
     params = {
         "lscargle_kwds": {
             "autopower_kwds": {
                 "normalization": "standard",
-                "nyquist_factor": 100}}
+                "nyquist_factor": 100,
+            }
+        }
     }
 
     def _model(self, x, a, b, c, Freq):
-        return (a * np.sin(2 * np.pi * Freq * x) +
-                b * np.cos(2 * np.pi * Freq * x) + c)
+        return (
+            a * np.sin(2 * np.pi * Freq * x)
+            + b * np.cos(2 * np.pi * Freq * x)
+            + c
+        )
 
     def _yfunc_maker(self, Freq):
         def func(x, a, b, c):
-            return (a * np.sin(2 * np.pi * Freq * x) +
-                    b * np.cos(2 * np.pi * Freq * x) + c)
+            return (
+                a * np.sin(2 * np.pi * Freq * x)
+                + b * np.cos(2 * np.pi * Freq * x)
+                + c
+            )
+
         return func
 
     def _components(self, magnitude, time, error, lscargle_kwds):
@@ -182,7 +189,8 @@ class FourierComponents(Extractor):
         A, PH = [], []
         for i in range(3):
             frequency, power = lscargle(
-                time=time, magnitude=magnitude, error=error, **lscargle_kwds)
+                time=time, magnitude=magnitude, error=error, **lscargle_kwds
+            )
 
             fmax = np.argmax(power)
             fundamental_Freq = frequency[fmax]
@@ -192,14 +200,15 @@ class FourierComponents(Extractor):
             for j in range(4):
                 function_to_fit = self._yfunc_maker((j + 1) * fundamental_Freq)
                 popt0, popt1, popt2 = curve_fit(
-                    function_to_fit, time, omagnitude)[0][:3]
+                    function_to_fit, time, omagnitude
+                )[0][:3]
 
                 Atemp.append(np.sqrt(popt0 ** 2 + popt1 ** 2))
                 PHtemp.append(np.arctan(popt1 / popt0))
 
                 model = self._model(
-                    time, popt0, popt1, popt2,
-                    (j + 1) * fundamental_Freq)
+                    time, popt0, popt1, popt2, (j + 1) * fundamental_Freq
+                )
                 magnitude = np.array(magnitude) - model
 
             A.append(Atemp)
@@ -214,13 +223,17 @@ class FourierComponents(Extractor):
         lscargle_kwds = lscargle_kwds or {}
 
         A, sPH = self._components(
-            magnitude=magnitude, time=time,
-            error=error, lscargle_kwds=lscargle_kwds)
+            magnitude=magnitude,
+            time=time,
+            error=error,
+            lscargle_kwds=lscargle_kwds,
+        )
 
         result = {
             "Freq1_harmonics": (A[0], sPH[0]),
             "Freq2_harmonics": (A[1], sPH[1]),
-            "Freq3_harmonics": (A[2], sPH[2])}
+            "Freq3_harmonics": (A[2], sPH[2]),
+        }
 
         return result
 
@@ -230,7 +243,10 @@ class FourierComponents(Extractor):
         flatten_value = {}
         for idx, ap in enumerate(zip(*value)):
             a, p = ap
-            flatten_value.update({
-                f"{feature}_amplitude_{idx}": a,
-                f"{feature}_rel_phase_{idx}": p})
+            flatten_value.update(
+                {
+                    f"{feature}_amplitude_{idx}": a,
+                    f"{feature}_rel_phase_{idx}": p,
+                }
+            )
         return flatten_value

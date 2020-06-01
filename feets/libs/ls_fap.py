@@ -65,17 +65,18 @@ def pdf_single(z, N, normalization, dH=1, dK=3):
         raise NotImplementedError("Degrees of freedom != 2")
     Nk = N - dK
 
-    if normalization == 'psd':
+    if normalization == "psd":
         return np.exp(-z)
-    elif normalization == 'standard':
+    elif normalization == "standard":
         return 0.5 * Nk * (1 - z) ** (0.5 * Nk - 1)
-    elif normalization == 'model':
+    elif normalization == "model":
         return 0.5 * Nk * (1 + z) ** (-0.5 * Nk - 1)
-    elif normalization == 'log':
+    elif normalization == "log":
         return 0.5 * Nk * np.exp(-0.5 * Nk * z)
     else:
-        raise ValueError("normalization='{0}' is not recognized"
-                         "".format(normalization))
+        raise ValueError(
+            "normalization='{0}' is not recognized" "".format(normalization)
+        )
 
 
 def fap_single(z, N, normalization, dH=1, dK=3):
@@ -116,17 +117,18 @@ def fap_single(z, N, normalization, dH=1, dK=3):
         raise NotImplementedError("Degrees of freedom != 2")
     Nk = N - dK
 
-    if normalization == 'psd':
+    if normalization == "psd":
         return np.exp(-z)
-    elif normalization == 'standard':
+    elif normalization == "standard":
         return (1 - z) ** (0.5 * Nk)
-    elif normalization == 'model':
+    elif normalization == "model":
         return (1 + z) ** (-0.5 * Nk)
-    elif normalization == 'log':
+    elif normalization == "log":
         return np.exp(-0.5 * Nk * z)
     else:
-        raise ValueError("normalization='{0}' is not recognized"
-                         "".format(normalization))
+        raise ValueError(
+            "normalization='{0}' is not recognized" "".format(normalization)
+        )
 
 
 def cdf_single(z, N, normalization, dH=1, dK=3):
@@ -166,7 +168,7 @@ def cdf_single(z, N, normalization, dH=1, dK=3):
     return 1 - fap_single(z, N, normalization=normalization, dH=dH, dK=dK)
 
 
-def tau_davies(Z, fmax, t, y, dy, normalization='standard', dH=1, dK=3):
+def tau_davies(Z, fmax, t, y, dy, normalization="standard", dH=1, dK=3):
     """tau factor for estimating Davies bound (Baluev 2008, Table 1)"""
     N = len(t)
     NH = N - dH  # DOF for null hypothesis
@@ -174,26 +176,33 @@ def tau_davies(Z, fmax, t, y, dy, normalization='standard', dH=1, dK=3):
     Dt = _weighted_var(t, dy)
     Teff = np.sqrt(4 * np.pi * Dt)
     W = fmax * Teff
-    if normalization == 'psd':
+    if normalization == "psd":
         # 'psd' normalization is same as Baluev's z
         return W * np.exp(-Z) * np.sqrt(Z)
-    elif normalization == 'standard':
+    elif normalization == "standard":
         # 'standard' normalization is Z = 2/NH * z_1
-        return (_gamma(NH) * W * (1 - Z) ** (0.5 * (NK - 1))
-                * np.sqrt(0.5 * NH * Z))
-    elif normalization == 'model':
+        return (
+            _gamma(NH)
+            * W
+            * (1 - Z) ** (0.5 * (NK - 1))
+            * np.sqrt(0.5 * NH * Z)
+        )
+    elif normalization == "model":
         # 'model' normalization is Z = 2/NK * z_2
-        return (_gamma(NK) * W * (1 + Z) ** (-0.5 * NK)
-                * np.sqrt(0.5 * NK * Z))
-    elif normalization == 'log':
+        return _gamma(NK) * W * (1 + Z) ** (-0.5 * NK) * np.sqrt(0.5 * NK * Z)
+    elif normalization == "log":
         # 'log' normalization is Z = 2/NK * z_3
-        return (_gamma(NK) * W * np.exp(-0.5 * Z * (NK - 0.5))
-                * np.sqrt(NK * np.sinh(0.5 * Z)))
+        return (
+            _gamma(NK)
+            * W
+            * np.exp(-0.5 * Z * (NK - 0.5))
+            * np.sqrt(NK * np.sinh(0.5 * Z))
+        )
     else:
         raise NotImplementedError("normalization={0}".format(normalization))
 
 
-def fap_simple(Z, fmax, t, y, dy, normalization='standard'):
+def fap_simple(Z, fmax, t, y, dy, normalization="standard"):
     """False Alarm Probability based on estimated number of indep frequencies
 
     """
@@ -204,7 +213,7 @@ def fap_simple(Z, fmax, t, y, dy, normalization='standard'):
     return 1 - p_s ** N_eff
 
 
-def fap_davies(Z, fmax, t, y, dy, normalization='standard'):
+def fap_davies(Z, fmax, t, y, dy, normalization="standard"):
     """Davies upper-bound to the false alarm probability
 
     (Eqn 5 of Baluev 2008)
@@ -215,7 +224,7 @@ def fap_davies(Z, fmax, t, y, dy, normalization='standard'):
     return fap_s + tau
 
 
-def fap_baluev(Z, fmax, t, y, dy, normalization='standard'):
+def fap_baluev(Z, fmax, t, y, dy, normalization="standard"):
     """Alias-free approximation to false alarm probability
 
     (Eqn 6 of Baluev 2008)
@@ -225,15 +234,24 @@ def fap_baluev(Z, fmax, t, y, dy, normalization='standard'):
     return 1 - cdf * np.exp(-tau)
 
 
-def fap_bootstrap(Z, fmax, t, y, dy, normalization='standard',
-                  n_bootstraps=1000, random_seed=None):
+def fap_bootstrap(
+    Z,
+    fmax,
+    t,
+    y,
+    dy,
+    normalization="standard",
+    n_bootstraps=1000,
+    random_seed=None,
+):
     rng = np.random.RandomState(random_seed)
 
     def bootstrapped_power():
         resample = rng.randint(0, len(y), len(y))  # sample with replacement
         ls_boot = LombScargle(t, y[resample], dy[resample])
-        freq, power = ls_boot.autopower(normalization=normalization,
-                                        maximum_frequency=fmax)
+        freq, power = ls_boot.autopower(
+            normalization=normalization, maximum_frequency=fmax
+        )
         return power.max()
 
     pmax = np.array([bootstrapped_power() for i in range(n_bootstraps)])
@@ -241,14 +259,17 @@ def fap_bootstrap(Z, fmax, t, y, dy, normalization='standard',
     return 1 - np.searchsorted(pmax, Z) / len(pmax)
 
 
-METHODS = {'simple': fap_simple,
-           'davies': fap_davies,
-           'baluev': fap_baluev,
-           'bootstrap': fap_bootstrap}
+METHODS = {
+    "simple": fap_simple,
+    "davies": fap_davies,
+    "baluev": fap_baluev,
+    "bootstrap": fap_bootstrap,
+}
 
 
-def false_alarm_probability(Z, fmax, t, y, dy, normalization,
-                            method='baluev', method_kwds=None):
+def false_alarm_probability(
+    Z, fmax, t, y, dy, normalization, method="baluev", method_kwds=None
+):
     """Approximate the False Alarm Probability
 
     Parameters

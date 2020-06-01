@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class PairSlopeTrend(Extractor):
     r"""
     **PairSlopeTrend**
@@ -69,13 +70,18 @@ class PairSlopeTrend(Extractor):
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
 
     """
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["PairSlopeTrend"]
 
     def fit(self, magnitude):
         data_last = magnitude[-30:]
 
-        pst = (float(len(np.where(np.diff(data_last) > 0)[0]) -
-               len(np.where(np.diff(data_last) <= 0)[0])) / 30)
+        pst = (
+            float(
+                len(np.where(np.diff(data_last) > 0)[0])
+                - len(np.where(np.diff(data_last) <= 0)[0])
+            )
+            / 30
+        )
 
         return {"PairSlopeTrend": pst}

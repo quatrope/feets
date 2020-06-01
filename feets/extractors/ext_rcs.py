@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class RCS(Extractor):
     r"""
     **Rcs** - Range of cumulative sum (:math:`R_{cs}`)
@@ -81,8 +82,8 @@ class RCS(Extractor):
 
     """
 
-    data = ['magnitude']
-    features = ['Rcs']
+    data = ["magnitude"]
+    features = ["Rcs"]
 
     def fit(self, magnitude):
         sigma = np.std(magnitude)

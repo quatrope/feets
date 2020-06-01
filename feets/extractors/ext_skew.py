@@ -44,6 +44,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Skew(Extractor):
     r"""
 
@@ -78,7 +79,7 @@ class Skew(Extractor):
 
     """
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["Skew"]
 
     def fit(self, magnitude):

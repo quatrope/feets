@@ -42,12 +42,13 @@ from feets import extractors
 # Test cases
 # =============================================================================
 
+
 def test_fourier_optional_data(periodic_lc_werror):
     lc = periodic_lc_werror.copy()
     lc["error"] = None
 
     ext = extractors.FourierComponents()
 
-    assert (
-        ext.extract(features={}, **periodic_lc_werror) !=
-        ext.extract(features={}, **lc))
+    assert ext.extract(features={}, **periodic_lc_werror) != ext.extract(
+        features={}, **lc
+    )

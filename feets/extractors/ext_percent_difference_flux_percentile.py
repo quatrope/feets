@@ -46,6 +46,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class PercentDifferenceFluxPercentile(Extractor):
     r"""
     **PercentDifferenceFluxPercentile**
@@ -70,7 +71,7 @@ class PercentDifferenceFluxPercentile(Extractor):
 
     """
 
-    data = ['magnitude']
+    data = ["magnitude"]
     features = ["PercentDifferenceFluxPercentile"]
 
     def fit(self, magnitude):

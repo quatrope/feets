@@ -53,6 +53,7 @@ from ..conftest import DATA_PATH
 # BASE CLASS
 # =============================================================================
 
+
 def test_load_OGLE3_catalog():
     df = pd.DataFrame({"# ID": [1, 2, 3]})
     with mock.patch("pandas.read_table", return_value=df):
