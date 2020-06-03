@@ -348,3 +348,14 @@ def test_fail_on_all_optional_data():
 
             def fit(self, *args):
                 pass
+
+
+# =============================================================================
+# TEST has PLOTS
+# =============================================================================
+
+
+@pytest.mark.parametrize("ename, ext_cls", extractors._extractors.items())
+def test_implement_plot_feature(ename, ext_cls):
+    msg = f"Extractor {ename} must implement plot_fature() method."
+    assert ext_cls.plot_feature is not Extractor.plot_feature, msg

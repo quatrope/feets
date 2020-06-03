@@ -448,7 +448,7 @@ class Extractor(metaclass=ExtractorMeta):
 
     def plot_feature(self, feature, **kwargs):
         raise NotImplementedError(
-            f"Plot for feature '{feature}' not implemeted"
+            f"Plot for feature '{feature}' not implemented"
         )
 
     def plot(self, feature, value, ax, plot_kws, **kwargs):
