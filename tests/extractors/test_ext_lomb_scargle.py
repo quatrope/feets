@@ -37,11 +37,11 @@
 
 import os
 
+from feets import FeatureSpace, extractors
+
 import numpy as np
 
 import pandas as pd
-
-from feets import extractors, FeatureSpace
 
 from ..conftest import DATA_PATH
 

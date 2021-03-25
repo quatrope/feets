@@ -41,14 +41,13 @@ import os
 import shutil
 from collections import Mapping
 
+import attr
+
 import numpy as np
 
 import requests
 
-import attr
-
 from ..extractors.core import DATAS
-
 
 # =============================================================================
 # FUNCTIONS

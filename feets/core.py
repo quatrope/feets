@@ -46,28 +46,27 @@ import itertools as it
 from collections import Counter
 from collections.abc import Mapping
 
-import pandas as pd
-
-import numpy as np
+import attr
 
 import matplotlib.pyplot as plt
 
-import attr
+import numpy as np
+
+import pandas as pd
 
 from . import extractors
 from .extractors.core import (
     DATAS,
-    DATA_MAGNITUDE,
-    DATA_TIME,
-    DATA_ERROR,
-    DATA_MAGNITUDE2,
+    DATA_ALIGNED_ERROR,
+    DATA_ALIGNED_ERROR2,
     DATA_ALIGNED_MAGNITUDE,
     DATA_ALIGNED_MAGNITUDE2,
     DATA_ALIGNED_TIME,
-    DATA_ALIGNED_ERROR,
-    DATA_ALIGNED_ERROR2,
+    DATA_ERROR,
+    DATA_MAGNITUDE,
+    DATA_MAGNITUDE2,
+    DATA_TIME,
 )
-
 
 # =============================================================================
 # EXCEPTIONS
@@ -164,13 +163,11 @@ class FeatureSet:
         return f"FeatureSet(features=<{feats}>, timeserie=<{ts}>)"
 
     def extractor_of(self, feature):
-        """Retrieve the  extractor instance used for create the given feature.
-
-        """
+        """Retrieve the  extractor instance used for create the feature."""
         return copy.deepcopy(self.extractors[feature])
 
     def plot(self, feature, ax=None, **plot_kws):
-        """If is available, draw the plot-representation of the given feature.
+        """If is available, draw the plot-representation of the feature.
 
         Parameters
         ----------

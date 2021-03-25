@@ -62,9 +62,7 @@ DATA_PATH = os.path.join(PATH, "data", "macho")
 
 
 def available_MACHO_lc():
-    """Retrieve a list with the available MACHO lightcurves
-
-    """
+    """Retrieve a list with the available MACHO lightcurves"""
     return [fp.rsplit(".", 2)[0] for fp in os.listdir(DATA_PATH)]
 
 

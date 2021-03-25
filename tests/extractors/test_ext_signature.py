@@ -35,13 +35,13 @@
 # IMPORTS
 # =============================================================================
 
-import numpy as np
-
 from feets import extractors
 
-import seaborn as sns
-
 from matplotlib.testing.decorators import check_figures_equal
+
+import numpy as np
+
+import seaborn as sns
 
 
 # =============================================================================

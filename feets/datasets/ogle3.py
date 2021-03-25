@@ -91,8 +91,8 @@ More Info: http://ogledb.astrouw.edu.pl/~ogle/CVS/
 # IMPORTS
 # =============================================================================
 
-import os
 import bz2
+import os
 import tarfile
 import warnings
 
@@ -102,7 +102,6 @@ import pandas as pd
 
 from . import base
 from .base import Data
-
 
 # =============================================================================
 # CONSTANTS
@@ -144,9 +143,7 @@ def _check_dim(lc):
 
 
 def load_OGLE3_catalog():
-    """Return the full list of variables stars of OGLE-3 as a DataFrame
-
-    """
+    """Return the full list of variables stars of OGLE-3 as a DataFrame"""
     with bz2.BZ2File(CATALOG_PATH) as bz2fp, warnings.catch_warnings():
         warnings.simplefilter("ignore")
         df = pd.read_table(bz2fp, skiprows=6)

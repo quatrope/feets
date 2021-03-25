@@ -53,14 +53,13 @@ https://github.com/isadoranun/FATS/blob/b45b5c1/FATS/test_library.py
 import os
 import warnings
 
+from feets.core import FeatureSpace
+
 import numpy as np
 
 import pandas as pd
 
-from feets.core import FeatureSpace
-
 from .conftest import DATA_PATH
-
 
 # =============================================================================
 # TESTS

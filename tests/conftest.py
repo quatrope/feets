@@ -37,11 +37,12 @@
 
 import os
 
-import numpy as np
-import pytest
-
 import feets
 from feets.datasets import macho
+
+import numpy as np
+
+import pytest
 
 
 # =============================================================================

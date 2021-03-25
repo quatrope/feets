@@ -63,10 +63,9 @@ allowing all residuals to be compared on an equal basis.
 
 import numpy as np
 
-from ..utils import indent
 from .core import Extractor
 from .ext_slotted_a_length import SlottedA_length
-
+from ..utils import indent
 
 # =============================================================================
 # EXTRACTOR CLASS

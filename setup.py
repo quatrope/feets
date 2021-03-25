@@ -43,10 +43,10 @@ from ez_setup import use_setuptools
 
 use_setuptools()
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 os.environ["FEETS_IN_SETUP"] = "True"
-import feets
+import feets  # noqa
 
 
 # =============================================================================

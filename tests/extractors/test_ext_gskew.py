@@ -37,10 +37,9 @@
 
 import warnings
 
-import numpy as np
-
 from feets import extractors
 
+import numpy as np
 
 # =============================================================================
 # Test cases

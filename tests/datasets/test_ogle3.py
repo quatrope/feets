@@ -37,17 +37,15 @@
 
 import os
 import tarfile
+from unittest import mock
+
+from feets.datasets import ogle3
 
 import numpy as np
 
 import pandas as pd
 
-from unittest import mock
-
-from feets.datasets import ogle3
-
 from ..conftest import DATA_PATH
-
 
 # =============================================================================
 # BASE CLASS

@@ -35,27 +35,26 @@
 # IMPORTS
 # =============================================================================
 
+from feets import (
+    Extractor,
+    ExtractorContractError,
+    FeatureNotFound,
+    FeatureSet,
+    FeatureSpace,
+    FeatureSpaceError,
+    extractors,
+    register_extractor,
+)
+
+from matplotlib import axes
+
 import numpy as np
 
 import pandas as pd
 
-from matplotlib import axes
-
 import pytest
 
 from pytest_unordered import unordered
-
-from feets import (
-    extractors,
-    FeatureSpace,
-    FeatureSpaceError,
-    FeatureNotFound,
-    Extractor,
-    register_extractor,
-    ExtractorContractError,
-)
-from feets.core import FeatureSet
-
 
 # =============================================================================
 # CONSTANTS

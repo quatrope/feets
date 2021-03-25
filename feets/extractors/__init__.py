@@ -48,14 +48,14 @@ __all__ = [
 # =============================================================================
 
 import inspect
+
 from .core import (
+    DATAS,
     Extractor,
     ExtractorBadDefinedError,
     ExtractorContractError,
     ExtractorWarning,
-    DATAS,
-)  # noqa
-
+)
 
 # =============================================================================
 # REGISTER UTILITY
@@ -113,9 +113,7 @@ def extractor_of(feature):
 
 
 def sort_by_dependencies(exts, retry=None):
-    """Calculate the Feature Extractor Resolution Order.
-
-    """
+    """Calculate the Feature Extractor Resolution Order."""
     sorted_ext, features_from_sorted = [], set()
     pending = [(e, 0) for e in exts]
     retry = len(exts) * 100 if retry is None else retry
@@ -149,6 +147,7 @@ from .ext_beyond1_std import *  # noqa
 from .ext_car import *  # noqa
 from .ext_color import *  # noqa
 from .ext_con import *  # noqa
+from .ext_dmdt import *  # noqa
 from .ext_eta_color import *  # noqa
 from .ext_eta_e import *  # noqa
 from .ext_flux_percentile_ratio import *  # noqa
@@ -165,16 +164,14 @@ from .ext_pair_slope_trend import *  # noqa
 from .ext_percent_amplitude import *  # noqa
 from .ext_percent_difference_flux_percentile import *  # noqa
 from .ext_q31 import *  # noqa
-from .ext_q31 import *  # noqa
 from .ext_rcs import *  # noqa
+from .ext_signature import *  # noqa
 from .ext_skew import *  # noqa
 from .ext_slotted_a_length import *  # noqa
 from .ext_small_kurtosis import *  # noqa
 from .ext_std import *  # noqa
 from .ext_stetson import *  # noqa
 from .ext_structure_functions import *  # noqa
-from .ext_signature import *  # noqa
-from .ext_dmdt import *  # noqa
 
 for cls in sort_by_dependencies(Extractor.__subclasses__()):
     register_extractor(cls)

@@ -35,14 +35,12 @@
 # IMPORTS
 # =============================================================================
 
-import numpy as np
-
 from astropy.timeseries import lombscargle
 
-from ..libs import ls_fap
+import numpy as np
 
 from .core import Extractor
-
+from ..libs import ls_fap
 
 # =============================================================================
 # CONSTANTS

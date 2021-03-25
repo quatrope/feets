@@ -35,12 +35,12 @@
 # IMPORTS
 # =============================================================================
 
+from feets import FeatureSpace, preprocess
+
+
 import numpy as np
 
 import pytest
-
-from feets import FeatureSpace, preprocess
-
 
 # =============================================================================
 # CASES

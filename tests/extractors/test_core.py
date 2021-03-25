@@ -37,16 +37,16 @@
 
 from unittest import mock
 
+from feets import (
+    Extractor,
+    ExtractorContractError,
+    extractors,
+    register_extractor,
+)
+
 import pytest
 
 from pytest_unordered import unordered
-
-from feets import (
-    Extractor,
-    register_extractor,
-    extractors,
-    ExtractorContractError,
-)
 
 
 # =============================================================================

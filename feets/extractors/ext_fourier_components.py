@@ -39,9 +39,8 @@ import numpy as np
 
 from scipy.optimize import curve_fit
 
-from .ext_lomb_scargle import lscargle
 from .core import Extractor
-
+from .ext_lomb_scargle import lscargle
 
 # =============================================================================
 # EXTRACTOR CLASS

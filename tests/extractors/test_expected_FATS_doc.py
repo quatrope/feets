@@ -38,12 +38,11 @@ original FATS documentation are the same of feets.
 # IMPORTS
 # =============================================================================
 
+from feets import extractors
+
 import numpy as np
 
 import pytest
-
-from feets import extractors
-
 
 # =============================================================================
 # CASES

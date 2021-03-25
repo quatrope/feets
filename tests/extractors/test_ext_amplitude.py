@@ -28,18 +28,18 @@
 # DOC
 # =============================================================================
 
-"""feets.extractors.ext_signature Tests"""
-
+"""feets.extractors.ext_amplitude Tests"""
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-import numpy as np
 
 from feets import extractors
 
 from matplotlib.testing.decorators import check_figures_equal
+
+import numpy as np
 
 
 # =============================================================================

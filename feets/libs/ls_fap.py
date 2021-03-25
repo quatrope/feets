@@ -203,9 +203,7 @@ def tau_davies(Z, fmax, t, y, dy, normalization="standard", dH=1, dK=3):
 
 
 def fap_simple(Z, fmax, t, y, dy, normalization="standard"):
-    """False Alarm Probability based on estimated number of indep frequencies
-
-    """
+    """False Alarm Probability based on estimated number of indep frequencies"""
     N = len(t)
     T = max(t) - min(t)
     N_eff = fmax * T
