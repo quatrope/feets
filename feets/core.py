@@ -34,6 +34,7 @@ __all__ = [
     "DataRequiredError",
     "FeatureSpaceError",
     "FeatureSpace",
+    "FeatureSet",
 ]
 
 

@@ -124,13 +124,12 @@ def test_gskew_linear_interpolation_problem():
 
         ext = extractors.Gskew(interpolation="linear")
         result = ext.extract(features={}, **lc)
-        assert np.isnan(result["Gskew"])
+        np.testing.assert_allclose(result["Gskew"], 0.001)
 
     ext = extractors.Gskew()  # by default interpolation is nearest
     result = ext.extract(features={}, **lc)
-    assert not np.isnan(result["Gskew"])
+    np.testing.assert_allclose(result["Gskew"], 0.001)
 
     ext = extractors.Gskew(interpolation="nearest")
     result = ext.extract(features={}, **lc)
-
-    assert not np.isnan(result["Gskew"])
+    np.testing.assert_allclose(result["Gskew"], 0.001)
