@@ -24,32 +24,29 @@
 # SOFTWARE.
 
 # =============================================================================
-# FUTURE
-# =============================================================================
-
-from __future__ import unicode_literals, print_function
-
-
-# =============================================================================
 # DOCS
 # =============================================================================
 
-__doc__ = """Features extractors base classes classes"""
+"""Features extractors base classes classes"""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+import abc
+import inspect
 import warnings
-from collections import namedtuple
+from dataclasses import dataclass
 
-import six
+import numpy as np
 
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
+
+MAX_VALUES_TO_REPR = 10
 
 DATA_MAGNITUDE = "magnitude"
 DATA_TIME = "time"
@@ -70,7 +67,7 @@ DATAS = (
     DATA_ALIGNED_MAGNITUDE,
     DATA_ALIGNED_MAGNITUDE2,
     DATA_ALIGNED_ERROR,
-    DATA_ALIGNED_ERROR2
+    DATA_ALIGNED_ERROR2,
 )
 
 
@@ -78,27 +75,24 @@ DATAS = (
 # EXCEPTIONS
 # =============================================================================
 
-class ExtractorBadDefinedError(Exception):
-    """The extractor are not properly defined."""
-    pass
+
+class ExtractorBadDefinedError(TypeError):
+    """The extractor class are not properly defined."""
 
 
 class ExtractorContractError(ValueError):
-    """The extractor dont get the expected features, data, parameters
-    or wathever.
+    """The extractor don't get the expected features, data, parameters
+    or whatever.
 
     """
-    pass
 
 
 class ExtractorWarning(UserWarning):
     """Warn about the Extractor behavior."""
-    pass
 
 
 class FeatureExtractionWarning(UserWarning):
     """Warn about calculation of some feature"""
-    pass
 
 
 warnings.simplefilter("always", ExtractorWarning)
@@ -106,205 +100,242 @@ warnings.simplefilter("always", FeatureExtractionWarning)
 
 
 # =============================================================================
-# BASE CLASSES
+# EXTRACTOR CONF & UTILS FOR META PROGRAMMING
 # =============================================================================
 
-ExtractorConf = namedtuple(
-    "ExtractorConf",
-    ["data", "dependencies", "params", "features", "warnings"])
+
+def _isabstract(attr):
+    return getattr(attr, "__isabstractmethod__", False)
 
 
-class ExtractorMeta(type):
+def _iter_method_parameters(method):
+    signature = inspect.signature(method)
+    parameters = tuple(signature.parameters.values())[1:]
+    yield from parameters
 
-    def __new__(mcls, name, bases, namespace):
-        cls = super(ExtractorMeta, mcls).__new__(mcls, name, bases, namespace)
 
-        try:
-            cls != Extractor
-        except NameError:
-            return cls
+@dataclass(frozen=True)
+class _ExtractorConf:
+    features: frozenset
+    data: frozenset
+    optional: frozenset
+    required: frozenset
+    dependencies: frozenset
+    parameters: frozenset
 
-        if not hasattr(cls, "data"):
-            msg = "'{}' must redefine {}"
-            raise ExtractorBadDefinedError(
-                msg.format(cls, "data attribute"))
-        if not cls.data:
-            msg = "'data' can't be empty"
-            raise ExtractorBadDefinedError(msg)
-        for d in cls.data:
-            if d not in DATAS:
-                msg = "'data' must be a iterable with values in {}. Found '{}'"
-                raise ExtractorBadDefinedError(msg.format(DATAS, d))
-        if len(set(cls.data)) != len(cls.data):
-            msg = "'data' has duplicated values: {}"
-            raise ExtractorBadDefinedError(msg.format(cls.data))
+    @classmethod
+    def _get_features_conf(cls, ecls):
+        features_attr = f"{ecls.__qualname__}.features"
 
-        if not hasattr(cls, "features"):
-            msg = "'{}' must redefine {}"
-            raise ExtractorBadDefinedError(
-                msg.format(cls, "features attribute"))
-        if not cls.features:
-            msg = "'features' can't be empty"
-            raise ExtractorBadDefinedError(msg)
-        for f in cls.features:
-            if not isinstance(f, six.string_types):
-                msg = "Feature name must be an instance of string. Found {}"
-                raise ExtractorBadDefinedError(msg.format(type(f)))
-            if f in DATAS:
-                msg = "Params can't be in {}".format(DATAS)
-                raise ExtractorBadDefinedError(msg)
-
-        if len(set(cls.features)) != len(cls.features):
-            msg = "'features' has duplicated values: {}"
-            raise ExtractorBadDefinedError(msg.format(cls.features))
-
-        if cls.fit == Extractor.fit:
-            msg = "'{}' must redefine {}"
-            raise ExtractorBadDefinedError(msg.format(cls, "fit method"))
-
-        if not hasattr(cls, "dependencies"):
-            cls.dependencies = ()
-        for d in cls.dependencies:
-            if not isinstance(d, six.string_types):
+        features = set()
+        for f in getattr(ecls, "features", []):
+            if not isinstance(f, str):
                 msg = (
-                    "All Dependencies must be an instance of string. Found {}")
-                raise ExtractorBadDefinedError(msg.format(type(d)))
-
-        if not hasattr(cls, "params"):
-            cls.params = {}
-        for p, default in cls.params.items():
-            if not isinstance(p, six.string_types):
-                msg = "Params names must be an instance of string. Found {}"
-                raise ExtractorBadDefinedError(msg.format(type(p)))
-            if p in DATAS:
-                msg = "Params can't be in {}".format(DATAS)
+                    "Feature name must be an instance of string. "
+                    f"Found {type(f)}, please check {features_attr!r}"
+                )
                 raise ExtractorBadDefinedError(msg)
+            if f in DATAS:
+                msg = f"Feature can't be in {DATAS!r}. Check {features_attr!r}"
+                raise ExtractorBadDefinedError(msg)
+            if f in features:
+                msg = f"Duplicated feature {f!r} in {features_attr!r}"
+                raise ExtractorBadDefinedError(msg)
+            features.add(f)
 
-        if not hasattr(cls, "warnings"):
-            cls.warnings = []
+        if not features:
+            msg = f"{features_attr!r} must be a not empty sequence"
+            raise ExtractorBadDefinedError(msg)
 
-        cls._conf = ExtractorConf(
-            data=frozenset(cls.data),
-            dependencies=frozenset(cls.dependencies),
-            params=tuple(cls.params.items()),
-            features=frozenset(cls.features),
-            warnings=tuple(cls.warnings))
+        return frozenset(features)
 
-        if not cls.__doc__:
-            cls.__doc__ = ""
+    @classmethod
+    def _get_extract_method_parameters(cls, ecls):
+        cls_name = ecls.__qualname__
+        data, required, optional, dependencies = set(), set(), set(), set()
 
-        if cls.warnings:
-            cls.__doc__ += "\n    Warnings\n    ---------\n" + "\n".join([
-                "    " + w for w in cls.warnings])
+        for param in _iter_method_parameters(ecls.extract):
+            pname = param.name
+            has_default = not (param.default is param.empty)
+            if pname in DATAS:
+                data.add(pname)
+                if has_default:
+                    optional.add(pname)
+                else:
+                    required.add(pname)
+            else:
+                if has_default:
+                    msg = (
+                        "Dependencies with default parameters make no sense. "
+                        f"Check {pname!r} in '{cls_name}.extract()' method"
+                    )
+                    raise ExtractorBadDefinedError(msg)
+                dependencies.add(pname)
 
-        del cls.data, cls.dependencies, cls.params, cls.features, cls.warnings
+        return (
+            frozenset(data),
+            frozenset(required),
+            frozenset(optional),
+            frozenset(dependencies),
+        )
 
-        return cls
+    @classmethod
+    def _get_init_method_parameters(cls, ecls):
+        cls_name = ecls.__name__
+        params = set()
+        for param in _iter_method_parameters(ecls.__init__):
+            pname = param.name
+            has_default = not (param.default is param.empty)
+            if not has_default:
+                msg = (
+                    f"All parameters in the '{cls_name}.__init__()' method "
+                    f"must have a default value. Check {pname!r}."
+                )
+                raise ExtractorBadDefinedError(msg)
+            params.add(pname)
+        return frozenset(params)
+
+    @classmethod
+    def from_extractor_class(cls, ecls):
+        features = cls._get_features_conf(ecls)
+        (
+            data,
+            required,
+            optional,
+            dependencies,
+        ) = cls._get_extract_method_parameters(ecls)
+        parameters = cls._get_init_method_parameters(ecls)
+
+        conf = _ExtractorConf(
+            features=features,
+            data=data,
+            required=required,
+            optional=optional,
+            dependencies=dependencies,
+            parameters=parameters,
+        )
+
+        return conf
 
 
-@six.add_metaclass(ExtractorMeta)
-class Extractor(object):
+# =============================================================================
+# EXTRACTOR
+# =============================================================================
 
-    _conf = None
+
+class Extractor(abc.ABC):
+
+    def __init_subclass__(cls):
+        cls_name = cls.__qualname__
+        if _isabstract(cls.__init__):
+            msg = f"'{cls_name}.__init__()' method must be redefined"
+            raise ExtractorBadDefinedError(msg)
+        if _isabstract(cls.extract):
+            msg = f"'{cls_name}.extract()' method must be redefined"
+            raise ExtractorBadDefinedError(msg)
+
+        cls._conf = _ExtractorConf.from_extractor_class(cls)
+        del cls.features
+
+
+    @classmethod
+    def get_features(cls):
+        """The set of features generated by this extractor."""
+        return cls._conf.features
 
     @classmethod
     def get_data(cls):
+        """Retrieve the set of data used for this extractor."""
         return cls._conf.data
 
     @classmethod
+    def get_optional(cls):
+        """Retrieve the set of optional data used for this extractor."""
+        return cls._conf.optional
+
+    @classmethod
+    def get_required_data(cls):
+        """Retrieve the required set data used for this extractor."""
+        return cls._conf.required
+
+    @classmethod
     def get_dependencies(cls):
+        """Which other features are needed to execute this extractor."""
         return cls._conf.dependencies
 
     @classmethod
     def get_default_params(cls):
+        """The default values of the available configuration parameters."""
         return dict(cls._conf.params)
 
-    @classmethod
-    def get_features(cls):
-        return cls._conf.features
+    def preprocess_arguments(self, data, dependencies):
+        """Preprocess all the incoming arguments \
+        (timeserie + dependencies + parameters) to feed the `extract`method.
 
-    @classmethod
-    def get_warnings(cls):
-        return cls._conf.warnings
+        """
+        # create the bessel for the parameters
+        kwargs = {}
 
-    @classmethod
-    def has_warnings(cls):
-        return not cls._conf.warnings
+        # add the required features
+        kwargs = {k: dependencies[k] for k in self.get_dependencies()}
 
-    def __init__(self, **cparams):
-        for w in self.get_warnings():
-            warnings.warn(w, ExtractorWarning)
+        # add the required data
+        for d in self.get_data():
+            kwargs[d] = data[d]
 
-        self.name = type(self).__name__
+        return kwargs
 
-        self.params = self.get_default_params()
-        set(cparams).difference(self.params)
+    def select_extract_and_validate(self, data, dependencies, selected_features):
+        """Internal method designed to select the parameters necessary for
+        executing the 'extract()' method, followed by its execution.
 
-        not_allowed = set(cparams).difference(self.params)
-        if not_allowed:
-            msg = "Extractor '{}' not allow the parameters: {}".format(
-                type(self).__name__, ", ".join(not_allowed))
-            raise ExtractorContractError(msg)
+        Additionally, finally, check that the features defined in the extractor
+        are correctly returned by the 'extract()' method.
 
-        # here all is ok
-        self.params.update(cparams)
+        """
+        extract_kwargs = self.preprocess_arguments(data, dependencies)
 
-    def __repr__(self):
-        return str(self)
+        # run the extractor
+        result = self.extract(**extract_kwargs)
 
-    def __str__(self):
-        if not hasattr(self, "__str"):
-            params = self.params
-            if params:
-                params = ", ".join([
-                    "{}={}".format(k, v) for k, v in params.items()])
-            else:
-                params = ""
-            self.__str = "{}({})".format(self.name, params)
-        return self.__str
+        # validate if the extractors generates the expected features
+        expected = self.get_features()  # the expected features
 
-    def setup(self):
-        """This method will be executed before the feature is calculated"""
-        pass
+        diff = set(result).symmetric_difference(expected)  # some diff
+        if diff:
+            cls_name = type(self).__qualname__
+            estr, fstr = ", ".join(expected), ", ".join(result.keys())
+            raise ExtractorContractError(
+                f"The extractor '{cls_name}' expect the features {estr}, "
+                f"and found: {fstr!r}"
+            )
 
-    def fit(self):
+        selected = {}
+        selected = {k: result[k] for k in selected_features}
+
+        return selected
+
+
+    # TO REDEFINE =============================================================
+
+    @abc.abstractmethod
+    def __init__(self):
         raise NotImplementedError()
 
-    def teardown(self):
-        """This method will be executed after the feature is calculated"""
+    @abc.abstractmethod
+    def extract(self):
+        raise NotImplementedError()
+
+
+
+class MyExtractor(Extractor):
+    features = ["a"]
+
+    def __init__(self, x=1):
         pass
 
-    def extract(self, **kwargs):
-        # create the besel for the parameters
-        fit_kwargs = {}
+    def extract(self, time, magnitude=None):
+        pass
 
-        # add the required features as parameters to fit()
-        dependencies = kwargs["features"]
-        fit_kwargs = {k: dependencies[k] for k in self.get_dependencies()}
 
-        # add the required data as parameters to fit()
-        for d in self.get_data():
-            fit_kwargs[d] = kwargs[d]
-
-        # add the configured parameters as parameters to fit()
-        fit_kwargs.update(self.params)
-        try:
-            # setup & run te extractor
-            self.setup()
-            result = self.fit(**fit_kwargs)
-
-            # validate if the extractors generates the expected features
-            expected = self.get_features()  # the expected features
-            diff = (
-                expected.difference(result.keys()) or
-                set(result).difference(expected))  # some diff
-            if diff:
-                cls = type(self)
-                estr, fstr = ", ".join(expected), ", ".join(result.keys())
-                msg = (
-                    "The extractor '{}' expect the features [{}], "
-                    "and found: [{}]").format(cls, estr, fstr)
-                raise ExtractorContractError(msg)
-            return dict(result)
-        finally:
-            self.teardown()
+ext = MyExtractor()

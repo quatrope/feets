@@ -108,7 +108,7 @@ KEYWORDS = (
 import os  # noqa
 
 if os.getenv("FEETS_IN_SETUP") != "True":
-    from .core import *  # noqa
+    # from .core import *  # noqa
     from .extractors import *  # noqa
 
 del os
