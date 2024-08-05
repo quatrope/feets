@@ -83,8 +83,10 @@ class MeanVariance(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ['Meanvariance']
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         return {"Meanvariance": np.std(magnitude) / np.mean(magnitude)}

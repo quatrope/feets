@@ -150,10 +150,10 @@ def sort_by_dependencies(exts, retry=None):
 # from .ext_linear_trend import *  # noqa
 # from .ext_lomb_scargle import *  # noqa
 # from .ext_max_slope import *  # noqa
-# from .ext_mean import *  # noqa
-# from .ext_mean_variance import *  # noqa
-# from .ext_median_abs_dev import *  # noqa
-# from .ext_median_brp import *  # noqa
+from .ext_mean import *  # noqa
+from .ext_mean_variance import *  # noqa
+from .ext_median_abs_dev import *  # noqa
+from .ext_median_brp import *  # noqa
 # from .ext_pair_slope_trend import *  # noqa
 # from .ext_percent_amplitude import *  # noqa
 # from .ext_percent_difference_flux_percentile import *  # noqa

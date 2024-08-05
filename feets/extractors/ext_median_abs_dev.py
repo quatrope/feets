@@ -83,10 +83,12 @@ class MedianAbsDev(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ["MedianAbsDev"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         median = np.median(magnitude)
         devs = abs(magnitude - median)
         return {"MedianAbsDev": np.median(devs)}
