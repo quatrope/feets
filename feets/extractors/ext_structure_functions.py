@@ -69,12 +69,14 @@ class StructureFunctions(Extractor):
 
     """
 
-    data = ['magnitude', 'time']
     features = ["StructureFunction_index_21",
                 "StructureFunction_index_31",
                 "StructureFunction_index_32"]
 
-    def fit(self, magnitude, time):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude, time):
         Nsf, Np = 100, 100
         sf1, sf2, sf3 = np.zeros(Nsf), np.zeros(Nsf), np.zeros(Nsf)
         f = interp1d(time, magnitude)

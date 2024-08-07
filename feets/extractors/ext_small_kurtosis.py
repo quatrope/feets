@@ -87,10 +87,12 @@ class SmallKurtosis(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ["SmallKurtosis"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         n = len(magnitude)
         mean = np.mean(magnitude)
         std = np.std(magnitude)

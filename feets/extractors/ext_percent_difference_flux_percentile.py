@@ -77,10 +77,12 @@ class PercentDifferenceFluxPercentile(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ["PercentDifferenceFluxPercentile"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         median_data = np.median(magnitude)
 
         sorted_data = np.sort(magnitude)

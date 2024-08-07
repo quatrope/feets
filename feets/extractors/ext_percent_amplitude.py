@@ -76,10 +76,12 @@ class PercentAmplitude(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ["PercentAmplitude"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         median_data = np.median(magnitude)
         distance_median = np.abs(magnitude - median_data)
         max_distance = np.max(distance_median)

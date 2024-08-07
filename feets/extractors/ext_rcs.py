@@ -88,10 +88,12 @@ class RCS(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ['Rcs']
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         sigma = np.std(magnitude)
         N = len(magnitude)
         m = np.mean(magnitude)

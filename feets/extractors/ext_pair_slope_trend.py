@@ -76,10 +76,13 @@ class PairSlopeTrend(Extractor):
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
 
     """
-    data = ['magnitude']
+
     features = ["PairSlopeTrend"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         data_last = magnitude[-30:]
 
         pst = (float(len(np.where(np.diff(data_last) > 0)[0]) -

@@ -331,7 +331,7 @@ class Extractor(abc.ABC):
 class MyExtractor(Extractor):
     features = ["a"]
 
-    def __init__(self, x=1):
+    def __init__(self):
         pass
 
     def extract(self, time, magnitude=None):

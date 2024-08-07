@@ -101,10 +101,12 @@ References
 class FluxPercentileRatioMid20(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
     features = ["FluxPercentileRatioMid20"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 
@@ -123,10 +125,12 @@ class FluxPercentileRatioMid20(Extractor):
 class FluxPercentileRatioMid35(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
     features = ["FluxPercentileRatioMid35"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 
@@ -145,10 +149,12 @@ class FluxPercentileRatioMid35(Extractor):
 class FluxPercentileRatioMid50(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
     features = ["FluxPercentileRatioMid50"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 
@@ -167,10 +173,12 @@ class FluxPercentileRatioMid50(Extractor):
 class FluxPercentileRatioMid65(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
     features = ["FluxPercentileRatioMid65"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 
@@ -189,10 +197,12 @@ class FluxPercentileRatioMid65(Extractor):
 class FluxPercentileRatioMid80(Extractor):
     __doc__ = COMMON_DOC
 
-    data = ['magnitude']
     features = ["FluxPercentileRatioMid80"]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
 

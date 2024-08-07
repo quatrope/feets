@@ -76,8 +76,10 @@ class Color(Extractor):
        Doi:10.1088/0004-637X/735/2/68.
 
     """
-    data = ['magnitude', 'magnitude2']
     features = ["Color"]
 
-    def fit(self, magnitude, magnitude2):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude, magnitude2):
         return {"Color": np.mean(magnitude) - np.mean(magnitude2)}

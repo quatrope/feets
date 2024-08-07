@@ -76,10 +76,12 @@ class Beyond1Std(Extractor):
 
     """
 
-    data = ['magnitude', 'error']
     features = ["Beyond1Std"]
 
-    def fit(self, magnitude, error):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude, error):
         n = len(magnitude)
 
         weighted_mean = np.average(magnitude, weights=1 / error ** 2)

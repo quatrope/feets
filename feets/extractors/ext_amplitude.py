@@ -72,10 +72,12 @@ class Amplitude(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ['Amplitude']
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         N = len(magnitude)
         sorted_mag = np.sort(magnitude)
 

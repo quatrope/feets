@@ -108,10 +108,12 @@ class Eta_e(Extractor):
 
     """
 
-    data = ['magnitude', 'time']
     features = ["Eta_e"]
 
-    def fit(self, magnitude, time):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude, time):
         w = 1.0 / np.power(np.subtract(time[1:], time[:-1]), 2)
         w_mean = np.mean(w)
 
