@@ -114,15 +114,16 @@ class StetsonJ(Extractor):
 
     """
 
-    data = ['aligned_magnitude', 'aligned_magnitude2',
-            'aligned_error', 'aligned_error2']
     features = ["StetsonJ"]
     warnings = [
         ("The original FATS documentation says that the result of StetsonJ "
          "must be ~0 for gausian distribution but the result is ~-0.41")]
 
-    def fit(self, aligned_magnitude, aligned_magnitude2,
-            aligned_error, aligned_error2):
+    def __init__(self):
+        pass
+
+    def extract(self, aligned_magnitude, aligned_magnitude2,
+                aligned_error, aligned_error2):
 
         N = len(aligned_magnitude)
 
@@ -180,13 +181,15 @@ class StetsonK(Extractor):
 
     """
 
-    data = ['magnitude', 'error']
     features = ['StetsonK']
     warnings = [
         ("The original FATS documentation says that the result of StetsonK "
          "must be 2/pi=0.798 for gausian distribution but the result is ~0.2")]
 
-    def fit(self, magnitude, error):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude, error):
         mean_mag = (np.sum(magnitude/(error*error)) /
                     np.sum(1.0 / (error * error)))
 
@@ -231,12 +234,13 @@ class StetsonKAC(Extractor):
 
     """
 
-    data = ['magnitude', 'time', 'error']
     features = ["StetsonK_AC"]
-    params = {"T": 1}
 
-    def fit(self, magnitude, time, error, T):
-        sal = SlottedA_length(T=T)
+    def __init__(self, T=1):
+        self.T = T
+
+    def extract(self, magnitude, time, error):
+        sal = SlottedA_length(T=self.T)
         autocor_vector = sal.start_conditions(
             magnitude, time, **sal.params)[-1]
 
@@ -285,12 +289,13 @@ class StetsonL(Extractor):
 
     """
 
-    data = ['aligned_magnitude', 'aligned_magnitude2',
-            'aligned_error', 'aligned_error2']
     features = ["StetsonL"]
 
-    def fit(self, aligned_magnitude, aligned_magnitude2,
-            aligned_error, aligned_error2):
+    def __init__(self):
+        pass
+
+    def extract(self, aligned_magnitude, aligned_magnitude2,
+                aligned_error, aligned_error2):
         magnitude, magnitude2 = aligned_magnitude, aligned_magnitude2
         error, error2 = aligned_error, aligned_error2
 

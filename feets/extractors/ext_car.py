@@ -185,9 +185,10 @@ class CAR(Extractor):
        Doi:10.1111/j.1365-2966.2012.22061.x.
 
     """
-    data = ['magnitude', 'time', 'error']
     features = ["CAR_sigma", "CAR_tau", "CAR_mean"]
-    params = {"minimize_method": "nelder-mead"}
+
+    def __init__(self, minimize_method="nelder-mead"):
+        self.minimize_method = minimize_method
 
     def _calculate_CAR(self, time, magnitude, error, minimize_method):
         magnitude = magnitude.copy()
@@ -200,13 +201,15 @@ class CAR(Extractor):
             warnings.filterwarnings('ignore')
             res = minimize(_car_like, x0,
                            args=(time, magnitude, error),
-                           method=minimize_method, bounds=bnds)
+                           method=minimize_method,
+                           bounds=bnds)
         sigma, tau = res.x[0], res.x[1]
         return sigma, tau
 
-    def fit(self, magnitude, time, error, minimize_method):
+    def extract(self, magnitude, time, error):
         sigma, tau = self._calculate_CAR(
-            time, magnitude, error, minimize_method)
+                                   time, magnitude, error,
+                                   self.minimize_method)
         mean = np.mean(magnitude) / tau
 
         return {"CAR_sigma": sigma, "CAR_tau": tau, "CAR_mean": mean}

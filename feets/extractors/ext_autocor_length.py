@@ -88,11 +88,13 @@ class AutocorLength(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ['Autocor_length']
-    params = {"nlags": 100}
 
-    def fit(self, magnitude, nlags):
+    def __init__(self, nlags=100):
+        self.nlags = nlags
+
+    def extract(self, magnitude):
+        nlags = self.nlags
 
         AC = stattools.acf(magnitude, nlags=nlags)
         k = next((index for index, value in

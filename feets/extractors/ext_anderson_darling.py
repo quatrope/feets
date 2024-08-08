@@ -78,13 +78,15 @@ class AndersonDarling(Extractor):
 
     """
 
-    data = ['magnitude']
     features = ["AndersonDarling"]
     warnings = [
         ("The original FATS documentation says that the result of "
          "AndersonDarling must be ~0.25 for gausian distribution but the  "
          "result is ~-0.60")]
 
-    def fit(self, magnitude):
+    def __init__(self):
+        pass
+
+    def extract(self, magnitude):
         ander = stats.anderson(magnitude)[0]
         return {"AndersonDarling": 1 / (1.0 + np.exp(-10 * (ander - 0.3)))}

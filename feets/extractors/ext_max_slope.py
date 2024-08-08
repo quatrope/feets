@@ -79,12 +79,13 @@ class MaxSlope(Extractor):
 
     """
 
-    data = ['magnitude', 'time']
     features = ["MaxSlope"]
-    params = {"timesort": True}
 
-    def fit(self, magnitude, time, timesort):
-        if timesort:
+    def __init__(self, timesort=True):
+        self.timesort = timesort
+
+    def extract(self, magnitude, time):
+        if self.timesort:
             sort = np.argsort(time)
             time, magnitude = time[sort], magnitude[sort]
 

@@ -161,7 +161,6 @@ class FourierComponents(Extractor):
 
     """
 
-    data = ['magnitude', 'time']
     features = ['Freq1_harmonics_amplitude_0',
                 'Freq1_harmonics_amplitude_1',
                 'Freq1_harmonics_amplitude_2',
@@ -186,12 +185,13 @@ class FourierComponents(Extractor):
                 'Freq3_harmonics_rel_phase_1',
                 'Freq3_harmonics_rel_phase_2',
                 'Freq3_harmonics_rel_phase_3']
-    params = {
-        "lscargle_kwds": {
-            "autopower_kwds": {
-                "normalization": "standard",
-                "nyquist_factor": 100}}
-    }
+
+    def __init__(self,
+                 lscargle_kwds={
+                     "autopower_kwds": {
+                         "normalization": "standard",
+                         "nyquist_factor": 100 }}):
+        self.lscargle_kwds = lscargle_kwds
 
     def _model(self, x, a, b, c, Freq):
         return (a * np.sin(2 * np.pi * Freq * x) +
@@ -234,9 +234,8 @@ class FourierComponents(Extractor):
 
         return A, scaledPH
 
-    def fit(self, magnitude, time, lscargle_kwds):
-        lscargle_kwds = lscargle_kwds or {}
-
+    def extract(self, magnitude, time):
+        lscargle_kwds = self.lscargle_kwds or {}
         A, sPH = self._components(magnitude, time, lscargle_kwds)
         result = {
             "Freq1_harmonics_amplitude_0": A[0][0],

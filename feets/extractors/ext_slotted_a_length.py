@@ -93,9 +93,10 @@ class SlottedA_length(Extractor):
 
     """
 
-    data = ["magnitude", "time"]
     features = ["SlottedA_length"]
-    params = {"T": 1}
+
+    def __init__(self, T=1):
+        self.T = T
 
     def slotted_autocorrelation(self, data, time, T, K,
                                 second_round=False, K1=100):
@@ -160,8 +161,8 @@ class SlottedA_length(Extractor):
 
         return T, K, slots, SAC2
 
-    def fit(self, magnitude, time, T):
-        T, K, slots, SAC2 = self.start_conditions(magnitude, time, T)
+    def extract(self, magnitude, time):
+        T, K, slots, SAC2 = self.start_conditions(magnitude, time, self.T)
 
         k = next((index for index, value in
                  enumerate(SAC2) if value < np.exp(-1)), None)

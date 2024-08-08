@@ -215,7 +215,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
             errors = self.random.normal(scale=0.001, size=1000)
-            values[idx] = ext.fit(magnitude=mags, error=errors)['StetsonK']
+            values[idx] = ext.extract(magnitude=mags, error=errors)['StetsonK']
         self.assertAllClose(values.mean(), 0.798)
 
     def test_FATS_doc_StetsonL(self):

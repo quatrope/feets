@@ -84,11 +84,13 @@ class Con(Extractor):
        Doi:10.1088/0004-637X/735/2/68.
 
     """
-    data = ['magnitude']
     features = ["Con"]
-    params = {"consecutiveStar": 3}
 
-    def fit(self, magnitude, consecutiveStar):
+    def __init__(self, consecutiveStar=3):
+        self.consecutiveStar = consecutiveStar
+
+    def extract(self, magnitude):
+        consecutiveStar = self.consecutiveStar
 
         N = len(magnitude)
         if N < consecutiveStar:
