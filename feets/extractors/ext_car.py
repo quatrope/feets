@@ -56,7 +56,7 @@ from .core import Extractor, FeatureExtractionWarning
 
 EPSILON = 1e-300
 
-CTE_NEG = -np.infty
+CTE_NEG = -np.inf
 
 
 # =============================================================================

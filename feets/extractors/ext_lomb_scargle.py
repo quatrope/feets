@@ -44,7 +44,7 @@ __doc__ = """"""
 
 import numpy as np
 
-from astropy.stats import lombscargle
+from astropy.timeseries import LombScargle as LombScargleAstroPy
 
 from ..libs import ls_fap
 
@@ -67,7 +67,7 @@ def lscargle(time, magnitude, error=None,
 
     model_kwds = model_kwds or {}
     autopower_kwds = autopower_kwds or {}
-    model = lombscargle.LombScargle(time, magnitude, error, **model_kwds)
+    model = LombScargleAstroPy(time, magnitude, error, **model_kwds)
     frequency, power = model.autopower(**autopower_kwds)
 
     fmax = np.argmax(power)
@@ -140,7 +140,6 @@ class LombScargle(Extractor):
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
-
     """
 
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
