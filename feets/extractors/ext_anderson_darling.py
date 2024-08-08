@@ -53,6 +53,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class AndersonDarling(Extractor):
     """
     **AndersonDarling**
@@ -78,14 +79,14 @@ class AndersonDarling(Extractor):
 
     """
 
-    features = ["AndersonDarling"]
-    warnings = [
-        ("The original FATS documentation says that the result of "
-         "AndersonDarling must be ~0.25 for gausian distribution but the  "
-         "result is ~-0.60")]
+    features = {"AndersonDarling"}
 
     def __init__(self):
-        pass
+        self.feature_warning(
+            "The original FATS documentation says that the result of "
+            "AndersonDarling must be ~0.25 for gausian distribution but the "
+            "result is ~-0.60"
+        )
 
     def extract(self, magnitude):
         ander = stats.anderson(magnitude)[0]

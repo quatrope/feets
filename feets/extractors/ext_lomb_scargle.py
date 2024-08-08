@@ -62,8 +62,8 @@ EPS = np.finfo(float).eps
 # FUNCTIONS
 # =============================================================================
 
-def lscargle(time, magnitude, error=None,
-             model_kwds=None, autopower_kwds=None):
+
+def lscargle(time, magnitude, error=None, model_kwds=None, autopower_kwds=None):
 
     model_kwds = model_kwds or {}
     autopower_kwds = autopower_kwds or {}
@@ -78,13 +78,14 @@ def lscargle(time, magnitude, error=None,
 def fap(power, fmax, time, mag, method, normalization, method_kwds=None):
     method_kwds = method_kwds or {}
     return ls_fap.false_alarm_probability(
-        power, fmax, time, mag,
-        dy=0.01, method=method, normalization=normalization)
+        power, fmax, time, mag, dy=0.01, method=method, normalization=normalization
+    )
 
 
 # =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
+
 
 class LombScargle(Extractor):
     """
@@ -144,14 +145,16 @@ class LombScargle(Extractor):
 
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
 
-    def __init__(self,
-                 lscargle_kwds={
-                     "autopower_kwds": {
-                         "normalization": "standard",
-                         "nyquist_factor": 100, }},
-                 fap_kwds={
-                     "normalization": "standard",
-                     "method": "simple" }):
+    def __init__(
+        self,
+        lscargle_kwds={
+            "autopower_kwds": {
+                "normalization": "standard",
+                "nyquist_factor": 100,
+            }
+        },
+        fap_kwds={"normalization": "standard", "method": "simple"},
+    ):
         self.lscargle_kwds = lscargle_kwds
         self.fap_kwds = fap_kwds
 
@@ -172,15 +175,19 @@ class LombScargle(Extractor):
 
     def _compute_eta(self, folded_data, N):
         sigma2 = np.var(folded_data)
-        Psi_eta = (1.0 / ((N - 1) * sigma2) *
-                   np.sum(np.power(folded_data[1:] - folded_data[:-1], 2)))
+        Psi_eta = (
+            1.0
+            / ((N - 1) * sigma2)
+            * np.sum(np.power(folded_data[1:] - folded_data[:-1], 2))
+        )
         return Psi_eta
 
     def extract(self, magnitude, time):
         # first we retrieve the frequencies, power,
         # max frequency and best_period
         frequency, power, fmax, best_period = self._compute_ls(
-            magnitude, time, self.lscargle_kwds)
+            magnitude, time, self.lscargle_kwds
+        )
 
         # false alarm probability
         fap = self._compute_fap(power, fmax, time, magnitude, self.fap_kwds)
@@ -194,5 +201,9 @@ class LombScargle(Extractor):
         R = self._compute_cs(folded_data, N)
         Psi_eta = self._compute_eta(folded_data, N)
 
-        return {"PeriodLS": best_period, "Period_fit": fap,
-                "Psi_CS": R, "Psi_eta": Psi_eta}
+        return {
+            "PeriodLS": best_period,
+            "Period_fit": fap,
+            "Psi_CS": R,
+            "Psi_eta": Psi_eta,
+        }

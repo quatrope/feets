@@ -83,7 +83,7 @@ class DeltamDeltat(Extractor):
         feature_attrs = []
         for i in range(len(dm_bins) - 1):
             for j in range(len(dt_bins) - 1):
-                feature_attrs.append("dt_{}_dm_{}".format(j, i))
+                feature_attrs.append(f"dt_{j}_dm_{i}")
 
         self.dt_bins = dt_bins
         self.dm_bins = dm_bins

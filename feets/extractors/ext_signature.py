@@ -58,7 +58,7 @@ class Signature(Extractor):
         feature_attrs = []
         for i in range(mag_bins):
             for j in range(phase_bins):
-                feature_attrs.append("ph_{}_mag_{}".format(j, i))
+                feature_attrs.append(f"ph_{j}_mag_{i}")
 
         self.phase_bins = phase_bins
         self.mag_bins = mag_bins
