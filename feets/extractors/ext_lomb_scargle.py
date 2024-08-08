@@ -42,14 +42,14 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
+import copy
+
 import numpy as np
 
 from astropy.timeseries import LombScargle as LombScargleAstroPy
 
-from ..libs import ls_fap
-
 from .core import Extractor
-
+from ..libs import ls_fap
 
 # =============================================================================
 # CONSTANTS
@@ -58,12 +58,24 @@ from .core import Extractor
 EPS = np.finfo(float).eps
 
 
+DEFAULT_FAP_KWS = {"normalization": "standard", "method": "simple"}
+
+DEFAULT_LSCARGLE_KWS = {
+    "autopower_kwds": {"normalization": "standard", "nyquist_factor": 100}
+}
+
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
 
 
-def lscargle(time, magnitude, error=None, model_kwds=None, autopower_kwds=None):
+def lscargle(
+    time,
+    magnitude,
+    error=None,
+    model_kwds=None,
+    autopower_kwds=None,
+):
 
     model_kwds = model_kwds or {}
     autopower_kwds = autopower_kwds or {}
@@ -78,7 +90,13 @@ def lscargle(time, magnitude, error=None, model_kwds=None, autopower_kwds=None):
 def fap(power, fmax, time, mag, method, normalization, method_kwds=None):
     method_kwds = method_kwds or {}
     return ls_fap.false_alarm_probability(
-        power, fmax, time, mag, dy=0.01, method=method, normalization=normalization
+        power,
+        fmax,
+        time,
+        mag,
+        dy=0.01,
+        method=method,
+        normalization=normalization,
     )
 
 
@@ -147,16 +165,18 @@ class LombScargle(Extractor):
 
     def __init__(
         self,
-        lscargle_kwds={
-            "autopower_kwds": {
-                "normalization": "standard",
-                "nyquist_factor": 100,
-            }
-        },
-        fap_kwds={"normalization": "standard", "method": "simple"},
+        lscargle_kwds=None,
+        fap_kwds=None,
     ):
-        self.lscargle_kwds = lscargle_kwds
-        self.fap_kwds = fap_kwds
+
+        self.lscargle_kwds = (
+            copy.deepcopy(DEFAULT_LSCARGLE_KWS)
+            if lscargle_kwds is None
+            else dict(lscargle_kwds)
+        )
+        self.fap_kwds = (
+            {copy.deepcopy(DEFAULT_FAP_KWS)} if fap_kwds is None else dict(fap_kwds)
+        )
 
     def _compute_ls(self, magnitude, time, lscargle_kwds):
         frequency, power, fmax = lscargle(time, magnitude, **lscargle_kwds)
