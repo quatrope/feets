@@ -165,8 +165,8 @@ from .ext_small_kurtosis import *  # noqa
 from .ext_std import *  # noqa
 from .ext_stetson import *  # noqa
 from .ext_structure_functions import *  # noqa
-# from .ext_signature import *  # noqa
-# from .ext_dmdt import *  # noqa
+from .ext_signature import *  # noqa
+from .ext_dmdt import *  # noqa
 
 for cls in sort_by_dependencies(Extractor.__subclasses__()):
     register_extractor(cls)

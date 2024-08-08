@@ -72,28 +72,24 @@ class DeltamDeltat(Extractor):
     References
     ----------
     Mahabal et. al 2017 (arxiv:1709.06257)
-
     """
-    data = ['magnitude', 'time']
-    params = {"dt_bins": np.hstack([0., np.logspace(-3., 3.5, num=23)]),
-              "dm_bins": np.hstack([-1.*np.logspace(1, -1, num=12), 0,
-                                    np.logspace(-1, 1, num=12)])}
+
+    features = ["DeltamDeltat"]
     parallel = True
 
-    features = []
-    for i in range(len(params["dm_bins"]) - 1):
-        for j in range(len(params["dt_bins"]) - 1):
-            features.append("DeltamDeltat_dt_{}_dm_{}".format(j, i))
+    def __init__(self, dt_bins=np.hstack([0., np.logspace(-3., 3.5, num=23)]),
+                 dm_bins=np.hstack([-1.*np.logspace(1, -1, num=12), 0,
+                                    np.logspace(-1, 1, num=12)])):
+        feature_attrs = []
+        for i in range(len(dm_bins) - 1):
+            for j in range(len(dt_bins) - 1):
+                feature_attrs.append("dt_{}_dm_{}".format(j, i))
 
-    # this variable stores a sorted version of the features
-    # because feets only stores a frozenset of the original features
-    # for future validation.
-    sorted_features = tuple(features)
+        self.dt_bins = dt_bins
+        self.dm_bins = dm_bins
+        self.feature_attrs = tuple(feature_attrs)
 
-    del i, j
-
-    def fit(self, magnitude, time, dt_bins, dm_bins):
-
+    def extract(self, magnitude, time):
         def delta_calc(idx):
             t0 = time[idx]
             m0 = magnitude[idx]
@@ -114,6 +110,7 @@ class DeltamDeltat(Extractor):
         deltat = deltas[:, 0]
         deltam = deltas[:, 1]
 
+        dt_bins, dm_bins = self.dt_bins, self.dm_bins
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
         counts = np.fix(255. * counts/n_vals + 0.999).astype(int)
