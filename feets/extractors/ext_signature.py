@@ -66,17 +66,19 @@ class Signature(Extractor):
 
     def extract(self, magnitude, time, PeriodLS, Amplitude):
         phase_bins, mag_bins = self.phase_bins, self.mag_bins
+        # ? Solo uso el primer periodo ?
+        period_ls = PeriodLS[0]
 
         lc_yaxis = (magnitude - np.min(magnitude)) / np.float(Amplitude)
 
         # SHIFT TO BEGIN AT MINIMUM
         loc = np.argmin(lc_yaxis)
-        lc_phase = np.remainder(time - time[loc], PeriodLS) / PeriodLS
+        lc_phases = np.remainder(time - time[loc], period_ls) / period_ls
 
         bins = (phase_bins, mag_bins)
-        counts = np.histogram2d(lc_phase, lc_yaxis, bins=bins, normed=True)[0]
+        count = np.histogram2d(lc_phases, lc_yaxis, bins=bins, normed=True)[0]
 
         result = zip(self.feature_attrs,
-                     counts.reshape(phase_bins * mag_bins))
+                     count.reshape(phase_bins * mag_bins))
 
         return {"Signature": dict(result)}
