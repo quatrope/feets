@@ -42,11 +42,13 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
+import copy
+
 import numpy as np
 
 from scipy.optimize import curve_fit
 
-from .ext_lomb_scargle import lscargle
+from .ext_lomb_scargle import DEFAULT_LSCARGLE_KWDS, lscargle
 from .core import Extractor
 
 
@@ -186,12 +188,12 @@ class FourierComponents(Extractor):
                 'Freq3_harmonics_rel_phase_2',
                 'Freq3_harmonics_rel_phase_3']
 
-    def __init__(self,
-                 lscargle_kwds={
-                     "autopower_kwds": {
-                         "normalization": "standard",
-                         "nyquist_factor": 100 }}):
-        self.lscargle_kwds = lscargle_kwds
+    def __init__(self, lscargle_kwds=None):
+        self.lscargle_kwds = (
+            copy.deepcopy(DEFAULT_LSCARGLE_KWDS)
+            if lscargle_kwds is None
+            else dict(lscargle_kwds)
+        )
 
     def _model(self, x, a, b, c, Freq):
         return (a * np.sin(2 * np.pi * Freq * x) +

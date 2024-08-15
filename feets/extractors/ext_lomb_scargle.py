@@ -57,12 +57,11 @@ from ..libs import ls_fap
 
 EPS = np.finfo(float).eps
 
-
-DEFAULT_FAP_KWS = {"normalization": "standard", "method": "simple"}
-
-DEFAULT_LSCARGLE_KWS = {
-    "autopower_kwds": {"normalization": "standard", "nyquist_factor": 100}
+DEFAULT_LSCARGLE_KWDS = {
+    "autopower_kwds": {"normalization": "standard", "nyquist_factor": 100 }
 }
+
+DEFAULT_FAP_KWDS = {"normalization": "standard", "method": "simple"}
 
 # =============================================================================
 # FUNCTIONS
@@ -170,12 +169,12 @@ class LombScargle(Extractor):
     ):
 
         self.lscargle_kwds = (
-            copy.deepcopy(DEFAULT_LSCARGLE_KWS)
+            copy.deepcopy(DEFAULT_LSCARGLE_KWDS)
             if lscargle_kwds is None
             else dict(lscargle_kwds)
         )
         self.fap_kwds = (
-            {copy.deepcopy(DEFAULT_FAP_KWS)} if fap_kwds is None else dict(fap_kwds)
+            {copy.deepcopy(DEFAULT_FAP_KWDS)} if fap_kwds is None else dict(fap_kwds)
         )
 
     def _compute_ls(self, magnitude, time, lscargle_kwds):
