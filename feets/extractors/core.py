@@ -276,9 +276,6 @@ class Extractor(abc.ABC):
         (timeserie + dependencies + parameters) to feed the `extract`method.
 
         """
-        # create the bessel for the parameters
-        kwargs = {}
-
         # add the required features
         kwargs = {k: dependencies[k] for k in self.get_dependencies()}
 
@@ -315,7 +312,6 @@ class Extractor(abc.ABC):
                 f"and found: {fstr!r}"
             )
 
-        selected = {}
         selected = {k: result[k] for k in selected_features}
 
         return selected
