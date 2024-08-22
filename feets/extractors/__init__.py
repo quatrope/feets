@@ -47,7 +47,8 @@ __all__ = [
     "ExtractorBadDefinedError",
     "ExtractorContractError",
     "ExtractorWarning",
-    "Extractor"]
+    "Extractor",
+]
 
 # =============================================================================
 # IMPORTS
@@ -58,8 +59,12 @@ import inspect
 import six
 
 from .core import (
-    Extractor, ExtractorBadDefinedError, ExtractorContractError,
-    ExtractorWarning, DATAS)  # noqa
+    Extractor,
+    ExtractorBadDefinedError,
+    ExtractorContractError,
+    ExtractorWarning,
+    DATAS,
+)  # noqa
 
 
 # =============================================================================
@@ -106,9 +111,7 @@ def extractor_of(feature):
 
 
 def sort_by_dependencies(exts, retry=None):
-    """Calculate the Feature Extractor Resolution Order.
-
-    """
+    """Calculate the Feature Extractor Resolution Order."""
     sorted_ext, features_from_sorted = [], set()
     pending = [(e, 0) for e in exts]
     retry = len(exts) * 100 if retry is None else retry

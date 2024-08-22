@@ -27,33 +27,35 @@ def ts_anim():
     # create a simple animation
     fig = plt.figure()
     ax = plt.axes(xlim=(0, 100), ylim=(-1, 1))
-    Color = [ 1 ,0.498039, 0.313725];
-    line, = ax.plot([], [], '*',color = Color)
+    Color = [1, 0.498039, 0.313725]
+    (line,) = ax.plot([], [], "*", color=Color)
     plt.xlabel("Time")
     plt.ylabel("Measurement")
 
     def init():
         line.set_data([], [])
-        return line,
+        return (line,)
 
     def animate(i):
-        x = np.linspace(0, i+1, i+1)
-        ts = 5*np.cos(x * 0.02 * np.pi) * np.sin(np.cos(x)  * 0.02 * np.pi)
+        x = np.linspace(0, i + 1, i + 1)
+        ts = 5 * np.cos(x * 0.02 * np.pi) * np.sin(np.cos(x) * 0.02 * np.pi)
         line.set_data(x, ts)
-        return line,
+        return (line,)
 
-    return animation.FuncAnimation(fig, animate, init_func=init,
-                                   frames=100, interval=200, blit=True)
+    return animation.FuncAnimation(
+        fig, animate, init_func=init, frames=100, interval=200, blit=True
+    )
 
 
 def macho_video():
-    return YouTubeVideo('qMx4ozpSRuE',  width=750, height=360, align='right')
+    return YouTubeVideo("qMx4ozpSRuE", width=750, height=360, align="right")
 
 
 def macho_example11():
-    picture = Image(filename='_static/curvas_ejemplos11.jpg')
+    picture = Image(filename="_static/curvas_ejemplos11.jpg")
     picture.size = (100, 100)
     return picture
+
 
 # the library
 
@@ -62,7 +64,8 @@ time_ex = np.arange(0, 30)
 
 # features table
 
-FEATURES_TABLE_TEMPLATE = jinja2.Template("""
+FEATURES_TABLE_TEMPLATE = jinja2.Template(
+    """
 <table class="table-condensed">
     <thead>
         <th>Feature</th>
@@ -81,7 +84,9 @@ FEATURES_TABLE_TEMPLATE = jinja2.Template("""
         {% endfor %}
     </tbody>
 </table>
-""")
+"""
+)
+
 
 def features_table():
 
@@ -93,19 +98,27 @@ def features_table():
             feature,
             ext.get_features().difference([feature]),
             ext.get_dependencies(),
-            ext.get_data())
+            ext.get_data(),
+        )
         rows.append(row)
 
     FourierComponents = feets.extractor_of("Freq2_harmonics_rel_phase_0")
-    rows.append((
-        "Freq{i}_harmonics_amplitude_{j}",
-        ["Freq{i}_harmonics_amplitude_{j} and Freq{i}_harmonics_rel_phase_{j}"],
-        FourierComponents.get_dependencies(), FourierComponents.get_data()
-    ))
+    rows.append(
+        (
+            "Freq{i}_harmonics_amplitude_{j}",
+            [
+                "Freq{i}_harmonics_amplitude_{j} and Freq{i}_harmonics_rel_phase_{j}"
+            ],
+            FourierComponents.get_dependencies(),
+            FourierComponents.get_data(),
+        )
+    )
 
     return HTML(FEATURES_TABLE_TEMPLATE.render(rows=sorted(rows)))
 
-RESULT_TABLE_TEMPLATE = jinja2.Template("""
+
+RESULT_TABLE_TEMPLATE = jinja2.Template(
+    """
 <table class="table-condensed">
     <thead>
         <th>Feature</th>
@@ -120,14 +133,17 @@ RESULT_TABLE_TEMPLATE = jinja2.Template("""
         {% endfor %}
     </tbody>
 </table>
-""")
+"""
+)
+
 
 def as_table(features, values):
     rows = zip(features, values)
     return HTML(RESULT_TABLE_TEMPLATE.render(rows=rows))
 
 
-DOC_TEMPLATE = jinja2.Template("""
+DOC_TEMPLATE = jinja2.Template(
+    """
 <div class="section" id="The-Features">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
@@ -208,14 +224,18 @@ $("div#extractors .warning").addClass("alert alert-warning");
 $("div#extractors .warning").prepend("<h5 class='text-warning'>Warning<h5><hr>");
 </script>
 </div>
-""")
+"""
+)
+
 
 def deindent_reference(string):
     lines = string.splitlines()
     to_remove = []
     to_bold = []
     for idx, l in enumerate(lines):
-        if l.strip() and (not l.replace("-", "").strip() or not l.replace("=", "").strip()):
+        if l.strip() and (
+            not l.replace("-", "").strip() or not l.replace("=", "").strip()
+        ):
             to_remove.append(idx)
             to_bold.append(idx - 1)
 
@@ -224,7 +244,7 @@ def deindent_reference(string):
         if idx in to_remove:
             continue
         elif idx in to_bold:
-            l = u"**{}**".format(l.strip())
+            l = "**{}**".format(l.strip())
         deindented.append(l)
 
     return "\n".join(deindented)
@@ -244,16 +264,15 @@ def features_doc():
     from docutils.core import publish_parts
 
     rows = []
-    extractors = sorted({
-        e for e in feets.registered_extractors().values()})
+    extractors = sorted({e for e in feets.registered_extractors().values()})
     for idx, ext in enumerate(extractors):
         name = ext.__name__
 
         doc = publish_parts(
-            make_title(name) + deindent_reference(ext.__doc__  or ""),
-            writer_name='html5',
-            writer=rst2html5_.HTML5Writer())["body"]
-
+            make_title(name) + deindent_reference(ext.__doc__ or ""),
+            writer_name="html5",
+            writer=rst2html5_.HTML5Writer(),
+        )["body"]
 
         features = ext.get_features()
         data = sorted(ext.get_data(), key=feets.extractors.DATAS.index)

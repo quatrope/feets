@@ -55,6 +55,7 @@ from .core import Extractor, FeatureExtractionWarning
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class StructureFunctions(Extractor):
     r"""The structure function of rotation measures (RMs) contains information
     on electron density and magnetic field fluctuations.
@@ -69,9 +70,11 @@ class StructureFunctions(Extractor):
 
     """
 
-    features = ["StructureFunction_index_21",
-                "StructureFunction_index_31",
-                "StructureFunction_index_32"]
+    features = [
+        "StructureFunction_index_21",
+        "StructureFunction_index_31",
+        "StructureFunction_index_32",
+    ]
 
     def __init__(self):
         pass
@@ -85,14 +88,23 @@ class StructureFunctions(Extractor):
         mag_int = f(time_int)
 
         for tau in np.arange(1, Nsf):
-            sf1[tau-1] = np.mean(
-                np.power(np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 1.0))
-            sf2[tau-1] = np.mean(
-                np.abs(np.power(
-                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 2.0)))
-            sf3[tau-1] = np.mean(
-                np.abs(np.power(
-                    np.abs(mag_int[0:Np-tau] - mag_int[tau:Np]), 3.0)))
+            sf1[tau - 1] = np.mean(
+                np.power(np.abs(mag_int[0 : Np - tau] - mag_int[tau:Np]), 1.0)
+            )
+            sf2[tau - 1] = np.mean(
+                np.abs(
+                    np.power(
+                        np.abs(mag_int[0 : Np - tau] - mag_int[tau:Np]), 2.0
+                    )
+                )
+            )
+            sf3[tau - 1] = np.mean(
+                np.abs(
+                    np.power(
+                        np.abs(mag_int[0 : Np - tau] - mag_int[tau:Np]), 3.0
+                    )
+                )
+            )
         sf1_log = np.log10(np.trim_zeros(sf1))
         sf2_log = np.log10(np.trim_zeros(sf2))
         sf3_log = np.log10(np.trim_zeros(sf3))
@@ -102,7 +114,8 @@ class StructureFunctions(Extractor):
         else:
             warnings.warn(
                 "Can't compute StructureFunction_index_21",
-                FeatureExtractionWarning)
+                FeatureExtractionWarning,
+            )
             m_21 = np.nan
 
         if len(sf1_log) and len(sf3_log):
@@ -110,7 +123,8 @@ class StructureFunctions(Extractor):
         else:
             warnings.warn(
                 "Can't compute StructureFunction_index_31",
-                FeatureExtractionWarning)
+                FeatureExtractionWarning,
+            )
             m_31 = np.nan
 
         if len(sf2_log) and len(sf3_log):
@@ -118,9 +132,12 @@ class StructureFunctions(Extractor):
         else:
             warnings.warn(
                 "Can't compute StructureFunction_index_32",
-                FeatureExtractionWarning)
+                FeatureExtractionWarning,
+            )
             m_32 = np.nan
 
-        return {"StructureFunction_index_21": m_21,
-                "StructureFunction_index_31": m_31,
-                "StructureFunction_index_32": m_32}
+        return {
+            "StructureFunction_index_21": m_21,
+            "StructureFunction_index_31": m_31,
+            "StructureFunction_index_32": m_32,
+        }

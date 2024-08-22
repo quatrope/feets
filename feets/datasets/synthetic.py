@@ -60,83 +60,102 @@ DEFAULT_SIZE = 10000
 # FUNCTIONS
 # =============================================================================
 
-def create_random(magf, magf_params, errf, errf_params,
-                  timef=np.linspace, timef_params=None, size=DEFAULT_SIZE,
-                  id=None, ds_name=DS_NAME, description=DESCRIPTION,
-                  bands=BANDS, metadata=METADATA):
-        """Generate a data with any given random function.
 
-        Parameters
-        ----------
+def create_random(
+    magf,
+    magf_params,
+    errf,
+    errf_params,
+    timef=np.linspace,
+    timef_params=None,
+    size=DEFAULT_SIZE,
+    id=None,
+    ds_name=DS_NAME,
+    description=DESCRIPTION,
+    bands=BANDS,
+    metadata=METADATA,
+):
+    """Generate a data with any given random function.
 
-        magf : callable
-            Function to generate the magnitudes.
-        magf_params : dict-like
-            Parameters to feed the `magf` function.
-        errf : callable
-            Function to generate the magnitudes.
-        errf_params : dict-like
-            Parameters to feed the `errf` function.
-        timef : callable, (default=numpy.linspace)
-            Function to generate the times.
-        timef_params : dict-like or None, (default={"start": 0., "stop": 1.})
-            Parameters to feed the `timef` callable.
-        size : int (default=10000)
-            Number of obervation of the light curves
-        id : object (default=None)
-            Id of the created data.
-        ds_name : str (default="feets-synthetic")
-            Name of the dataset
-        description : str (default="Lightcurve created with random numbers")
-            Description of the data
-        bands : tuple of strings (default=("B", "V"))
-            The bands to be created
-        metadata : dict-like or None (default=None)
-            The metadata of the created data
+    Parameters
+    ----------
 
-        Returns
-        -------
+    magf : callable
+        Function to generate the magnitudes.
+    magf_params : dict-like
+        Parameters to feed the `magf` function.
+    errf : callable
+        Function to generate the magnitudes.
+    errf_params : dict-like
+        Parameters to feed the `errf` function.
+    timef : callable, (default=numpy.linspace)
+        Function to generate the times.
+    timef_params : dict-like or None, (default={"start": 0., "stop": 1.})
+        Parameters to feed the `timef` callable.
+    size : int (default=10000)
+        Number of obervation of the light curves
+    id : object (default=None)
+        Id of the created data.
+    ds_name : str (default="feets-synthetic")
+        Name of the dataset
+    description : str (default="Lightcurve created with random numbers")
+        Description of the data
+    bands : tuple of strings (default=("B", "V"))
+        The bands to be created
+    metadata : dict-like or None (default=None)
+        The metadata of the created data
 
-        data
-            A Data object with a random lightcurves.
+    Returns
+    -------
 
-        Examples
-        --------
+    data
+        A Data object with a random lightcurves.
 
-        .. code-block:: pycon
+    Examples
+    --------
 
-            >>> from numpy import random
-            >>>  create_random(
-            ...     magf=random.normal, magf_params={"loc": 0, "scale": 1},
-            ...     errf=random.normal, errf_params={"loc": 0, "scale": 0.008})
-            Data(id=None, ds_name='feets-synthetic', bands=('B', 'V'))
+    .. code-block:: pycon
 
-        """
-        timef_params = (
-            {"start": 0., "stop": 1.}
-            if timef_params is None else
-            timef_params.copy())
-        timef_params.update(num=size)
+        >>> from numpy import random
+        >>>  create_random(
+        ...     magf=random.normal, magf_params={"loc": 0, "scale": 1},
+        ...     errf=random.normal, errf_params={"loc": 0, "scale": 0.008})
+        Data(id=None, ds_name='feets-synthetic', bands=('B', 'V'))
 
-        magf_params = magf_params.copy()
-        magf_params.update(size=size)
+    """
+    timef_params = (
+        {"start": 0.0, "stop": 1.0}
+        if timef_params is None
+        else timef_params.copy()
+    )
+    timef_params.update(num=size)
 
-        errf_params = errf_params.copy()
-        errf_params.update(size=size)
+    magf_params = magf_params.copy()
+    magf_params.update(size=size)
 
-        data = {}
-        for band in bands:
-            data[band] = {
-                "time": timef(**timef_params),
-                "magnitude": magf(**magf_params),
-                "error":  errf(**errf_params)}
-        return Data(
-            id=id, ds_name=ds_name, description=description,
-            bands=bands, metadata=metadata, data=data)
+    errf_params = errf_params.copy()
+    errf_params.update(size=size)
+
+    data = {}
+    for band in bands:
+        data[band] = {
+            "time": timef(**timef_params),
+            "magnitude": magf(**magf_params),
+            "error": errf(**errf_params),
+        }
+    return Data(
+        id=id,
+        ds_name=ds_name,
+        description=description,
+        bands=bands,
+        metadata=metadata,
+        data=data,
+    )
 
 
-def create_normal(mu=0., sigma=1., mu_err=0.,
-                  sigma_err=1., seed=None, **kwargs):
+def create_normal(
+    mu=0.0, sigma=1.0, mu_err=0.0, sigma_err=1.0, seed=None, **kwargs
+):
     """Generate a data with magnitudes that follows a Gaussian
      distribution. Also their errors are gaussian.
 
@@ -185,13 +204,17 @@ def create_normal(mu=0., sigma=1., mu_err=0.,
 
     random = np.random.RandomState(seed)
     return create_random(
-        magf=random.normal, magf_params={"loc": mu, "scale": sigma},
-        errf=random.normal, errf_params={"loc": mu_err, "scale": sigma_err},
-        **kwargs)
+        magf=random.normal,
+        magf_params={"loc": mu, "scale": sigma},
+        errf=random.normal,
+        errf_params={"loc": mu_err, "scale": sigma_err},
+        **kwargs,
+    )
 
 
-def create_uniform(low=0., high=1., mu_err=0., sigma_err=1.,
-                   seed=None, **kwargs):
+def create_uniform(
+    low=0.0, high=1.0, mu_err=0.0, sigma_err=1.0, seed=None, **kwargs
+):
     """Generate a data with magnitudes that follows a uniform
      distribution; the error instead are gaussian.
 
@@ -239,12 +262,15 @@ def create_uniform(low=0., high=1., mu_err=0., sigma_err=1.,
     """
     random = np.random.RandomState(seed)
     return create_random(
-        magf=random.uniform, magf_params={"low": low, "high": high},
-        errf=random.normal, errf_params={"loc": mu_err, "scale": sigma_err},
-        **kwargs)
+        magf=random.uniform,
+        magf_params={"low": low, "high": high},
+        errf=random.normal,
+        errf_params={"loc": mu_err, "scale": sigma_err},
+        **kwargs,
+    )
 
 
-def create_periodic(mu_err=0., sigma_err=1., seed=None, **kwargs):
+def create_periodic(mu_err=0.0, sigma_err=1.0, seed=None, **kwargs):
     """Generate a data with magnitudes with periodic variability
      distribution; the error instead are gaussian.
 
@@ -300,6 +326,11 @@ def create_periodic(mu_err=0., sigma_err=1., seed=None, **kwargs):
     times, mags, errors = iter(times), iter(mags), iter(errors)
 
     return create_random(
-        magf=lambda **k: next(mags), magf_params={},
-        errf=lambda **k: next(errors), errf_params={},
-        timef=lambda **k: next(times), timef_params={}, **kwargs)
+        magf=lambda **k: next(mags),
+        magf_params={},
+        errf=lambda **k: next(errors),
+        errf_params={},
+        timef=lambda **k: next(times),
+        timef_params={},
+        **kwargs,
+    )

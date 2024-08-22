@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Beyond1Std(Extractor):
     """
     **Beyond1Std**
@@ -84,14 +85,18 @@ class Beyond1Std(Extractor):
     def extract(self, magnitude, error):
         n = len(magnitude)
 
-        weighted_mean = np.average(magnitude, weights=1 / error ** 2)
+        weighted_mean = np.average(magnitude, weights=1 / error**2)
 
         # Standard deviation with respect to the weighted mean
 
         var = sum((magnitude - weighted_mean) ** 2)
         std = np.sqrt((1.0 / (n - 1)) * var)
 
-        count = np.sum(np.logical_or(magnitude > weighted_mean + std,
-                                     magnitude < weighted_mean - std))
+        count = np.sum(
+            np.logical_or(
+                magnitude > weighted_mean + std,
+                magnitude < weighted_mean - std,
+            )
+        )
 
         return {"Beyond1Std": float(count) / n}

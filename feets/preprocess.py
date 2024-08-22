@@ -34,14 +34,13 @@ import pandas as pd
 
 from six.moves import range
 
-__all__ = [
-    "remove_noise",
-    "align"]
+__all__ = ["remove_noise", "align"]
 
 
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
+
 
 def remove_noise(time, magnitude, error, error_limit=3, std_limit=5):
     """Points within 'std_limit' standard deviations from the mean and with
@@ -60,8 +59,9 @@ def remove_noise(time, magnitude, error, error_limit=3, std_limit=5):
     mjd_out, data_out, error_out = [], [], []
     for i in range(data_len):
         is_not_noise = (
-            error[i] < error_tolerance and
-            (np.absolute(data[i] - data_mean) / data_std) < std_limit)
+            error[i] < error_tolerance
+            and (np.absolute(data[i] - data_mean) / data_std) < std_limit
+        )
 
         if is_not_noise:
             mjd_out.append(mjd[i])
@@ -101,7 +101,7 @@ def align(time, time2, magnitude, magnitude2, error, error2):
         sserie, lserie = lserie, sserie
 
     # make the merge
-    merged = sserie.join(lserie, how="inner", rsuffix='2')
+    merged = sserie.join(lserie, how="inner", rsuffix="2")
 
     # recreate columns
     new_time = merged.index.values

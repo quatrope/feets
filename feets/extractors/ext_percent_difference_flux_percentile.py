@@ -53,6 +53,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class PercentDifferenceFluxPercentile(Extractor):
     r"""
     **PercentDifferenceFluxPercentile**

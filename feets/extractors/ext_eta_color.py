@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class EtaColor(Extractor):
     """
 
@@ -94,7 +95,11 @@ class EtaColor(Extractor):
         S1 = sum(w * (B_Rdata[1:] - B_Rdata[:-1]) ** 2)
         S2 = sum(w)
 
-        eta_B_R = (w_mean * np.power(aligned_time[N - 1] -
-                   aligned_time[0], 2) * S1 / (sigma2 * S2 * N ** 2))
+        eta_B_R = (
+            w_mean
+            * np.power(aligned_time[N - 1] - aligned_time[0], 2)
+            * S1
+            / (sigma2 * S2 * N**2)
+        )
 
         return {"Eta_color": eta_B_R}

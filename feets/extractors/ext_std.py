@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Std(Extractor):
     r"""
     **Std** - Standard deviation of the magnitudes

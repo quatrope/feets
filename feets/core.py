@@ -36,10 +36,7 @@ from __future__ import unicode_literals, print_function
 
 __doc__ = """core functionalities of feets"""
 
-__all__ = [
-    "FeatureNotFound",
-    "DataRequiredError",
-    "FeatureSpace"]
+__all__ = ["FeatureNotFound", "DataRequiredError", "FeatureSpace"]
 
 
 # =============================================================================
@@ -60,7 +57,8 @@ from .extractors.core import (
     DATA_ALIGNED_MAGNITUDE2,
     DATA_ALIGNED_TIME,
     DATA_ALIGNED_ERROR,
-    DATA_ALIGNED_ERROR2)
+    DATA_ALIGNED_ERROR2,
+)
 
 
 # =============================================================================
@@ -87,6 +85,7 @@ logger.setLevel(logging.WARNING)
 # EXCEPTIONS
 # =============================================================================
 
+
 class FeatureNotFound(ValueError):
     pass
 
@@ -98,6 +97,7 @@ class DataRequiredError(ValueError):
 # =============================================================================
 # FEATURE SET
 # =============================================================================
+
 
 class FeatureSet(object):
 
@@ -134,6 +134,7 @@ class FeatureSet(object):
 # =============================================================================
 # FEATURE SPACE
 # =============================================================================
+
 
 class FeatureSpace(object):
     """Wrapper class, to allow user select the
@@ -205,6 +206,7 @@ class FeatureSpace(object):
         {"Mean": 23}
 
     """
+
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
         # retrieve all the extractors
         exts = extractors.registered_extractors()
@@ -239,7 +241,8 @@ class FeatureSpace(object):
 
         # the candidate to be the features to be extracted
         candidates = self._features_by_data.intersection(
-            self._only).difference(self._exclude)
+            self._only
+        ).difference(self._exclude)
 
         # remove by dependencies
         if only or exclude:
@@ -277,10 +280,12 @@ class FeatureSpace(object):
 
         # excecution order by dependencies
         self._execution_plan = extractors.sort_by_dependencies(
-            features_extractors)
+            features_extractors
+        )
 
         not_found = set(self._kwargs).difference(
-            self._features_extractors_names)
+            self._features_extractors_names
+        )
         if not_found:
             msg = (
                 "This space not found feature(s) extractor(s) {} "
@@ -306,29 +311,41 @@ class FeatureSpace(object):
             array_data[k] = v if v is None else np.asarray(v)
         return array_data
 
-    def extract(self, time=None, magnitude=None, error=None,
-                magnitude2=None, aligned_time=None,
-                aligned_magnitude=None, aligned_magnitude2=None,
-                aligned_error=None, aligned_error2=None):
+    def extract(
+        self,
+        time=None,
+        magnitude=None,
+        error=None,
+        magnitude2=None,
+        aligned_time=None,
+        aligned_magnitude=None,
+        aligned_magnitude2=None,
+        aligned_error=None,
+        aligned_error2=None,
+    ):
 
-        kwargs = self.dict_data_as_array({
-            DATA_TIME: time,
-            DATA_MAGNITUDE: magnitude,
-            DATA_ERROR: error,
-            DATA_MAGNITUDE2: magnitude2,
-            DATA_ALIGNED_TIME: aligned_time,
-            DATA_ALIGNED_MAGNITUDE: aligned_magnitude,
-            DATA_ALIGNED_MAGNITUDE2: aligned_magnitude2,
-            DATA_ALIGNED_ERROR: aligned_error,
-            DATA_ALIGNED_ERROR2: aligned_error2})
+        kwargs = self.dict_data_as_array(
+            {
+                DATA_TIME: time,
+                DATA_MAGNITUDE: magnitude,
+                DATA_ERROR: error,
+                DATA_MAGNITUDE2: magnitude2,
+                DATA_ALIGNED_TIME: aligned_time,
+                DATA_ALIGNED_MAGNITUDE: aligned_magnitude,
+                DATA_ALIGNED_MAGNITUDE2: aligned_magnitude2,
+                DATA_ALIGNED_ERROR: aligned_error,
+                DATA_ALIGNED_ERROR2: aligned_error2,
+            }
+        )
 
         features = {}
         for fextractor in self._execution_plan:
             result = fextractor.extract(features=features, **kwargs)
             features.update(result)
 
-        fvalues = np.array([
-            features[fname] for fname in self._features_as_array])
+        fvalues = np.array(
+            [features[fname] for fname in self._features_as_array]
+        )
 
         return self._features_as_array, fvalues
 

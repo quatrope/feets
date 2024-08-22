@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Color(Extractor):
     """
     **Color**
@@ -76,6 +77,7 @@ class Color(Extractor):
        Doi:10.1088/0004-637X/735/2/68.
 
     """
+
     features = ["Color"]
 
     def __init__(self):

@@ -88,7 +88,8 @@ def white_noise():
         "magnitude2": second_data,
         "aligned_magnitude": aligned_data,
         "aligned_magnitude2": aligned_second_data,
-        "aligned_time": aligned_mjd}
+        "aligned_time": aligned_mjd,
+    }
     return lc
 
 
@@ -101,11 +102,9 @@ def periodic_lc():
     mean = np.zeros(N)
     for i in np.arange(N):
         for j in np.arange(N):
-            cov[i, j] = np.exp(-(np.sin((np.pi/Period) * (i-j)) ** 2))
+            cov[i, j] = np.exp(-(np.sin((np.pi / Period) * (i - j)) ** 2))
     data_periodic = random.multivariate_normal(mean, cov)
-    lc = {
-        "magnitude": data_periodic,
-        "time": mjd_periodic}
+    lc = {"magnitude": data_periodic, "time": mjd_periodic}
     return lc
 
 
@@ -113,27 +112,25 @@ def periodic_lc():
 def uniform_lc():
     mjd_uniform = np.arange(1000000)
     data_uniform = random.uniform(size=1000000)
-    lc = {
-        "magnitude": data_uniform,
-        "time": mjd_uniform}
+    lc = {"magnitude": data_uniform, "time": mjd_uniform}
     return lc
 
 
 @pytest.fixture
 def random_walk():
     N = 10000
-    alpha = 1.
+    alpha = 1.0
     sigma = 0.5
     data_rw = np.zeros([N, 1])
     data_rw[0] = 1
     time_rw = range(1, N)
     for t in time_rw:
-        data_rw[t] = alpha * data_rw[t-1] + random.normal(loc=0.0, scale=sigma)
+        data_rw[t] = alpha * data_rw[t - 1] + random.normal(
+            loc=0.0, scale=sigma
+        )
     time_rw = np.array(range(0, N)) + 1 * random.uniform(size=N)
     data_rw = data_rw.squeeze()
-    lc = {
-        "magnitude": data_rw,
-        "time": time_rw}
+    lc = {"magnitude": data_rw, "time": time_rw}
     return lc
 
 
@@ -141,41 +138,47 @@ def random_walk():
 # TESTS
 # =============================================================================
 
+
 def test_Beyond1Std(white_noise):
-    fs = FeatureSpace(only=['Beyond1Std'])
+    fs = FeatureSpace(only=["Beyond1Std"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= 0.30 and result <= 0.40
 
 
 def test_Mean(white_noise):
-    fs = FeatureSpace(only=['Mean'])
+    fs = FeatureSpace(only=["Mean"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= -0.1 and result <= 0.1
 
 
 def test_Con(white_noise):
-    fs = FeatureSpace(only=['Con'], Con={"consecutiveStar": 1})
+    fs = FeatureSpace(only=["Con"], Con={"consecutiveStar": 1})
     result = fs.extract(**white_noise)[1][0]
     assert result >= 0.04 and result <= 0.05
 
 
 def test_Eta_color(white_noise):
-    fs = FeatureSpace(only=['Eta_color'])
+    fs = FeatureSpace(only=["Eta_color"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= 1.9 and result <= 2.1
 
 
 def test_Eta_e(white_noise):
-    fs = FeatureSpace(only=['Eta_e'])
+    fs = FeatureSpace(only=["Eta_e"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= 1.9 and result <= 2.1
 
 
 def test_FluxPercentile(white_noise):
-    fs = FeatureSpace(only=[
-        'FluxPercentileRatioMid20', 'FluxPercentileRatioMid35',
-        'FluxPercentileRatioMid50', 'FluxPercentileRatioMid65',
-        'FluxPercentileRatioMid80'])
+    fs = FeatureSpace(
+        only=[
+            "FluxPercentileRatioMid20",
+            "FluxPercentileRatioMid35",
+            "FluxPercentileRatioMid50",
+            "FluxPercentileRatioMid65",
+            "FluxPercentileRatioMid80",
+        ]
+    )
     result = fs.extract(**white_noise)[1]
     assert result[0] >= 0.145 and result[0] <= 0.160
     assert result[1] >= 0.260 and result[1] <= 0.290
@@ -185,25 +188,25 @@ def test_FluxPercentile(white_noise):
 
 
 def test_LinearTrend(white_noise):
-    fs = FeatureSpace(only=['LinearTrend'])
+    fs = FeatureSpace(only=["LinearTrend"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= -0.1 and result <= 0.1
 
 
 def test_Meanvariance(uniform_lc):
-    fs = FeatureSpace(only=['Meanvariance'])
+    fs = FeatureSpace(only=["Meanvariance"])
     result = fs.extract(**uniform_lc)[1][0]
     assert result >= 0.575 and result <= 0.580
 
 
 def test_MedianAbsDev(white_noise):
-    fs = FeatureSpace(only=['MedianAbsDev'])
+    fs = FeatureSpace(only=["MedianAbsDev"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= 0.630 and result <= 0.700
 
 
 def test_PairSlopeTrend(white_noise):
-    fs = FeatureSpace(only=['PairSlopeTrend'])
+    fs = FeatureSpace(only=["PairSlopeTrend"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= -0.25 and result <= 0.25
 
@@ -218,71 +221,85 @@ def test_Period_Psi(periodic_lc):
         }
     }
 
-    fs = FeatureSpace(only=['PeriodLS'], LombScargle=params)
+    fs = FeatureSpace(only=["PeriodLS"], LombScargle=params)
     result = fs.extract(**periodic_lc)[1][0]
     assert result >= 19 and result <= 21
 
 
 def test_Q31(white_noise):
-    fs = FeatureSpace(only=['Q31'])
+    fs = FeatureSpace(only=["Q31"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= 1.30 and result <= 1.38
 
 
 def test_Rcs(white_noise):
-    fs = FeatureSpace(only=['Rcs'])
+    fs = FeatureSpace(only=["Rcs"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= 0 and result <= 0.1
 
 
 def test_Skew(white_noise):
-    fs = FeatureSpace(only=['Skew'])
+    fs = FeatureSpace(only=["Skew"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= -0.1 and result <= 0.1
 
 
 def test_SmallKurtosis(white_noise):
-    fs = FeatureSpace(only=['SmallKurtosis'])
+    fs = FeatureSpace(only=["SmallKurtosis"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= -0.2 and result <= 0.2
 
 
 def test_Std(white_noise):
-    fs = FeatureSpace(only=['Std'])
+    fs = FeatureSpace(only=["Std"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= 0.9 and result <= 1.1
 
 
 def test_Gskew(white_noise):
-    fs = FeatureSpace(only=['Gskew'])
+    fs = FeatureSpace(only=["Gskew"])
     result = fs.extract(**white_noise)[1][0]
     assert result >= -0.2 and result <= 0.2
 
 
 def test_StructureFunction(random_walk):
-    fs = FeatureSpace(only=[
-        'StructureFunction_index_21',
-        'StructureFunction_index_31',
-        'StructureFunction_index_32'])
+    fs = FeatureSpace(
+        only=[
+            "StructureFunction_index_21",
+            "StructureFunction_index_31",
+            "StructureFunction_index_32",
+        ]
+    )
     result = fs.extract(**random_walk)[1]
-    assert(result[0] >= 1.520 and result[0] <= 2.067)
-    assert(result[1] >= 1.821 and result[1] <= 3.162)
-    assert(result[2] >= 1.243 and result[2] <= 1.562)
+    assert result[0] >= 1.520 and result[0] <= 2.067
+    assert result[1] >= 1.821 and result[1] <= 3.162
+    assert result[2] >= 1.243 and result[2] <= 1.562
 
 
 # =============================================================================
 # TUTORIAL TEST CASE
 # =============================================================================
 
+
 class FATSTutorialTestCase(FeetsTestCase):
 
-    def shuffle(self, mag, error, time, mag2, aligned_mag, aligned_mag2,
-                aligned_time, aligned_error, aligned_error2):
+    def shuffle(
+        self,
+        mag,
+        error,
+        time,
+        mag2,
+        aligned_mag,
+        aligned_mag2,
+        aligned_time,
+        aligned_error,
+        aligned_error2,
+    ):
 
         N = len(mag)
         shuffle = np.arange(0, N)
         index = self.random.permutation(shuffle)
-        index = np.sort(index[0:int(N/2)])
+        index = np.sort(index[0 : int(N / 2)])
 
         mag_test = mag[index]
         time_test = time[index]
@@ -291,14 +308,14 @@ class FATSTutorialTestCase(FeetsTestCase):
         N2 = len(mag2)
         shuffle2 = np.arange(0, N2)
         index2 = self.random.permutation(shuffle2)
-        index2 = np.sort(index2[0:int(N2/2)])
+        index2 = np.sort(index2[0 : int(N2 / 2)])
 
         mag2_test = mag2[index2]
 
         N3 = len(aligned_mag)
         shuffle3 = np.arange(0, N3)
         index3 = self.random.permutation(shuffle3)
-        index3 = np.sort(index3[0:int(N3/2)])
+        index3 = np.sort(index3[0 : int(N3 / 2)])
 
         aligned_mag_test = aligned_mag[index3]
         aligned_mag2_test = aligned_mag2[index3]
@@ -308,14 +325,15 @@ class FATSTutorialTestCase(FeetsTestCase):
 
         return {
             "magnitude": mag_test,
-            "time":  time_test,
+            "time": time_test,
             "error": error_test,
             "magnitude2": mag2_test,
             "aligned_magnitude": aligned_mag_test,
-            "aligned_magnitude2":  aligned_mag2_test,
+            "aligned_magnitude2": aligned_mag2_test,
             "aligned_time": aligned_time_test,
             "aligned_error": aligned_error_test,
-            "aligned_error2": aligned_error2_test}
+            "aligned_error2": aligned_error2_test,
+        }
 
     def setUp(self):
         self.random = np.random.RandomState(42)
@@ -353,7 +371,8 @@ class FATSTutorialTestCase(FeetsTestCase):
             aligned_magnitude2=self.lc["aligned_mag2"],
             aligned_time=self.lc["aligned_time"],
             aligned_error=self.lc["aligned_error"],
-            aligned_error2=self.lc["aligned_error2"])
+            aligned_error2=self.lc["aligned_error2"],
+        )
 
         def normalize(c):
             name, value = c.name, c[0]

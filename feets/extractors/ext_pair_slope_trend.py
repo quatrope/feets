@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class PairSlopeTrend(Extractor):
     r"""
     **PairSlopeTrend**
@@ -85,7 +86,12 @@ class PairSlopeTrend(Extractor):
     def extract(self, magnitude):
         data_last = magnitude[-30:]
 
-        pst = (float(len(np.where(np.diff(data_last) > 0)[0]) -
-               len(np.where(np.diff(data_last) <= 0)[0])) / 30)
+        pst = (
+            float(
+                len(np.where(np.diff(data_last) > 0)[0])
+                - len(np.where(np.diff(data_last) <= 0)[0])
+            )
+            / 30
+        )
 
         return {"PairSlopeTrend": pst}

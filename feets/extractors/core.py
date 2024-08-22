@@ -288,7 +288,9 @@ class Extractor(abc.ABC):
 
         return kwargs
 
-    def select_extract_and_validate(self, data, dependencies, selected_features):
+    def select_extract_and_validate(
+        self, data, dependencies, selected_features
+    ):
         """Internal method designed to select the parameters necessary for
         executing the 'extract()' method, followed by its execution.
 
@@ -318,7 +320,6 @@ class Extractor(abc.ABC):
 
         return selected
 
-
     # TO REDEFINE =============================================================
 
     @abc.abstractmethod
@@ -328,7 +329,6 @@ class Extractor(abc.ABC):
     @abc.abstractmethod
     def extract(self):
         raise NotImplementedError()
-
 
 
 class MyExtractor(Extractor):

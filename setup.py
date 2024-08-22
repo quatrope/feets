@@ -40,6 +40,7 @@
 import os
 
 from ez_setup import use_setuptools
+
 use_setuptools()
 
 from setuptools import setup, find_packages
@@ -53,14 +54,24 @@ import feets
 # =============================================================================
 
 REQUIREMENTS = [
-    "numpy", "scipy", "six", "pytest",
-    "statsmodels", "mock", "astropy",
-    "pandas", "requests", "attrs", "joblib"]
+    "numpy",
+    "scipy",
+    "six",
+    "pytest",
+    "statsmodels",
+    "mock",
+    "astropy",
+    "pandas",
+    "requests",
+    "attrs",
+    "joblib",
+]
 
 
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
+
 
 def do_setup():
     setup(
@@ -73,7 +84,7 @@ def do_setup():
         url=feets.URL,
         license=feets.LICENSE,
         keywords=list(feets.KEYWORDS),
-        package_data={"feets.tests.data": ['tests/data/*.*']},
+        package_data={"feets.tests.data": ["tests/data/*.*"]},
         include_package_data=True,
         classifiers=[
             "Development Status :: 4 - Beta",
@@ -90,8 +101,7 @@ def do_setup():
             "Programming Language :: Python :: Implementation :: CPython",
             "Topic :: Scientific/Engineering",
         ],
-        packages=[
-            pkg for pkg in find_packages() if pkg.startswith("feets")],
+        packages=[pkg for pkg in find_packages() if pkg.startswith("feets")],
         py_modules=["ez_setup"],
         install_requires=REQUIREMENTS,
     )

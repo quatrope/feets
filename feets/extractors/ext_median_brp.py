@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class MedianBRP(Extractor):
     r"""
     **MedianBRP** (Median buffer range percentage)
@@ -86,7 +87,10 @@ class MedianBRP(Extractor):
         amplitude = (np.max(magnitude) - np.min(magnitude)) / 10
         n = len(magnitude)
 
-        count = np.sum(np.logical_and(magnitude < median + amplitude,
-                                      magnitude > median - amplitude))
+        count = np.sum(
+            np.logical_and(
+                magnitude < median + amplitude, magnitude > median - amplitude
+            )
+        )
 
         return {"MedianBRP": float(count) / n}

@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class DeltamDeltat(Extractor):
     """
     Deltas features described in
@@ -76,9 +77,13 @@ class DeltamDeltat(Extractor):
 
     features = ["DeltamDeltat"]
 
-    def __init__(self, dt_bins=np.hstack([0., np.logspace(-3., 3.5, num=23)]),
-                 dm_bins=np.hstack([-1.*np.logspace(1, -1, num=12), 0,
-                                    np.logspace(-1, 1, num=12)])):
+    def __init__(
+        self,
+        dt_bins=np.hstack([0.0, np.logspace(-3.0, 3.5, num=23)]),
+        dm_bins=np.hstack(
+            [-1.0 * np.logspace(1, -1, num=12), 0, np.logspace(-1, 1, num=12)]
+        ),
+    ):
         feature_attrs = []
         for i in range(len(dm_bins) - 1):
             for j in range(len(dt_bins) - 1):
@@ -92,8 +97,8 @@ class DeltamDeltat(Extractor):
         def delta_calc(idx):
             t0 = time[idx]
             m0 = magnitude[idx]
-            deltat = time[idx + 1:] - t0
-            deltam = magnitude[idx + 1:] - m0
+            deltat = time[idx + 1 :] - t0
+            deltam = magnitude[idx + 1 :] - m0
 
             deltat[np.where(deltat < 0)] *= -1
             deltam[np.where(deltat < 0)] *= -1
@@ -103,8 +108,7 @@ class DeltamDeltat(Extractor):
         lc_len = len(time)
         n_vals = int(0.5 * lc_len * (lc_len - 1))
 
-        deltas = np.vstack(
-            delta_calc(idx) for idx in range(lc_len - 1))
+        deltas = np.vstack(delta_calc(idx) for idx in range(lc_len - 1))
 
         deltat = deltas[:, 0]
         deltam = deltas[:, 1]
@@ -112,9 +116,11 @@ class DeltamDeltat(Extractor):
         dt_bins, dm_bins = self.dt_bins, self.dm_bins
         bins = [dt_bins, dm_bins]
         counts = np.histogram2d(deltat, deltam, bins=bins, normed=False)[0]
-        counts = np.fix(255. * counts/n_vals + 0.999).astype(int)
+        counts = np.fix(255.0 * counts / n_vals + 0.999).astype(int)
 
-        result = zip(self.sorted_features,
-                     counts.reshape((len(dt_bins) - 1) * (len(dm_bins) - 1)))
+        result = zip(
+            self.sorted_features,
+            counts.reshape((len(dt_bins) - 1) * (len(dm_bins) - 1)),
+        )
 
         return dict(result)

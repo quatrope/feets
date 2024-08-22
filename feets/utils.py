@@ -34,6 +34,7 @@ __doc__ = """feets utilities"""
 # FUNCTIONS
 # =============================================================================
 
+
 def indent(s, c=" ", n=4):
     """Indent the string 's' with the character 'c', 'n' times.
 

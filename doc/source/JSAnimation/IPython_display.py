@@ -6,7 +6,7 @@ import random
 import os
 
 
-__all__ = ['anim_to_html', 'display_animation']
+__all__ = ["anim_to_html", "display_animation"]
 
 
 class _NameOnlyTemporaryFile(object):
@@ -41,11 +41,22 @@ class _NameOnlyTemporaryFile(object):
     False
 
     """
-    def __init__(self, prefix='_tmp_', suffix='', hash_length=8,
-                 seed=None, absolute=True):
+
+    def __init__(
+        self,
+        prefix="_tmp_",
+        suffix="",
+        hash_length=8,
+        seed=None,
+        absolute=True,
+    ):
         rng = random.Random(seed)
-        self.name = '%s%0*x%s' % (prefix, hash_length,
-                                  rng.getrandbits(4 * hash_length), suffix)
+        self.name = "%s%0*x%s" % (
+            prefix,
+            hash_length,
+            rng.getrandbits(4 * hash_length),
+            suffix,
+        )
         if absolute:
             self.name = os.path.abspath(self.name)
 
@@ -57,11 +68,11 @@ class _NameOnlyTemporaryFile(object):
             os.remove(self.name)
 
 
-def anim_to_html(anim, fps=None, embed_frames=True, default_mode='loop'):
+def anim_to_html(anim, fps=None, embed_frames=True, default_mode="loop"):
     """Generate HTML representation of the animation"""
-    if fps is None and hasattr(anim, '_interval'):
+    if fps is None and hasattr(anim, "_interval"):
         # Convert interval in ms to frames per second
-        fps = 1000. / anim._interval
+        fps = 1000.0 / anim._interval
 
     plt.close(anim._fig)
     if hasattr(anim, "_html_representation"):
@@ -69,11 +80,16 @@ def anim_to_html(anim, fps=None, embed_frames=True, default_mode='loop'):
     else:
         # tempfile can't be used here: we need a filename, and this
         # fails on windows.  Instead, we use a custom filename generator
-        #with tempfile.NamedTemporaryFile(suffix='.html') as f:
-        with _NameOnlyTemporaryFile(suffix='.html') as f:
-            anim.save(f.name,  writer=HTMLWriter(fps=fps,
-                                                 embed_frames=embed_frames,
-                                                 default_mode=default_mode))
+        # with tempfile.NamedTemporaryFile(suffix='.html') as f:
+        with _NameOnlyTemporaryFile(suffix=".html") as f:
+            anim.save(
+                f.name,
+                writer=HTMLWriter(
+                    fps=fps,
+                    embed_frames=embed_frames,
+                    default_mode=default_mode,
+                ),
+            )
             html = open(f.name).read()
 
         anim._html_representation = html
@@ -83,6 +99,7 @@ def anim_to_html(anim, fps=None, embed_frames=True, default_mode='loop'):
 def display_animation(anim, **kwargs):
     """Display the animation with an IPython HTML object"""
     from IPython.display import HTML
+
     return HTML(anim_to_html(anim, **kwargs))
 
 

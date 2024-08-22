@@ -57,6 +57,7 @@ from .core import FeetsTestCase
 # BASE CLASS
 # =============================================================================
 
+
 class SortByFependenciesTest(FeetsTestCase):
 
     @mock.patch("feets.extractors._extractors", {})
@@ -151,7 +152,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.uniform(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['Meanvariance']
+            values[idx] = ext.fit(magnitude=mags)["Meanvariance"]
         self.assertAllClose(values.mean(), 0.57664232208148747)
 
     def test_FATS_doc_MedianAbsDev(self):
@@ -159,7 +160,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['MedianAbsDev']
+            values[idx] = ext.fit(magnitude=mags)["MedianAbsDev"]
         self.assertAllClose(values.mean(), 0.67490807679242459)
 
     def test_FATS_doc_RCS(self):
@@ -167,7 +168,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.uniform(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['Rcs']
+            values[idx] = ext.fit(magnitude=mags)["Rcs"]
         self.assertAllClose(values.mean(), 0.03902862976795655)
 
     def test_FATS_doc_Skew(self):
@@ -175,7 +176,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['Skew']
+            values[idx] = ext.fit(magnitude=mags)["Skew"]
         self.assertAllClose(values.mean(), -0.0017170680368871292)
 
     def test_FATS_doc_SmallKurtosis(self):
@@ -183,7 +184,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['SmallKurtosis']
+            values[idx] = ext.fit(magnitude=mags)["SmallKurtosis"]
         self.assertAllClose(values.mean(), 0.00040502517673364258)
 
     def test_FATS_doc_Std(self):
@@ -191,7 +192,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
         values = np.empty(1000)
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
-            values[idx] = ext.fit(magnitude=mags)['Std']
+            values[idx] = ext.fit(magnitude=mags)["Std"]
         self.assertAllClose(values.mean(), 0.9994202277548033)
 
     @unittest.skip("FATS say must be 0, but actual is -0.41")
@@ -204,8 +205,11 @@ class FATSExtractorsTestCases(FeetsTestCase):
             errors = self.random.normal(scale=0.001, size=1000)
             errors2 = self.random.normal(scale=0.001, size=1000)
             values[idx] = ext.fit(
-                aligned_magnitude=mags, aligned_magnitude2=mags2,
-                aligned_error=errors, aligned_error2=errors2)['StetsonJ']
+                aligned_magnitude=mags,
+                aligned_magnitude2=mags2,
+                aligned_error=errors,
+                aligned_error2=errors2,
+            )["StetsonJ"]
         self.assertAllClose(values.mean(), 0)
 
     @unittest.skip("FATS say must be 2/pi, but actual is -0.20")
@@ -215,7 +219,7 @@ class FATSExtractorsTestCases(FeetsTestCase):
         for idx in range(values.size):
             mags = self.random.normal(size=1000)
             errors = self.random.normal(scale=0.001, size=1000)
-            values[idx] = ext.extract(magnitude=mags, error=errors)['StetsonK']
+            values[idx] = ext.extract(magnitude=mags, error=errors)["StetsonK"]
         self.assertAllClose(values.mean(), 0.798)
 
     def test_FATS_doc_StetsonL(self):
@@ -227,8 +231,11 @@ class FATSExtractorsTestCases(FeetsTestCase):
             errors = self.random.normal(scale=0.001, size=1000)
             errors2 = self.random.normal(scale=0.001, size=1000)
             values[idx] = ext.fit(
-                aligned_magnitude=mags, aligned_magnitude2=mags2,
-                aligned_error=errors, aligned_error2=errors2)['StetsonL']
+                aligned_magnitude=mags,
+                aligned_magnitude2=mags2,
+                aligned_error=errors,
+                aligned_error2=errors2,
+            )["StetsonL"]
         self.assertAllClose(values.mean(), -0.0470713296883)
 
 

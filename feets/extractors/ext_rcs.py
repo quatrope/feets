@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class RCS(Extractor):
     r"""
     **Rcs** - Range of cumulative sum (:math:`R_{cs}`)
@@ -88,7 +89,7 @@ class RCS(Extractor):
 
     """
 
-    features = ['Rcs']
+    features = ["Rcs"]
 
     def __init__(self):
         pass

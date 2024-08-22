@@ -18,17 +18,16 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('.'))
+
+sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
 
 # on_rtd is whether we are on readthedocs.org
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-
-
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 
 # to retrieve scikit criteria metadata
-#~ os.environ["FEETS_IN_SETUP"] = "True"
+# ~ os.environ["FEETS_IN_SETUP"] = "True"
 import feets
 
 
@@ -42,36 +41,36 @@ import feets
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autosummary",
+    "numpydoc",
+    "nbsphinx",
+]
 
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.autosummary',
-    'numpydoc',
-    'nbsphinx']
-
-exclude_patterns = ['_build', 'source/.ipynb_checkpoints/*']
+exclude_patterns = ["_build", "source/.ipynb_checkpoints/*"]
 
 numpydoc_class_members_toctree = False
 
-nbsphinx_execute = 'never'
+nbsphinx_execute = "never"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = u'feets'
-copyright = u'2017, JuanBC'
-author = u'JuanBC'
+project = "feets"
+copyright = "2017, JuanBC"
+author = "JuanBC"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -95,7 +94,7 @@ language = None
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
@@ -113,26 +112,26 @@ html_theme = "alabaster"
 # documentation.
 #
 html_theme_options = {
-    'logo': 'logo_small.png',
-    'logo_name': True,
-    'github_user': 'carpyncho',
-    'github_repo': 'feets',
-    'extra_nav_links': {
+    "logo": "logo_small.png",
+    "logo_name": True,
+    "github_user": "carpyncho",
+    "github_repo": "feets",
+    "extra_nav_links": {
         "feets Source Code": "https://github.com/carpyncho/feets"
-    }
+    },
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 html_favicon = "_static/favicon.ico"
 
 
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'feetsdoc'
+htmlhelp_basename = "feetsdoc"
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -141,15 +140,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -159,8 +155,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'feets.tex', u'feets Documentation',
-     u'JuanBC', 'manual'),
+    (master_doc, "feets.tex", "feets Documentation", "JuanBC", "manual"),
 ]
 
 
@@ -168,10 +163,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'feets', u'feets Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, "feets", "feets Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -180,16 +172,21 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'feets', u'feets Documentation',
-     author, 'feets', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        "feets",
+        "feets Documentation",
+        author,
+        "feets",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
 ]
 
 
-
-
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {"https://docs.python.org/": None}
+
 
 def setup(app):
     app.add_stylesheet("custom.css")

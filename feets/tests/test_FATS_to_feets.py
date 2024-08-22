@@ -47,7 +47,7 @@ import os
 import numpy as np
 
 from .. import FeatureSpace, preprocess
-from .. datasets import macho
+from ..datasets import macho
 
 from .core import FeetsTestCase, DATA_PATH
 
@@ -55,6 +55,7 @@ from .core import FeetsTestCase, DATA_PATH
 # =============================================================================
 # CLASSES
 # =============================================================================
+
 
 class FATSPreprocessRegressionTestCase(FeetsTestCase):
 
@@ -75,17 +76,19 @@ class FATSPreprocessRegressionTestCase(FeetsTestCase):
 
         self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
         with np.load(self.lc_path) as npz:
-            self.aF_time = npz['aligned_time']
-            self.aF_mag = npz['aligned_mag']
-            self.aF_mag2 = npz['aligned_mag2']
-            self.aF_error = npz['aligned_error']
-            self.aF_error2 = npz['aligned_error2']
+            self.aF_time = npz["aligned_time"]
+            self.aF_mag = npz["aligned_mag"]
+            self.aF_mag2 = npz["aligned_mag2"]
+            self.aF_error = npz["aligned_error"]
+            self.aF_error2 = npz["aligned_error2"]
 
     def test_remove_noise(self):
         p_time, p_mag, p_error = preprocess.remove_noise(
-            self.time, self.mag, self.error)
+            self.time, self.mag, self.error
+        )
         p_time2, p_mag2, p_error2 = preprocess.remove_noise(
-            self.time2, self.mag2, self.error2)
+            self.time2, self.mag2, self.error2
+        )
         self.assertArrayEqual(p_time, self.pF_time)
         self.assertArrayEqual(p_time2, self.pF_time2)
         self.assertArrayEqual(p_mag, self.pF_mag)
@@ -95,9 +98,13 @@ class FATSPreprocessRegressionTestCase(FeetsTestCase):
 
     def test_align(self):
         a_time, a_mag, a_mag2, a_error, a_error2 = preprocess.align(
-            self.pF_time, self.pF_time2,
-            self.pF_mag, self.pF_mag2,
-            self.pF_error, self.pF_error2)
+            self.pF_time,
+            self.pF_time2,
+            self.pF_mag,
+            self.pF_mag2,
+            self.pF_error,
+            self.pF_error2,
+        )
         self.assertArrayEqual(a_time, self.aF_time)
         self.assertArrayEqual(a_mag, self.aF_mag)
         self.assertArrayEqual(a_mag2, self.aF_mag2)
@@ -115,15 +122,16 @@ class FATSRegressionTestCase(FeetsTestCase):
         # recreate light curve
         with np.load(self.lc_path) as npz:
             self.lc = (
-                npz['time'],
-                npz['mag'],
-                npz['error'],
-                npz['mag2'],
-                npz['aligned_time'],
-                npz['aligned_mag'],
-                npz['aligned_mag2'],
-                npz['aligned_error'],
-                npz['aligned_error2'])
+                npz["time"],
+                npz["mag"],
+                npz["error"],
+                npz["mag2"],
+                npz["aligned_time"],
+                npz["aligned_mag"],
+                npz["aligned_mag2"],
+                npz["aligned_error"],
+                npz["aligned_error2"],
+            )
 
         # recreate the FATS result
         with np.load(self.FATS_result_path) as npz:
@@ -132,7 +140,7 @@ class FATSRegressionTestCase(FeetsTestCase):
             self.FATS_result = dict(zip(self.features, npz["values"]))
 
         # creates an template for all error, messages
-        self.err_template = ("Feature '{feature}' missmatch.")
+        self.err_template = "Feature '{feature}' missmatch."
 
     def exclude_value_feature_evaluation(self, feature):
         return "_harmonics_" in feature
@@ -142,9 +150,10 @@ class FATSRegressionTestCase(FeetsTestCase):
             "PeriodLS": {"atol": 1e-04},
             "Period_fit": {"atol": 1e-40},
             "Psi_CS": {"atol": 1e-02},
-            "Psi_eta": {"atol": 1e-01}}
+            "Psi_eta": {"atol": 1e-01},
+        }
         params = {"err_msg": self.err_template.format(feature=feature)}
-        params .update(feature_params.get(feature, {}))
+        params.update(feature_params.get(feature, {}))
         return params
 
     def assertFATS(self, feets_result):
@@ -159,9 +168,7 @@ class FATSRegressionTestCase(FeetsTestCase):
             self.assertAllClose(feets_value, FATS_value, **params)
 
     def test_FATS_to_feets_extract_one(self):
-        fs = FeatureSpace(
-            SlottedA_length={"T": None},
-            StetsonKAC={"T": None})
+        fs = FeatureSpace(SlottedA_length={"T": None}, StetsonKAC={"T": None})
         result = fs.extract(*self.lc)
         feets_result = dict(zip(*result))
         self.assertFATS(feets_result)

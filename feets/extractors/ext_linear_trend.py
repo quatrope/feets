@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class LinearTrend(Extractor):
     r"""
     **LinearTrend**

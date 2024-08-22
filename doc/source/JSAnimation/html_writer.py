@@ -3,6 +3,7 @@ import sys
 import random
 import string
 import warnings
+
 if sys.version_info < (3, 0):
     from cStringIO import StringIO as InMemory
 else:
@@ -11,24 +12,29 @@ from matplotlib.animation import writers, FileMovieWriter
 from base64 import b64encode
 
 
-ICON_DIR = os.path.join(os.path.dirname(__file__), 'icons')
+ICON_DIR = os.path.join(os.path.dirname(__file__), "icons")
 
 
 class _Icons(object):
     """This class is a container for base64 representations of the icons"""
-    icons = ['first', 'prev', 'reverse', 'pause', 'play', 'next', 'last']
 
-    def __init__(self, icon_dir=ICON_DIR, extension='png'):
+    icons = ["first", "prev", "reverse", "pause", "play", "next", "last"]
+
+    def __init__(self, icon_dir=ICON_DIR, extension="png"):
         self.icon_dir = icon_dir
         self.extension = extension
         for icon in self.icons:
-            setattr(self, icon,
-                    self._load_base64('{0}.{1}'.format(icon, extension)))
+            setattr(
+                self,
+                icon,
+                self._load_base64("{0}.{1}".format(icon, extension)),
+            )
 
     def _load_base64(self, filename):
-        data = open(os.path.join(self.icon_dir, filename), 'rb').read()
-        return 'data:image/{0};base64,{1}'.format(self.extension,
-                                                  b64encode(data).decode('ascii'))
+        data = open(os.path.join(self.icon_dir, filename), "rb").read()
+        return "data:image/{0};base64,{1}".format(
+            self.extension, b64encode(data).decode("ascii")
+        )
 
 
 JS_INCLUDE = """
@@ -221,9 +227,11 @@ INCLUDED_FRAMES = """
 
 def _included_frames(frame_list, frame_format):
     """frame_list should be a list of filenames"""
-    return INCLUDED_FRAMES.format(Nframes=len(frame_list),
-                                  frame_dir=os.path.dirname(frame_list[0]),
-                                  frame_format=frame_format)
+    return INCLUDED_FRAMES.format(
+        Nframes=len(frame_list),
+        frame_dir=os.path.dirname(frame_list[0]),
+        frame_format=frame_format,
+    )
 
 
 def _embedded_frames(frame_list, frame_format):
@@ -231,64 +239,77 @@ def _embedded_frames(frame_list, frame_format):
     template = '  frames[{0}] = "data:image/{1};base64,{2}"\n'
     embedded = "\n"
     for i, frame_data in enumerate(frame_list):
-        embedded += template.format(i, frame_format,
-                                    frame_data.replace('\n', '\\\n'))
+        embedded += template.format(
+            i, frame_format, frame_data.replace("\n", "\\\n")
+        )
     return embedded
 
 
-@writers.register('html')
+@writers.register("html")
 class HTMLWriter(FileMovieWriter):
     # we start the animation id count at a random number: this way, if two
     # animations are meant to be included on one HTML page, there is a
     # very small chance of conflict.
     rng = random.Random()
-    exec_key = 'animation.ffmpeg_path'
-    args_key = 'animation.ffmpeg_args'
-    supported_formats = ['png', 'jpeg', 'tiff', 'svg']
+    exec_key = "animation.ffmpeg_path"
+    args_key = "animation.ffmpeg_args"
+    supported_formats = ["png", "jpeg", "tiff", "svg"]
 
     @classmethod
     def new_id(cls):
-        #return '%16x' % cls.rng.getrandbits(64)
-        return ''.join(cls.rng.choice(string.ascii_uppercase)
-                       for x in range(16))
+        # return '%16x' % cls.rng.getrandbits(64)
+        return "".join(
+            cls.rng.choice(string.ascii_uppercase) for x in range(16)
+        )
 
-    def __init__(self, fps=30, codec=None, bitrate=None, extra_args=None,
-                 metadata=None, embed_frames=False, default_mode='loop'):
+    def __init__(
+        self,
+        fps=30,
+        codec=None,
+        bitrate=None,
+        extra_args=None,
+        metadata=None,
+        embed_frames=False,
+        default_mode="loop",
+    ):
         self.embed_frames = embed_frames
         self.default_mode = default_mode.lower()
 
-        if self.default_mode not in ['loop', 'once', 'reflect']:
-            self.default_mode = 'loop'
+        if self.default_mode not in ["loop", "once", "reflect"]:
+            self.default_mode = "loop"
             warnings.warn("unrecognized default_mode: using 'loop'")
 
         self._saved_frames = list()
-        super(HTMLWriter, self).__init__(fps, codec, bitrate,
-                                         extra_args, metadata)
+        super(HTMLWriter, self).__init__(
+            fps, codec, bitrate, extra_args, metadata
+        )
 
     def setup(self, fig, outfile, dpi, frame_dir=None):
-        if os.path.splitext(outfile)[-1] not in ['.html', '.htm']:
+        if os.path.splitext(outfile)[-1] not in [".html", ".htm"]:
             raise ValueError("outfile must be *.htm or *.html")
 
         if not self.embed_frames:
             if frame_dir is None:
-                frame_dir = outfile.rstrip('.html') + '_frames'
+                frame_dir = outfile.rstrip(".html") + "_frames"
             if not os.path.exists(frame_dir):
                 os.makedirs(frame_dir)
-            frame_prefix = os.path.join(frame_dir, 'frame')
+            frame_prefix = os.path.join(frame_dir, "frame")
         else:
             frame_prefix = None
 
-        super(HTMLWriter, self).setup(fig, outfile, dpi,
-                                      frame_prefix, clear_temp=False)
+        super(HTMLWriter, self).setup(
+            fig, outfile, dpi, frame_prefix, clear_temp=False
+        )
 
     def grab_frame(self, **savefig_kwargs):
         if self.embed_frames:
-            suffix = '.' + self.frame_format
+            suffix = "." + self.frame_format
             f = InMemory()
-            self.fig.savefig(f, format=self.frame_format,
-                             dpi=self.dpi, **savefig_kwargs)
+            self.fig.savefig(
+                f, format=self.frame_format, dpi=self.dpi, **savefig_kwargs
+            )
             f.seek(0)
-            self._saved_frames.append(b64encode(f.read()).decode('ascii'))
+            self._saved_frames.append(b64encode(f.read()).decode("ascii"))
         else:
             return super(HTMLWriter, self).grab_frame(**savefig_kwargs)
 
@@ -297,31 +318,35 @@ class HTMLWriter(FileMovieWriter):
         # this is called by the MovieWriter base class, but not used here.
         class ProcessStandin(object):
             returncode = 0
+
             def communicate(self):
-                return ('', '')
+                return ("", "")
+
         self._proc = ProcessStandin()
 
         # save the frames to an html file
         if self.embed_frames:
-            fill_frames = _embedded_frames(self._saved_frames,
-                                           self.frame_format)
+            fill_frames = _embedded_frames(
+                self._saved_frames, self.frame_format
+            )
         else:
             # temp names is filled by FileMovieWriter
-            fill_frames = _included_frames(self._temp_names,
-                                           self.frame_format)
+            fill_frames = _included_frames(self._temp_names, self.frame_format)
 
-        mode_dict = dict(once_checked='',
-                         loop_checked='',
-                         reflect_checked='')
-        mode_dict[self.default_mode + '_checked'] = 'checked'
+        mode_dict = dict(once_checked="", loop_checked="", reflect_checked="")
+        mode_dict[self.default_mode + "_checked"] = "checked"
 
-        interval = int(1000. / self.fps)
+        interval = int(1000.0 / self.fps)
 
-        with open(self.outfile, 'w') as of:
+        with open(self.outfile, "w") as of:
             of.write(JS_INCLUDE)
-            of.write(DISPLAY_TEMPLATE.format(id=self.new_id(),
-                                             Nframes=len(self._temp_names),
-                                             fill_frames=fill_frames,
-                                             interval=interval,
-                                             icons=_Icons(),
-                                             **mode_dict))
+            of.write(
+                DISPLAY_TEMPLATE.format(
+                    id=self.new_id(),
+                    Nframes=len(self._temp_names),
+                    fill_frames=fill_frames,
+                    interval=interval,
+                    icons=_Icons(),
+                    **mode_dict,
+                )
+            )

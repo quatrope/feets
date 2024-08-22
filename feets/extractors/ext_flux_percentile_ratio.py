@@ -98,6 +98,7 @@ References
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class FluxPercentileRatioMid20(Extractor):
     __doc__ = COMMON_DOC
 

@@ -53,6 +53,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class AutocorLength(Extractor):
     r"""
     **Autocor_length**
@@ -88,7 +89,7 @@ class AutocorLength(Extractor):
 
     """
 
-    features = ['Autocor_length']
+    features = ["Autocor_length"]
 
     def __init__(self, nlags=100):
         self.nlags = nlags
@@ -97,13 +98,21 @@ class AutocorLength(Extractor):
         nlags = self.nlags
 
         AC = stattools.acf(magnitude, nlags=nlags)
-        k = next((index for index, value in
-                 enumerate(AC) if value < np.exp(-1)), None)
+        k = next(
+            (index for index, value in enumerate(AC) if value < np.exp(-1)),
+            None,
+        )
 
         while k is None:
             nlags = nlags + 100
             AC = stattools.acf(magnitude, nlags=nlags)
-            k = next((index for index, value in
-                      enumerate(AC) if value < np.exp(-1)), None)
+            k = next(
+                (
+                    index
+                    for index, value in enumerate(AC)
+                    if value < np.exp(-1)
+                ),
+                None,
+            )
 
-        return {'Autocor_length': k}
+        return {"Autocor_length": k}

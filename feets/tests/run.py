@@ -59,9 +59,10 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 # IMPORTS
 # =============================================================================
 
+
 def run(argv=None):
     argv = argv or []
-    return pytest.main(['-x', PATH] + argv)
+    return pytest.main(["-x", PATH] + argv)
 
 
 # =============================================================================

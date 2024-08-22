@@ -53,6 +53,7 @@ from .core import FeetsTestCase
 # BASE CLASS
 # =============================================================================
 
+
 class RemoveNoiseTestCase(FeetsTestCase):
 
     def test_remove_noise(self):
@@ -76,19 +77,24 @@ class AlignTestCase(FeetsTestCase):
         error2 = error[time2]
 
         atime, amag, amag2, aerror, aerror2 = preprocess.align(
-            time, time2, mag, mag2, error, error2)
+            time, time2, mag, mag2, error, error2
+        )
 
         self.assertArrayEqual(amag, amag2)
         self.assertTrue(
-            np.array_equal(amag, mag) or np.array_equal(amag, mag2))
+            np.array_equal(amag, mag) or np.array_equal(amag, mag2)
+        )
         self.assertTrue(
-            np.array_equal(amag2, mag) or np.array_equal(amag2, mag2))
+            np.array_equal(amag2, mag) or np.array_equal(amag2, mag2)
+        )
 
         self.assertArrayEqual(aerror, aerror2)
         self.assertTrue(
-            np.array_equal(aerror, error) or np.array_equal(aerror, error2))
+            np.array_equal(aerror, error) or np.array_equal(aerror, error2)
+        )
         self.assertTrue(
-            np.array_equal(aerror2, error) or np.array_equal(aerror2, error2))
+            np.array_equal(aerror2, error) or np.array_equal(aerror2, error2)
+        )
 
     def test_align_different_len(self):
         time = np.arange(5)
@@ -102,7 +108,8 @@ class AlignTestCase(FeetsTestCase):
         error2 = np.hstack((error, np.random.rand(1)))[time2]
 
         atime, amag, amag2, aerror, aerror2 = preprocess.align(
-            time, time2, mag, mag2, error, error2)
+            time, time2, mag, mag2, error, error2
+        )
 
         self.assertArrayEqual(amag, amag2)
         self.assertArrayEqual(aerror, aerror2)

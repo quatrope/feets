@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Signature(Extractor):
     features = ["Signature"]
 
@@ -77,10 +78,13 @@ class Signature(Extractor):
             lc_phases = np.remainder(time - time[loc], period_ls) / period_ls
 
             bins = (phase_bins, mag_bins)
-            count = np.histogram2d(lc_phases, lc_yaxis, bins=bins, normed=True)[0]
+            count = np.histogram2d(
+                lc_phases, lc_yaxis, bins=bins, normed=True
+            )[0]
 
-            signature = zip(self.feature_attrs,
-                        count.reshape(phase_bins * mag_bins))
+            signature = zip(
+                self.feature_attrs, count.reshape(phase_bins * mag_bins)
+            )
 
             signatures[idx] = dict(signature)
 

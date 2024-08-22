@@ -53,6 +53,7 @@ from ..core import FeetsTestCase
 # BASE CLASS
 # =============================================================================
 
+
 class NormalTestCase(FeetsTestCase):
 
     def test_normal(self):

@@ -63,6 +63,7 @@ CTE_NEG = -np.inf
 # FUNCTIONS
 # =============================================================================
 
+
 def _car_like(parameters, t, x, error_vars):
     sigma, tau = parameters
 
@@ -71,11 +72,11 @@ def _car_like(parameters, t, x, error_vars):
     b = np.mean(x) / tau
     num_datos = np.size(x)
 
-    Omega = [(tau * (sigma ** 2)) / 2.]
-    x_hat = [0.]
+    Omega = [(tau * (sigma**2)) / 2.0]
+    x_hat = [0.0]
     x_ast = [x[0] - b * tau]
 
-    loglik = 0.
+    loglik = 0.0
 
     for i in range(1, num_datos):
 
@@ -84,24 +85,38 @@ def _car_like(parameters, t, x, error_vars):
         x_ast.append(x[i] - b * tau)
 
         x_hat.append(
-            a_new * x_hat[i - 1] +
-            (a_new * Omega[i - 1] / (Omega[i - 1] + error_vars[i - 1])) *
-            (x_ast[i - 1] - x_hat[i - 1]))
+            a_new * x_hat[i - 1]
+            + (a_new * Omega[i - 1] / (Omega[i - 1] + error_vars[i - 1]))
+            * (x_ast[i - 1] - x_hat[i - 1])
+        )
 
         Omega.append(
-            Omega[0] * (1 - (a_new ** 2)) + ((a_new ** 2)) * Omega[i - 1] *
-            (1 - (Omega[i - 1] / (Omega[i - 1] + error_vars[i - 1]))))
+            Omega[0] * (1 - (a_new**2))
+            + ((a_new**2))
+            * Omega[i - 1]
+            * (1 - (Omega[i - 1] / (Omega[i - 1] + error_vars[i - 1])))
+        )
 
         loglik_inter = np.log(
-            ((2 * np.pi * (Omega[i] + error_vars[i])) ** -0.5) *
-            (np.exp(-0.5 * (((x_hat[i] - x_ast[i]) ** 2) /
-             (Omega[i] + error_vars[i]))) + EPSILON))
+            ((2 * np.pi * (Omega[i] + error_vars[i])) ** -0.5)
+            * (
+                np.exp(
+                    -0.5
+                    * (
+                        ((x_hat[i] - x_ast[i]) ** 2)
+                        / (Omega[i] + error_vars[i])
+                    )
+                )
+                + EPSILON
+            )
+        )
 
         loglik = loglik + loglik_inter
 
         if loglik <= CTE_NEG:
             warnings.warn(
-                "CAR log-likelihood to inf", FeatureExtractionWarning)
+                "CAR log-likelihood to inf", FeatureExtractionWarning
+            )
             return -np.infty
 
     # the minus one is to perfor maximization using the minimize function
@@ -111,6 +126,7 @@ def _car_like(parameters, t, x, error_vars):
 # =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
+
 
 class CAR(Extractor):
     r"""In order to model the irregular sampled times series we use CAR
@@ -185,6 +201,7 @@ class CAR(Extractor):
        Doi:10.1111/j.1365-2966.2012.22061.x.
 
     """
+
     features = ["CAR_sigma", "CAR_tau", "CAR_mean"]
 
     def __init__(self, minimize_method="nelder-mead"):
@@ -198,18 +215,21 @@ class CAR(Extractor):
         x0 = [10, 0.5]
         bnds = ((0, 100), (0, 100))
         with warnings.catch_warnings():
-            warnings.filterwarnings('ignore')
-            res = minimize(_car_like, x0,
-                           args=(time, magnitude, error),
-                           method=minimize_method,
-                           bounds=bnds)
+            warnings.filterwarnings("ignore")
+            res = minimize(
+                _car_like,
+                x0,
+                args=(time, magnitude, error),
+                method=minimize_method,
+                bounds=bnds,
+            )
         sigma, tau = res.x[0], res.x[1]
         return sigma, tau
 
     def extract(self, magnitude, time, error):
         sigma, tau = self._calculate_CAR(
-                                   time, magnitude, error,
-                                   self.minimize_method)
+            time, magnitude, error, self.minimize_method
+        )
         mean = np.mean(magnitude) / tau
 
         return {"CAR_sigma": sigma, "CAR_tau": tau, "CAR_mean": mean}

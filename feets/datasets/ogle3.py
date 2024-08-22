@@ -89,7 +89,8 @@ More Info: http://ogledb.astrouw.edu.pl/~ogle/CVS/
 
 # This is for add as descr in every Data instance
 DESCR = "LightCurve from OGLE-3\n\n{}".format(
-    "\n".join(__doc__.splitlines()[2:]))
+    "\n".join(__doc__.splitlines()[2:])
+)
 
 
 # =============================================================================
@@ -126,6 +127,7 @@ URL = "http://ogledb.astrouw.edu.pl/~ogle/CVS/sendobj.php?starcat={}"
 # FUNCTIONS
 # =============================================================================
 
+
 def _get_OGLE3_data_home(data_home):
     # retrieve the data home
     data_home = base.get_data_home(data_home=data_home)
@@ -142,9 +144,7 @@ def _check_dim(lc):
 
 
 def load_OGLE3_catalog():
-    """Return the full list of variables stars of OGLE-3 as a DataFrame
-
-    """
+    """Return the full list of variables stars of OGLE-3 as a DataFrame"""
     with bz2.BZ2File(CATALOG_PATH) as bz2fp, warnings.catch_warnings():
         warnings.simplefilter("ignore")
         df = pd.read_table(bz2fp, skiprows=6)
@@ -152,8 +152,9 @@ def load_OGLE3_catalog():
     return df
 
 
-def fetch_OGLE3(ogle3_id, data_home=None,
-                metadata=None, download_if_missing=True):
+def fetch_OGLE3(
+    ogle3_id, data_home=None, metadata=None, download_if_missing=True
+):
     """Retrieve a lighte curve from OGLE-3 database
 
     Parameters
@@ -215,8 +216,10 @@ def fetch_OGLE3(ogle3_id, data_home=None,
     file_path = os.path.join(store_path, "{}.tar".format(ogle3_id))
 
     # members of the two bands of ogle3
-    members = {"I": "./{}.I.dat".format(ogle3_id),
-               "V": "./{}.V.dat".format(ogle3_id)}
+    members = {
+        "I": "./{}.I.dat".format(ogle3_id),
+        "V": "./{}.V.dat".format(ogle3_id),
+    }
 
     # the url of the lightcurve
     if download_if_missing:
@@ -232,9 +235,11 @@ def fetch_OGLE3(ogle3_id, data_home=None,
                 member = tfp.getmember(member_name)
                 src = tfp.extractfile(member)
                 lc = _check_dim(np.loadtxt(src))
-                data[band_name] = {"time": lc[:, 0],
-                                   "magnitude": lc[:, 1],
-                                   "error": lc[:, 2]}
+                data[band_name] = {
+                    "time": lc[:, 0],
+                    "magnitude": lc[:, 1],
+                    "error": lc[:, 2],
+                }
                 bands.append(band_name)
     if metadata:
         cat = load_OGLE3_catalog()
@@ -242,5 +247,10 @@ def fetch_OGLE3(ogle3_id, data_home=None,
         del cat
 
     return Data(
-        id=ogle3_id, metadata=metadata, ds_name="OGLE-III",
-        description=DESCR, bands=bands, data=data)
+        id=ogle3_id,
+        metadata=metadata,
+        ds_name="OGLE-III",
+        description=DESCR,
+        bands=bands,
+        data=data,
+    )

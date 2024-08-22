@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class Q31(Extractor):
     r"""
     **Q31** (:math:`Q_{3-1}`)

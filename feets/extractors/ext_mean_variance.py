@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class MeanVariance(Extractor):
     r"""
     **Meanvariance** (:math:`\frac{\sigma}{\bar{m}}`)
@@ -83,7 +84,7 @@ class MeanVariance(Extractor):
 
     """
 
-    features = ['Meanvariance']
+    features = ["Meanvariance"]
 
     def __init__(self):
         pass

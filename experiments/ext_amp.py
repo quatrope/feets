@@ -51,6 +51,7 @@ from .core import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class AMP(Extractor):
     r"""Calculate the AMP feature.
 
@@ -60,7 +61,7 @@ class AMP(Extractor):
 
     """
 
-    data = ['time', 'magnitude']
+    data = ["time", "magnitude"]
     features = ["AMP"]
 
     def fit(self, time, magnitude):

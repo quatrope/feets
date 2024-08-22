@@ -53,14 +53,15 @@ from feets import Extractor
 # EXTRACTOR CLASS
 # =============================================================================
 
+
 class LombScargle(Extractor):
 
-    data = ['magnitude', 'time']
+    data = ["magnitude", "time"]
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
-    params = {"ofac": 6.}
+    params = {"ofac": 6.0}
 
     def _compute_ls(self, magnitude, time, ofac):
-        fx, fy, nout, jmax, prob = lomb.fasper(time, magnitude, ofac, 100.)
+        fx, fy, nout, jmax, prob = lomb.fasper(time, magnitude, ofac, 100.0)
         period = fx[jmax]
         T = 1.0 / period
         new_time = np.mod(time, 2 * T) / (2 * T)
@@ -76,8 +77,11 @@ class LombScargle(Extractor):
 
     def _compute_eta(self, folded_data, N):
         sigma2 = np.var(folded_data)
-        Psi_eta = (1.0 / ((N - 1) * sigma2) *
-                   np.sum(np.power(folded_data[1:] - folded_data[:-1], 2)))
+        Psi_eta = (
+            1.0
+            / ((N - 1) * sigma2)
+            * np.sum(np.power(folded_data[1:] - folded_data[:-1], 2))
+        )
         return Psi_eta
 
     def fit(self, magnitude, time, ofac):
@@ -89,5 +93,9 @@ class LombScargle(Extractor):
         R = self._compute_cs(folded_data, N)
         Psi_eta = self._compute_eta(folded_data, N)
 
-        return {"PeriodLS": T, "Period_fit": prob,
-                "Psi_CS": R, "Psi_eta": Psi_eta}
+        return {
+            "PeriodLS": T,
+            "Period_fit": prob,
+            "Psi_CS": R,
+            "Psi_eta": Psi_eta,
+        }

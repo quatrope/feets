@@ -60,10 +60,9 @@ DATA_PATH = os.path.join(PATH, "data", "macho")
 # FUNCTIONS
 # =============================================================================
 
-def available_MACHO_lc():
-    """Retrieve a list with the available MACHO lightcurves
 
-    """
+def available_MACHO_lc():
+    """Retrieve a list with the available MACHO lightcurves"""
     return [fp.rsplit(".", 2)[0] for fp in os.listdir(DATA_PATH)]
 
 
@@ -102,18 +101,19 @@ def load_MACHO(macho_id):
 
     bands = ("R", "B")
     data = {
-        "R": {
-            "time": rlc[:, 0],
-            "magnitude": rlc[:, 1],
-            "error": rlc[:, 2]},
-        "B": {
-            "time": blc[:, 0],
-            "magnitude": blc[:, 1],
-            "error": blc[:, 2]}
+        "R": {"time": rlc[:, 0], "magnitude": rlc[:, 1], "error": rlc[:, 2]},
+        "B": {"time": blc[:, 0], "magnitude": blc[:, 1], "error": blc[:, 2]},
     }
-    descr = ("The files are gathered from the original FATS project "
-             "tutorial: https://github.com/isadoranun/tsfeat")
+    descr = (
+        "The files are gathered from the original FATS project "
+        "tutorial: https://github.com/isadoranun/tsfeat"
+    )
 
     return Data(
-        id=macho_id, metadata=None, ds_name="MACHO",
-        description=descr, bands=bands, data=data)
+        id=macho_id,
+        metadata=None,
+        ds_name="MACHO",
+        description=descr,
+        bands=bands,
+        data=data,
+    )
