@@ -24,6 +24,22 @@
 # SOFTWARE.
 
 # =============================================================================
+# IMPORTS
+# =============================================================================
+
+import os
+import bz2
+import tarfile
+import warnings
+
+import numpy as np
+
+import pandas as pd
+
+from . import base
+from .base import Data
+
+# =============================================================================
 # DOCS
 # =============================================================================
 
@@ -91,23 +107,6 @@ More Info: http://ogledb.astrouw.edu.pl/~ogle/CVS/
 DESCR = "LightCurve from OGLE-3\n\n{}".format(
     "\n".join(__doc__.splitlines()[2:])
 )
-
-
-# =============================================================================
-# IMPORTS
-# =============================================================================
-
-import os
-import bz2
-import tarfile
-import warnings
-
-import numpy as np
-
-import pandas as pd
-
-from . import base
-from .base import Data
 
 
 # =============================================================================

@@ -51,13 +51,11 @@ import feets
 
 REQUIREMENTS = [
     "numpy",
-    "scipy",
-    "six",
+    "scipy>=1,<2",
     "pytest",
     "statsmodels",
-    "mock",
-    "astropy",
-    "pandas",
+    "astropy>=6,<7",
+    "pandas>=2,<3",
     "requests",
     "attrs",
     "joblib",
@@ -80,7 +78,6 @@ def do_setup():
         url=feets.URL,
         license=feets.LICENSE,
         keywords=list(feets.KEYWORDS),
-        package_data={"feets.tests.data": ["tests/data/*.*"]},
         include_package_data=True,
         classifiers=[
             "Development Status :: 4 - Beta",
@@ -98,7 +95,6 @@ def do_setup():
             "Topic :: Scientific/Engineering",
         ],
         packages=[pkg for pkg in find_packages() if pkg.startswith("feets")],
-        py_modules=["ez_setup"],
         install_requires=REQUIREMENTS,
     )
 

@@ -113,7 +113,7 @@ class FeatureSet(object):
     def __getattr__(self, name):
         names, values = self.as_array()
         try:
-            return values[np.argwhere(names == a)[0]][0]
+            return values[np.argwhere(names == name)[0]][0]
         except IndexError:
             raise AttributeError(name)
 
