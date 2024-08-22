@@ -46,10 +46,9 @@ import copy
 
 import numpy as np
 
-from astropy.timeseries import LombScargle as LombScargleAstroPy
+from astropy.timeseries import LombScargle as _LombScargle
 
 from .core import Extractor
-from ..libs import ls_fap
 
 # =============================================================================
 # CONSTANTS
@@ -61,7 +60,17 @@ DEFAULT_LSCARGLE_KWDS = {
     "autopower_kwds": {"normalization": "standard", "nyquist_factor": 100}
 }
 
-DEFAULT_FAP_KWDS = {"normalization": "standard", "method": "simple"}
+DEFAULT_FAP_KWDS = {
+    "method": "baluev",
+    "samples_per_peak": 5,
+    "nyquist_factor": 5,
+    "method_kwds": None,
+}
+
+FORCED_FAP_KWDS = {
+    "minimum_frequency": None,
+    "maximum_frequency": None,
+}
 
 # =============================================================================
 # FUNCTIONS
@@ -75,29 +84,18 @@ def lscargle(
     error=None,
     model_kwds=None,
     autopower_kwds=None,
+    fap_kwds=None,
 ):
 
     model_kwds = model_kwds or {}
     autopower_kwds = autopower_kwds or {}
-    model = LombScargleAstroPy(time, magnitude, error, **model_kwds)
+    model = _LombScargle(time, magnitude, error, **model_kwds)
     frequency, power = model.autopower(**autopower_kwds)
+    fap = model.false_alarm_probability(power, **fap_kwds)
 
     fmax = np.argsort(power)[-nfrequencies:]
 
-    return frequency, power, fmax
-
-
-def fap(power, fmax, time, mag, method, normalization, method_kwds=None):
-    method_kwds = method_kwds or {}
-    return ls_fap.false_alarm_probability(
-        power,
-        fmax,
-        time,
-        mag,
-        dy=0.01,
-        method=method,
-        normalization=normalization,
-    )
+    return frequency, fmax, fap
 
 
 # =============================================================================
@@ -174,17 +172,19 @@ class LombScargle(Extractor):
             if fap_kwds is None
             else dict(fap_kwds)
         )
+        self.fap_kwds.update(FORCED_FAP_KWDS)
         self.nperiods = nperiods
 
-    def _compute_ls(self, magnitude, time, nperiods, lscargle_kwds):
-        frequency, power, fmax = lscargle(
-            time, magnitude, nfrequencies=nperiods, **lscargle_kwds
+    def _compute_ls(self, magnitude, time, nperiods, lscargle_kwds, fap_kwds):
+        frequency, fmax, fap = lscargle(
+            time,
+            magnitude,
+            nfrequencies=nperiods,
+            fap_kwds=fap_kwds,
+            **lscargle_kwds,
         )
         best_periods = 1 / frequency[fmax]
-        return frequency, power, fmax, best_periods
-
-    def _compute_fap(self, power, fmax, time, magnitude, fap_kwds):
-        return fap(np.max(power), fmax, time, magnitude, **fap_kwds)
+        return best_periods, fap
 
     def _compute_cs(self, folded_data, N):
         sigma = np.std(folded_data)
@@ -205,6 +205,8 @@ class LombScargle(Extractor):
     def _compute_cs_eta(self, time, magnitude, period):
         # fold the data
         new_time = np.mod(time, 2 * period) / (2 * period)
+        print(f"{new_time=}")
+        print(f"{np.argsort(new_time)=}")
         folded_data = magnitude[np.argsort(new_time)]
         N = len(folded_data)
 
@@ -213,21 +215,20 @@ class LombScargle(Extractor):
         return R, Psi_eta
 
     def extract(self, magnitude, time):
-        # first we retrieve the frequencies, power,
-        # max frequency and best_period
-        frequency, power, fmax, best_periods = self._compute_ls(
-            magnitude, time, self.nperiods, self.lscargle_kwds
+        # first we retrieve the best periods and the false alarm probability
+        best_periods, fap = self._compute_ls(
+            magnitude, time, self.nperiods, self.lscargle_kwds, self.fap_kwds
         )
 
-        # false alarm probability
-        fap = self._compute_fap(power, fmax, time, magnitude, self.fap_kwds)
-
         # CS and Psi_eta
-        zipped_results = [
-            self._compute_cs_eta(time, magnitude, period)
-            for period in best_periods
-        ]
-        R, Psi_eta = zip(*zipped_results)
+        results = np.array(
+            tuple(
+                self._compute_cs_eta(time, magnitude, period)
+                for period in best_periods
+            )
+        )
+        R = results[:, 0]
+        Psi_eta = results[:, 1]
 
         return {
             "PeriodLS": best_periods,
