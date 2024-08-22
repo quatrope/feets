@@ -65,9 +65,6 @@ DEFAULT_FAP_KWDS = {
     "samples_per_peak": 5,
     "nyquist_factor": 5,
     "method_kwds": None,
-}
-
-FORCED_FAP_KWDS = {
     "minimum_frequency": None,
     "maximum_frequency": None,
 }
@@ -172,7 +169,6 @@ class LombScargle(Extractor):
             if fap_kwds is None
             else dict(fap_kwds)
         )
-        self.fap_kwds.update(FORCED_FAP_KWDS)
         self.nperiods = nperiods
 
     def _compute_ls(self, magnitude, time, nperiods, lscargle_kwds, fap_kwds):

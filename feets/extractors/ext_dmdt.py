@@ -75,7 +75,6 @@ class DeltamDeltat(Extractor):
     """
 
     features = ["DeltamDeltat"]
-    parallel = True
 
     def __init__(self, dt_bins=np.hstack([0., np.logspace(-3., 3.5, num=23)]),
                  dm_bins=np.hstack([-1.*np.logspace(1, -1, num=12), 0,
