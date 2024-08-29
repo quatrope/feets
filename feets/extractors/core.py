@@ -316,9 +316,8 @@ class Extractor(abc.ABC):
 
     # TO REDEFINE =============================================================
 
-    @abc.abstractmethod
     def __init__(self):
-        raise NotImplementedError()
+        pass
 
     @abc.abstractmethod
     def extract(self):
