@@ -94,7 +94,7 @@ def lscargle(
 
 
 class LombScargle(Extractor):
-    """
+    r"""
     **PeriodLS**
 
     The Lomb-Scargle (L-S) algorithm (Scargle, 1982) is a variation of the

@@ -46,7 +46,7 @@ from .core import Extractor
 
 
 class DeltamDeltat(Extractor):
-    """
+    r"""
     Deltas features described in
     Configure the bins as desired.
 
