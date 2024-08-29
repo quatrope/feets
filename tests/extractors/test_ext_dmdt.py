@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_dmdt
+
+import numpy as np
 
 
 def test_DeltamDeltat_extract(normal_light_curve):

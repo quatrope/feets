@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_mean_variance
+
+import numpy as np
 
 
 def test_MeanVariance_extract():

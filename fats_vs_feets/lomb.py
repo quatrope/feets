@@ -28,7 +28,6 @@ Reference:
   bib code: 1989ApJ...338..277P
 
 """
-from __future__ import print_function
 
 from numpy import *
 from numpy.fft import *

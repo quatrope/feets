@@ -63,9 +63,9 @@ allowing all residuals to be compared on an equal basis.
 
 import numpy as np
 
-from ..utils import indent
 from .core import Extractor
 from .ext_slotted_a_length import SlottedA_length
+from ..utils import indent
 
 
 # =============================================================================
@@ -198,7 +198,8 @@ class StetsonK(Extractor):
     def __init__(self):
         self.feature_warning(
             "The original FATS documentation says that the result of StetsonK "
-            "must be 2/pi=0.798 for gausian distribution but the result is ~0.2"
+            "must be 2/pi=0.798 for gausian distribution but the result is "
+            "~0.2"
         )
 
     def extract(self, magnitude, error):

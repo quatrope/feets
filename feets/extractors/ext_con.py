@@ -35,8 +35,6 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
-from six.moves import range
-
 import numpy as np
 
 from .core import Extractor

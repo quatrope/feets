@@ -23,12 +23,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# =============================================================================
-# FUTURE
-# =============================================================================
-
-from __future__ import print_function
-
 
 # =============================================================================
 # DOCS
@@ -59,11 +53,11 @@ import inspect
 import six
 
 from .core import (
+    DATAS,
     Extractor,
     ExtractorBadDefinedError,
     ExtractorContractError,
     ExtractorWarning,
-    DATAS,
 )  # noqa
 
 

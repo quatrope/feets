@@ -39,8 +39,6 @@ import inspect
 import warnings
 from dataclasses import dataclass
 
-import numpy as np
-
 
 # =============================================================================
 # CONSTANTS

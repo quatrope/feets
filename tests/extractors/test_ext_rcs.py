@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_rcs
+
+import numpy as np
 
 
 def test_RCS_extract():

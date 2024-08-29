@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_stetson
+
+import numpy as np
 
 import pytest
 

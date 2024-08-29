@@ -41,11 +41,11 @@ import os
 import shutil
 from collections import Mapping
 
+import attr
+
 import numpy as np
 
 import requests
-
-import attr
 
 from ..extractors.core import DATAS
 
@@ -237,7 +237,7 @@ class Data(Mapping):
     Attributes
     ----------
 
-    id : any object or None
+    _id : any object or None
         the id of the lightcurve or None
     ds_name : str
         The name of the dataset
@@ -252,7 +252,7 @@ class Data(Mapping):
 
     """
 
-    id = attr.ib()
+    _id = attr.ib()
     ds_name = attr.ib(converter=str)
     description = attr.ib(converter=str, repr=False)
     bands = attr.ib(converter=tuple)

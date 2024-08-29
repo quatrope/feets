@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_median_abs_dev
+
+import numpy as np
 
 
 def test_MedianAbsDev_extract(normal_light_curve):

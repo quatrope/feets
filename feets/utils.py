@@ -50,4 +50,4 @@ def indent(s, c=" ", n=4):
 
     """
     indentation = c * n
-    return "\n".join([indentation + l for l in s.splitlines()])
+    return "\n".join([indentation + line for line in s.splitlines()])

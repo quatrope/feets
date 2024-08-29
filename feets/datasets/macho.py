@@ -110,7 +110,7 @@ def load_MACHO(macho_id):
     )
 
     return Data(
-        id=macho_id,
+        _id=macho_id,
         metadata=None,
         ds_name="MACHO",
         description=descr,

@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_skew
+
+import numpy as np
 
 
 def test_Skew_extract(normal_light_curve):

@@ -27,8 +27,8 @@
 # IMPORTS
 # =============================================================================
 
-import os
 import bz2
+import os
 import tarfile
 import warnings
 
@@ -184,7 +184,7 @@ def fetch_OGLE3(
 
         >>> ds = fetch_OGLE3("OGLE-BLG-LPV-232377")
         >>> ds
-        Data(id='OGLE-BLG-LPV-232377', ds_name='OGLE-III', bands=('I', 'V'))
+        Data(_id='OGLE-BLG-LPV-232377', ds_name='OGLE-III', bands=('I', 'V'))
         >>> ds.bands
         ('I', 'V')
         >>> ds.data.I
@@ -246,7 +246,7 @@ def fetch_OGLE3(
         del cat
 
     return Data(
-        id=ogle3_id,
+        _id=ogle3_id,
         metadata=metadata,
         ds_name="OGLE-III",
         description=DESCR,

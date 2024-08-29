@@ -23,12 +23,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# =============================================================================
-# FUTURE
-# =============================================================================
-
-from __future__ import unicode_literals, print_function
-
 
 # =============================================================================
 # DOCS
@@ -49,15 +43,15 @@ import numpy as np
 
 from . import extractors
 from .extractors.core import (
-    DATA_MAGNITUDE,
-    DATA_TIME,
-    DATA_ERROR,
-    DATA_MAGNITUDE2,
+    DATA_ALIGNED_ERROR,
+    DATA_ALIGNED_ERROR2,
     DATA_ALIGNED_MAGNITUDE,
     DATA_ALIGNED_MAGNITUDE2,
     DATA_ALIGNED_TIME,
-    DATA_ALIGNED_ERROR,
-    DATA_ALIGNED_ERROR2,
+    DATA_ERROR,
+    DATA_MAGNITUDE,
+    DATA_MAGNITUDE2,
+    DATA_TIME,
 )
 
 

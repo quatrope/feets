@@ -39,10 +39,11 @@
 
 import os
 
-from setuptools import setup, find_packages
+import feets
+
+from setuptools import find_packages, setup
 
 os.environ["FEETS_IN_SETUP"] = "True"
-import feets
 
 
 # =============================================================================

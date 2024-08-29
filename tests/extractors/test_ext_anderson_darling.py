@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_anderson_darling
+
+import numpy as np
 
 import pytest
 

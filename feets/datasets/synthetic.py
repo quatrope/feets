@@ -69,7 +69,7 @@ def create_random(
     timef=np.linspace,
     timef_params=None,
     size=DEFAULT_SIZE,
-    id=None,
+    _id=None,
     ds_name=DS_NAME,
     description=DESCRIPTION,
     bands=BANDS,
@@ -94,7 +94,7 @@ def create_random(
         Parameters to feed the `timef` callable.
     size : int (default=10000)
         Number of obervation of the light curves
-    id : object (default=None)
+    _id : object (default=None)
         Id of the created data.
     ds_name : str (default="feets-synthetic")
         Name of the dataset
@@ -120,7 +120,7 @@ def create_random(
         >>>  create_random(
         ...     magf=random.normal, magf_params={"loc": 0, "scale": 1},
         ...     errf=random.normal, errf_params={"loc": 0, "scale": 0.008})
-        Data(id=None, ds_name='feets-synthetic', bands=('B', 'V'))
+        Data(_id=None, ds_name='feets-synthetic', bands=('B', 'V'))
 
     """
     timef_params = (
@@ -144,7 +144,7 @@ def create_random(
             "error": errf(**errf_params),
         }
     return Data(
-        id=id,
+        _id=_id,
         ds_name=ds_name,
         description=description,
         bands=bands,
@@ -193,7 +193,7 @@ def create_normal(
 
         >>> ds = create_normal(0, 1, 0, .0008, seed=42)
         >>> ds
-        Data(id=None, ds_name='feets-synthetic', bands=('B', 'V'))
+        Data(_id=None, ds_name='feets-synthetic', bands=('B', 'V'))
         >>> ds.data.B
         LightCurve(time[10000], magnitude[10000], error[10000])
         >>> ds.data.B.time
@@ -254,7 +254,7 @@ def create_uniform(
 
         >>> ds = synthetic.create_uniform(1, 2, 0, .0008, 42)
         >>> ds
-        Data(id=None, ds_name='feets-synthetic', bands=('B', 'V'))
+        Data(_id=None, ds_name='feets-synthetic', bands=('B', 'V'))
         >>> ds.data.B.magnitude
         array([ 1.37454012,  1.95071431,  1.73199394, ...,  1.94670792,
                 1.39748799,  1.2171404 ])
@@ -303,7 +303,7 @@ def create_periodic(mu_err=0.0, sigma_err=1.0, seed=None, **kwargs):
 
         >>> ds = synthetic.create_periodic(bands=["Ks"])
         >>> ds
-        Data(id=None, ds_name='feets-synthetic', bands=('Ks',))
+        Data(_id=None, ds_name='feets-synthetic', bands=('Ks',))
         >>> ds.data.Ks.magnitude
         array([ 0.95428053,  0.73022685,  0.03005121, ..., -0.26305297,
                 2.57880082,  1.03376863])

@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_con
+
+import numpy as np
 
 
 def test_Con_extract(normal_light_curve):

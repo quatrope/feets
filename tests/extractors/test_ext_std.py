@@ -1,6 +1,6 @@
-import numpy as np
-
 from feets.extractors import ext_std
+
+import numpy as np
 
 
 def test_Std_extract(normal_light_curve):
