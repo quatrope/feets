@@ -5,7 +5,7 @@ import numpy as np
 
 def test_Beyond1Std_extract(normal_light_curve):
     # create the extractor
-    ext = ext_beyond1_std.Beyond1Std()
+    extractor = ext_beyond1_std.Beyond1Std()
 
     # init the seed
     seed = np.random.default_rng(42)
@@ -19,7 +19,7 @@ def test_Beyond1Std_extract(normal_light_curve):
             error_scale=0.001,
             data=["magnitude", "error"],
         )
-        values[idx] = ext.extract(**lc)["Beyond1Std"]
+        values[idx] = extractor.extract(**lc)["Beyond1Std"]
 
     # test!
     np.testing.assert_allclose(values.mean(), 0.329713)
