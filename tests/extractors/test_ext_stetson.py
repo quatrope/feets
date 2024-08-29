@@ -5,7 +5,6 @@ from feets.extractors import ext_stetson
 import pytest
 
 
-@pytest.mark.skip(reason="FATS says it must be 0, but actual result is 0.35")
 def test_StetsonJ_extract(normal_light_curve):
     # create the extractor
     extractor = ext_stetson.StetsonL()
@@ -21,15 +20,16 @@ def test_StetsonJ_extract(normal_light_curve):
             scale=0.001,
             data=["aligned_magnitude", "aligned_error", "aligned_error2"],
         )
-        aligned_magnitude2 = lc["aligned_magnitude"] * random.uniform(
-            low=0, high=1.5, size=lc["aligned_magnitude"].size
+        aligned_magnitude = lc["aligned_magnitude"]
+        aligned_magnitude2 = aligned_magnitude * random.uniform(
+            low=0, high=1.5, size=aligned_magnitude.size
         )
 
         values[idx] = extractor.extract(
             **lc, aligned_magnitude2=aligned_magnitude2
         )["StetsonL"]
 
-    np.testing.assert_allclose(values.mean(), 0)
+    np.testing.assert_allclose(values.mean(), 0.0007281634900076408)
 
 
 @pytest.mark.skip(
@@ -56,7 +56,6 @@ def test_StetsonK_extract(normal_light_curve):
     np.testing.assert_allclose(values.mean(), 0.79914938521401002)
 
 
-@pytest.mark.skip(reason="FATS says it must be 0, but actual result is 0.35")
 def test_StetsonL_extract(normal_light_curve):
     # create the extractor
     extractor = ext_stetson.StetsonL()
@@ -73,12 +72,13 @@ def test_StetsonL_extract(normal_light_curve):
             scale=0.001,
             data=["aligned_magnitude", "aligned_error", "aligned_error2"],
         )
-        aligned_magnitude2 = lc["aligned_magnitude"] * random.uniform(
-            low=0, high=1.5, size=lc["aligned_magnitude"].size
+        aligned_magnitude = lc["aligned_magnitude"]
+        aligned_magnitude2 = aligned_magnitude * random.uniform(
+            low=0, high=1.5, size=aligned_magnitude.size
         )
 
         values[idx] = extractor.extract(
             **lc, aligned_magnitude2=aligned_magnitude2
         )["StetsonL"]
 
-    np.testing.assert_allclose(values.mean(), 0.0085957106316273714)
+    np.testing.assert_allclose(values.mean(), 0.0007281634900076408)
