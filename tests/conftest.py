@@ -7,8 +7,8 @@ import pytest
 
 @pytest.fixture(scope="session")
 def normal_light_curve():
-    def maker(*, data=None, size=100, seed=None, **kwargs):
-        random = np.random.default_rng(seed)
+    def maker(*, data=None, size=100, random=None, **kwargs):
+        random = np.random.default_rng(random)
 
         data = core.DATAS if data is None else data
         diff = set(data).difference(core.DATAS)

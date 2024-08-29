@@ -3,17 +3,21 @@ import numpy as np
 from feets.extractors import ext_con
 
 
-def test_Con_extract():
+def test_Con_extract(normal_light_curve):
     # create the extractor
     extractor = ext_con.Con(consecutiveStar=1)
 
     # init the seed
-    random = np.random.default_rng(seed=42)
+    random = np.random.default_rng(42)
 
     # excute the simulation
     values = np.empty(1000)
     for idx in range(values.size):
-        mags = random.normal(size=1000)
-        values[idx] = extractor.extract(magnitude=mags)["Con"]
+        lc = normal_light_curve(
+            random=random,
+            size=1000,
+            data=["magnitude"],
+        )
+        values[idx] = extractor.extract(**lc)["Con"]
 
     np.testing.assert_allclose(values.mean(), 0.04554)

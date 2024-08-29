@@ -5,6 +5,6 @@ from feets.extractors import ext_amplitude
 
 def test_Amplitude_extract():
     extractor = ext_amplitude.Amplitude()
-    mags = np.arange(0, 1001)
-    value = extractor.extract(magnitude=mags)["Amplitude"]
+    magnitude = np.arange(0, 1000)
+    value = extractor.extract(magnitude=magnitude)["Amplitude"]
     np.testing.assert_allclose(value, 475)

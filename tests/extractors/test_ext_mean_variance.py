@@ -8,13 +8,12 @@ def test_MeanVariance_extract():
     extractor = ext_mean_variance.MeanVariance()
 
     # init the seed
-    random = np.random.default_rng(seed=42)
+    random = np.random.default_rng(42)
 
     # excute the simulation
     values = np.empty(1000)
     for idx in range(values.size):
-        mags = random.uniform(size=1000)
-        values[idx] = extractor.extract(magnitude=mags)["Meanvariance"]
+        magnitude = random.uniform(size=1000)
+        values[idx] = extractor.extract(magnitude=magnitude)["Meanvariance"]
 
     np.testing.assert_allclose(values.mean(), 0.5770949)
-

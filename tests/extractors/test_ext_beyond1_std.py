@@ -8,13 +8,13 @@ def test_Beyond1Std_extract(normal_light_curve):
     extractor = ext_beyond1_std.Beyond1Std()
 
     # init the seed
-    seed = np.random.default_rng(42)
+    random = np.random.default_rng(42)
 
     # excute the simulation
     values = np.empty(1000)
     for idx in range(values.size):
         lc = normal_light_curve(
-            seed=seed,
+            random=random,
             size=1000,
             error_scale=0.001,
             data=["magnitude", "error"],
