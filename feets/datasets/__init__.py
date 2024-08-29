@@ -32,3 +32,9 @@
 including methods to load and fetch some example light curves.
 
 """
+
+
+from .macho import load_MACHO, load_MACHO_example, available_MACHO_lc
+
+
+__all__ = ["load_MACHO", "load_MACHO_example", "available_MACHO_lc"]

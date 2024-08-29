@@ -103,6 +103,9 @@ import os  # noqa
 
 if os.getenv("FEETS_IN_SETUP") != "True":
     # from .core import *  # noqa
+    from . import datasets
     from .extractors import *  # noqa
+
+__all__ = ["datasets"]
 
 del os

@@ -40,21 +40,28 @@ https://github.com/isadoranun/tsfeat
 # =============================================================================
 
 import os
+import pathlib
 import tarfile
 
 import numpy as np
 
-from .base import Data
+from ..libs import bunch
 
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
 
-PATH = os.path.abspath(os.path.dirname(__file__))
+PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
-DATA_PATH = os.path.join(PATH, "data", "macho")
+DATA_PATH = PATH / "data" / "macho"
 
+DATASET_NAME = "MACHO"
+
+DATASET_DESCRIPTION = (
+    "The files are gathered from the original FATS project "
+    "tutorial: https://github.com/isadoranun/tsfeat"
+)
 
 # =============================================================================
 # FUNCTIONS
@@ -90,30 +97,38 @@ def load_MACHO(macho_id):
     https://github.com/isadoranun/tsfeat
 
     """
-    tarfname = "{}.tar.bz2".format(macho_id)
-    tarpath = os.path.join(DATA_PATH, tarfname)
-
+    # Read the data
+    tarpath = DATA_PATH / f"{macho_id}.tar.bz2"
     rpath = "{}.R.mjd".format(macho_id)
     bpath = "{}.B.mjd".format(macho_id)
     with tarfile.open(tarpath, mode="r:bz2") as tf:
         rlc = np.loadtxt(tf.extractfile(rpath))
         blc = np.loadtxt(tf.extractfile(bpath))
 
-    bands = ("R", "B")
-    data = {
-        "R": {"time": rlc[:, 0], "magnitude": rlc[:, 1], "error": rlc[:, 2]},
-        "B": {"time": blc[:, 0], "magnitude": blc[:, 1], "error": blc[:, 2]},
-    }
-    descr = (
-        "The files are gathered from the original FATS project "
-        "tutorial: https://github.com/isadoranun/tsfeat"
+    # split the R and B bands
+    r_band = bunch.Bunch(
+        "R",
+        {"time": rlc[:, 0], "magnitude": rlc[:, 1], "error": rlc[:, 2]},
+    )
+    b_band = (
+        bunch.Bunch(
+            "B",
+            {"time": blc[:, 0], "magnitude": blc[:, 1], "error": blc[:, 2]},
+        ),
     )
 
-    return Data(
-        _id=macho_id,
-        metadata=None,
-        ds_name="MACHO",
-        description=descr,
-        bands=bands,
-        data=data,
+    # create the bands
+    data = bunch.Bunch("data", {"R": r_band, "B": b_band})
+
+    # the bunch data
+    lc = bunch.Bunch(
+        "lc",
+        {
+            "id": macho_id,
+            "ds_name": DATASET_NAME,
+            "description": DATASET_DESCRIPTION,
+            "data": data,
+        },
     )
+
+    return lc

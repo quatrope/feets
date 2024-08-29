@@ -1,8 +1,15 @@
+import os
+import pathlib
+
 from feets.extractors import core
 
 import numpy as np
 
 import pytest
+
+PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
+
+TEST_DATASET_PATH = PATH / "data"
 
 
 @pytest.fixture(scope="session")
