@@ -34,7 +34,7 @@ __all__ = [
     "DATAS",
     "register_extractor",
     "registered_extractors",
-    "is_registered",
+    "is_extractor_registered",
     "available_features",
     "extractor_of",
     "sort_by_dependencies",
@@ -48,10 +48,6 @@ __all__ = [
 # IMPORTS
 # =============================================================================
 
-import inspect
-
-import six
-
 from .core import (
     DATAS,
     Extractor,
@@ -60,11 +56,11 @@ from .core import (
     ExtractorWarning,
 )  # noqa
 from .register import (
-    register_extractor,
-    registered_extractors,
-    is_registered,
     available_features,
     extractor_of,
+    is_extractor_registered,
+    register_extractor,
+    registered_extractors,
     sort_by_dependencies,
 )
 

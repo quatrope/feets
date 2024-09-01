@@ -39,11 +39,10 @@
 
 import os
 
-import feets
-
-from setuptools import find_packages, setup
-
 os.environ["FEETS_IN_SETUP"] = "True"
+import feets  # noqa
+
+from setuptools import find_packages, setup  # noqa
 
 
 # =============================================================================

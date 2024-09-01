@@ -35,17 +35,17 @@
 # IMPORTS
 # =============================================================================
 
-import os
+# import os
 
 import feets
-from feets import preprocess
 
 import numpy as np
 
 import pytest
 
+import tests.conftest as conftest
+
 # from .c import FeetsTestCase, DATA_PATH
-from . import conftest
 
 
 # =============================================================================
@@ -54,7 +54,7 @@ from . import conftest
 
 
 @pytest.fixture
-def MACHO_lc():
+def MACHO_LC():
     lc = feets.datasets.load_MACHO_example()
     lc = {
         "time": lc.data.R.time,
@@ -99,10 +99,10 @@ def FATS_MACHO_LC_aligned():
 
 
 def test_FATS2feets_remove_noise(MACHO_LC, FATS_MACHO_LC_remove_noise_result):
-    p_time, p_mag, p_error = preprocess.remove_noise(
+    p_time, p_mag, p_error = feets.preprocess.remove_noise(
         MACHO_LC["time"], MACHO_LC["magnitude"], MACHO_LC["error"]
     )
-    p_time2, p_mag2, p_error2 = preprocess.remove_noise(
+    p_time2, p_mag2, p_error2 = feets.preprocess.remove_noise(
         MACHO_LC["time2"], MACHO_LC["magnitude2"], MACHO_LC["error2"]
     )
     np.testing.assert_array_equal(
@@ -126,7 +126,9 @@ def test_FATS2feets_remove_noise(MACHO_LC, FATS_MACHO_LC_remove_noise_result):
 
 
 def test_FATS2feets_align(MACHO_LC, FATS_MACHO_LC_remove_noise_aligned):
-    a_time, a_mag, a_mag2, a_error, a_error2 = preprocess.align(**MACHO_LC)
+    a_time, a_mag, a_mag2, a_error, a_error2 = feets.preprocess.align(
+        **MACHO_LC
+    )
     np.testing.assert_array_equal(
         a_time, FATS_MACHO_LC_remove_noise_aligned["time"]
     )
@@ -142,6 +144,7 @@ def test_FATS2feets_align(MACHO_LC, FATS_MACHO_LC_remove_noise_aligned):
     np.testing.assert_array_equal(
         a_error2, FATS_MACHO_LC_remove_noise_aligned["error2"]
     )
+
 
 # NO implementemos ESTO AUN!
 # class FATSRegressionTestCase(FeetsTestCase):

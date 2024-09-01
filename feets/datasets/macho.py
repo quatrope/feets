@@ -107,14 +107,10 @@ def load_MACHO(macho_id):
 
     # split the R and B bands
     r_band = bunch.Bunch(
-        "R",
-        {"time": rlc[:, 0], "magnitude": rlc[:, 1], "error": rlc[:, 2]},
+        "R", {"time": rlc[:, 0], "magnitude": rlc[:, 1], "error": rlc[:, 2]}
     )
-    b_band = (
-        bunch.Bunch(
-            "B",
-            {"time": blc[:, 0], "magnitude": blc[:, 1], "error": blc[:, 2]},
-        ),
+    b_band = bunch.Bunch(
+        "B", {"time": blc[:, 0], "magnitude": blc[:, 1], "error": blc[:, 2]}
     )
 
     # create the bands
