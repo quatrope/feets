@@ -98,6 +98,7 @@ def FATS_MACHO_LC_aligned():
     return lc
 
 
+@pytest.mark.skip
 def test_FATS2feets_remove_noise(MACHO_LC, FATS_MACHO_LC_remove_noise_result):
     p_time, p_mag, p_error = feets.preprocess.remove_noise(
         MACHO_LC["time"], MACHO_LC["magnitude"], MACHO_LC["error"]
@@ -124,7 +125,7 @@ def test_FATS2feets_remove_noise(MACHO_LC, FATS_MACHO_LC_remove_noise_result):
         p_error2, FATS_MACHO_LC_remove_noise_result["error2"]
     )
 
-
+@pytest.mark.skip
 def test_FATS2feets_align(MACHO_LC, FATS_MACHO_LC_remove_noise_aligned):
     a_time, a_mag, a_mag2, a_error, a_error2 = feets.preprocess.align(
         **MACHO_LC

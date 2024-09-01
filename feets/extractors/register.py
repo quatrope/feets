@@ -9,7 +9,7 @@ from . import core
 _extractors = {}
 
 
-def is_isntance_or_is_extractor(obj):
+def is_instance_or_is_extractor(obj):
     return isinstance(obj, core.Extractor) or (
         inspect.isclass(obj) and issubclass(obj, core.Extractor)
     )
