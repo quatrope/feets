@@ -20,14 +20,13 @@ def test_StetsonJ_extract(normal_light_curve):
             scale=0.001,
             data=["aligned_magnitude", "aligned_error", "aligned_error2"],
         )
-        aligned_magnitude = lc["aligned_magnitude"]
-        aligned_magnitude2 = aligned_magnitude * random.uniform(
-            low=0, high=1.5, size=aligned_magnitude.size
+
+        mags = lc["aligned_magnitude"]
+        lc["aligned_magnitude2"] = mags * random.uniform(
+            low=0, high=1.5, size=mags.size
         )
 
-        values[idx] = extractor.extract(
-            **lc, aligned_magnitude2=aligned_magnitude2
-        )["StetsonL"]
+        values[idx] = extractor.extract(**lc)["StetsonL"]
 
     np.testing.assert_allclose(values.mean(), 0.0007281634900076408)
 
@@ -45,12 +44,8 @@ def test_StetsonK_extract(normal_light_curve):
     values = np.empty(1000)
     for idx in range(values.size):
         lc = normal_light_curve(
-            random=random,
-            size=1000,
-            scale=0.001,
-            data=["magnitude", "error"],
+            random=random, size=1000, scale=0.001, data=["magnitude", "error"]
         )
-
         values[idx] = extractor.extract(**lc)["StetsonK"]
 
     np.testing.assert_allclose(values.mean(), 0.79914938521401002)
@@ -72,13 +67,12 @@ def test_StetsonL_extract(normal_light_curve):
             scale=0.001,
             data=["aligned_magnitude", "aligned_error", "aligned_error2"],
         )
-        aligned_magnitude = lc["aligned_magnitude"]
-        aligned_magnitude2 = aligned_magnitude * random.uniform(
-            low=0, high=1.5, size=aligned_magnitude.size
+
+        mags = lc["aligned_magnitude"]
+        lc["aligned_magnitude2"] = mags * random.uniform(
+            low=0, high=1.5, size=mags.size
         )
 
-        values[idx] = extractor.extract(
-            **lc, aligned_magnitude2=aligned_magnitude2
-        )["StetsonL"]
+        values[idx] = extractor.extract(**lc)["StetsonL"]
 
     np.testing.assert_allclose(values.mean(), 0.0007281634900076408)

@@ -173,7 +173,8 @@ class LombScargle(Extractor):
             **lscargle_kwds,
         )
         best_periods = 1 / frequency[fmax]
-        return best_periods, fap
+        fap_best_periods = fap[fmax]
+        return best_periods, fap_best_periods
 
     def _compute_cs(self, folded_data, N):
         sigma = np.std(folded_data)
@@ -194,8 +195,6 @@ class LombScargle(Extractor):
     def _compute_cs_eta(self, time, magnitude, period):
         # fold the data
         new_time = np.mod(time, 2 * period) / (2 * period)
-        print(f"{new_time=}")
-        print(f"{np.argsort(new_time)=}")
         folded_data = magnitude[np.argsort(new_time)]
         N = len(folded_data)
 
@@ -205,7 +204,7 @@ class LombScargle(Extractor):
 
     def extract(self, magnitude, time):
         # first we retrieve the best periods and the false alarm probability
-        best_periods, fap = self._compute_ls(
+        best_periods, fap_best_periods = self._compute_ls(
             magnitude, time, self.nperiods, self.lscargle_kwds, self.fap_kwds
         )
 
@@ -221,7 +220,7 @@ class LombScargle(Extractor):
 
         return {
             "PeriodLS": best_periods,
-            "Period_fit": fap,
+            "Period_fit": fap_best_periods,
             "Psi_CS": R,
             "Psi_eta": Psi_eta,
         }

@@ -14,11 +14,7 @@ def test_DeltamDeltat_extract(normal_light_curve):
     time = np.arange(0, 1000)
     values = np.empty(50)
     for idx in range(values.size):
-        lc = normal_light_curve(
-            random=random,
-            size=1000,
-            data=["magnitude"],
-        )
+        lc = normal_light_curve(random=random, size=1000, data=["magnitude"])
         feats = extractor.extract(**lc, time=time)
         values[idx] = np.sum(list(feats.values()))
 

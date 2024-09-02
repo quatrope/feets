@@ -3,7 +3,7 @@ from feets.extractors import ext_mean_variance
 import numpy as np
 
 
-def test_MeanVariance_extract():
+def test_MeanVariance_extract(uniform_light_curve):
     # create the extractor
     extractor = ext_mean_variance.MeanVariance()
 
@@ -13,7 +13,7 @@ def test_MeanVariance_extract():
     # excute the simulation
     values = np.empty(1000)
     for idx in range(values.size):
-        magnitude = random.uniform(size=1000)
-        values[idx] = extractor.extract(magnitude=magnitude)["Meanvariance"]
+        lc = uniform_light_curve(random=random, size=1000, data=["magnitude"])
+        values[idx] = extractor.extract(**lc)["Meanvariance"]
 
     np.testing.assert_allclose(values.mean(), 0.5770949)

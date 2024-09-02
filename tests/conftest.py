@@ -30,3 +30,58 @@ def normal_light_curve():
         return lc
 
     return maker
+
+
+@pytest.fixture(scope="session")
+def uniform_light_curve():
+    def maker(*, data=None, size=100, random=None, **kwargs):
+        random = np.random.default_rng(random)
+
+        data = core.DATAS if data is None else data
+        diff = set(data).difference(core.DATAS)
+        if diff:
+            raise ValueError(f"Invalid data/s {diff}")
+
+        lc = {}
+        for data_name in data:
+            data_low, data_high = f"{data_name}_low", f"{data_name}_high"
+            low, high = kwargs.get(data_low, 0.0), kwargs.get(data_high, 1.0)
+            lc[data_name] = random.uniform(low=low, high=high, size=size)
+        return lc
+
+    return maker
+
+
+@pytest.fixture(scope="session")
+def periodic_light_curve():
+    def maker(*, data=None, size=100, random=None, **kwargs):
+        random = np.random.default_rng(random)
+
+        data = core.DATAS if data is None else data
+        diff = set(data).difference(core.DATAS)
+        if diff:
+            raise ValueError(f"Invalid data/s {diff}")
+
+        lc = {}
+        for data_name in data:
+            data_mean, data_cov, data_period = (
+                f"{data_name}_mean",
+                f"{data_name}_cov",
+                f"{data_name}_period",
+            )
+            mean, cov, period = (
+                kwargs.get(data_mean, np.zeros(size)),
+                kwargs.get(data_cov, None),
+                kwargs.get(data_period, 10),
+            )
+            if cov is None:
+                cov = np.zeros([size, size])
+                for i in np.arange(size):
+                    for j in np.arange(size):
+                        cov[i, j] = np.exp(
+                            -(np.sin((np.pi / period) * (i - j)) ** 2)
+                        )
+            lc[data_name] = random.multivariate_normal(mean=mean, cov=cov)
+        return lc
+
+    return maker
