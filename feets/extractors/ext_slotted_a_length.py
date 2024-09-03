@@ -127,7 +127,7 @@ class SlottedA_length(Extractor):
                     slots[i] = k
                     i = i + 1
                 else:
-                    prod[k] = np.infty
+                    prod[k] = np.inf
         else:
             for k in np.arange(K1, K):
                 idx = np.where(ks == k)
@@ -136,7 +136,7 @@ class SlottedA_length(Extractor):
                     slots[i - 1] = k
                     i = i + 1
                 else:
-                    prod[k] = np.infty
+                    prod[k] = np.inf
             np.trim_zeros(prod, trim="b")
 
         slots = np.trim_zeros(slots, trim="b")

@@ -112,12 +112,6 @@ class StetsonJ(Extractor):
 
     features = ["StetsonJ"]
 
-    def __init__(self):
-        self.feature_warning(
-            "The original FATS documentation says that the result of StetsonJ "
-            "must be ~0 for gausian distribution but the result is ~-0.41"
-        )
-
     def extract(
         self,
         aligned_magnitude,
@@ -195,13 +189,6 @@ class StetsonK(Extractor):
 
     features = ["StetsonK"]
 
-    def __init__(self):
-        self.feature_warning(
-            "The original FATS documentation says that the result of StetsonK "
-            "must be 2/pi=0.798 for gausian distribution but the result is "
-            "~0.2"
-        )
-
     def extract(self, magnitude, error):
         mean_mag = np.sum(magnitude / (error * error)) / np.sum(
             1.0 / (error * error)
@@ -259,11 +246,9 @@ class StetsonKAC(Extractor):
     def __init__(self, T=1):
         self.T = T
 
-    def extract(self, magnitude, time, error):
+    def extract(self, magnitude, time):
         sal = SlottedA_length(T=self.T)
-        autocor_vector = sal.start_conditions(magnitude, time, **sal.params)[
-            -1
-        ]
+        autocor_vector = sal.start_conditions(magnitude, time, sal.T)[-1]
 
         N_autocor = len(autocor_vector)
         sigmap = (

@@ -110,7 +110,7 @@ def _car_like(parameters, t, x, error_vars):
             warnings.warn(
                 "CAR log-likelihood to inf", FeatureExtractionWarning
             )
-            return -np.infty
+            return -np.inf
 
     # the minus one is to perfor maximization using the minimize function
     return -loglik

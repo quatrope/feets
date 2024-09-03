@@ -20,17 +20,12 @@ def test_LombScargle_extract(periodic_light_curve):
     random = np.random.default_rng(42)
 
     # excute the simulation
-    iters = 100
+    sims = 100
     size = 100
 
     time = np.arange(size)
-
-    PeriodLS = np.empty(iters)
-    Period_fit = np.empty(iters)
-    Psi_CS = np.empty(iters)
-    Psi_eta = np.empty(iters)
-
-    for idx in range(iters):
+    values = np.empty([sims, 4])
+    for idx in range(sims):
         lc = periodic_light_curve(
             random=random, size=size, data=["magnitude"], magnitude_period=20
         )
@@ -41,15 +36,15 @@ def test_LombScargle_extract(periodic_light_curve):
             assert len(value) == 3
 
         # save the results related to the best period
-        PeriodLS[idx], Period_fit[idx], Psi_CS[idx], Psi_eta[idx] = (
+        values[idx] = (
             results["PeriodLS"][0],
             results["Period_fit"][0],
             results["Psi_CS"][0],
             results["Psi_eta"][0],
         )
 
-    # check the results
-    np.testing.assert_allclose(PeriodLS.mean(), 20.262508344699437)
-    np.testing.assert_allclose(Period_fit.mean(), 1.4306433603192423e-11)
-    np.testing.assert_allclose(Psi_CS.mean(), 0.23181927251239132)
-    np.testing.assert_allclose(Psi_eta.mean(), 0.9003366875414928)
+    # test
+    np.testing.assert_allclose(values[:, 0].mean(), 20.262508344699437)
+    np.testing.assert_allclose(values[:, 1].mean(), 1.4306433603192423e-11)
+    np.testing.assert_allclose(values[:, 2].mean(), 0.23181927251239132)
+    np.testing.assert_allclose(values[:, 3].mean(), 0.9003366875414928)

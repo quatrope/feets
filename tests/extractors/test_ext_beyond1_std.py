@@ -16,10 +16,11 @@ def test_Beyond1Std_extract(normal_light_curve):
         lc = normal_light_curve(
             random=random,
             size=1000,
-            error_scale=0.001,
             data=["magnitude", "error"],
+            error_loc=1,
+            error_scale=0.008,
         )
         values[idx] = extractor.extract(**lc)["Beyond1Std"]
 
     # test!
-    np.testing.assert_allclose(values.mean(), 0.329713)
+    np.testing.assert_allclose(values.mean(), 0.317288)
