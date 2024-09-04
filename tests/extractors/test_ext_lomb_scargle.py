@@ -15,6 +15,12 @@ def test_LombScargle_extract(periodic_light_curve):
         }
     }
     extractor = ext_lomb_scargle.LombScargle(lscargle_kwds=lscargle_kwds)
+    features = [
+        "PeriodLS",
+        "Period_fit",
+        "Psi_CS",
+        "Psi_eta",
+    ]
 
     # init the seed
     random = np.random.default_rng(42)
@@ -32,19 +38,15 @@ def test_LombScargle_extract(periodic_light_curve):
         lc["time"] = time
 
         results = extractor.extract(**lc)
-        for value in results.values():
-            assert len(value) == 3
-
-        # save the results related to the best period
-        values[idx] = (
-            results["PeriodLS"][0],
-            results["Period_fit"][0],
-            results["Psi_CS"][0],
-            results["Psi_eta"][0],
-        )
+        for index, feature in enumerate(features):
+            np.testing.assert_(len(results[feature]) == 3)
+            values[idx, index] = results[feature][0]
 
     # test
-    np.testing.assert_allclose(values[:, 0].mean(), 20.262508344699437)
-    np.testing.assert_allclose(values[:, 1].mean(), 1.4306433603192423e-11)
-    np.testing.assert_allclose(values[:, 2].mean(), 0.23181927251239132)
-    np.testing.assert_allclose(values[:, 3].mean(), 0.9003366875414928)
+    expected = [
+        20.262508344699437,
+        1.4306433603192423e-11,
+        0.23181927251239132,
+        0.9003366875414928,
+    ]
+    np.testing.assert_allclose(values.mean(axis=0), expected)

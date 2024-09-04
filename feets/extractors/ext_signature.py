@@ -61,7 +61,7 @@ class Signature(Extractor):
     def extract(self, magnitude, time, PeriodLS, Amplitude):
         phase_bins, mag_bins = self.phase_bins, self.mag_bins
 
-        lc_yaxis = (magnitude - np.min(magnitude)) / np.float(Amplitude)
+        lc_yaxis = (magnitude - np.min(magnitude)) / np.float64(Amplitude)
 
         # SHIFT TO BEGIN AT MINIMUM
         loc = np.argmin(lc_yaxis)
@@ -71,9 +71,9 @@ class Signature(Extractor):
             lc_phases = np.remainder(time - time[loc], period_ls) / period_ls
 
             bins = (phase_bins, mag_bins)
-            # todo: remove `normed` from params
+
             count = np.histogram2d(
-                lc_phases, lc_yaxis, bins=bins, normed=True
+                lc_phases, lc_yaxis, bins=bins, density=True
             )[0]
 
             signature = zip(

@@ -76,9 +76,9 @@ def lscargle(
     autopower_kwds=None,
     fap_kwds=None,
 ):
-
     model_kwds = model_kwds or {}
     autopower_kwds = autopower_kwds or {}
+    fap_kwds = fap_kwds or {}
     model = _LombScargle(time, magnitude, error, **model_kwds)
     frequency, power = model.autopower(**autopower_kwds)
     fap = model.false_alarm_probability(power, **fap_kwds)
@@ -151,7 +151,7 @@ class LombScargle(Extractor):
 
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
 
-    def __init__(self, lscargle_kwds=None, fap_kwds=None, nperiods=3) -> None:
+    def __init__(self, lscargle_kwds=None, fap_kwds=None, nperiods=3):
         self.lscargle_kwds = (
             copy.deepcopy(DEFAULT_LSCARGLE_KWDS)
             if lscargle_kwds is None
