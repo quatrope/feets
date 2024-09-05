@@ -12,6 +12,10 @@ class FeatureNotFound(ValueError):
     pass
 
 
+class FeatureExtractorAlreadyRegistered(ValueError):
+    pass
+
+
 # =============================================================================
 # REGISTER UTILITY
 # =============================================================================
@@ -33,8 +37,15 @@ def register_extractor(cls):
         if d not in _extractors.keys():
             msg = f"Dependency '{d}' from extractor '{cls}'"
             raise core.ExtractorBadDefinedError(msg)
-    _extractors.update((f, cls) for f in cls.get_features())
+    for feature in cls.get_features():
+        if is_feature_registered(feature):
+            raise FeatureExtractorAlreadyRegistered(feature)
+        _extractors[feature] = cls
     return cls
+
+
+def unregister_extractor(cls):
+    pass
 
 
 def registered_extractors():
@@ -97,7 +108,7 @@ def get_extractors_by_data(data=None):
 
     diff = set(data).difference(core.DATAS)
     if diff:
-        msg = f"Invalid data(s): {", ".join(diff)}."
+        msg = f"Invalid data(s): {', '.join(diff)}."
         raise ValueError(msg)
 
     extractors = set()

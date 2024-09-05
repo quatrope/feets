@@ -53,7 +53,7 @@ from .extractors.core import (
     DATA_MAGNITUDE2,
     DATA_TIME,
 )
-
+from .libs import bunch
 
 # =============================================================================
 # CONSTANTS
@@ -89,36 +89,8 @@ class DataRequiredError(ValueError):
 # =============================================================================
 
 
-class FeatureSet(object):
-
-    def __init__(self, fs, names, values):
-        self._fs = fs
-        self._names = names
-        self._values = values
-        self._arr = None
-
-    def __dir__(self):
-        return super(FeatureSet, self) + list(self._names)
-
-    def __getattr__(self, name):
-        names, values = self.as_array()
-        try:
-            return values[np.argwhere(names == name)[0]][0]
-        except IndexError:
-            raise AttributeError(name)
-
-    def as_array(self):
-        if self._arr is None:
-            self._arr = self._fs.as_array(self._names, self._values)
-        return self._arr
-
-    @property
-    def names(self):
-        return self._names[:]
-
-    @property
-    def values(self):
-        return self._values[:]
+class FeatureSet(bunch.Bunch):
+    pass
 
 
 # =============================================================================
@@ -198,19 +170,27 @@ class FeatureSpace:
     """
 
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
-        self._extractors = extractors.register.get_plan(
+        extractors_clss = extractors.register.get_plan(
             data=data, only=only, exclude=exclude
         )
+
+        exts = []
+        for extractor_cls in extractors_clss:
+            ext_kwargs = {
+                pname: kwargs.get(pname, pvalue)
+                for pname, pvalue in extractor_cls.get_default_params()
+            }
+            extractor = extractor_cls(**ext_kwargs)
+            exts.append(extractor)
+
+        self._extractors = np.array(exts)
 
     def __repr__(self):
         return str(self)
 
     def __str__(self):
-        if not hasattr(self, "__str"):
-            extractors = [str(extractor) for extractor in self._execution_plan]
-            space = ", ".join(extractors)
-            self.__str = "<FeatureSpace: {}>".format(space)
-        return self.__str
+        space = ", ".join(str(extractor) for extractor in self._execution_plan)
+        return f"<FeatureSpace: {space}>"
 
     def dict_data_as_array(self, d):
         array_data = {}
@@ -252,31 +232,11 @@ class FeatureSpace:
             result = fextractor.extract(features=features, **kwargs)
             features.update(result)
 
-        fvalues = np.array(
-            [features[fname] for fname in self._features_as_array]
-        )
-
-        return self._features_as_array, fvalues
+        return FeatureSet("features", features)
 
     @property
     def kwargs(self):
         return dict(self._kwargs)
-
-    @property
-    def data(self):
-        return self._data
-
-    @property
-    def only(self):
-        return self._only
-
-    @property
-    def exclude(self):
-        return self._exclude
-
-    @property
-    def features_by_data_(self):
-        return self._features_by_data
 
     @property
     def features_(self):
@@ -292,8 +252,4 @@ class FeatureSpace:
 
     @property
     def excecution_plan_(self):
-        return self._execution_plan
-
-    @property
-    def required_data_(self):
-        return self._required_data
+        return self._extractors
