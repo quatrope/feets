@@ -1,10 +1,11 @@
-from feets.extractors import ext_signature, ext_lomb_scargle, ext_amplitude
+from feets.extractors import ext_amplitude, ext_lomb_scargle, ext_signature
 
 import numpy as np
 
 import pytest
 
 
+@pytest.mark.slow
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_Signature_extract(periodic_light_curve):
     # create the extractors

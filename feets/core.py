@@ -30,7 +30,7 @@
 
 __doc__ = """core functionalities of feets"""
 
-__all__ = ["FeatureNotFound", "DataRequiredError", "FeatureSpace"]
+__all__ = ["DataRequiredError", "FeatureSpace"]
 
 
 # =============================================================================
@@ -80,10 +80,6 @@ logger.setLevel(logging.WARNING)
 # =============================================================================
 
 
-class FeatureNotFound(ValueError):
-    pass
-
-
 class DataRequiredError(ValueError):
     pass
 
@@ -130,7 +126,7 @@ class FeatureSet(object):
 # =============================================================================
 
 
-class FeatureSpace(object):
+class FeatureSpace:
     """Wrapper class, to allow user select the
     features based on the available time series vectors (magnitude, time,
     error, second magnitude, etc.) or specify a list of features.
@@ -202,90 +198,9 @@ class FeatureSpace(object):
     """
 
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
-        # retrieve all the extractors
-        exts = extractors.registered_extractors()
-
-        # store all the parameters for the extractors
-        self._kwargs = kwargs
-
-        # get all posible features by data
-        if data:
-            fbdata = []
-            for fname, f in exts.items():
-                if not f.get_data().difference(data):
-                    fbdata.append(fname)
-        else:
-            fbdata = exts.keys()
-        self._data = frozenset(data or extractors.DATAS)
-        self._features_by_data = frozenset(fbdata)
-
-        # validate the list of features or select all of them
-        if only:
-            for f in only:
-                if f not in exts:
-                    raise FeatureNotFound(f)
-        self._only = frozenset(only or exts.keys())
-
-        # select the features to exclude or not exclude anything
-        if exclude:
-            for f in exclude:
-                if f not in exts:
-                    raise FeatureNotFound(f)
-        self._exclude = frozenset(exclude or ())
-
-        # the candidate to be the features to be extracted
-        candidates = self._features_by_data.intersection(
-            self._only
-        ).difference(self._exclude)
-
-        # remove by dependencies
-        if only or exclude:
-            final = set()
-            for f in candidates:
-                fcls = exts[f]
-                dependencies = fcls.get_dependencies()
-                if dependencies.issubset(candidates):
-                    final.add(f)
-        else:
-            final = candidates
-
-        # the final features
-        self._features = frozenset(final)
-
-        # create a ndarray for all the results
-        self._features_as_array = np.array(sorted(self._features))
-
-        # initialize the extractors and determine the required data only
-        features_extractors, features_extractors_names = set(), set()
-        required_data = set()
-        for fcls in set(exts.values()):
-            if fcls.get_features().intersection(self._features):
-
-                params = self._kwargs.get(fcls.__name__, {})
-                fext = fcls(**params)
-
-                features_extractors.add(fext)
-                features_extractors_names.add(fext.name)
-                required_data.update(fext.get_data())
-
-        self._features_extractors = frozenset(features_extractors)
-        self._features_extractors_names = frozenset(features_extractors_names)
-        self._required_data = frozenset(required_data)
-
-        # excecution order by dependencies
-        self._execution_plan = extractors.sort_by_dependencies(
-            features_extractors
+        self._extractors = extractors.register.get_plan(
+            data=data, only=only, exclude=exclude
         )
-
-        not_found = set(self._kwargs).difference(
-            self._features_extractors_names
-        )
-        if not_found:
-            msg = (
-                "This space not found feature(s) extractor(s) {} "
-                "to assign the given parameter(s)"
-            ).format(", ".join(not_found))
-            raise FeatureNotFound(msg)
 
     def __repr__(self):
         return str(self)

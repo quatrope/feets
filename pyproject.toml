@@ -1,3 +1,12 @@
 [tool.black]
 line-length = 79
 target-version = ['py39', 'py310', 'py311', 'py312']
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+testpaths = [
+    "tests",
+]
+addopts = "-m 'not slow' --disable-warnings"

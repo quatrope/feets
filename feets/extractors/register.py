@@ -2,6 +2,16 @@ import inspect
 
 from . import core
 
+
+# =============================================================================
+# EXCEPTIONS
+# =============================================================================
+
+
+class FeatureNotFound(ValueError):
+    pass
+
+
 # =============================================================================
 # REGISTER UTILITY
 # =============================================================================
@@ -17,11 +27,11 @@ def is_instance_or_is_extractor(obj):
 
 def register_extractor(cls):
     if not issubclass(cls, core.Extractor):
-        msg = "'cls' must be a subclass of Extractor. Found: {}"
-        raise TypeError(msg.format(cls))
+        msg = f"'cls' must be a subclass of Extractor. Found: {cls}"
+        raise TypeError(msg)
     for d in cls.get_dependencies():
         if d not in _extractors.keys():
-            msg = "Dependency '{}' from extractor {}".format(d, cls)
+            msg = f"Dependency '{d}' from extractor '{cls}'"
             raise core.ExtractorBadDefinedError(msg)
     _extractors.update((f, cls) for f in cls.get_features())
     return cls
@@ -37,8 +47,8 @@ def is_feature_registered(feature):
 
 def is_extractor_registered(cls):
     if not issubclass(cls, core.Extractor):
-        msg = "'cls' must be a subclass of Extractor. Found: {}"
-        raise TypeError(msg.format(cls))
+        msg = f"'cls' must be a subclass of Extractor. Found: '{cls}'"
+        raise TypeError(msg)
     return cls in _extractors.values()
 
 
@@ -61,16 +71,66 @@ def sort_by_dependencies(exts, retry=None):
         if not isinstance(ext, core.Extractor) and not issubclass(
             ext, core.Extractor
         ):
-            msg = "Only Extractor instances are allowed. Found {}."
-            raise TypeError(msg.format(type(ext)))
+            msg = (
+                f"Only Extractor instances are allowed. Found: '{type(ext)}'."
+            )
+            raise TypeError(msg)
 
         deps = ext.get_dependencies()
         if deps.difference(features_from_sorted):
             if cnt + 1 > retry:
-                msg = "Maximun retry ({}) to sort achieved from extractor {}."
-                raise RuntimeError(msg.format(retry, type(ext)))
+                msg = (
+                    f"Maximum retry ({retry}) to sort achieved by "
+                    f"extractor '{type(ext)}'."
+                )
+                raise RuntimeError(msg)
             pending.append((ext, cnt + 1))
         else:
             sorted_ext.append(ext)
             features_from_sorted.update(ext.get_features())
     return tuple(sorted_ext)
+
+
+def get_extractors_by_data(data=None):
+    if data is None:
+        return set(registered_extractors().values())
+
+    diff = set(data).difference(core.DATAS)
+    if diff:
+        msg = f"Invalid data(s): {", ".join(diff)}."
+        raise ValueError(msg)
+
+    extractors = set()
+    for extractor in registered_extractors().values():
+        if extractor.get_data().intersection(data):
+            extractors.add(extractor)
+
+    return extractors
+
+
+def get_extractors(features=None):
+    selected_features = available_features() if features is None else features
+
+    extractors = set()
+    for feature in selected_features:
+        if not is_feature_registered(feature):
+            raise FeatureNotFound(feature)
+        extractors.add(extractor_of(feature))
+
+    return extractors
+
+
+def get_plan(*, data=None, only=None, exclude=None):
+    if set(only).intersection(exclude):
+        msg = "Features in 'only' and 'exclude' must be disjoint."
+        raise ValueError(msg)
+
+    from_data = get_extractors_by_data(data=data)
+    from_only = get_extractors(features=only)
+    from_exclude = get_extractors(features=exclude)
+
+    selected_extractors = from_data.intersection(from_only).difference(
+        from_exclude
+    )
+
+    return sort_by_dependencies(selected_extractors)

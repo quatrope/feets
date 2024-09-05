@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 
+@pytest.mark.slow
 @pytest.mark.filterwarnings(
     "ignore::RuntimeWarning", "ignore::scipy.optimize.OptimizeWarning"
 )

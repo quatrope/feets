@@ -58,7 +58,7 @@ def test_StetsonK_extract(normal_light_curve):
     np.testing.assert_allclose(values.mean(), 0.7978257009818837)
 
 
-@pytest.mark.skip(reason="Slow test")
+@pytest.mark.slow
 def test_StetsonKAC_extract(normal_light_curve):
     # create the extractor
     extractor = ext_stetson.StetsonKAC()

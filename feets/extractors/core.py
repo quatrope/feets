@@ -306,8 +306,8 @@ class Extractor(abc.ABC):
             cls_name = type(self).__qualname__
             estr, fstr = ", ".join(expected), ", ".join(result.keys())
             raise ExtractorContractError(
-                f"The extractor '{cls_name}' expect the features {estr}, "
-                f"and found: {fstr!r}"
+                f"The extractor '{cls_name}' expected the features {estr}. "
+                f"Found: {fstr!r}"
             )
 
         selected = {k: result[k] for k in selected_features}

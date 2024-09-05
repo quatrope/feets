@@ -2,7 +2,10 @@ from feets.extractors import ext_car
 
 import numpy as np
 
+import pytest
 
+
+@pytest.mark.slow
 def test_CAR_extract(periodic_light_curve):
     # create the extractor
     extractor = ext_car.CAR()

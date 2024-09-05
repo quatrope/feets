@@ -28,41 +28,30 @@
 # DOCS
 # =============================================================================
 
-__doc__ = """Features extractors classes and register utilities"""
-
-__all__ = [
-    "DATAS",
-    "register_extractor",
-    "registered_extractors",
-    "is_extractor_registered",
-    "available_features",
-    "extractor_of",
-    "sort_by_dependencies",
-    "ExtractorBadDefinedError",
-    "ExtractorContractError",
-    "ExtractorWarning",
-    "Extractor",
-]
+"""Features extractors classes and register utilities"""
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+from . import register
 from .core import (
     DATAS,
     Extractor,
     ExtractorBadDefinedError,
     ExtractorContractError,
     ExtractorWarning,
-)  # noqa
-from .register import (
-    available_features,
-    extractor_of,
-    is_extractor_registered,
-    register_extractor,
-    registered_extractors,
-    sort_by_dependencies,
 )
+
+
+__all__ = [
+    "DATAS",
+    "ExtractorBadDefinedError",
+    "ExtractorContractError",
+    "ExtractorWarning",
+    "Extractor",
+    "register",
+]
 
 
 # =============================================================================
@@ -102,7 +91,7 @@ from .ext_structure_functions import *  # noqa
 from .ext_signature import *  # noqa
 from .ext_dmdt import *  # noqa
 
-for cls in sort_by_dependencies(Extractor.__subclasses__()):
-    register_extractor(cls)
+for cls in register.sort_by_dependencies(Extractor.__subclasses__()):
+    register.register_extractor(cls)
 
 del cls
