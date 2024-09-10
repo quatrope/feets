@@ -41,6 +41,76 @@ from .extractor import Extractor
 
 
 # =============================================================================
+# FUNCTIONS
+# =============================================================================
+
+
+def slotted_autocorrelation(data, time, T, K, second_round=False, K1=100):
+
+    slots, i = np.zeros((K, 1)), 1
+
+    # make time start from 0
+    time = time - np.min(time)
+
+    # subtract mean from mag values
+    m = np.mean(data)
+    data = data - m
+
+    prod = np.zeros((K, 1))
+    pairs = np.subtract.outer(time, time)
+    pairs[np.tril_indices_from(pairs)] = 10000000
+
+    ks = np.int64(np.floor(np.abs(pairs) / T + 0.5))
+
+    # We calculate the slotted autocorrelation for k=0 separately
+    idx = np.where(ks == 0)
+    prod[0] = (sum(data**2) + sum(data[idx[0]] * data[idx[1]])) / (
+        len(idx[0]) + len(data)
+    )
+    slots[0] = 0
+
+    # We calculate it for the rest of the ks
+    if second_round is False:
+        for k in np.arange(1, K):
+            idx = np.where(ks == k)
+            if len(idx[0]) != 0:
+                prod[k] = sum(data[idx[0]] * data[idx[1]]) / (len(idx[0]))
+                slots[i] = k
+                i = i + 1
+            else:
+                prod[k] = np.inf
+    else:
+        for k in np.arange(K1, K):
+            idx = np.where(ks == k)
+            if len(idx[0]) != 0:
+                prod[k] = sum(data[idx[0]] * data[idx[1]]) / (len(idx[0]))
+                slots[i - 1] = k
+                i = i + 1
+            else:
+                prod[k] = np.inf
+        np.trim_zeros(prod, trim="b")
+
+    slots = np.trim_zeros(slots, trim="b")
+    return prod / prod[0], np.int64(slots).flatten()
+
+
+def start_conditions(magnitude, time, T):
+    N = len(time)
+
+    if T is None:
+        deltaT = time[1:] - time[:-1]
+        sorted_deltaT = np.sort(deltaT)
+        T = sorted_deltaT[int(N * 0.05) + 1]
+
+    K = 100
+
+    SAC, slots = slotted_autocorrelation(magnitude, time, T, K)
+    SAC2 = SAC[slots]
+
+    return T, K, slots, SAC2
+
+
+# =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
 
@@ -92,73 +162,8 @@ class SlottedA_length(Extractor):
     def __init__(self, T=1):
         self.T = T
 
-    def slotted_autocorrelation(
-        self, data, time, T, K, second_round=False, K1=100
-    ):
-
-        slots, i = np.zeros((K, 1)), 1
-
-        # make time start from 0
-        time = time - np.min(time)
-
-        # subtract mean from mag values
-        m = np.mean(data)
-        data = data - m
-
-        prod = np.zeros((K, 1))
-        pairs = np.subtract.outer(time, time)
-        pairs[np.tril_indices_from(pairs)] = 10000000
-
-        ks = np.int64(np.floor(np.abs(pairs) / T + 0.5))
-
-        # We calculate the slotted autocorrelation for k=0 separately
-        idx = np.where(ks == 0)
-        prod[0] = (sum(data**2) + sum(data[idx[0]] * data[idx[1]])) / (
-            len(idx[0]) + len(data)
-        )
-        slots[0] = 0
-
-        # We calculate it for the rest of the ks
-        if second_round is False:
-            for k in np.arange(1, K):
-                idx = np.where(ks == k)
-                if len(idx[0]) != 0:
-                    prod[k] = sum(data[idx[0]] * data[idx[1]]) / (len(idx[0]))
-                    slots[i] = k
-                    i = i + 1
-                else:
-                    prod[k] = np.inf
-        else:
-            for k in np.arange(K1, K):
-                idx = np.where(ks == k)
-                if len(idx[0]) != 0:
-                    prod[k] = sum(data[idx[0]] * data[idx[1]]) / (len(idx[0]))
-                    slots[i - 1] = k
-                    i = i + 1
-                else:
-                    prod[k] = np.inf
-            np.trim_zeros(prod, trim="b")
-
-        slots = np.trim_zeros(slots, trim="b")
-        return prod / prod[0], np.int64(slots).flatten()
-
-    def start_conditions(self, magnitude, time, T):
-        N = len(time)
-
-        if T is None:
-            deltaT = time[1:] - time[:-1]
-            sorted_deltaT = np.sort(deltaT)
-            T = sorted_deltaT[int(N * 0.05) + 1]
-
-        K = 100
-
-        SAC, slots = self.slotted_autocorrelation(magnitude, time, T, K)
-        SAC2 = SAC[slots]
-
-        return T, K, slots, SAC2
-
     def extract(self, magnitude, time):
-        T, K, slots, SAC2 = self.start_conditions(magnitude, time, self.T)
+        T, K, slots, SAC2 = start_conditions(magnitude, time, self.T)
 
         k = next(
             (index for index, value in enumerate(SAC2) if value < np.exp(-1)),
@@ -170,7 +175,7 @@ class SlottedA_length(Extractor):
             if K > (np.max(time) - np.min(time)) / T:
                 break
             else:
-                SAC, slots = self.slotted_autocorrelation(
+                SAC, slots = slotted_autocorrelation(
                     magnitude, time, T, K, second_round=True, K1=int(K / 2)
                 )
                 SAC2 = SAC[slots]

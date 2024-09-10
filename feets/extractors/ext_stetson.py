@@ -64,7 +64,7 @@ allowing all residuals to be compared on an equal basis.
 import numpy as np
 
 from .extractor import Extractor
-from .ext_slotted_a_length import SlottedA_length
+from .ext_slotted_a_length import start_conditions
 from ..utils import indent
 
 
@@ -247,8 +247,7 @@ class StetsonKAC(Extractor):
         self.T = T
 
     def extract(self, magnitude, time):
-        sal = SlottedA_length(T=self.T)
-        autocor_vector = sal.start_conditions(magnitude, time, sal.T)[-1]
+        autocor_vector = start_conditions(magnitude, time, self.T)[-1]
 
         N_autocor = len(autocor_vector)
         sigmap = (

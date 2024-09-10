@@ -263,7 +263,7 @@ class Extractor(abc.ABC):
     @classmethod
     def get_default_params(cls):
         """The default values of the available configuration parameters."""
-        return dict(cls._conf.params)
+        return dict(cls._conf.parameters)
 
     def feature_warning(self, msg):
         """Issue a warning."""

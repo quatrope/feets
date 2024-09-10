@@ -1,5 +1,5 @@
 import feets.extractors.register
-from feets.extractors.core import Extractor
+from feets.extractors.extractor import Extractor
 from feets.extractors.register import (
     available_features,
     extractor_of,
@@ -96,9 +96,9 @@ def test_is_feature_registered(mocker):
                 "test_b2": None,
             }
 
-    for feature in A._conf.features:
+    for feature in A.get_features():
         np.testing.assert_(is_feature_registered(feature))
-    for feature in B._conf.features:
+    for feature in B.get_features():
         np.testing.assert_(not is_feature_registered(feature))
 
 
@@ -180,9 +180,9 @@ def test_extractor_of(mocker):
                 "test_b2": None,
             }
 
-    for feature in A._conf.features:
+    for feature in A.get_features():
         np.testing.assert_equal(extractor_of(feature), A)
-    for feature in B._conf.features:
+    for feature in B.get_features():
         np.testing.assert_equal(extractor_of(feature), B)
 
 
