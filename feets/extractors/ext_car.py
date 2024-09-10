@@ -40,7 +40,7 @@ import numpy as np
 
 from scipy.optimize import minimize
 
-from .core import Extractor, FeatureExtractionWarning
+from .extractor import Extractor, FeatureExtractionWarning
 
 
 # =============================================================================

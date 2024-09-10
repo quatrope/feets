@@ -1,7 +1,7 @@
 import os
 import pathlib
 
-from feets.extractors import core
+from feets.extractors import extractor
 
 import numpy as np
 
@@ -17,8 +17,8 @@ def normal_light_curve():
     def maker(*, data=None, size=100, random=None, **kwargs):
         random = np.random.default_rng(random)
 
-        data = core.DATAS if data is None else data
-        diff = set(data).difference(core.DATAS)
+        data = extractor.DATAS if data is None else data
+        diff = set(data).difference(extractor.DATAS)
         if diff:
             raise ValueError(f"Invalid data/s {diff}")
 
@@ -37,8 +37,8 @@ def uniform_light_curve():
     def maker(*, data=None, size=100, random=None, **kwargs):
         random = np.random.default_rng(random)
 
-        data = core.DATAS if data is None else data
-        diff = set(data).difference(core.DATAS)
+        data = extractor.DATAS if data is None else data
+        diff = set(data).difference(extractor.DATAS)
         if diff:
             raise ValueError(f"Invalid data/s {diff}")
 
@@ -57,8 +57,8 @@ def periodic_light_curve():
     def maker(*, data=None, size=100, random=None, **kwargs):
         random = np.random.default_rng(random)
 
-        data = core.DATAS if data is None else data
-        diff = set(data).difference(core.DATAS)
+        data = extractor.DATAS if data is None else data
+        diff = set(data).difference(extractor.DATAS)
         if diff:
             raise ValueError(f"Invalid data/s {diff}")
 

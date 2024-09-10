@@ -63,7 +63,7 @@ allowing all residuals to be compared on an equal basis.
 
 import numpy as np
 
-from .core import Extractor
+from .extractor import Extractor
 from .ext_slotted_a_length import SlottedA_length
 from ..utils import indent
 

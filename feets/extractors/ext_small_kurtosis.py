@@ -37,7 +37,7 @@ __doc__ = """"""
 
 import numpy as np
 
-from .core import Extractor
+from .extractor import Extractor
 
 
 # =============================================================================

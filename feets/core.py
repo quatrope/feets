@@ -42,7 +42,7 @@ import logging
 import numpy as np
 
 from . import extractors
-from .extractors.core import (
+from .extractors.extractor import (
     DATA_ALIGNED_ERROR,
     DATA_ALIGNED_ERROR2,
     DATA_ALIGNED_MAGNITUDE,
@@ -189,12 +189,12 @@ class FeatureSpace:
         return str(self)
 
     def __str__(self):
-        space = ", ".join(str(extractor) for extractor in self._execution_plan)
+        space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
-    def dict_data_as_array(self, d):
+    def dict_data_as_array(self, data):
         array_data = {}
-        for k, v in d.items():
+        for k, v in data.items():
             if k in self._required_data and v is None:
                 raise DataRequiredError(k)
             array_data[k] = v if v is None else np.asarray(v)
@@ -228,8 +228,8 @@ class FeatureSpace:
         )
 
         features = {}
-        for fextractor in self._execution_plan:
-            result = fextractor.extract(features=features, **kwargs)
+        for extractor in self._extractors:
+            result = extractor.extract(features=features, **kwargs)
             features.update(result)
 
         return FeatureSet("features", features)

@@ -47,7 +47,7 @@ import numpy as np
 
 import requests
 
-from ..extractors.core import DATAS
+from ..extractors.extractor import DATAS
 
 
 # =============================================================================

@@ -41,7 +41,7 @@ import numpy as np
 
 from scipy.interpolate import interp1d
 
-from .core import Extractor, FeatureExtractionWarning
+from .extractor import Extractor, FeatureExtractionWarning
 
 
 # =============================================================================

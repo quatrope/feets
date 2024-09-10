@@ -37,7 +37,7 @@ __doc__ = """"""
 
 from scipy import stats
 
-from .core import Extractor
+from .extractor import Extractor
 
 
 # =============================================================================

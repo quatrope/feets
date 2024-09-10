@@ -41,7 +41,7 @@ import numpy as np
 
 from scipy.optimize import curve_fit
 
-from .core import Extractor
+from .extractor import Extractor
 from .ext_lomb_scargle import DEFAULT_LSCARGLE_KWDS, lscargle
 
 

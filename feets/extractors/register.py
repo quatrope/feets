@@ -1,6 +1,10 @@
 import inspect
 
-from . import core
+from .extractor import (
+    DATAS,
+    Extractor,
+    ExtractorBadDefinedError,
+)
 
 
 # =============================================================================
@@ -24,19 +28,19 @@ _extractors = {}
 
 
 def is_instance_or_is_extractor(obj):
-    return isinstance(obj, core.Extractor) or (
-        inspect.isclass(obj) and issubclass(obj, core.Extractor)
+    return isinstance(obj, Extractor) or (
+        inspect.isclass(obj) and issubclass(obj, Extractor)
     )
 
 
 def register_extractor(cls):
-    if not issubclass(cls, core.Extractor):
+    if not issubclass(cls, Extractor):
         msg = f"'cls' must be a subclass of Extractor. Found: {cls}"
         raise TypeError(msg)
     for d in cls.get_dependencies():
         if d not in _extractors.keys():
             msg = f"Dependency '{d}' from extractor '{cls}'"
-            raise core.ExtractorBadDefinedError(msg)
+            raise ExtractorBadDefinedError(msg)
     for feature in cls.get_features():
         if is_feature_registered(feature):
             raise FeatureExtractorAlreadyRegistered(feature)
@@ -57,7 +61,7 @@ def is_feature_registered(feature):
 
 
 def is_extractor_registered(cls):
-    if not issubclass(cls, core.Extractor):
+    if not issubclass(cls, Extractor):
         msg = f"'cls' must be a subclass of Extractor. Found: '{cls}'"
         raise TypeError(msg)
     return cls in _extractors.values()
@@ -79,9 +83,7 @@ def sort_by_dependencies(exts, retry=None):
     while pending:
         ext, cnt = pending.pop(0)
 
-        if not isinstance(ext, core.Extractor) and not issubclass(
-            ext, core.Extractor
-        ):
+        if not isinstance(ext, Extractor) and not issubclass(ext, Extractor):
             msg = (
                 f"Only Extractor instances are allowed. Found: '{type(ext)}'."
             )
@@ -106,15 +108,15 @@ def get_extractors_by_data(data=None):
     if data is None:
         return set(registered_extractors().values())
 
-    diff = set(data).difference(core.DATAS)
+    diff = set(data).difference(DATAS)
     if diff:
         msg = f"Invalid data(s): {', '.join(diff)}."
         raise ValueError(msg)
 
     extractors = set()
-    for extractor in registered_extractors().values():
-        if extractor.get_data().intersection(data):
-            extractors.add(extractor)
+    for extractor_cls in registered_extractors().values():
+        if extractor_cls.get_data().intersection(data):
+            extractors.add(extractor_cls)
 
     return extractors
 

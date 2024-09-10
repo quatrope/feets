@@ -41,7 +41,7 @@ from astropy.timeseries import LombScargle as _LombScargle
 
 import numpy as np
 
-from .core import Extractor
+from .extractor import Extractor
 
 # =============================================================================
 # CONSTANTS

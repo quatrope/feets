@@ -39,7 +39,7 @@ import numpy as np
 
 from statsmodels.tsa import stattools
 
-from .core import Extractor
+from .extractor import Extractor
 
 
 # =============================================================================

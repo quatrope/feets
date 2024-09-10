@@ -35,7 +35,7 @@
 # =============================================================================
 
 from . import register
-from .core import (
+from .extractor import (
     DATAS,
     Extractor,
     ExtractorBadDefinedError,

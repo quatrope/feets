@@ -39,7 +39,7 @@ import numpy as np
 
 from scipy import stats
 
-from .core import Extractor
+from .extractor import Extractor
 
 
 # =============================================================================
