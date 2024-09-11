@@ -63,8 +63,8 @@ allowing all residuals to be compared on an equal basis.
 
 import numpy as np
 
-from .extractor import Extractor
 from .ext_slotted_a_length import start_conditions
+from .extractor import Extractor
 from ..utils import indent
 
 

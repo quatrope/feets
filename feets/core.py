@@ -30,7 +30,7 @@
 
 __doc__ = """core functionalities of feets"""
 
-__all__ = ["DataRequiredError", "FeatureSpace"]
+__all__ = ["FeatureSpace"]
 
 
 # =============================================================================
@@ -42,17 +42,6 @@ import logging
 import numpy as np
 
 from . import extractors
-from .extractors.extractor import (
-    DATA_ALIGNED_ERROR,
-    DATA_ALIGNED_ERROR2,
-    DATA_ALIGNED_MAGNITUDE,
-    DATA_ALIGNED_MAGNITUDE2,
-    DATA_ALIGNED_TIME,
-    DATA_ERROR,
-    DATA_MAGNITUDE,
-    DATA_MAGNITUDE2,
-    DATA_TIME,
-)
 from .libs import bunch
 
 # =============================================================================
@@ -170,20 +159,33 @@ class FeatureSpace:
     """
 
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
-        extractors_clss = extractors.register.get_plan(
+        extractor_clss = extractors.register.get_plan(
             data=data, only=only, exclude=exclude
         )
 
-        exts = []
-        for extractor_cls in extractors_clss:
-            ext_kwargs = {
+        selected_extractors = []
+        selected_features = set()
+        required_data = set()
+        for extractor_cls in extractor_clss:
+            extractor_kwargs = {
                 pname: kwargs.get(pname, pvalue)
                 for pname, pvalue in extractor_cls.get_default_params()
             }
-            extractor = extractor_cls(**ext_kwargs)
-            exts.append(extractor)
 
-        self._extractors = np.array(exts)
+            extractor = extractor_cls(**extractor_kwargs)
+            features = extractor_cls.get_features()
+            data = extractor_cls.get_data()
+
+            selected_extractors.append(extractor)
+            selected_features.update(features)
+            required_data.update(data)
+
+        self._extractors = np.array(selected_extractors)
+        self._selected_features = frozenset(
+            selected_features.intersection(only)
+        )
+        self._selected_features_as_array = np.array(list(selected_features))
+        self._required_data = frozenset(required_data)
 
     def __repr__(self):
         return str(self)
@@ -192,63 +194,29 @@ class FeatureSpace:
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
-    def dict_data_as_array(self, data):
-        array_data = {}
-        for k, v in data.items():
-            if k in self._required_data and v is None:
-                raise DataRequiredError(k)
-            array_data[k] = v if v is None else np.asarray(v)
-        return array_data
-
-    def extract(
-        self,
-        time=None,
-        magnitude=None,
-        error=None,
-        magnitude2=None,
-        aligned_time=None,
-        aligned_magnitude=None,
-        aligned_magnitude2=None,
-        aligned_error=None,
-        aligned_error2=None,
-    ):
-
-        kwargs = self.dict_data_as_array(
-            {
-                DATA_TIME: time,
-                DATA_MAGNITUDE: magnitude,
-                DATA_ERROR: error,
-                DATA_MAGNITUDE2: magnitude2,
-                DATA_ALIGNED_TIME: aligned_time,
-                DATA_ALIGNED_MAGNITUDE: aligned_magnitude,
-                DATA_ALIGNED_MAGNITUDE2: aligned_magnitude2,
-                DATA_ALIGNED_ERROR: aligned_error,
-                DATA_ALIGNED_ERROR2: aligned_error2,
-            }
-        )
+    def extract(self, **data):
+        for dname in self._required_data:
+            if data.get(dname, None) is None:
+                raise DataRequiredError(dname)
 
         features = {}
         for extractor in self._extractors:
-            result = extractor.extract(features=features, **kwargs)
-            features.update(result)
+            results = extractor.select_extract_and_validate(
+                data=data,
+                dependencies=features,
+                selected_features=self._selected_features,
+            )
+            features.update(results)
 
         return FeatureSet("features", features)
 
     @property
-    def kwargs(self):
-        return dict(self._kwargs)
-
-    @property
     def features_(self):
-        return self._features
-
-    @property
-    def features_extractors_(self):
-        return self._features_extractors
+        return self._selected_features
 
     @property
     def features_as_array_(self):
-        return self._features_as_array
+        return self._selected_features_as_array
 
     @property
     def excecution_plan_(self):

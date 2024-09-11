@@ -271,17 +271,45 @@ class Extractor(abc.ABC):
 
     def preprocess_arguments(self, data, dependencies):
         """Preprocess all the incoming arguments \
-        (timeserie + dependencies + parameters) to feed the `extract`method.
+        (timeserie + dependencies + parameters) to feed the `extract` method.
 
         """
+        kwargs = {}
+
         # add the required features
-        kwargs = {k: dependencies[k] for k in self.get_dependencies()}
+        for d in self.get_dependencies():
+            kwargs[d] = dependencies[d]
 
         # add the required data
         for d in self.get_data():
             kwargs[d] = data[d]
 
         return kwargs
+
+    def postprocess_result(self, result, selected_features):
+        """Validate if the extractor generated the expeccted features \
+        after calling the `extract` method.
+
+        """
+
+        # validate if the extractor generates the expected features
+        expected_features = self.get_features()  # the expected features
+
+        diff = set(result).symmetric_difference(expected_features)  # some diff
+        if diff:
+            cls_name = type(self).__qualname__
+            estr, fstr = ", ".join(expected_features), ", ".join(result.keys())
+            raise ExtractorContractError(
+                f"The extractor '{cls_name}' expected the features {estr}. "
+                f"Found: {fstr!r}"
+            )
+
+        # todo: normalize `result` to a 1-level dictionary before filtering
+        # filter only the selected features
+        selection = set(result).intersection(selected_features)
+        features = {k: result[k] for k in selection}
+
+        return features
 
     def select_extract_and_validate(
         self, data, dependencies, selected_features
@@ -298,21 +326,9 @@ class Extractor(abc.ABC):
         # run the extractor
         result = self.extract(**extract_kwargs)
 
-        # validate if the extractors generates the expected features
-        expected = self.get_features()  # the expected features
+        features = self.postprocess_result(result, selected_features)
 
-        diff = set(result).symmetric_difference(expected)  # some diff
-        if diff:
-            cls_name = type(self).__qualname__
-            estr, fstr = ", ".join(expected), ", ".join(result.keys())
-            raise ExtractorContractError(
-                f"The extractor '{cls_name}' expected the features {estr}. "
-                f"Found: {fstr!r}"
-            )
-
-        selected = {k: result[k] for k in selected_features}
-
-        return selected
+        return features
 
     # TO REDEFINE =============================================================
 
