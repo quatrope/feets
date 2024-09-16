@@ -134,7 +134,7 @@ def get_extractors(features=None):
 
 
 def get_plan(*, data=None, only=None, exclude=None):
-    if set(only).intersection(exclude):
+    if set(only or []).intersection(exclude or []):
         msg = "Features in 'only' and 'exclude' must be disjoint."
         raise ValueError(msg)
 

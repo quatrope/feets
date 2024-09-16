@@ -182,15 +182,11 @@ class FeatureSpace:
 
         self._extractors = np.array(selected_extractors)
         self._selected_features = frozenset(
-            selected_features.intersection(only)
+            selected_features.intersection(only or [])
         )
-        self._selected_features_as_array = np.array(list(selected_features))
         self._required_data = frozenset(required_data)
 
     def __repr__(self):
-        return str(self)
-
-    def __str__(self):
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
@@ -213,10 +209,6 @@ class FeatureSpace:
     @property
     def features_(self):
         return self._selected_features
-
-    @property
-    def features_as_array_(self):
-        return self._selected_features_as_array
 
     @property
     def excecution_plan_(self):
