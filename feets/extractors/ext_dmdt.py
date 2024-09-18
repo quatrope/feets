@@ -131,4 +131,4 @@ class DeltamDeltat(Extractor):
             counts.reshape((len(dt_bins) - 1) * (len(dm_bins) - 1)),
         )
 
-        return dict(result)
+        return {"DeltamDeltat": dict(result)}

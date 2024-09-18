@@ -163,28 +163,27 @@ class FeatureSpace:
             data=data, only=only, exclude=exclude
         )
 
+        selected_features = set(
+            extractors.register.available_features() if only is None else only
+        ).difference(exclude or [])
+
         selected_extractors = []
-        selected_features = set()
         required_data = set()
         for extractor_cls in extractor_clss:
-            extractor_params = extractor_cls.get_default_params().items()
+            default_params = extractor_cls.get_default_params().items()
             extractor_kwargs = {
                 pname: kwargs.get(pname, pvalue)
-                for pname, pvalue in extractor_params
+                for pname, pvalue in default_params
             }
 
             extractor = extractor_cls(**extractor_kwargs)
-            features = extractor_cls.get_features()
             data = extractor_cls.get_data()
 
             selected_extractors.append(extractor)
-            selected_features.update(features)
             required_data.update(data)
 
         self._extractors = np.array(selected_extractors)
-        self._selected_features = frozenset(
-            selected_features.intersection(only or [])
-        )
+        self._selected_features = frozenset(selected_features)
         self._required_data = frozenset(required_data)
 
     def __repr__(self):
@@ -195,6 +194,7 @@ class FeatureSpace:
         for dname in self._required_data:
             if data.get(dname, None) is None:
                 raise DataRequiredError(dname)
+        data = {dname: np.asarray(dvalue) for dname, dvalue in data.items()}
 
         features = {}
         for extractor in self._extractors:

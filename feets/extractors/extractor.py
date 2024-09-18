@@ -295,7 +295,9 @@ class Extractor(abc.ABC):
         # validate if the extractor generates the expected features
         expected_features = self.get_features()  # the expected features
 
-        diff = set(result).symmetric_difference(expected_features)  # some diff
+        diff = set(result or []).symmetric_difference(
+            expected_features or []
+        )  # some diff
         if diff:
             cls_name = type(self).__qualname__
             estr, fstr = ", ".join(expected_features), ", ".join(result.keys())
@@ -306,7 +308,7 @@ class Extractor(abc.ABC):
 
         # todo: normalize `result` to a 1-level dictionary before filtering
         # filter only the selected features
-        selection = set(result).intersection(selected_features)
+        selection = set(result or []).intersection(selected_features or [])
         features = {k: result[k] for k in selection}
 
         return features
@@ -324,9 +326,9 @@ class Extractor(abc.ABC):
         extract_kwargs = self.preprocess_arguments(data, dependencies)
 
         # run the extractor
-        result = self.extract(**extract_kwargs)
+        results = self.extract(**extract_kwargs)
 
-        features = self.postprocess_result(result, selected_features)
+        features = self.postprocess_result(results, selected_features)
 
         return features
 
@@ -340,14 +342,14 @@ class Extractor(abc.ABC):
         raise NotImplementedError()
 
 
-class MyExtractor(Extractor):
-    features = ["a"]
+# class MyExtractor(Extractor):
+#     features = ["a"]
 
-    def __init__(self):
-        pass
+#     def __init__(self):
+#         pass
 
-    def extract(self, time, magnitude=None):
-        pass
+#     def extract(self, time, magnitude=None):
+#         pass
 
 
-ext = MyExtractor()
+# ext = MyExtractor()
