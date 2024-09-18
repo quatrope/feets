@@ -332,6 +332,9 @@ class Extractor(abc.ABC):
 
         return features
 
+    # def select_extracted_feature(self, result, feature):
+    #     return result[feature]
+
     # TO REDEFINE =============================================================
 
     def __init__(self):

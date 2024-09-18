@@ -40,15 +40,11 @@ __all__ = ["FeatureSpace"]
 import logging
 import inspect
 
-from pprint import pprint
-
 import numpy as np
 
 from . import extractors
 from .libs import bunch
 
-# from dask.utils import apply
-from dask.threaded import get
 from dask.delayed import Delayed
 
 # =============================================================================
@@ -92,6 +88,11 @@ class FeatureSet(bunch.Bunch):
 # =============================================================================
 # FEATURE SPACE
 # =============================================================================
+
+
+def select_feature(extraction, feature_aux):
+    feature = feature_aux[: (len(feature_aux) - 4)]
+    return extraction[feature]
 
 
 class FeatureSpace:
@@ -170,11 +171,8 @@ class FeatureSpace:
             data=data, only=only, exclude=exclude
         )
 
-        selected_features = set(
-            extractors.register.available_features() if only is None else only
-        ).difference(exclude or [])
-
         selected_extractors = []
+        selected_features = set()
         required_data = set()
         for extractor_cls in extractor_clss:
             default_params = extractor_cls.get_default_params().items()
@@ -184,9 +182,14 @@ class FeatureSpace:
             }
 
             extractor = extractor_cls(**extractor_kwargs)
+            features = extractor.get_features()
             data = extractor_cls.get_data()
 
+            if only is not None:
+                features = features.intersection(only)
+
             selected_extractors.append(extractor)
+            selected_features.update(features)
             required_data.update(data)
 
         self._extractors = np.array(selected_extractors)
@@ -197,7 +200,7 @@ class FeatureSpace:
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
-    def extract(self, **data):
+    def extract_sequential(self, **data):
         for dname in self._required_data:
             if data.get(dname, None) is None:
                 raise DataRequiredError(dname)
@@ -214,7 +217,7 @@ class FeatureSpace:
 
         return FeatureSet("features", features)
 
-    def extract_dsk(self, **data):
+    def extract(self, **data):
         dsk = {}
         for dname in self._required_data:
             if data.get(dname, None) is None:
@@ -232,20 +235,28 @@ class FeatureSpace:
 
         for feature in self._selected_features:
             extractor = extractors.register.extractor_of(feature)
+            feature_aux = feature + "_aux"
 
             dsk[feature] = (
-                lambda extraction: extraction[feature],
+                select_feature,
                 "extraction_" + extractor.__qualname__,
+                feature_aux,
             )
 
         dsk["features"] = (
-            lambda *features: FeatureSet("features", features),
+            lambda features: FeatureSet(
+                "features",
+                {
+                    fname: list(features)[index]
+                    for index, fname in enumerate(self._selected_features)
+                },
+            ),
             [f for f in self._selected_features],
         )
 
         delayed_dsk = Delayed("features", dsk)
-        delayed_dsk.visualize()
-        return delayed_dsk.compute()
+
+        return delayed_dsk.compute(scheduler="single-threaded")
 
     @property
     def features(self):
