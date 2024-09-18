@@ -159,7 +159,7 @@ class FeatureSpace:
     """
 
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
-        extractor_clss = extractors.register.get_plan(
+        extractor_clss = extractors.register.get_execution_plan(
             data=data, only=only, exclude=exclude
         )
 
@@ -207,9 +207,9 @@ class FeatureSpace:
         return FeatureSet("features", features)
 
     @property
-    def features_(self):
+    def features(self):
         return self._selected_features
 
     @property
-    def excecution_plan_(self):
+    def execution_plan(self):
         return self._extractors

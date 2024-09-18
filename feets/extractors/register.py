@@ -37,9 +37,9 @@ def register_extractor(cls):
     if not issubclass(cls, Extractor):
         msg = f"'cls' must be a subclass of Extractor. Found: {cls}"
         raise TypeError(msg)
-    for d in cls.get_dependencies():
-        if d not in _extractors.keys():
-            msg = f"Dependency '{d}' from extractor '{cls}'"
+    for dependency in cls.get_dependencies():
+        if dependency not in _extractors.keys():
+            msg = f"Dependency '{dependency}' from extractor '{cls}'"
             raise ExtractorBadDefinedError(msg)
     for feature in cls.get_features():
         if is_feature_registered(feature):
@@ -72,6 +72,8 @@ def available_features():
 
 
 def extractor_of(feature):
+    if not is_feature_registered(feature):
+        raise FeatureNotFound(feature)
     return _extractors[feature]
 
 
@@ -104,46 +106,48 @@ def sort_by_dependencies(exts, retry=None):
     return tuple(sorted_ext)
 
 
-def get_extractors_by_data(data=None):
-    if data is None:
-        return set(registered_extractors().values())
-
+def extractors_from_data(data):
     diff = set(data).difference(DATAS)
     if diff:
         msg = f"Invalid data(s): {', '.join(diff)}."
         raise ValueError(msg)
 
     extractors = set()
-    for extractor_cls in registered_extractors().values():
-        if extractor_cls.get_data().intersection(data):
-            extractors.add(extractor_cls)
-
+    for extractor in _extractors.values():
+        if extractor.get_data().issubset(data):
+            extractors.add(extractor)
     return extractors
 
 
-def get_extractors(features=None):
-    selected_features = available_features() if features is None else features
-
+def extractors_from_features(features):
     extractors = set()
-    for feature in selected_features:
+    for feature in features:
         if not is_feature_registered(feature):
             raise FeatureNotFound(feature)
         extractors.add(extractor_of(feature))
+    return set(extractors)
 
-    return extractors
 
+def get_execution_plan(*, data=None, only=None, exclude=None):
+    if not set(only or []).isdisjoint(exclude or []):
+        raise ValueError("Features in 'only' and 'exclude' must be disjoint.")
 
-def get_plan(*, data=None, only=None, exclude=None):
-    if set(only or []).intersection(exclude or []):
-        msg = "Features in 'only' and 'exclude' must be disjoint."
-        raise ValueError(msg)
+    from_data = (
+        extractors_from_data(data)
+        if data is not None
+        else _extractors.values()
+    )
+    from_only = (
+        extractors_from_features(only)
+        if only is not None
+        else _extractors.values()
+    )
+    from_exclude = (
+        extractors_from_features(exclude) if exclude is not None else set([])
+    )
 
-    from_data = get_extractors_by_data(data=data)
-    from_only = get_extractors(features=only)
-    from_exclude = get_extractors(features=exclude)
-
-    selected_extractors = from_data.intersection(from_only).difference(
-        from_exclude
+    selected_extractors = (
+        set(from_data).intersection(from_only).difference(from_exclude)
     )
 
     return sort_by_dependencies(selected_extractors)
