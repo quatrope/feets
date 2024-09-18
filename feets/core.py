@@ -38,11 +38,18 @@ __all__ = ["FeatureSpace"]
 # =============================================================================
 
 import logging
+import inspect
+
+from pprint import pprint
 
 import numpy as np
 
 from . import extractors
 from .libs import bunch
+
+# from dask.utils import apply
+from dask.threaded import get
+from dask.delayed import Delayed
 
 # =============================================================================
 # CONSTANTS
@@ -206,6 +213,39 @@ class FeatureSpace:
             features.update(results)
 
         return FeatureSet("features", features)
+
+    def extract_dsk(self, **data):
+        dsk = {}
+        for dname in self._required_data:
+            if data.get(dname, None) is None:
+                raise DataRequiredError(dname)
+            dsk[dname] = np.asarray(data[dname])
+
+        for extractor in self._extractors:
+            extract_params = list(
+                inspect.signature(extractor.extract).parameters.keys()
+            )
+            dsk["extraction_" + type(extractor).__qualname__] = (
+                extractor.extract,
+                *extract_params,
+            )
+
+        for feature in self._selected_features:
+            extractor = extractors.register.extractor_of(feature)
+
+            dsk[feature] = (
+                lambda extraction: extraction[feature],
+                "extraction_" + extractor.__qualname__,
+            )
+
+        dsk["features"] = (
+            lambda *features: FeatureSet("features", features),
+            [f for f in self._selected_features],
+        )
+
+        delayed_dsk = Delayed("features", dsk)
+        delayed_dsk.visualize()
+        return delayed_dsk.compute()
 
     @property
     def features(self):

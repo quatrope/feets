@@ -308,10 +308,10 @@ class Extractor(abc.ABC):
 
         # todo: normalize `result` to a 1-level dictionary before filtering
         # filter only the selected features
-        selection = set(result or []).intersection(selected_features or [])
-        features = {k: result[k] for k in selection}
+        # selection = set(result or []).intersection(selected_features or [])
+        # features = {k: result[k] for k in selection}
 
-        return features
+        return result
 
     def select_extract_and_validate(
         self, data, dependencies, selected_features
