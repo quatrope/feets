@@ -119,7 +119,7 @@ class _ExtractorConf:
     optional: frozenset
     required: frozenset
     dependencies: frozenset
-    parameters: frozenset
+    parameters: dict
 
     @classmethod
     def _get_features_conf(cls, ecls):
@@ -180,7 +180,7 @@ class _ExtractorConf:
     @classmethod
     def _get_init_method_parameters(cls, ecls):
         cls_name = ecls.__name__
-        params = set()
+        params = {}
         for param in _iter_method_parameters(ecls.__init__):
             pname = param.name
             has_default = not (param.default is param.empty)
@@ -190,8 +190,8 @@ class _ExtractorConf:
                     f"must have a default value. Check {pname!r}."
                 )
                 raise ExtractorBadDefinedError(msg)
-            params.add(pname)
-        return frozenset(params)
+            params[pname] = param.default
+        return dict(params)
 
     @classmethod
     def from_extractor_class(cls, ecls):
@@ -263,7 +263,7 @@ class Extractor(abc.ABC):
     @classmethod
     def get_default_params(cls):
         """The default values of the available configuration parameters."""
-        return dict(cls._conf.parameters)
+        return cls._conf.parameters
 
     def feature_warning(self, msg):
         """Issue a warning."""

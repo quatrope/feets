@@ -167,9 +167,10 @@ class FeatureSpace:
         selected_features = set()
         required_data = set()
         for extractor_cls in extractor_clss:
+            extractor_params = extractor_cls.get_default_params().items()
             extractor_kwargs = {
                 pname: kwargs.get(pname, pvalue)
-                for pname, pvalue in extractor_cls.get_default_params()
+                for pname, pvalue in extractor_params
             }
 
             extractor = extractor_cls(**extractor_kwargs)

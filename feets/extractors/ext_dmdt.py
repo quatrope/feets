@@ -35,9 +35,23 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
+import copy
+
 import numpy as np
 
 from .extractor import Extractor
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+
+EPS = np.finfo(float).eps
+
+DEFAULT_DT_BINS = np.hstack([0.0, np.logspace(-3.0, 3.5, num=23)])
+
+DEFAULT_DM_BINS = np.hstack(
+    [-1.0 * np.logspace(1, -1, num=12), 0, np.logspace(-1, 1, num=12)]
+)
 
 
 # =============================================================================
@@ -70,13 +84,14 @@ class DeltamDeltat(Extractor):
 
     features = ["DeltamDeltat"]
 
-    def __init__(
-        self,
-        dt_bins=np.hstack([0.0, np.logspace(-3.0, 3.5, num=23)]),
-        dm_bins=np.hstack(
-            [-1.0 * np.logspace(1, -1, num=12), 0, np.logspace(-1, 1, num=12)]
-        ),
-    ):
+    def __init__(self, dt_bins=None, dm_bins=None):
+        dt_bins = (
+            copy.deepcopy(DEFAULT_DT_BINS) if dt_bins is None else dt_bins
+        )
+        dm_bins = (
+            copy.deepcopy(DEFAULT_DM_BINS) if dm_bins is None else dm_bins
+        )
+
         feature_attrs = []
         for i in range(len(dm_bins) - 1):
             for j in range(len(dt_bins) - 1):
