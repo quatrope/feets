@@ -38,14 +38,15 @@ __all__ = ["FeatureSpace"]
 # =============================================================================
 
 import logging
-import inspect
+from collections import OrderedDict
+from itertools import chain
 
 import numpy as np
 
 from . import extractors
 from .libs import bunch
 
-from dask.delayed import Delayed
+from dask.delayed import delayed
 
 # =============================================================================
 # CONSTANTS
@@ -90,8 +91,7 @@ class FeatureSet(bunch.Bunch):
 # =============================================================================
 
 
-def select_feature(extraction, feature_aux):
-    feature = feature_aux[: (len(feature_aux) - 4)]
+def _feature_from_extraction(extraction, feature):
     return extraction[feature]
 
 
@@ -171,9 +171,8 @@ class FeatureSpace:
             data=data, only=only, exclude=exclude
         )
 
-        selected_extractors = []
-        selected_features = set()
         required_data = set()
+        selected_extractors = []
         for extractor_cls in extractor_clss:
             default_params = extractor_cls.get_default_params().items()
             extractor_kwargs = {
@@ -181,20 +180,21 @@ class FeatureSpace:
                 for pname, pvalue in default_params
             }
 
-            extractor = extractor_cls(**extractor_kwargs)
-            features = extractor.get_features()
             data = extractor_cls.get_data()
-
-            if only is not None:
-                features = features.intersection(only)
-
-            selected_extractors.append(extractor)
-            selected_features.update(features)
             required_data.update(data)
 
-        self._extractors = np.array(selected_extractors)
-        self._selected_features = frozenset(selected_features)
+            extractor = extractor_cls(**extractor_kwargs)
+            features = extractor.get_features()
+            if only is not None:
+                features = features.intersection(only)
+            selected_extractors.append((extractor, frozenset(features)))
+
         self._required_data = frozenset(required_data)
+        self._extractor_features = OrderedDict(selected_extractors)
+        self._extractors = np.asarray(list(self._extractor_features.keys()))
+        self._selected_features = frozenset(
+            chain.from_iterable(self._extractor_features.values())
+        )
 
     def __repr__(self):
         space = ", ".join(str(extractor) for extractor in self._extractors)
@@ -218,45 +218,53 @@ class FeatureSpace:
         return FeatureSet("features", features)
 
     def extract(self, **data):
-        dsk = {}
         for dname in self._required_data:
             if data.get(dname, None) is None:
                 raise DataRequiredError(dname)
-            dsk[dname] = np.asarray(data[dname])
 
-        for extractor in self._extractors:
-            extract_params = list(
-                inspect.signature(extractor.extract).parameters.keys()
+        delayed_results = {}
+        for dname, dvalue in data.items():
+            delayed_data = delayed(np.asarray)(
+                dvalue, dask_key_name="data_" + dname
             )
-            dsk["extraction_" + type(extractor).__qualname__] = (
-                extractor.extract,
-                *extract_params,
+            delayed_results[dname] = delayed_data
+
+        for extractor, features in self._extractor_features.items():
+            extractor_data = {}
+            for dname in extractor.get_required_data():
+                extractor_data[dname] = delayed_results[dname]
+
+            extractor_dependencies = {}
+            for dname in extractor.get_dependencies():
+                extractor_dependencies[dname] = delayed_results[dname]
+
+            delayed_extraction = delayed(
+                extractor.select_extract_and_validate
+            )(
+                extractor_data,
+                extractor_dependencies,
+                features,
+                dask_key_name="extract_" + type(extractor).__qualname__,
             )
 
-        for feature in self._selected_features:
-            extractor = extractors.register.extractor_of(feature)
-            feature_aux = feature + "_aux"
+            for feature in features:
+                delayed_feature = delayed(_feature_from_extraction)(
+                    delayed_extraction,
+                    feature,
+                    dask_key_name="feature_" + feature,
+                )
+                delayed_results[feature] = delayed_feature
 
-            dsk[feature] = (
-                select_feature,
-                "extraction_" + extractor.__qualname__,
-                feature_aux,
-            )
+        feature_results = {}
+        for fname in self._selected_features:
+            fvalue = delayed_results[fname]
+            feature_results[fname] = fvalue
 
-        dsk["features"] = (
-            lambda features: FeatureSet(
-                "features",
-                {
-                    fname: list(features)[index]
-                    for index, fname in enumerate(self._selected_features)
-                },
-            ),
-            [f for f in self._selected_features],
+        features = delayed(FeatureSet)("features", feature_results)
+        features.visualize(
+            filename="./feets/execution_graph.png", optimize_graph=True
         )
-
-        delayed_dsk = Delayed("features", dsk)
-
-        return delayed_dsk.compute(scheduler="single-threaded")
+        return features.compute(optimize_graph=True)
 
     @property
     def features(self):
