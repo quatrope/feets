@@ -262,7 +262,9 @@ class FeatureSpace:
 
         features = delayed(FeatureSet)("features", feature_results)
         features.visualize(
-            filename="./feets/execution_graph.png", optimize_graph=True
+            filename="./feets/execution_graph.png",
+            optimize_graph=True,
+            rankdir="LR",
         )
         return features.compute(optimize_graph=True)
 
