@@ -38,7 +38,6 @@ __all__ = ["FeatureSpace"]
 # =============================================================================
 
 import logging
-from collections import OrderedDict
 from itertools import chain
 
 import numpy as np
@@ -46,7 +45,8 @@ import numpy as np
 from . import extractors
 from .libs import bunch
 
-from dask.delayed import delayed
+# from dask.delayed import delayed
+from dask.distributed import Client
 
 # =============================================================================
 # CONSTANTS
@@ -167,12 +167,15 @@ class FeatureSpace:
     """
 
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
+        self._client = Client()
+
         extractor_clss = extractors.register.get_execution_plan(
             data=data, only=only, exclude=exclude
         )
 
+        ext_actors = []
+        ext_features = []
         required_data = set()
-        selected_extractors = []
         for extractor_cls in extractor_clss:
             default_params = extractor_cls.get_default_params().items()
             extractor_kwargs = {
@@ -180,98 +183,59 @@ class FeatureSpace:
                 for pname, pvalue in default_params
             }
 
+            ext_actor = extractors.extractor_actor.ExtractorActor(
+                extractor_cls, **extractor_kwargs
+            )
+            ext_actors.append(ext_actor)
+
+            features = extractor_cls.get_features()
+            if only is not None:
+                features = features.intersection(only)
+            ext_features.append(features)
+
             data = extractor_cls.get_data()
             required_data.update(data)
 
-            extractor = extractor_cls(**extractor_kwargs)
-            features = extractor.get_features()
-            if only is not None:
-                features = features.intersection(only)
-            selected_extractors.append((extractor, frozenset(features)))
-
         self._required_data = frozenset(required_data)
-        self._extractor_features = OrderedDict(selected_extractors)
-        self._extractors = np.asarray(list(self._extractor_features.keys()))
-        self._selected_features = frozenset(
-            chain.from_iterable(self._extractor_features.values())
-        )
+        self._feature_extractors = zip(ext_features, ext_actors)
+        self._selected_features = frozenset(chain.from_iterable(ext_features))
+        self._extractors = np.asarray(ext_actors)
 
     def __repr__(self):
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
-    def extract_sequential(self, **data):
+    def extract(self, **data):
         for dname in self._required_data:
             if data.get(dname, None) is None:
                 raise DataRequiredError(dname)
         data = {dname: np.asarray(dvalue) for dname, dvalue in data.items()}
 
-        features = {}
-        for extractor in self._extractors:
-            results = extractor.select_extract_and_validate(
-                data=data,
-                dependencies=features,
-                selected_features=self._selected_features,
-            )
-            features.update(results)
-
-        return FeatureSet("features", features)
-
-    def extract(self, **data):
-        for dname in self._required_data:
-            if data.get(dname, None) is None:
-                raise DataRequiredError(dname)
-
-        delayed_results = {}
-        for dname, dvalue in data.items():
-            delayed_data = delayed(np.asarray)(
-                dvalue, dask_key_name="data_" + dname
-            )
-            delayed_results[dname] = delayed_data
-
-        for extractor, features in self._extractor_features.items():
-            extractor_data = {}
-            for dname in extractor.get_required_data():
-                extractor_data[dname] = delayed_results[dname]
-
-            extractor_dependencies = {}
-            for dname in extractor.get_dependencies():
-                extractor_dependencies[dname] = delayed_results[dname]
-
-            delayed_extraction = delayed(
-                extractor.select_extract_and_validate
-            )(
-                extractor_data,
-                extractor_dependencies,
-                features,
-                dask_key_name="extract_" + type(extractor).__qualname__,
+        feature_futures = {}
+        for features, extractor_actor in self._feature_extractors:
+            extracted_results_future = self._client.submit(
+                extractor_actor.select_extract_and_validate,
+                data,
+                feature_futures,
             )
 
             for feature in features:
-                delayed_feature = delayed(_feature_from_extraction)(
-                    delayed_extraction,
+                feature_future = self._client.submit(
+                    extractor_actor.get_feature,
+                    extracted_results_future,
                     feature,
-                    dask_key_name="feature_" + feature,
                 )
-                delayed_results[feature] = delayed_feature
 
-        feature_results = {}
-        for fname in self._selected_features:
-            fvalue = delayed_results[fname]
-            feature_results[fname] = fvalue
+                feature_futures[feature] = feature_future
 
-        features = delayed(FeatureSet)("features", feature_results)
-        features.visualize(
-            filename="./feets/execution_graph.png",
-            optimize_graph=True,
-            rankdir="LR",
+        return FeatureSet(
+            "features",
+            {
+                feature: future.result()
+                for feature, future in feature_futures.items()
+            },
         )
-        return features.compute(optimize_graph=True)
 
     @property
     def features(self):
         return self._selected_features
-
-    @property
-    def execution_plan(self):
-        return self._extractors

@@ -151,3 +151,19 @@ def get_execution_plan(*, data=None, only=None, exclude=None):
     )
 
     return sort_by_dependencies(selected_extractors)
+
+
+# def get_feature_plan(*, data=None, only=None, exclude=None):
+#     execution_plan = get_execution_plan(data=data, only=only, exclude=exclude)
+
+#     layers = []
+#     last_layer = set()
+#     for extractor in execution_plan:
+#         dependencies = extractor.get_dependencies()
+
+#         if dependencies.intersection(last_layer):
+#             layers.append(last_layer)
+#             last_layer = set()
+
+#         features = extractor.get_features()
+#         last_layer.update(features)

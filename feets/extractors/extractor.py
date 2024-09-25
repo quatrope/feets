@@ -234,6 +234,7 @@ class Extractor(abc.ABC):
 
         cls._conf = _ExtractorConf.from_extractor_class(cls)
         del cls.features
+        cls._extracted_features = dict()
 
     @classmethod
     def get_features(cls):
@@ -268,72 +269,6 @@ class Extractor(abc.ABC):
     def feature_warning(self, msg):
         """Issue a warning."""
         warnings.warn(msg, FeatureExtractionWarning)
-
-    def preprocess_arguments(self, data, dependencies):
-        """Preprocess all the incoming arguments \
-        (timeserie + dependencies + parameters) to feed the `extract` method.
-
-        """
-        kwargs = {}
-
-        # add the required features
-        for d in self.get_dependencies():
-            kwargs[d] = dependencies[d]
-
-        # add the required data
-        for d in self.get_data():
-            kwargs[d] = data[d]
-
-        return kwargs
-
-    def postprocess_result(self, result, selected_features):
-        """Validate if the extractor generated the expeccted features \
-        after calling the `extract` method.
-
-        """
-
-        # validate if the extractor generates the expected features
-        expected_features = self.get_features()  # the expected features
-
-        diff = set(result or []).symmetric_difference(
-            expected_features or []
-        )  # some diff
-        if diff:
-            cls_name = type(self).__qualname__
-            estr, fstr = ", ".join(expected_features), ", ".join(result.keys())
-            raise ExtractorContractError(
-                f"The extractor '{cls_name}' expected the features {estr}. "
-                f"Found: {fstr!r}"
-            )
-
-        # todo: normalize `result` to a 1-level dictionary before filtering
-        # filter only the selected features
-        # selection = set(result or []).intersection(selected_features or [])
-        # features = {k: result[k] for k in selection}
-
-        return result
-
-    def select_extract_and_validate(
-        self, data, dependencies, selected_features
-    ):
-        """Internal method designed to select the parameters necessary for
-        executing the 'extract()' method, followed by its execution.
-
-        Additionally, finally, check that the features defined in the extractor
-        are correctly returned by the 'extract()' method.
-
-        """
-        extract_kwargs = self.preprocess_arguments(data, dependencies)
-
-        # run the extractor
-        results = self.extract(**extract_kwargs)
-
-        features = self.postprocess_result(results, selected_features)
-
-        return features
-
-    # def select_extracted_feature(self, result, feature):
-    #     return result[feature]
 
     # TO REDEFINE =============================================================
 
