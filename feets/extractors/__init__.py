@@ -42,7 +42,7 @@ from .extractor import (
     ExtractorContractError,
     ExtractorWarning,
 )
-from . import extractor_actor
+from . import actor
 
 
 __all__ = [
@@ -52,7 +52,7 @@ __all__ = [
     "ExtractorWarning",
     "Extractor",
     "register",
-    "extractor_actor",
+    "actor",
 ]
 
 

@@ -45,8 +45,7 @@ import numpy as np
 from . import extractors
 from .libs import bunch
 
-# from dask.delayed import delayed
-from dask.distributed import Client
+import ray
 
 # =============================================================================
 # CONSTANTS
@@ -167,74 +166,82 @@ class FeatureSpace:
     """
 
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
-        self._client = Client()
+        ray.init()
 
         extractor_clss = extractors.register.get_execution_plan(
             data=data, only=only, exclude=exclude
         )
 
-        ext_actors = []
-        ext_features = []
+        feature_extractors = []
         required_data = set()
         for extractor_cls in extractor_clss:
-            default_params = extractor_cls.get_default_params().items()
-            extractor_kwargs = {
-                pname: kwargs.get(pname, pvalue)
-                for pname, pvalue in default_params
-            }
-
-            ext_actor = extractors.extractor_actor.ExtractorActor(
-                extractor_cls, **extractor_kwargs
+            extractor, features, data = self.init_extractor(
+                extractor_cls, only=only, **kwargs
             )
-            ext_actors.append(ext_actor)
-
-            features = extractor_cls.get_features()
-            if only is not None:
-                features = features.intersection(only)
-            ext_features.append(features)
-
-            data = extractor_cls.get_data()
+            feature_extractors.append((extractor, features))
             required_data.update(data)
 
+        self._feature_extractors = np.asarray(feature_extractors)
+        self._extractors = np.asarray(self._feature_extractors[:, 0])
+        self._selected_features = frozenset(
+            chain.from_iterable(self._feature_extractors[:, 1])
+        )
         self._required_data = frozenset(required_data)
-        self._feature_extractors = zip(ext_features, ext_actors)
-        self._selected_features = frozenset(chain.from_iterable(ext_features))
-        self._extractors = np.asarray(ext_actors)
+
+    def init_extractor(self, extractor_cls, only=None, **kwargs):
+        # parameters needed to initialize the extractor
+        default_params = extractor_cls.get_default_params().items()
+        extractor_params = {
+            pname: kwargs.get(pname, pvalue)
+            for pname, pvalue in default_params
+        }
+
+        # initialize the extractor
+        extractor = extractor_cls(**extractor_params)
+
+        # expected features
+        features = extractor_cls.get_features()
+        if only is not None:
+            features = features.intersection(only)
+
+        # required data
+        data = extractor_cls.get_data()
+
+        return extractor, features, data
 
     def __repr__(self):
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
-    def extract(self, **data):
-        for dname in self._required_data:
-            if data.get(dname, None) is None:
-                raise DataRequiredError(dname)
-        data = {dname: np.asarray(dvalue) for dname, dvalue in data.items()}
+    def extract(self, **kwargs):
+        for key in self._required_data:
+            if kwargs.get(key, None) is None:
+                raise DataRequiredError(key)
+        data = {key: np.asarray(value) for key, value in kwargs.items()}
 
-        feature_futures = {}
-        for features, extractor_actor in self._feature_extractors:
-            extracted_results_future = self._client.submit(
-                extractor_actor.select_extract_and_validate,
-                data,
-                feature_futures,
+        actor_refs = []
+        result_refs_by_feature = {}
+        for extractor, features in self._feature_extractors:
+            actor_ref = extractors.actor.ExtractorActor.remote(
+                extractor, result_refs_by_feature
             )
+            actor_refs.append(actor_ref)
+
+            result_ref = actor_ref.extract.remote(data)
 
             for feature in features:
-                feature_future = self._client.submit(
-                    extractor_actor.get_feature,
-                    extracted_results_future,
-                    feature,
-                )
+                result_refs_by_feature[feature] = result_ref
 
-                feature_futures[feature] = feature_future
+        features = {}
+        for feature in self._selected_features:
+            result_ref = result_refs_by_feature[feature]
+            result = ray.get(result_ref)
+            features[feature] = result[feature]
 
-        return FeatureSet(
-            "features",
-            {
-                feature: future.result()
-                for feature, future in feature_futures.items()
-            },
-        )
+        for actor_ref in actor_refs:
+            ray.kill(actor_ref)
+
+        return FeatureSet("features", features)
 
     @property
     def features(self):
