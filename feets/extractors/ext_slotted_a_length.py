@@ -37,6 +37,7 @@ __doc__ = """"""
 
 import numpy as np
 
+from ..libs import doctools
 from .extractor import Extractor
 
 
@@ -116,8 +117,7 @@ def start_conditions(magnitude, time, T):
 
 
 class SlottedA_length(Extractor):
-    r"""
-    **SlottedA_length** - Slotted Autocorrelation
+    r"""Slotted Autocorrelation.
 
     In slotted autocorrelation, time lags are defined as intervals or slots
     instead of single values. The slotted autocorrelation function at a
@@ -162,6 +162,8 @@ class SlottedA_length(Extractor):
     def __init__(self, T=1):
         self.T = T
 
+
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
         T, K, slots, SAC2 = start_conditions(magnitude, time, self.T)
 

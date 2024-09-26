@@ -277,6 +277,13 @@ class Extractor(abc.ABC):
 
     @abc.abstractmethod
     def extract(self):
+        """Extract features from the time series.
+
+        Returns
+        -------
+        dict
+            The dictionary of features.
+        """
         raise NotImplementedError()
 
 

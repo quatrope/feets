@@ -59,6 +59,7 @@ REQUIREMENTS = [
     "requests",
     "attrs",
     "joblib",
+    "custom_inherit",
 ]
 
 
