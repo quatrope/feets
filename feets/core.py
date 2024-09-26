@@ -42,10 +42,10 @@ from itertools import chain
 
 import numpy as np
 
+import ray
+
 from . import extractors
 from .libs import bunch
-
-import ray
 
 # =============================================================================
 # CONSTANTS
@@ -227,7 +227,7 @@ class FeatureSpace:
             )
             actor_refs.append(actor_ref)
 
-            result_ref = actor_ref.extract.remote(data)
+            result_ref = actor_ref.select_extract_and_validate.remote(data)
 
             for feature in features:
                 result_refs_by_feature[feature] = result_ref

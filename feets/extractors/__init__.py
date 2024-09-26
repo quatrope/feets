@@ -34,6 +34,7 @@
 # IMPORTS
 # =============================================================================
 
+from . import actor
 from . import register
 from .extractor import (
     DATAS,
@@ -42,7 +43,6 @@ from .extractor import (
     ExtractorContractError,
     ExtractorWarning,
 )
-from . import actor
 
 
 __all__ = [
