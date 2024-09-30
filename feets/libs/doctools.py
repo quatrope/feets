@@ -1,4 +1,10 @@
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2017-2024, Cabral, Juan
+# Copyright (c) 2024, QuatroPe, Felipe Clariá
+# License: MIT
+# Full Text:
+#     https://github.com/quatrope/feets/blob/master/LICENSE
 
 # This code was ripped of from scikit-criteria on 10-nov-2022.
 # https://github.com/quatrope/scikit-criteria/blob/ec63c/skcriteria/utils/bunch.py

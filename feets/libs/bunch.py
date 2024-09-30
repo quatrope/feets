@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# This file is part of the
-#   Scikit-NeuroMSI Project (https://github.com/renatoparedes/scikit-neuromsi).
-# Copyright (c) 2021-2022, Renato Paredes; Cabral, Juan
-# License: BSD 3-Clause
+# Copyright (c) 2017-2024, Cabral, Juan
+# Copyright (c) 2024, QuatroPe, Felipe Clariá
+# License: MIT
 # Full Text:
-#     https://github.com/renatoparedes/scikit-neuromsi/blob/main/LICENSE.txt
+#     https://github.com/quatrope/feets/blob/master/LICENSE
 
 # This code was ripped of from scikit-criteria on 10-nov-2022.
 # https://github.com/quatrope/scikit-criteria/blob/ec63c/skcriteria/utils/bunch.py
