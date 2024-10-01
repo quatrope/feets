@@ -23,8 +23,6 @@ def test_DeltamDeltat_extract(normal_light_curve):
     values = np.empty(50)
     for idx in range(values.size):
         lc = normal_light_curve(random=random, size=1000, data=["magnitude"])
-        feats = extractor.extract(**lc, time=time)
-        values[idx] = np.sum(list(feats.values()))
-
-    print(values.mean())
+        deltam_deltat = extractor.extract(**lc, time=time)["DeltamDeltat"]
+        values[idx] = np.sum(list(deltam_deltat.values()))
     np.testing.assert_allclose(values.mean(), 425.86)

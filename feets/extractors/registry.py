@@ -204,8 +204,8 @@ class ExtractorRegistry:
 
     @property
     def registered_extractors(self):
-        return self._extractors
+        return frozenset(self._extractors)
 
     @property
     def available_features(self):
-        return self._features
+        return frozenset(self._features)
