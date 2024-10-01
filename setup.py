@@ -43,6 +43,7 @@ REQUIREMENTS = [
     "attrs",
     "joblib",
     "custom_inherit",
+    "ray",
 ]
 
 

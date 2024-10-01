@@ -59,13 +59,12 @@ DATAS = (
 
 
 class ExtractorBadDefinedError(TypeError):
-    """The extractor class are not properly defined."""
+    """The extractor class is not defined properly."""
 
 
 class ExtractorContractError(ValueError):
-    """The extractor don't get the expected features, data, parameters
+    """The extractor doesn't have the expected features, data, parameters
     or whatever.
-
     """
 
 
@@ -74,7 +73,7 @@ class ExtractorWarning(UserWarning):
 
 
 class FeatureExtractionWarning(UserWarning):
-    """Warn about calculation of some feature"""
+    """Warn about the calculation of some feature"""
 
 
 warnings.simplefilter("always", ExtractorWarning)

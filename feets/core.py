@@ -151,8 +151,10 @@ class FeatureSpace:
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
         ray.init()
 
-        extractor_clss = extractors.register.get_execution_plan(
-            data=data, only=only, exclude=exclude
+        extractor_clss = extractors.extractor_registry.get_execution_plan(
+            data=data,
+            only=only,
+            exclude=exclude,
         )
 
         feature_extractors = []

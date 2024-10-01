@@ -18,7 +18,7 @@
 # =============================================================================
 
 from . import actor
-from . import register
+from . import registry
 from .extractor import (
     DATAS,
     Extractor,
@@ -34,7 +34,7 @@ __all__ = [
     "ExtractorContractError",
     "ExtractorWarning",
     "Extractor",
-    "register",
+    "registry",
     "actor",
 ]
 
@@ -76,7 +76,8 @@ from .ext_structure_functions import *  # noqa
 from .ext_signature import *  # noqa
 from .ext_dmdt import *  # noqa
 
-for cls in register.sort_by_dependencies(Extractor.__subclasses__()):
-    register.register_extractor(cls)
+extractor_registry = registry.ExtractorRegistry()
+for cls in Extractor.__subclasses__():
+    extractor_registry.register_extractor(cls)
 
 del cls
