@@ -120,21 +120,6 @@ class _ExtractorConf:
             )
         features.add(feature)
 
-    @classmethod
-    def _get_feature_conf(cls, ecls):
-        features_attr = f"{ecls.__qualname__}.features"
-        features = set()
-
-        for feature in getattr(ecls, "features", []):
-            cls._validate_and_add_feature(feature, features, features_attr)
-
-        if not features:
-            raise ExtractorBadDefinedError(
-                f"{features_attr!r} must be a non-empty sequence"
-            )
-
-        return frozenset(features)
-
     @staticmethod
     def _validate_and_add_extract_param(
         param, required, optional, dependencies, ecls_name
@@ -156,6 +141,31 @@ class _ExtractorConf:
             )
         dependencies.add(pname)
 
+    @staticmethod
+    def _validate_and_add_init_param(param, parameters, ecls_name):
+        pname = param.name
+        if param.default is param.empty:
+            raise ExtractorBadDefinedError(
+                f"All parameters in the '{ecls_name}.__init__()' method"
+                f"must have a default value. Check {pname!r}."
+            )
+        parameters[pname] = param.default
+
+    @classmethod
+    def _get_feature_conf(cls, ecls):
+        features_attr = f"{ecls.__qualname__}.features"
+        features = set()
+
+        for feature in getattr(ecls, "features", []):
+            cls._validate_and_add_feature(feature, features, features_attr)
+
+        if not features:
+            raise ExtractorBadDefinedError(
+                f"{features_attr!r} must be a non-empty sequence"
+            )
+
+        return frozenset(features)
+
     @classmethod
     def _get_extract_method_parameters(cls, ecls):
         ecls_name = ecls.__qualname__
@@ -172,16 +182,6 @@ class _ExtractorConf:
             frozenset(optional),
             frozenset(dependencies),
         )
-
-    @staticmethod
-    def _validate_and_add_init_param(param, parameters, ecls_name):
-        pname = param.name
-        if param.default is param.empty:
-            raise ExtractorBadDefinedError(
-                f"All parameters in the '{ecls_name}.__init__()' method"
-                f"must have a default value. Check {pname!r}."
-            )
-        parameters[pname] = param.default
 
     @classmethod
     def _get_init_method_parameters(cls, ecls):
@@ -226,10 +226,6 @@ class Extractor(abc.ABC):
 
     def __init_subclass__(cls):
         cls_name = cls.__qualname__
-        if _isabstract(cls.__init__):
-            raise ExtractorBadDefinedError(
-                f"'{cls_name}.__init__()' method must be redefined"
-            )
         if _isabstract(cls.extract):
             raise ExtractorBadDefinedError(
                 f"'{cls_name}.extract()' method must be redefined"
