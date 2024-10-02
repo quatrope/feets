@@ -213,7 +213,27 @@ def test_sort_extractors_by_dependencies_valid(registry):
     registry.register_extractor(extractorB2)
     registry.register_extractor(extractorC)
 
-    extractors = [extractorB1, extractorC, extractorA]
+    extractors = [extractorB1, extractorC, extractorB2, extractorA]
+    result = registry.sort_extractors_by_dependencies(extractors)
+
+    np.testing.assert_equal(result[0], extractorA)
+    np.testing.assert_equal(result[3], extractorC)
+    assert result[1] in {extractorB1, extractorB2}
+    assert result[2] in {extractorB1, extractorB2}
+
+
+def test_sort_extractors_by_dependencies_missing_dependencies(registry):
+    extractorA = MockExtractorA
+    extractorB1 = MockExtractorB1
+    extractorB2 = MockExtractorB2
+    extractorC = MockExtractorC
+
+    registry.register_extractor(extractorA)
+    registry.register_extractor(extractorB1)
+    registry.register_extractor(extractorB2)
+    registry.register_extractor(extractorC)
+
+    extractors = [extractorC]
     result = registry.sort_extractors_by_dependencies(extractors)
 
     np.testing.assert_equal(result[0], extractorA)

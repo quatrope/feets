@@ -92,111 +92,129 @@ def _isabstract(attr):
 def _iter_method_parameters(method):
     signature = inspect.signature(method)
     parameters = tuple(signature.parameters.values())[1:]
-    yield from parameters
+    return iter(parameters)
 
 
 @dataclass(frozen=True)
 class _ExtractorConf:
     features: frozenset
-    data: frozenset
     optional: frozenset
     required: frozenset
     dependencies: frozenset
     parameters: dict
 
-    @classmethod
-    def _get_features_conf(cls, ecls):
-        features_attr = f"{ecls.__qualname__}.features"
+    @staticmethod
+    def _validate_and_add_feature(feature, features, features_attr):
+        if not isinstance(feature, str):
+            raise ExtractorBadDefinedError(
+                f"Feature name must be an instance of string. "
+                f"Found {type(feature)}, please check {features_attr!r}"
+            )
+        if feature in DATAS:
+            raise ExtractorBadDefinedError(
+                f"Feature can't be in {DATAS!r}. Check {features_attr!r}"
+            )
+        if feature in features:
+            raise ExtractorBadDefinedError(
+                f"Duplicated feature {feature!r} in {features_attr!r}"
+            )
+        features.add(feature)
 
+    @classmethod
+    def _get_feature_conf(cls, ecls):
+        features_attr = f"{ecls.__qualname__}.features"
         features = set()
-        for f in getattr(ecls, "features", []):
-            if not isinstance(f, str):
-                msg = (
-                    "Feature name must be an instance of string. "
-                    f"Found {type(f)}, please check {features_attr!r}"
-                )
-                raise ExtractorBadDefinedError(msg)
-            if f in DATAS:
-                msg = f"Feature can't be in {DATAS!r}. Check {features_attr!r}"
-                raise ExtractorBadDefinedError(msg)
-            if f in features:
-                msg = f"Duplicated feature {f!r} in {features_attr!r}"
-                raise ExtractorBadDefinedError(msg)
-            features.add(f)
+
+        for feature in getattr(ecls, "features", []):
+            cls._validate_and_add_feature(feature, features, features_attr)
 
         if not features:
-            msg = f"{features_attr!r} must be a not empty sequence"
-            raise ExtractorBadDefinedError(msg)
+            raise ExtractorBadDefinedError(
+                f"{features_attr!r} must be a non-empty sequence"
+            )
 
         return frozenset(features)
 
+    @staticmethod
+    def _validate_and_add_extract_param(
+        param, required, optional, dependencies, ecls_name
+    ):
+        pname = param.name
+        has_default = param.default is not param.empty
+
+        if pname in DATAS:
+            if has_default:
+                optional.add(pname)
+            else:
+                required.add(pname)
+            return
+
+        if has_default:
+            raise ExtractorBadDefinedError(
+                "Dependencies can't have default values. "
+                f"Check {pname!r} in '{ecls_name}.extract()' method"
+            )
+        dependencies.add(pname)
+
     @classmethod
     def _get_extract_method_parameters(cls, ecls):
-        cls_name = ecls.__qualname__
-        data, required, optional, dependencies = set(), set(), set(), set()
+        ecls_name = ecls.__qualname__
+        required, optional, dependencies = set(), set(), set()
 
-        for param in _iter_method_parameters(ecls.extract):
-            pname = param.name
-            has_default = not (param.default is param.empty)
-            if pname in DATAS:
-                data.add(pname)
-                if has_default:
-                    optional.add(pname)
-                else:
-                    required.add(pname)
-            else:
-                if has_default:
-                    msg = (
-                        "Dependencies with default parameters make no sense. "
-                        f"Check {pname!r} in '{cls_name}.extract()' method"
-                    )
-                    raise ExtractorBadDefinedError(msg)
-                dependencies.add(pname)
+        extract_params = _iter_method_parameters(ecls.extract)
+        for param in extract_params:
+            cls._validate_and_add_extract_param(
+                param, required, optional, dependencies, ecls_name
+            )
 
         return (
-            frozenset(data),
             frozenset(required),
             frozenset(optional),
             frozenset(dependencies),
         )
 
+    @staticmethod
+    def _validate_and_add_init_param(param, parameters, ecls_name):
+        pname = param.name
+        if param.default is param.empty:
+            raise ExtractorBadDefinedError(
+                f"All parameters in the '{ecls_name}.__init__()' method"
+                f"must have a default value. Check {pname!r}."
+            )
+        parameters[pname] = param.default
+
     @classmethod
     def _get_init_method_parameters(cls, ecls):
-        cls_name = ecls.__name__
-        params = {}
-        for param in _iter_method_parameters(ecls.__init__):
-            pname = param.name
-            has_default = not (param.default is param.empty)
-            if not has_default:
-                msg = (
-                    f"All parameters in the '{cls_name}.__init__()' method "
-                    f"must have a default value. Check {pname!r}."
-                )
-                raise ExtractorBadDefinedError(msg)
-            params[pname] = param.default
-        return dict(params)
+        ecls_name = ecls.__name__
+        parameters = {}
+
+        init_params = _iter_method_parameters(ecls.__init__)
+        for param in init_params:
+            cls._validate_and_add_init_param(param, parameters, ecls_name)
+
+        return dict(parameters)
 
     @classmethod
     def from_extractor_class(cls, ecls):
-        features = cls._get_features_conf(ecls)
+        features = cls._get_feature_conf(ecls)
         (
-            data,
             required,
             optional,
             dependencies,
         ) = cls._get_extract_method_parameters(ecls)
         parameters = cls._get_init_method_parameters(ecls)
 
-        conf = _ExtractorConf(
+        return _ExtractorConf(
             features=features,
-            data=data,
             required=required,
             optional=optional,
             dependencies=dependencies,
             parameters=parameters,
         )
 
-        return conf
+    @property
+    def data(self):
+        return frozenset(self.required.union(self.optional))
 
 
 # =============================================================================
@@ -209,15 +227,16 @@ class Extractor(abc.ABC):
     def __init_subclass__(cls):
         cls_name = cls.__qualname__
         if _isabstract(cls.__init__):
-            msg = f"'{cls_name}.__init__()' method must be redefined"
-            raise ExtractorBadDefinedError(msg)
+            raise ExtractorBadDefinedError(
+                f"'{cls_name}.__init__()' method must be redefined"
+            )
         if _isabstract(cls.extract):
-            msg = f"'{cls_name}.extract()' method must be redefined"
-            raise ExtractorBadDefinedError(msg)
+            raise ExtractorBadDefinedError(
+                f"'{cls_name}.extract()' method must be redefined"
+            )
 
         cls._conf = _ExtractorConf.from_extractor_class(cls)
         del cls.features
-        cls._extracted_features = dict()
 
     @classmethod
     def get_features(cls):
@@ -268,16 +287,3 @@ class Extractor(abc.ABC):
             The dictionary of features.
         """
         raise NotImplementedError()
-
-
-# class MyExtractor(Extractor):
-#     features = ["a"]
-
-#     def __init__(self):
-#         pass
-
-#     def extract(self, time, magnitude=None):
-#         pass
-
-
-# ext = MyExtractor()
