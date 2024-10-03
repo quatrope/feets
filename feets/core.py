@@ -21,11 +21,10 @@ __all__ = ["FeatureSpace"]
 # =============================================================================
 
 import logging
-from itertools import chain
+
+from dask.delayed import delayed
 
 import numpy as np
-
-import ray
 
 from . import extractors
 from .libs import bunch
@@ -149,85 +148,109 @@ class FeatureSpace:
     """
 
     def __init__(self, data=None, only=None, exclude=None, **kwargs):
-        ray.init()
-
         extractor_clss = extractors.extractor_registry.get_execution_plan(
-            data=data,
-            only=only,
-            exclude=exclude,
+            data=data, only=only, exclude=exclude
         )
 
-        feature_extractors = []
+        extractor_instances = []
+        features = set()
         required_data = set()
-        for extractor_cls in extractor_clss:
-            extractor, features, data = self.init_extractor(
-                extractor_cls, only=only, **kwargs
-            )
-            feature_extractors.append((extractor, features))
-            required_data.update(data)
 
-        self._feature_extractors = np.asarray(feature_extractors)
-        self._extractors = np.asarray(self._feature_extractors[:, 0])
-        self._selected_features = frozenset(
-            chain.from_iterable(self._feature_extractors[:, 1])
-        )
+        for extractor_cls in extractor_clss:
+            extractor_instance = self._init_extractor(extractor_cls, **kwargs)
+
+            extractor_instances.append(extractor_instance)
+            features.update(extractor_instance.get_features())
+            required_data.update(extractor_instance.get_data())
+
+        self._extractors = np.array(extractor_instances, dtype=object)
+        self._selected_features = frozenset(features if only is None else only)
         self._required_data = frozenset(required_data)
 
-    def init_extractor(self, extractor_cls, only=None, **kwargs):
-        # parameters needed to initialize the extractor
-        default_params = extractor_cls.get_default_params().items()
-        extractor_params = {
-            pname: kwargs.get(pname, pvalue)
-            for pname, pvalue in default_params
+    def _init_extractor(self, extractor_cls, **kwargs):
+        default_params = extractor_cls.get_default_params()
+        params = {
+            param: kwargs.get(param, default)
+            for param, default in default_params.items()
         }
-
-        # initialize the extractor
-        extractor = extractor_cls(**extractor_params)
-
-        # expected features
-        features = extractor_cls.get_features()
-        if only is not None:
-            features = features.intersection(only)
-
-        # required data
-        data = extractor_cls.get_data()
-
-        return extractor, features, data
+        return extractor_cls(**params)
 
     def __repr__(self):
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
     def extract(self, **kwargs):
-        for key in self._required_data:
-            if kwargs.get(key, None) is None:
-                raise DataRequiredError(key)
-        data = {key: np.asarray(value) for key, value in kwargs.items()}
+        data_store = self._validate_and_store_data(kwargs)
 
-        actor_refs = []
-        result_refs_by_feature = {}
-        for extractor, features in self._feature_extractors:
-            actor_ref = extractors.actor.ExtractorActor.remote(
-                extractor, result_refs_by_feature
-            )
-            actor_refs.append(actor_ref)
+        feature_store = self._extract_and_store_features(data_store)
 
-            result_ref = actor_ref.select_extract_and_validate.remote(data)
-
-            for feature in features:
-                result_refs_by_feature[feature] = result_ref
-
-        features = {}
-        for feature in self._selected_features:
-            result_ref = result_refs_by_feature[feature]
-            result = ray.get(result_ref)
-            features[feature] = result[feature]
-
-        for actor_ref in actor_refs:
-            ray.kill(actor_ref)
+        features = self._gather_selected_features(feature_store)
 
         return FeatureSet("features", features)
+
+    def _validate_and_store_data(self, kwargs):
+        data_store = {}
+
+        for required in self._required_data:
+            if kwargs.get(required, None) is None:
+                raise DataRequiredError(required)
+
+            data = kwargs[required]
+            delayed_data = delayed(np.asarray)(
+                data, dask_key_name=f"data_{required}"
+            )
+            data_store[required] = delayed_data
+
+        return data_store
+
+    def _extract_and_store_features(self, data_store):
+        feature_store = {}
+
+        for extractor in self._extractors:
+            extractor_name = type(extractor).__qualname__
+
+            delayed_kwargs = extractors.delayed.select_extract_kwargs(
+                extractor, data_store, feature_store
+            )
+
+            delayed_extraction = delayed(
+                extractors.delayed.validate_and_extract
+            )(
+                extractor,
+                delayed_kwargs,
+                dask_key_name=f"extract_{extractor_name}",
+            )
+
+            for feature in extractor.get_features():
+                delayed_feature = delayed(extractors.delayed.select_feature)(
+                    delayed_extraction,
+                    feature,
+                    dask_key_name=f"feature_{feature}",
+                )
+                feature_store[feature] = delayed_feature
+
+        return feature_store
+
+    def _gather_selected_features(self, feature_store):
+        feature_results = {
+            feature: feature_store[feature]
+            for feature in self._selected_features
+        }
+
+        features = delayed(feature_results)
+
+        features.visualize(
+            filename="./feets/execution_graph.png",
+            optimize_graph=True,
+            rankdir="LR",
+            dask_key_name="features",
+        )
+        return features.compute(optimize_graph=True)
 
     @property
     def features(self):
         return self._selected_features
+
+    @property
+    def execution_plan(self):
+        return self._extractors

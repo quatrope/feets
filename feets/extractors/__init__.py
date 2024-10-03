@@ -17,7 +17,7 @@
 # IMPORTS
 # =============================================================================
 
-from . import actor
+from . import delayed
 from . import registry
 from .extractor import (
     DATAS,
@@ -35,7 +35,7 @@ __all__ = [
     "ExtractorWarning",
     "Extractor",
     "registry",
-    "actor",
+    "delayed",
 ]
 
 
