@@ -22,11 +22,9 @@ __all__ = ["FeatureSpace"]
 
 import logging
 
-from dask.delayed import delayed
-
 import numpy as np
 
-from . import extractors
+from . import extractors, runner
 from .libs import bunch
 
 # =============================================================================
@@ -47,15 +45,6 @@ TABULATE_PARAMS = {
 logger = logging.getLogger("feets")
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.WARNING)
-
-
-# =============================================================================
-# EXCEPTIONS
-# =============================================================================
-
-
-class DataRequiredError(ValueError):
-    pass
 
 
 # =============================================================================
@@ -180,72 +169,14 @@ class FeatureSpace:
         return f"<FeatureSpace: {space}>"
 
     def extract(self, **kwargs):
-        data_store = self._validate_and_store_data(kwargs)
-
-        feature_store = self._extract_and_store_features(data_store)
-
-        features = self._gather_selected_features(feature_store)
+        features = runner.run(
+            extractors=self._extractors,
+            selected_features=self._selected_features,
+            required_data=self._required_data,
+            **kwargs,
+        )
 
         return FeatureSet("features", features)
-
-    def _validate_and_store_data(self, kwargs):
-        data_store = {}
-
-        for required in self._required_data:
-            if kwargs.get(required, None) is None:
-                raise DataRequiredError(required)
-
-            data = kwargs[required]
-            delayed_data = delayed(np.asarray)(
-                data, dask_key_name=f"data_{required}"
-            )
-            data_store[required] = delayed_data
-
-        return data_store
-
-    def _extract_and_store_features(self, data_store):
-        feature_store = {}
-
-        for extractor in self._extractors:
-            extractor_name = type(extractor).__qualname__
-
-            delayed_kwargs = extractors.delayed.select_extract_kwargs(
-                extractor, data_store, feature_store
-            )
-
-            delayed_extraction = delayed(
-                extractors.delayed.validate_and_extract
-            )(
-                extractor,
-                delayed_kwargs,
-                dask_key_name=f"extract_{extractor_name}",
-            )
-
-            for feature in extractor.get_features():
-                delayed_feature = delayed(extractors.delayed.select_feature)(
-                    delayed_extraction,
-                    feature,
-                    dask_key_name=f"feature_{feature}",
-                )
-                feature_store[feature] = delayed_feature
-
-        return feature_store
-
-    def _gather_selected_features(self, feature_store):
-        feature_results = {
-            feature: feature_store[feature]
-            for feature in self._selected_features
-        }
-
-        features = delayed(feature_results)
-
-        features.visualize(
-            filename="./feets/execution_graph.png",
-            optimize_graph=True,
-            rankdir="LR",
-            dask_key_name="features",
-        )
-        return features.compute(optimize_graph=True)
 
     @property
     def features(self):

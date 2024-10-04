@@ -268,6 +268,57 @@ class Extractor(abc.ABC):
         """Issue a warning."""
         warnings.warn(msg, FeatureExtractionWarning)
 
+    def select_kwargs(self, data, dependencies):
+        """Preprocess all the incoming arguments \
+        (timeserie + dependencies + parameters) to feed the `extract` method.
+
+        """
+        kwargs = {}
+
+        # add the required features
+        for d in self.get_dependencies():
+            kwargs[d] = dependencies[d]
+
+        # add the required data
+        for d in self.get_data():
+            kwargs[d] = data[d]
+
+        return kwargs
+
+    def validate_results(self, results):
+        """Validate if the extractor generated the expeccted features \
+        after calling the `extract` method.
+
+        """
+        # validate if the extractor generates the expected features
+        expected_features = self.get_features()
+
+        diff = expected_features.symmetric_difference(results)
+        if diff:
+            cls_name = type(self).__qualname__
+            expected_str = ", ".join(expected_features)
+            results_str = ", ".join(results.keys())
+            raise ExtractorContractError(
+                f"The extractor '{cls_name}' expected the features "
+                f"{expected_str}. Found: {results_str!r}"
+            )
+
+        return results
+
+    def extract_and_validate(self, kwargs):
+        """Internal method designed to select the parameters necessary for
+        executing the 'extract()' method, followed by its execution.
+
+        Additionally, finally, check that the features defined in the extractor
+        are correctly returned by the 'extract()' method.
+
+        """
+        results = self.extract(**kwargs)
+
+        self.validate_results(results)
+
+        return results
+
     # TO REDEFINE =============================================================
 
     def __init__(self):
