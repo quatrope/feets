@@ -264,9 +264,15 @@ class Extractor(abc.ABC):
         """The default values of the available configuration parameters."""
         return cls._conf.parameters
 
-    def feature_warning(self, msg):
+    @classmethod
+    def feature_warning(cls, msg):
         """Issue a warning."""
-        warnings.warn(msg, FeatureExtractionWarning)
+        warnings.warn(msg, FeatureExtractionWarning, 2)
+
+    @classmethod
+    def extractor_warning(cls, msg):
+        """Issue a warning."""
+        warnings.warn(msg, ExtractorWarning, 2)
 
     def select_kwargs(self, data, dependencies):
         """Preprocess all the incoming arguments \

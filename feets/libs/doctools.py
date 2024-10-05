@@ -6,12 +6,12 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-# This code was ripped of from scikit-criteria on 10-nov-2022.
-# https://github.com/quatrope/scikit-criteria/blob/ec63c/skcriteria/utils/bunch.py
-# Util this point the copyright is
+# This code was ripped of from scikit-criteria on 05-oct-2024.
+# https://github.com/quatrope/scikit-criteria/blob/48ab420/skcriteria/utils/doctools.py
+# Until this point the copyright is
 # License: BSD-3 (https://tldrlegal.com/license/bsd-3-clause-license-(revised))
 # Copyright (c) 2016-2021, Cabral, Juan; Luczywo, Nadia
-# Copyright (c) 2022, QuatroPe
+# Copyright (c) 2022, 2023, 2024 QuatroPe
 # All rights reserved.
 
 # =============================================================================

@@ -58,7 +58,7 @@ class AndersonDarling(Extractor):
     features = {"AndersonDarling"}
 
     def __init__(self):
-        self.feature_warning(
+        self.extractor_warning(
             "The original FATS documentation says that the result of "
             "AndersonDarling must be ~0.25 for gausian distribution but the "
             "result is ~-0.60"

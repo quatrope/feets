@@ -1,11 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2017-2024, Cabral, Juan
+# Copyright (c) 2024, QuatroPe, Felipe Clariá
+# License: MIT
+# Full Text:
+#     https://github.com/quatrope/feets/blob/master/LICENSE
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-import numpy as np
-
 import dask
 from dask.delayed import delayed
+
+import numpy as np
 
 # =============================================================================
 # EXCEPTIONS
@@ -22,12 +30,14 @@ class DataRequiredError(ValueError):
 
 
 def _preprocess_data(required_data, kwargs):
-    return {
-        data: np.asarray(kwargs[data])
-        for data in required_data
-        if kwargs.get(data) is not None
-    }
+    datas = {}
+    for required in required_data:
+        data = kwargs.get(required)
+        if data is None:
+            raise DataRequiredError(f"Required data {required} not found")
+        datas[required] = np.asarray(data)
 
+    return datas
 
 @delayed
 def _get_feature(results, feature):

@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2017-2024, Cabral, Juan
+# Copyright (c) 2024, QuatroPe, Felipe Clariá
+# License: MIT
+# Full Text:
+#     https://github.com/quatrope/feets/blob/master/LICENSE
+
+
+# =============================================================================
+# IMPORRTS
+# =============================================================================
+
 from feets.extractors.extractor import (
     Extractor,
     ExtractorBadDefinedError,
@@ -282,7 +295,7 @@ def test_Extractor_init_subclass_success(mocker):
         features = ["feature1", "feature2"]
 
         def extract(self):
-            None
+            pass
 
     np.testing.assert_equal(MockExtractor._conf, "mock_conf")
 
@@ -293,7 +306,7 @@ def test_Extractor_init_subclass_empty_feature_list(mocker):
 
         class MockExtractor(Extractor):
             def extract(self):
-                None
+                pass
 
 
 def test_Extractor_init_subclass_method_not_redefined(mocker):
@@ -356,7 +369,7 @@ def test_Extractor_feature_warning(mocker):
         features = ["feature1", "feature2"]
 
         def extract(self):
-            None
+            pass
 
     extractor = MockExtractor()
     with pytest.warns(FeatureExtractionWarning):

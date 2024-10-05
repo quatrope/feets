@@ -18,13 +18,12 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
-import warnings
 
 import numpy as np
 
 from scipy.interpolate import interp1d
 
-from .extractor import Extractor, FeatureExtractionWarning
+from .extractor import Extractor
 
 
 # =============================================================================
@@ -65,19 +64,19 @@ class StructureFunctions(Extractor):
 
         for tau in np.arange(1, Nsf):
             sf1[tau - 1] = np.mean(
-                np.power(np.abs(mag_int[0 : Np - tau] - mag_int[tau:Np]), 1.0)
+                np.power(np.abs(mag_int[: Np - tau] - mag_int[tau:Np]), 1.0)
             )
             sf2[tau - 1] = np.mean(
                 np.abs(
                     np.power(
-                        np.abs(mag_int[0 : Np - tau] - mag_int[tau:Np]), 2.0
+                        np.abs(mag_int[: Np - tau] - mag_int[tau:Np]), 2.0
                     )
                 )
             )
             sf3[tau - 1] = np.mean(
                 np.abs(
                     np.power(
-                        np.abs(mag_int[0 : Np - tau] - mag_int[tau:Np]), 3.0
+                        np.abs(mag_int[: Np - tau] - mag_int[tau:Np]), 3.0
                     )
                 )
             )
@@ -88,28 +87,19 @@ class StructureFunctions(Extractor):
         if len(sf1_log) and len(sf2_log):
             m_21, b_21 = np.polyfit(sf1_log, sf2_log, 1)
         else:
-            warnings.warn(
-                "Can't compute StructureFunction_index_21",
-                FeatureExtractionWarning,
-            )
+            self.feature_warning("Can't compute StructureFunction_index_21")
             m_21 = np.nan
 
         if len(sf1_log) and len(sf3_log):
             m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
         else:
-            warnings.warn(
-                "Can't compute StructureFunction_index_31",
-                FeatureExtractionWarning,
-            )
+            self.feature_warning("Can't compute StructureFunction_index_31")
             m_31 = np.nan
 
         if len(sf2_log) and len(sf3_log):
             m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
         else:
-            warnings.warn(
-                "Can't compute StructureFunction_index_32",
-                FeatureExtractionWarning,
-            )
+            self.feature_warning("Can't compute StructureFunction_index_32")
             m_32 = np.nan
 
         return {
