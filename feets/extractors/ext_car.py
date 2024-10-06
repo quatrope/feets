@@ -18,12 +18,11 @@ __doc__ = """"""
 # IMPORTS
 # =============================================================================
 
+import warnings
 
 import numpy as np
 
 from scipy.optimize import minimize
-
-import warnings
 
 from .extractor import Extractor
 
@@ -192,7 +191,7 @@ class CAR(Extractor):
                 x0,
                 args=(time, magnitude, error),
                 method=minimize_method,
-                bounds=bnds
+                bounds=bnds,
             )
 
         sigma, tau = res.x[0], res.x[1]

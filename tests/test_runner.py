@@ -10,7 +10,7 @@
 # IMPORTS
 # =============================================================================
 
-from feets.runner import run, DataRequiredError
+from feets.runner import DataRequiredError, run
 
 import numpy as np
 
@@ -18,11 +18,11 @@ import pytest
 
 
 # =============================================================================
-# MOCKS
+# FAKE CLASSES AND FIXTURES FOR TESTING
 # =============================================================================
 
 
-class MockExtractor:
+class FakeExtractor:
     def __init__(self, *, features, data=None, dependencies=None):
         self.features = features
         self.data = data or []
@@ -57,8 +57,8 @@ class MockExtractor:
 def test_run():
     features = run(
         extractors=[
-            MockExtractor(features=["feature1", "feature2"], data=["data1"]),
-            MockExtractor(features=["feature3", "feature4"], data=["data1"]),
+            FakeExtractor(features=["feature1", "feature2"], data=["data1"]),
+            FakeExtractor(features=["feature3", "feature4"], data=["data1"]),
         ],
         selected_features=["feature1", "feature2", "feature3"],
         required_data=["data1"],
@@ -77,8 +77,8 @@ def test_run():
 def test_run_dependencies():
     features = run(
         extractors=[
-            MockExtractor(features=["feature1"], data=["data1"]),
-            MockExtractor(
+            FakeExtractor(features=["feature1"], data=["data1"]),
+            FakeExtractor(
                 features=["feature2"],
                 data=["data1"],
                 dependencies=["feature1"],
@@ -100,7 +100,7 @@ def test_run_dependencies():
 def test_run_empty_data():
     features = run(
         extractors=[
-            MockExtractor(features=["feature1"], data=[]),
+            FakeExtractor(features=["feature1"], data=[]),
         ],
         selected_features=["feature1"],
         required_data=[],
@@ -118,7 +118,7 @@ def test_run_missing_data():
         DataRequiredError, match="Required data 'data1' not found"
     ):
         run(
-            extractors=[MockExtractor(features=["feature1"])],
+            extractors=[FakeExtractor(features=["feature1"])],
             selected_features=["feature1"],
             required_data=["data1"],
         )

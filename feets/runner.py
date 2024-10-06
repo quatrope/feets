@@ -17,12 +17,21 @@
 # IMPORTS
 # =============================================================================
 
+import copy
+
 import dask
 from dask.delayed import delayed
 
 import numpy as np
 
 __all__ = ["run"]
+
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+
+DEFAULT_DASK_OPTIONS = {"scheduler": "threads"}
 
 
 # =============================================================================
@@ -80,7 +89,14 @@ def _extract_selected_features(extractors, data, selected_features):
     }
 
 
-def run(*, extractors, selected_features, required_data, **kwargs):
+def run(
+    *,
+    extractors,
+    selected_features,
+    required_data,
+    dask_options=None,
+    **kwargs,
+):
     """Run the extractors on the given data and return the selected features.
 
     This function executes a series of feature extractors on provided data
@@ -89,13 +105,16 @@ def run(*, extractors, selected_features, required_data, **kwargs):
 
     Parameters
     ----------
-    extractors : list of Extractor
-        The extractors to run. Must be sorted in order of dependencies.
-    selected_features : list of str
+    extractors : np.ndarray of Extractor
+        List of extractor instances to run. Must be sorted in order of
+        dependencies.
+    selected_features : array-like of str
         The features to return.
-    required_data : list of str
+    required_data : array-like of str
         The data required by the extractors.
-    kwargs
+    dask_options : dict, optional
+        Options to be passed to the Dask scheduler.
+    **kwargs
         The data to feed the extractors.
 
     Returns
@@ -111,15 +130,18 @@ def run(*, extractors, selected_features, required_data, **kwargs):
 
     Notes
     -----
-    The extractors are ran in parallel using Dask:
+    The extractors are run in parallel using Dask:
     https://docs.dask.org/en/stable/
     """
+    if dask_options is None:
+        dask_options = copy.deepcopy(DEFAULT_DASK_OPTIONS)
+
     data = _preprocess_data(required_data, kwargs)
 
     delayed_features = _extract_selected_features(
         extractors, data, selected_features
     )
 
-    (features,) = dask.compute(delayed_features)
+    (features,) = dask.compute(delayed_features, **dask_options)
 
     return features
