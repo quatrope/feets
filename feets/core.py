@@ -19,7 +19,11 @@
 
 import logging
 
+import attrs
+
 import numpy as np
+
+import pandas as pd
 
 from . import extractors, runner
 from .libs import bunch
@@ -41,8 +45,42 @@ logger.setLevel(logging.WARNING)
 # =============================================================================
 
 
-class FeatureSet(bunch.Bunch):
-    pass
+@attrs.define(frozen=True, repr=False)
+class FeatureSet:
+    features: bunch.Bunch = attrs.field(
+        converter=(lambda f: bunch.Bunch("features", f))
+    )
+    extractors: np.ndarray = attrs.field()
+
+    def __getattr__(self, a):
+        """Allow to access the features as attributes."""
+        return getattr(self.features, a)
+
+    def __repr__(self):
+        """Return a nice string representation of the feature set."""
+        features_str = ", ".join(fname for fname in self.features)
+        return f"<fetureset ({features_str})"
+
+    def _get_extractor_of(self, feature):
+        """Return the extractor that can compute the given feature."""
+        for extractor in self.extractors:
+            if feature in extractor.get_features():
+                return extractor
+        raise ValueError(f"No extractor found for {feature}")
+
+    def as_series(self):
+        # a = [1, 2, 3] ==> ["a_0": 1, "a_1": 2, "a_2": 3]
+        # b = {"hola": [1,2,3], "chau": 1} ==>
+        #   ["b_hola_0": 1, "b_hola_1": 2, "b_hola_2": 3, "b_chau": 1]
+
+        data = {}
+        for fname, fvalue in self.features.items():
+            fflattened = {fname: fvalue}
+            if not np.isscalar(fvalue):
+                extractor = self._get_extractor_of(feature=fname)
+                fflattened = extractor.flatten_feature(fname, fvalue)
+            data.update(fflattened)
+        return pd.Series(data, name="features")
 
 
 # =============================================================================
@@ -185,7 +223,7 @@ class FeatureSpace:
             **kwargs,
         )
 
-        return FeatureSet("features", features)
+        return FeatureSet(features=features, extractors=self._extractors)
 
     @property
     def features(self):
