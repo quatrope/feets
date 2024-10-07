@@ -11,7 +11,7 @@
 # DOCS
 # =============================================================================
 
-__doc__ = """feets: feATURE eXTRACTOR FOR tIME sERIES.
+"""feets: feATURE eXTRACTOR FOR tIME sERIES.
 
 In time-domain astronomy, data gathered from the telescopes is usually
 represented in the form of light-curves. These are time series that show the
