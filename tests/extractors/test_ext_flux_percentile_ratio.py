@@ -24,7 +24,6 @@ def test_FluxPercentileRatioMid20_extract(normal_light_curve):
         lc = normal_light_curve(random=random, size=1000, data=["magnitude"])
         values[idx] = extractor.extract(**lc)["FluxPercentileRatioMid20"]
 
-    print(values.mean())
     np.testing.assert_allclose(values.mean(), 0.15400018087922435)
 
 
@@ -41,7 +40,6 @@ def test_FluxPercentileRatioMid35_extract(normal_light_curve):
         lc = normal_light_curve(random=random, size=1000, data=["magnitude"])
         values[idx] = extractor.extract(**lc)["FluxPercentileRatioMid35"]
 
-    print(values.mean())
     np.testing.assert_allclose(values.mean(), 0.2756448446910934)
 
 
@@ -58,7 +56,6 @@ def test_FluxPercentileRatioMid50_extract(normal_light_curve):
         lc = normal_light_curve(random=random, size=1000, data=["magnitude"])
         values[idx] = extractor.extract(**lc)["FluxPercentileRatioMid50"]
 
-    print(values.mean())
     np.testing.assert_allclose(values.mean(), 0.4095911599833594)
 
 

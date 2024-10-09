@@ -11,7 +11,7 @@
 # DOCS
 # =============================================================================
 
-"""Features extractors base classes classes."""
+"""Feature extractors base classes."""
 
 
 # =============================================================================
@@ -21,7 +21,10 @@
 import abc
 import inspect
 import warnings
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+
+from numpy import isscalar
 
 
 # =============================================================================
@@ -66,8 +69,13 @@ class ExtractorContractError(ValueError):
     """The extractor does not adhere to the defined contract.
 
     This error occurs when the extractor's implementation does not match
-    the expected features or the defined data vectors.
+    the expected features or when the format of the returned values are
+    not as expected.
     """
+
+
+class ExtractorTransformError(RuntimeError):
+    """The extractor can't transform the data into the expected format."""
 
 
 class ExtractorWarning(UserWarning):
@@ -95,6 +103,26 @@ def _iter_method_parameters(method):
     signature = inspect.signature(method)
     parameters = tuple(signature.parameters.values())[1:]
     return iter(parameters)
+
+
+def _transform_data(data, prefix=""):
+    result = {}
+
+    if isscalar(data):
+        result[prefix] = data
+    elif isinstance(data, Mapping):
+        for key, value in data.items():
+            result.update(_transform_data(value, f"{prefix}_{key}"))
+    elif isinstance(data, Sequence):
+        for index, item in enumerate(data):
+            result.update(_transform_data(item, f"{prefix}_{index}"))
+    else:
+        raise ExtractorTransformError(
+            f"Can't transform data {data!r} of type {type(data)} into a "
+            f"scalar format."
+        )
+
+    return result
 
 
 @dataclass(frozen=True)
@@ -238,6 +266,10 @@ class Extractor(abc.ABC):
     Extractors must define a `features` attribute, which is the list of
     features that the extractor can compute.
 
+    Additionally, extractors can override the `flatten_feature` method to
+    normalize a feature into a dictionary of scalar subfeatures for
+    representation purposes.
+
     Attributes
     ----------
     features : array_like
@@ -247,6 +279,9 @@ class Extractor(abc.ABC):
     -------
     extract(**kwargs)
         Extract features from the time series.
+
+    flatten_feature(feature, data)
+        Flatten the feature value for representation.
 
     Notes on the `extract()` method
     -------------------------------
@@ -258,10 +293,25 @@ class Extractor(abc.ABC):
     well as the features computed by other extractors on which the calculation
     may also depend.
 
-    It must return a dictionary with the results of the feature extraction,
-    where the keys represent the feature names and the values are the computed
-    results. Additionally, the features returned in the dictionary must be
-    those defined in the `features` attribute.
+    The return value must be a dictionary containing the results of the feature
+    extraction, where the keys represent the feature names and the values are
+    the computed results. Additionally, the features returned in the dictionary
+    must be those defined in the `features` attribute.
+
+    Notes on the `flatten_feature()` method
+    ---------------------------------------
+    The `flatten_feature()` method can be overridden by the user to normalize a
+    feature whose value comes in a complex format into a flat dictionary of
+    subfeatures for representation purposes.
+
+    It must accept as arguments the feature name and the feature computed
+    value, and return a flat dictionary where the keys represent the
+    subfeature names and the values are the normalized results as numpy
+    scalars.
+
+    The built-in implementation of `flatten_feature()` is already able to
+    handle dictionaries and sequences, but it may need to be overridden if the
+    feature comes in a different format.
 
     Examples
     --------
@@ -275,8 +325,8 @@ class Extractor(abc.ABC):
     >>> ext.extract(magnitude=[1, 2, 3, 4])
     {'sum_feature': 10}
 
-    **An extractor that depends on the sum feature and computes the mean of
-    the magnitude vector:**
+    **An extractor that depends on the previously computed sum feature and
+    computes the mean of the magnitude vector:**
     >>> class MeanExtractor(Extractor):
     ...     features = ["mean_feature"]
     ...
@@ -285,6 +335,19 @@ class Extractor(abc.ABC):
     >>> ext = MeanExtractor()
     >>> ext.extract(magnitude=[1, 2, 3, 4], sum_feature=10)
     {'mean_feature': 2.5}
+
+    **An extractor that flattens a feature into subfeatures:**
+    >>> class FlattenExtractor(Extractor):
+    ...     features = ["my_feature"]
+    ...
+    ...     def extract(self, magnitude):
+    ...         return {"my_feature": magnitude}
+    ...
+    ...     def flatten_feature(self, feature, data):
+    ...         return {f"{feature}_{i}": val for i, val in enumerate(data)}
+    >>> ext = FlattenExtractor()
+    >>> ext.flatten_feature("my_feature", [1, 2, 3])
+    {'my_feature_0': 1, 'my_feature_1': 2, 'my_feature_2': 3}
     """
 
     def __init_subclass__(cls):
@@ -480,6 +543,47 @@ class Extractor(abc.ABC):
 
         return results
 
+    def flatten_and_validate(self, feature, value):
+        """Flatten and validate the feature value for representation.
+
+        This method flattens the feature value using the `flatten_feature()`
+        method and ensures that the returned value is a dictionary of numpy
+        scalars.
+
+        Parameters
+        ----------
+        feature : str
+            The name of the feature to flatten.
+        value : object
+            The value of the feature to flatten.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the flattened feature value.
+        """
+        flattened = self.flatten_feature(feature, value)
+
+        if not isinstance(flattened, dict):
+            raise ExtractorContractError(
+                f"The 'flatten_feature()' method must return a dictionary. "
+                f"Found {type(flattened)} for feature {feature!r}"
+            )
+
+        for key, val in flattened.items():
+            if not isinstance(key, str):
+                raise ExtractorContractError(
+                    f"The keys of the flattened feature must be strings. "
+                    f"Found {type(key)} for feature {feature!r}"
+                )
+            if not isscalar(val):
+                raise ExtractorContractError(
+                    f"The values of the flattened feature must be scalars. "
+                    f"Found {type(val)} for feature {feature!r}"
+                )
+
+        return flattened
+
     # TO REDEFINE =============================================================
 
     def __init__(self):
@@ -495,3 +599,20 @@ class Extractor(abc.ABC):
             The dictionary of features extracted from the time series.
         """
         raise NotImplementedError()
+
+    def flatten_feature(self, feature, value):
+        """Flatten the feature value for representation.
+
+        Parameters
+        ----------
+        feature : str
+            The name of the feature to flatten.
+        value : object
+            The value of the feature.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the flattened feature value as subfeatures.
+        """
+        return _transform_data(value, feature)

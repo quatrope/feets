@@ -88,10 +88,6 @@ class FeatureSet:
 # =============================================================================
 
 
-def _feature_from_extraction(extraction, feature):
-    return extraction[feature]
-
-
 class FeatureSpace:
     """Class to manage the selection and extraction of features from a time series.
 
@@ -163,8 +159,6 @@ class FeatureSpace:
         extractor_instances = []
         selected_features = set()
         required_data = set()
-
-        print(extractor_clss)
 
         for extractor_cls in extractor_clss:
             extractor_instance = self._init_extractor(extractor_cls, **kwargs)

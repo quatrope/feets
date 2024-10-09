@@ -81,7 +81,6 @@ def test_StetsonKAC_extract(normal_light_curve):
         lc["time"] = np.arange(10000)
         values[idx] = extractor.extract(**lc)["StetsonK_AC"]
 
-    print(values.mean())
     np.testing.assert_allclose(values.mean(), 0.21042263044101692)
 
 
