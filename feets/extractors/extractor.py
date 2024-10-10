@@ -472,6 +472,15 @@ class Extractor(abc.ABC):
         """
         warnings.warn(msg, ExtractorWarning, 2)
 
+    def __repr__(self):
+        cls_name = type(self).__name__
+        state = {}
+        for aname, avalue in vars(self).items():
+            if len(repr(avalue)) > 20:
+                avalue = "<MANY CONFIGURATIONS>"
+            state[aname] = avalue
+        return f"<{cls_name} {state}>" if state else f"<{cls_name}>"
+
     def select_kwargs(self, data, dependencies):
         """Prepare keyword arguments for the `extract()` method.
 

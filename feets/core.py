@@ -50,19 +50,17 @@ logger.setLevel(logging.WARNING)
 @attrs.define(frozen=True)
 class Features(Sequence):
     features: tuple = attrs.field(converter=np.array, repr=False)
-    extractors: np.ndarray = attrs.field(
-        repr=False, repr=False, coverter=tuple
-    )
+    extractors: np.ndarray = attrs.field(repr=False, converter=tuple)
     feature_names: np.ndarray = attrs.field(init=False, repr=True)
     length: int = attrs.field(init=False, repr=True)
 
     @feature_names.default
     def _feature_names_defaults(self):
-        return frozenset(self.features[0])
+        return tuple(set(self.features[0]))
 
     @length.default
     def _length_defaults(self):
-        return tuple(set(self.features[0]))
+        return len(self.features)
 
     def __attrs_post_init__(self):
         self.features.setflags(write=False)
@@ -77,6 +75,9 @@ class Features(Sequence):
     def __len__(self):
         return self.length
 
+    def __dir__(self):
+        return list(vars(type(self))) + list(self.feature_names)
+
     def _extractors_by_features(self):
         all_extractors_by_features = {}
         for extractor in self.extractors:
@@ -87,12 +88,12 @@ class Features(Sequence):
         return all_extractors_by_features
 
     def _get_default_jobs(self):
-        jobs = np.min(len(self.feature_names), joblib.cpu_count())
+        jobs = min(len(self.features), joblib.cpu_count())
         return jobs
 
-    def _feature_as_serie(self, feature, extractors_by_feature):
+    def _features_as_serie(self, features, extractors_by_feature):
         data = {}
-        for fname, fvalue in self.features.items():
+        for fname, fvalue in features.items():
             extractor = extractors_by_feature[fname]
             fflattened = extractor.flatten_feature(fname, fvalue)
             data.update(fflattened)
@@ -105,13 +106,14 @@ class Features(Sequence):
 
         extractors_by_features = self._extractors_by_features()
 
-        kwargs.setdefault("prefer", "loky")
+        kwargs.setdefault("prefer", "processes")
         kwargs.setdefault("n_jobs", self._get_default_jobs())
+
         with joblib.Parallel(**kwargs) as P:
             features_as_serie = joblib.delayed(self._features_as_serie)
             all_series = P(
-                features_as_serie(feature, extractors_by_features)
-                for feature in self
+                features_as_serie(features, extractors_by_features)
+                for features in self.features
             )
         df = pd.DataFrame(all_series)
         df.columns.name = "Features"
@@ -257,9 +259,9 @@ class FeatureSpace:
             selected_features=self._selected_features,
             required_data=self._required_data,
             dask_options=self._dask_options,
-            lcs=lcs,
+            lc=lc,
         )
-        return Features(features=features, extractors=self._extractors)
+        return Features(features=[features], extractors=self._extractors)
 
     @property
     def features(self):
