@@ -17,16 +17,18 @@
 # IMPORTS
 # =============================================================================
 
+from collections.abc import Sequence
 import logging
 
 import attrs
+
+import joblib
 
 import numpy as np
 
 import pandas as pd
 
 from . import extractors, runner
-from .libs import bunch
 
 __all__ = ["FeatureSpace"]
 
@@ -45,42 +47,75 @@ logger.setLevel(logging.WARNING)
 # =============================================================================
 
 
-@attrs.define(frozen=True, repr=False)
-class FeatureSet:
-    features: bunch.Bunch = attrs.field(
-        converter=(lambda f: bunch.Bunch("features", f))
+@attrs.define(frozen=True)
+class Features(Sequence):
+    features: tuple = attrs.field(converter=np.array, repr=False)
+    extractors: np.ndarray = attrs.field(
+        repr=False, repr=False, coverter=tuple
     )
-    extractors: np.ndarray = attrs.field()
+    feature_names: np.ndarray = attrs.field(init=False, repr=True)
+    length: int = attrs.field(init=False, repr=True)
+
+    @feature_names.default
+    def _feature_names_defaults(self):
+        return frozenset(self.features[0])
+
+    @length.default
+    def _length_defaults(self):
+        return tuple(set(self.features[0]))
+
+    def __attrs_post_init__(self):
+        self.features.setflags(write=False)
 
     def __getattr__(self, a):
         """Allow to access the features as attributes."""
-        return getattr(self.features, a)
+        return np.array([feat[a] for feat in self.features])
 
-    def __repr__(self):
-        """Return a nice string representation of the feature set."""
-        features_str = ", ".join(fname for fname in self.features)
-        return f"<fetureset ({features_str})"
+    def __getitem__(self, slicer):
+        return self.features.__getitem__(slicer)
 
-    def _get_extractor_of(self, feature):
-        """Return the extractor that can compute the given feature."""
+    def __len__(self):
+        return self.length
+
+    def _extractors_by_features(self):
+        all_extractors_by_features = {}
         for extractor in self.extractors:
-            if feature in extractor.get_features():
-                return extractor
-        raise ValueError(f"No extractor found for {feature}")
+            extractor_by_feature = dict.fromkeys(
+                extractor.get_features(), extractor
+            )
+            all_extractors_by_features.update(extractor_by_feature)
+        return all_extractors_by_features
 
-    def as_series(self):
+    def _get_default_jobs(self):
+        jobs = np.min(len(self.feature_names), joblib.cpu_count())
+        return jobs
+
+    def _feature_as_serie(self, feature, extractors_by_feature):
+        data = {}
+        for fname, fvalue in self.features.items():
+            extractor = extractors_by_feature[fname]
+            fflattened = extractor.flatten_feature(fname, fvalue)
+            data.update(fflattened)
+        return pd.Series(data)
+
+    def as_frame(self, **kwargs):
         # a = [1, 2, 3] ==> ["a_0": 1, "a_1": 2, "a_2": 3]
         # b = {"hola": [1,2,3], "chau": 1} ==>
         #   ["b_hola_0": 1, "b_hola_1": 2, "b_hola_2": 3, "b_chau": 1]
 
-        data = {}
-        for fname, fvalue in self.features.items():
-            fflattened = {fname: fvalue}
-            if not np.isscalar(fvalue):
-                extractor = self._get_extractor_of(feature=fname)
-                fflattened = extractor.flatten_feature(fname, fvalue)
-            data.update(fflattened)
-        return pd.Series(data, name="features")
+        extractors_by_features = self._extractors_by_features()
+
+        kwargs.setdefault("prefer", "loky")
+        kwargs.setdefault("n_jobs", self._get_default_jobs())
+        with joblib.Parallel(**kwargs) as P:
+            features_as_serie = joblib.delayed(self._features_as_serie)
+            all_series = P(
+                features_as_serie(feature, extractors_by_features)
+                for feature in self
+            )
+        df = pd.DataFrame(all_series)
+        df.columns.name = "Features"
+        return df
 
 
 # =============================================================================
@@ -151,7 +186,9 @@ class FeatureSpace:
     <features {'Std', ...}>
     """
 
-    def __init__(self, data=None, only=None, exclude=None, **kwargs):
+    def __init__(
+        self, data=None, only=None, exclude=None, dask_options=None, **kwargs
+    ):
         extractor_clss = extractors.extractor_registry.get_execution_plan(
             data=data, only=only, exclude=exclude
         )
@@ -174,6 +211,7 @@ class FeatureSpace:
         self._extractors = np.array(extractor_instances, dtype=object)
         self._selected_features = frozenset(selected_features)
         self._required_data = frozenset(required_data)
+        self._dask_options = dask_options
 
     def _init_extractor(self, extractor_cls, **kwargs):
         default_params = extractor_cls.get_default_params()
@@ -188,7 +226,7 @@ class FeatureSpace:
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
-    def extract(self, dask_options=None, **kwargs):
+    def extract(self, *lcs, **lc):
         """Extract all the selected features from the provided data.
 
         Parameters
@@ -209,15 +247,19 @@ class FeatureSpace:
         >>> fs.extract(**lc)
         <features {'Std'}>
         """
+        if lc and lcs:
+            raise ValueError("O una curva separadas o muchas en diccionarios")
+
+        lcs = [lc] if lc else lcs
+
         features = runner.run(
             extractors=self._extractors,
             selected_features=self._selected_features,
             required_data=self._required_data,
-            dask_options=dask_options,
-            **kwargs,
+            dask_options=self._dask_options,
+            lcs=lcs,
         )
-
-        return FeatureSet(features=features, extractors=self._extractors)
+        return Features(features=features, extractors=self._extractors)
 
     @property
     def features(self):

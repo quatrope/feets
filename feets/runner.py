@@ -95,7 +95,7 @@ def run(
     selected_features,
     required_data,
     dask_options=None,
-    **kwargs,
+    lc,
 ):
     """Run the extractors on the given data and return the selected features.
 
@@ -136,7 +136,7 @@ def run(
     if dask_options is None:
         dask_options = copy.deepcopy(DEFAULT_DASK_OPTIONS)
 
-    data = _preprocess_data(required_data, kwargs)
+    data = _preprocess_data(required_data, lc)
 
     delayed_features = _extract_selected_features(
         extractors, data, selected_features
