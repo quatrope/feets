@@ -49,8 +49,8 @@ logger.setLevel(logging.WARNING)
 
 @attrs.define(frozen=True)
 class Features(Sequence):
-    features: tuple = attrs.field(converter=np.array, repr=False)
-    extractors: np.ndarray = attrs.field(repr=False, converter=tuple)
+    features: np.ndarray = attrs.field(converter=np.array, repr=False)
+    extractors: np.ndarray = attrs.field(converter=tuple, repr=False)
     feature_names: np.ndarray = attrs.field(init=False, repr=True)
     length: int = attrs.field(init=False, repr=True)
 
@@ -100,9 +100,7 @@ class Features(Sequence):
         return pd.Series(data)
 
     def as_frame(self, **kwargs):
-        # a = [1, 2, 3] ==> ["a_0": 1, "a_1": 2, "a_2": 3]
-        # b = {"hola": [1,2,3], "chau": 1} ==>
-        #   ["b_hola_0": 1, "b_hola_1": 2, "b_hola_2": 3, "b_chau": 1]
+        """Return the features as a pandas DataFrame."""
 
         extractors_by_features = self._extractors_by_features()
 
@@ -250,18 +248,23 @@ class FeatureSpace:
         <features {'Std'}>
         """
         if lc and lcs:
-            raise ValueError("O una curva separadas o muchas en diccionarios")
+            raise ValueError(
+                "Please provide either a single light curve or a list of light curves, but not both."
+            )
 
         lcs = [lc] if lc else lcs
 
-        features = runner.run(
+        features_by_lc = runner.run(
             extractors=self._extractors,
             selected_features=self._selected_features,
             required_data=self._required_data,
             dask_options=self._dask_options,
-            lc=lc,
+            lcs=lcs,
         )
-        return Features(features=[features], extractors=self._extractors)
+
+        # return features_by_lc
+        # print(features_by_lc)
+        return Features(features=features_by_lc, extractors=self._extractors)
 
     @property
     def features(self):

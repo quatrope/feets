@@ -12,6 +12,7 @@
 # =============================================================================
 
 from typing import OrderedDict
+
 from attr import dataclass
 
 from feets.extractors.extractor import (

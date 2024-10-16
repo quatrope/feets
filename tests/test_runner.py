@@ -54,7 +54,25 @@ class FakeExtractor:
 # =============================================================================
 
 
-def test_run():
+@pytest.mark.parametrize(
+    ["lcs", "expected"],
+    [
+        (
+            [{"data1": 123}],
+            [{"feature1": 123, "feature2": 123, "feature3": 123}],
+        ),
+        (
+            [{"data1": 123}, {"data1": 456}, {"data1": 789, "data2": 123}],
+            [
+                {"feature1": 123, "feature2": 123, "feature3": 123},
+                {"feature1": 456, "feature2": 456, "feature3": 456},
+                {"feature1": 789, "feature2": 789, "feature3": 789},
+            ],
+        ),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_run(lcs, expected):
     features = run(
         extractors=[
             FakeExtractor(features=["feature1", "feature2"], data=["data1"]),
@@ -62,19 +80,33 @@ def test_run():
         ],
         selected_features=["feature1", "feature2", "feature3"],
         required_data=["data1"],
-        data1=123,
+        lcs=lcs,
     )
     np.testing.assert_equal(
         features,
-        {
-            "feature1": 123,
-            "feature2": 123,
-            "feature3": 123,
-        },
+        expected,
     )
 
 
-def test_run_dependencies():
+@pytest.mark.parametrize(
+    ["lcs", "expected"],
+    [
+        (
+            [{"data1": 123}],
+            [{"feature1": 123, "feature2": 246}],
+        ),
+        (
+            [{"data1": 123}, {"data1": 456}, {"data1": 789, "data2": 123}],
+            [
+                {"feature1": 123, "feature2": 246},
+                {"feature1": 456, "feature2": 912},
+                {"feature1": 789, "feature2": 1578},
+            ],
+        ),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_run_dependencies(lcs, expected):
     features = run(
         extractors=[
             FakeExtractor(features=["feature1"], data=["data1"]),
@@ -86,34 +118,49 @@ def test_run_dependencies():
         ],
         selected_features=["feature1", "feature2"],
         required_data=["data1"],
-        data1=123,
+        lcs=lcs,
     )
     np.testing.assert_equal(
         features,
-        {
-            "feature1": 123,
-            "feature2": 246,
-        },
+        expected,
     )
 
 
-def test_run_empty_data():
+@pytest.mark.parametrize(
+    ["lcs", "expected"],
+    [
+        (
+            [{}],
+            [{"feature1": 0}],
+        ),
+        (
+            [{}, {"data2": 123}, {"data1": 123, "data2": 456}],
+            [{"feature1": 0}, {"feature1": 0}, {"feature1": 0}],
+        ),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_run_empty_data(lcs, expected):
     features = run(
         extractors=[
             FakeExtractor(features=["feature1"], data=[]),
         ],
         selected_features=["feature1"],
         required_data=[],
+        lcs=lcs,
     )
-    np.testing.assert_equal(
-        features,
-        {
-            "feature1": 0,
-        },
-    )
+    np.testing.assert_equal(features, expected)
 
 
-def test_run_missing_data():
+@pytest.mark.parametrize(
+    "lcs",
+    [
+        [{}],
+        [{"data1": 123}, {"data2": 123}, {"data1": 123, "data2": 123}],
+    ],
+    ids=["simple", "multiple"],
+)
+def test_run_missing_data(lcs):
     with pytest.raises(
         DataRequiredError, match="Required data 'data1' not found"
     ):
@@ -121,4 +168,5 @@ def test_run_missing_data():
             extractors=[FakeExtractor(features=["feature1"])],
             selected_features=["feature1"],
             required_data=["data1"],
+            lcs=lcs,
         )

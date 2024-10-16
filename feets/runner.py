@@ -20,6 +20,7 @@
 import copy
 
 import dask
+import dask.bag as db
 from dask.delayed import delayed
 
 import numpy as np
@@ -89,59 +90,92 @@ def _extract_selected_features(extractors, data, selected_features):
     }
 
 
+def _run_single(
+    *,
+    extractors,
+    selected_features,
+    required_data,
+    lc,
+):
+
+    data = _preprocess_data(required_data, lc)
+    delayed_features = _extract_selected_features(
+        extractors, data, selected_features
+    )
+    return delayed_features
+
+
 def run(
     *,
     extractors,
     selected_features,
     required_data,
     dask_options=None,
-    lc,
+    lcs,
 ):
-    """Run the extractors on the given data and return the selected features.
+    """Run extractors and select features from the given light curves.
 
-    This function executes a series of feature extractors on provided data
-    and returns a dictionary of the selected features. It assumes that the
-    given extractors are sorted in order of their dependencies.
+    This function runs a series of feature extractors on the provided light
+    curves and selects only the desired features. The result is a list
+    containing the selected features for each light curve.
+
+    The extractors should be sorted based on their dependencies to ensure
+    proper execution.
 
     Parameters
     ----------
     extractors : np.ndarray of Extractor
-        List of extractor instances to run. Must be sorted in order of
-        dependencies.
+        Array of extractor instances to run. Must be sorted based on dependencies.
     selected_features : array-like of str
-        The features to return.
+        The features to extract.
     required_data : array-like of str
         The data required by the extractors.
     dask_options : dict, optional
         Options to be passed to the Dask scheduler.
-    **kwargs
-        The data to feed the extractors.
+    lcs : list of dict
+        The light curves to process.
 
     Returns
     -------
-    features : dict
-        The extracted features.
-        Example: {"feature1": 123, "feature2": 456}
+    list of dict
+        The extracted features for each light curve. The order of the list is preserved.
 
     Raises
     ------
     DataRequiredError
-        If some required data is missing.
+        If any required data is missing from the light curves.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from feets.extractors.ext_mean import Mean
+    >>> lcs = [{"magnitude": [1, 2, 3]}, {"magnitude": [4, 5, 6]}]
+    >>> run(extractors=np.array([Mean()]),
+    ...     selected_features=["Mean"],
+    ...     required_data=["magnitude"],
+    ...     lcs=lcs)
+    [{'Mean': np.float64(2.0)}, {'Mean': np.float64(5.0)}]
 
     Notes
     -----
-    The extractors are run in parallel using Dask:
-    https://docs.dask.org/en/stable/
+    The feature extraction is performed in parallel using Dask, and can be
+    configured using the `dask_options` parameter.
+
+    For more information on Dask, visit: https://docs.dask.org/en/stable/
     """
     if dask_options is None:
         dask_options = copy.deepcopy(DEFAULT_DASK_OPTIONS)
 
-    data = _preprocess_data(required_data, lc)
-
-    delayed_features = _extract_selected_features(
-        extractors, data, selected_features
+    delayed_features_by_lc = db.from_sequence(lcs).map(
+        lambda lc: dask.compute(
+            _run_single(
+                extractors=extractors,
+                selected_features=selected_features,
+                required_data=required_data,
+                lc=lc,
+            ),
+            **dask_options,
+        )[0]
     )
 
-    (features,) = dask.compute(delayed_features, **dask_options)
-
-    return features
+    return delayed_features_by_lc.compute(**dask_options)
