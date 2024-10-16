@@ -24,7 +24,7 @@ import warnings
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from numpy import isscalar
+import numpy as np
 
 
 # =============================================================================
@@ -108,12 +108,12 @@ def _iter_method_parameters(method):
 def _transform_data(data, prefix=""):
     result = {}
 
-    if isscalar(data):
+    if np.isscalar(data):
         result[prefix] = data
     elif isinstance(data, Mapping):
         for key, value in data.items():
             result.update(_transform_data(value, f"{prefix}_{key}"))
-    elif isinstance(data, Sequence):
+    elif isinstance(data, Sequence) or isinstance(data, np.ndarray):
         for index, item in enumerate(data):
             result.update(_transform_data(item, f"{prefix}_{index}"))
     else:
@@ -585,7 +585,7 @@ class Extractor(abc.ABC):
                     f"The keys of the flattened feature must be strings. "
                     f"Found {type(key)} for feature {feature!r}"
                 )
-            if not isscalar(val):
+            if not np.isscalar(val):
                 raise ExtractorContractError(
                     f"The values of the flattened feature must be scalars. "
                     f"Found {type(val)} for feature {feature!r}"

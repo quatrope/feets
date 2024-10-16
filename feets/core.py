@@ -17,8 +17,8 @@
 # IMPORTS
 # =============================================================================
 
-from collections.abc import Sequence
 import logging
+from collections.abc import Sequence
 
 import attrs
 
@@ -30,7 +30,7 @@ import pandas as pd
 
 from . import extractors, runner
 
-__all__ = ["FeatureSpace"]
+__all__ = ["Features", "FeatureSpace"]
 
 
 # =============================================================================
@@ -49,33 +49,51 @@ logger.setLevel(logging.WARNING)
 
 @attrs.define(frozen=True)
 class Features(Sequence):
+    """Class to manage and manipulate feature extraction results.
+
+    Attributes
+    ----------
+    features : np.ndarray
+        The extracted features by light curve.
+    extractors : np.ndarray
+        The extractors used to generate the features.
+    feature_names : set
+        The names of the extracted features.
+    length : int
+        The number of light curves.
+    """
+
     features: np.ndarray = attrs.field(converter=np.array, repr=False)
     extractors: np.ndarray = attrs.field(converter=tuple, repr=False)
-    feature_names: np.ndarray = attrs.field(init=False, repr=True)
+    feature_names: set = attrs.field(init=False, repr=True)
     length: int = attrs.field(init=False, repr=True)
 
     @feature_names.default
     def _feature_names_defaults(self):
-        return tuple(set(self.features[0]))
+        return set(self.features[0])
 
     @length.default
     def _length_defaults(self):
         return len(self.features)
 
     def __attrs_post_init__(self):
+        """Prevent the modification of features."""
         self.features.setflags(write=False)
 
-    def __getattr__(self, a):
-        """Allow to access the features as attributes."""
-        return np.array([feat[a] for feat in self.features])
+    def __getattr__(self, feature_name):
+        """Access feature values by using name as attribute."""
+        return np.array([feat[feature_name] for feat in self.features])
 
     def __getitem__(self, slicer):
+        """Access features by index or slice."""
         return self.features.__getitem__(slicer)
 
     def __len__(self):
+        """Return the number of light curves."""
         return self.length
 
     def __dir__(self):
+        """Return the list of attributes of the object."""
         return list(vars(type(self))) + list(self.feature_names)
 
     def _extractors_by_features(self):
@@ -101,7 +119,6 @@ class Features(Sequence):
 
     def as_frame(self, **kwargs):
         """Return the features as a pandas DataFrame."""
-
         extractors_by_features = self._extractors_by_features()
 
         kwargs.setdefault("prefer", "processes")
@@ -160,13 +177,13 @@ class FeatureSpace:
 
     >>> fs = feets.FeatureSpace(only=['Std'])
     >>> fs.extract(**lc)
-    <features {'Std'}>
+    Features(feature_names={'Std'}, length=1)
 
     **List of available data as an input:**
 
     >>> fs = feets.FeatureSpace(data=['magnitude','time'])
     >>> fs.extract(**lc)
-    <features {...}>
+    Features(feature_names={...}, length=1)
 
     **List of features and available data as an input:**
 
@@ -174,16 +191,19 @@ class FeatureSpace:
     ...     only=['Mean','Beyond1Std', 'CAR_sigma','Color'],
     ...     data=['magnitude', 'error'])
     >>> fs.extract(**lc)
-    <features {'Mean', 'Beyond1Std'}>
+
+    >>> fs = feets.FeatureSpace(data=['magnitude','time'])
+    >>> fs.extract(**lc)
+    Features(feature_names={'Mean', 'Beyond1Std'}, length=1)
 
     **List of exclusions as an input:**
 
     >>> fs = feets.FeatureSpace(data=['magnitude'])
     >>> fs.extract(**lc)
-    <features {'Mean', 'Std', ...}>
+    Features(feature_names={'Mean', 'Std', ...}, length=1)
     >>> fs = feets.FeatureSpace(data=['magnitude'], exclude=['Mean'])
     >>> fs.extract(**lc)
-    <features {'Std', ...}>
+    Features(feature_names={'Std', ...}, length=1)
     """
 
     def __init__(
@@ -227,29 +247,46 @@ class FeatureSpace:
         return f"<FeatureSpace: {space}>"
 
     def extract(self, *lcs, **lc):
-        """Extract all the selected features from the provided data.
+        """Extract the selected features from the provided light curves.
+
+        Note that only one of `lcs` or `lc` can be provided.
 
         Parameters
         ----------
-        dask_options : dict, optional
-            Options to be passed to the Dask scheduler.
-        **kwargs
-            The time series data required by the extractors.
+        *lcs : array_like of dict, optional
+            A list of light curves represented as dictionaries.
+        **lc : dict, optional
+            A single light curve represented as a dictionary.
+
+        Raises
+        ------
+        ValueError
+            Both `lc` and `lcs` are provided.
 
         Returns
         -------
-        FeatureSet
-            A collection of extracted features.
+        Features
+            A collection of extracted features of the provided light curves.
 
         Examples
         --------
+        **Single light curve:**
+
         >>> fs = feets.FeatureSpace(only=['Std'])
-        >>> fs.extract(**lc)
-        <features {'Std'}>
+        >>> fs.extract(magnitude=[1, 2, 3])
+        Features(feature_names={'Std'}, length=1)
+
+        **Multiple light curves:**
+
+        >>> fs = feets.FeatureSpace(only=['Std'])
+        >>> fs.extract({'magnitude': [1, 2, 3]}, {'magnitude': [4, 5, 6]})
+        Features(feature_names={'Std'}, length=2)
+
         """
         if lc and lcs:
             raise ValueError(
-                "Please provide either a single light curve or a list of light curves, but not both."
+                "Please provide either a single light curve or a list of light "
+                "curves, but not both."
             )
 
         lcs = [lc] if lc else lcs
@@ -262,8 +299,6 @@ class FeatureSpace:
             lcs=lcs,
         )
 
-        # return features_by_lc
-        # print(features_by_lc)
         return Features(features=features_by_lc, extractors=self._extractors)
 
     @property

@@ -11,9 +11,11 @@
 # IMPORTS
 # =============================================================================
 
-from feets.core import FeatureSet, FeatureSpace
+from feets.core import FeatureSpace, Features
 
 import numpy as np
+
+import pandas as pd
 
 import pytest
 
@@ -78,9 +80,166 @@ def fake_extractor_cls():
             def get_default_params(cls):
                 return default_params
 
+            def flatten_feature(self, feature, value):
+                return {f"flat_{feature}": value}
+
         return FakeExtractor
 
     return maker
+
+
+# =============================================================================
+# FEATURES TESTS
+# =============================================================================
+
+
+@pytest.mark.parametrize(
+    ["features_by_lc", "feature_names", "length"],
+    [
+        ([{"feature1": 1, "feature2": 2}], {"feature1", "feature2"}, 1),
+        ([{"feature1": 1}] * 3, {"feature1"}, 3),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_Features_init(
+    fake_extractor_cls, features_by_lc, feature_names, length
+):
+    fake_extractors = [
+        fake_extractor_cls(features=["feature1"])(),
+        fake_extractor_cls(features=["feature2"])(),
+    ]
+    features = Features(features=features_by_lc, extractors=fake_extractors)
+
+    np.testing.assert_equal(features.features, features_by_lc)
+    np.testing.assert_equal(features.extractors, fake_extractors)
+    np.testing.assert_equal(features.feature_names, feature_names)
+    np.testing.assert_equal(features.length, length)
+
+
+@pytest.mark.parametrize(
+    ["features_by_lc", "feature_names", "length"],
+    [
+        ([{"feature1": 1, "feature2": 2}], {"feature1", "feature2"}, 1),
+        ([{"feature1": 1}] * 3, {"feature1"}, 3),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_Features_repr(
+    fake_extractor_cls, features_by_lc, feature_names, length
+):
+    fake_extractors = [
+        fake_extractor_cls(features=["feature1"])(),
+        fake_extractor_cls(features=["feature2"])(),
+    ]
+    features = Features(features=features_by_lc, extractors=fake_extractors)
+
+    np.testing.assert_equal(
+        repr(features),
+        f"Features({feature_names=}, {length=})",
+    )
+
+
+@pytest.mark.parametrize(
+    ["features_by_lc", "feature_name", "expected"],
+    [
+        ([{"feature1": 1, "feature2": 2}], "feature1", [1]),
+        ([{"feature1": 1}] * 3, "feature1", [1] * 3),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_Features_getattr(
+    fake_extractor_cls, features_by_lc, feature_name, expected
+):
+    fake_extractors = [
+        fake_extractor_cls(features=["feature1"])(),
+        fake_extractor_cls(features=["feature2"])(),
+    ]
+    features = Features(features=features_by_lc, extractors=fake_extractors)
+
+    np.testing.assert_equal(getattr(features, feature_name), expected)
+
+
+@pytest.mark.parametrize(
+    ["features_by_lc", "slicer", "expected"],
+    [
+        ([{"feature1": 1, "feature2": 2}], 0, {"feature1": 1, "feature2": 2}),
+        ([{"feature1": 1}] * 3, 0, {"feature1": 1}),
+        (
+            [{"feature1": 1}, {"feature1": 2}, {"feature1": 3}],
+            slice(0, 2),
+            [{"feature1": 1}, {"feature1": 2}],
+        ),
+    ],
+    ids=["simple", "multiple", "multiple_slice"],
+)
+def test_Features_getitem(
+    fake_extractor_cls, features_by_lc, slicer, expected
+):
+    fake_extractors = [
+        fake_extractor_cls(features=["feature1"])(),
+        fake_extractor_cls(features=["feature2"])(),
+    ]
+    features = Features(features=features_by_lc, extractors=fake_extractors)
+
+    np.testing.assert_equal(features[slicer], expected)
+
+
+@pytest.mark.parametrize(
+    ["features_by_lc", "expected"],
+    [
+        ([{"feature1": 1, "feature2": 2}], 1),
+        ([{"feature1": 1}] * 3, 3),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_Features_len(fake_extractor_cls, features_by_lc, expected):
+    fake_extractors = [
+        fake_extractor_cls(features=["feature1"])(),
+        fake_extractor_cls(features=["feature2"])(),
+    ]
+    features = Features(features=features_by_lc, extractors=fake_extractors)
+
+    np.testing.assert_equal(len(features), expected)
+
+
+@pytest.mark.parametrize(
+    ["features_by_lc", "feature_names"],
+    [
+        ([{"feature1": 1, "feature2": 2}], ["feature1", "feature2"]),
+        ([{"feature1": 1}] * 3, ["feature1"]),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_Features_dir(fake_extractor_cls, features_by_lc, feature_names):
+    fake_extractors = [
+        fake_extractor_cls(features=["feature1"])(),
+        fake_extractor_cls(features=["feature2"])(),
+    ]
+    features = Features(features=features_by_lc, extractors=fake_extractors)
+
+    assert set(feature_names).issubset(dir(features))
+
+
+@pytest.mark.parametrize(
+    ["features_by_lc", "expected"],
+    [
+        (
+            [{"feature1": 1, "feature2": 2}],
+            pd.DataFrame({"flat_feature1": [1], "flat_feature2": [2]}),
+        ),
+        ([{"feature1": 1}] * 3, pd.DataFrame({"flat_feature1": [1] * 3})),
+    ],
+    ids=["simple", "multiple"],
+)
+def test_Features_as_frame(fake_extractor_cls, features_by_lc, expected):
+    fake_extractors = [
+        fake_extractor_cls(features=["feature1"])(),
+        fake_extractor_cls(features=["feature2"])(),
+    ]
+    features = Features(features=features_by_lc, extractors=fake_extractors)
+    expected.columns.name = "Features"
+
+    pd.testing.assert_frame_equal(features.as_frame(), expected)
 
 
 # =============================================================================
@@ -162,25 +321,34 @@ def test_FeatureSpace_extract(
         fake_extractor_cls(features=["feature1", "feature2", "feature3"])
     ]
     mock_extractor_registry(extractor_clss)
-    mock_run({"feature1": 1, "feature2": 2, "feature3": 3})
+    mock_run([{"feature1": 1, "feature2": 2, "feature3": 3}])
 
     fs = FeatureSpace()
 
     features = fs.extract()
 
-    expected = FeatureSet(
-        "features",
-        {
-            "feature1": 1,
-            "feature2": 2,
-            "feature3": 3,
-        },
+    expected = Features(
+        features=([{"feature1": 1, "feature2": 2, "feature3": 3}]),
+        extractors=fs._extractors,
     )
 
-    np.testing.assert_equal(
-        features,
-        expected,
-    )
+    assert features == expected
+
+
+def test_FeatureSpace_extract_raises_ValueError(
+    mock_extractor_registry, fake_extractor_cls, mock_run
+):
+    extractor_clss = [
+        fake_extractor_cls(features=["feature1", "feature2", "feature3"])
+    ]
+    mock_extractor_registry(extractor_clss)
+
+    fs = FeatureSpace()
+
+    lc = {"data1": [1, 2, 3]}
+
+    with pytest.raises(ValueError):
+        fs.extract(lc, **lc)
 
 
 def test_FeatureSpace_properties(fake_extractor_cls, mock_extractor_registry):

@@ -6,6 +6,4 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-"""External libs
-
-"""
+"""External libs."""

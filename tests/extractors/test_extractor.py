@@ -692,7 +692,7 @@ def test_Extractor_extract_default(
         ([0, 1, 2], {"feature1_0": 0, "feature1_1": 1, "feature1_2": 2}),
         ({"key": "value"}, {"feature1_key": "value"}),
         (
-            {"key": [0, 1, {"first": 2, "last": 3}]},
+            {"key": np.array([0, 1, {"first": 2, "last": 3}])},
             {
                 "feature1_key_0": 0,
                 "feature1_key_1": 1,
@@ -729,12 +729,8 @@ def test_Extractor_flatten_feature_default(
         None,
         {"result1", "result2"},
         lambda x: x,
-        (
-            np.array([1, 2, 3]),
-            {"feature1_0": 1, "feature1_1": 2, "feature1_2": 3},
-        ),
     ],
-    ids=["none", "set", "function", "numpy_array"],
+    ids=["none", "set", "function"],
 )
 def test_Extractor_flatten_feature_default_raises_ExtractorTransformError(
     fake_extractor_conf_cls, mock_extractor_conf, raw_value
