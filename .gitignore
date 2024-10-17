@@ -59,4 +59,4 @@ target/
 # feets
 .ipynb_checkpoints*
 .pytest_cache
-feets/execution_graph.png
+benchmarks/cache
