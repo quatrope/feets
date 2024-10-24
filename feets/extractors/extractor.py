@@ -105,17 +105,17 @@ def _iter_method_parameters(method):
     return iter(parameters)
 
 
-def _transform_data(data, prefix=""):
+def _flatten_data(data, prefix):
     result = {}
 
     if np.isscalar(data):
         result[prefix] = data
     elif isinstance(data, Mapping):
         for key, value in data.items():
-            result.update(_transform_data(value, f"{prefix}_{key}"))
-    elif isinstance(data, Sequence) or isinstance(data, np.ndarray):
+            result.update(_flatten_data(value, f"{prefix}_{key}"))
+    elif isinstance(data, (Sequence, np.ndarray)):
         for index, item in enumerate(data):
-            result.update(_transform_data(item, f"{prefix}_{index}"))
+            result.update(_flatten_data(item, f"{prefix}_{index}"))
     else:
         raise ExtractorTransformError(
             f"Can't transform data {data!r} of type {type(data)} into a "
@@ -624,4 +624,4 @@ class Extractor(abc.ABC):
         dict
             A dictionary containing the flattened feature value as subfeatures.
         """
-        return _transform_data(value, feature)
+        return _flatten_data(value, feature)

@@ -59,4 +59,4 @@ target/
 # feets
 .ipynb_checkpoints*
 .pytest_cache
-benchmarks/cache
+*.jpkl
