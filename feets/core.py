@@ -206,6 +206,16 @@ class FeatureSpace:
     Features(feature_names={'Std', ...}, length=1)
     """
 
+    # CONSTRUCTOR =============================================================
+
+    def _init_extractor(self, extractor_cls, **kwargs):
+        default_params = extractor_cls.get_default_params()
+        params = {
+            param: kwargs.get(param, default)
+            for param, default in default_params.items()
+        }
+        return extractor_cls(**params)
+
     def __init__(
         self, data=None, only=None, exclude=None, dask_options=None, **kwargs
     ):
@@ -233,18 +243,74 @@ class FeatureSpace:
         self._required_data = frozenset(required_data)
         self._dask_options = dask_options
 
-    def _init_extractor(self, extractor_cls, **kwargs):
-        default_params = extractor_cls.get_default_params()
-        params = {
-            param: kwargs.get(param, default)
-            for param, default in default_params.items()
-        }
-        return extractor_cls(**params)
+    # FROM LC =================================================================
+
+    @classmethod
+    def _coerce_lightcurves(cls, *, single_lc, multiple_lc):
+        if single_lc and multiple_lc:
+            raise ValueError(
+                "Please provide either a single light curve or a list of light "
+                "curves, but not both."
+            )
+
+        return [single_lc] if single_lc else multiple_lc
+
+    @classmethod
+    def from_lightcurves(cls, *lcs, **lc):
+        """Return a FeatureSpace object from a set of light curves data \
+        present in one of multiple lightcurves.
+
+        Parameters
+        ----------
+        *lcs : optional
+            A list of light curves represented as dictionaries.
+        **lc : optional
+            A single light curve represented as a dictionary.
+
+        Returns
+        -------
+        FeatureSpace
+            A FeatureSpace object with the features that can be extracted from
+            the provided light curves.
+
+        Examples
+        --------
+        >>> fs = feets.FeatureSpace.from_lightcurves(lc)
+        >>> fs.extract(**lc)
+        Features(feature_names={...}, length=1)
+
+        >>> fs = feets.FeatureSpace.from_lightcurves(*lcs)
+        >>> fs.extract(*lcs)
+        Features(feature_names={...}, length=1)
+
+        """
+        lcs = cls._coerce_lightcurves(single_lc=lc, multiple_lc=lcs)
+        selected_data = set(extractors.DATAS)
+        for lc in lcs:
+            selected_data.intersection_update(lc)
+        return cls(data=selected_data)
+
+    # PROPERTIES ==============================================================
+
+    @property
+    def features(self):
+        """frozenset: The selected features."""
+        return self._selected_features
+
+    @property
+    def execution_plan(self):
+        """np.ndarray: The extractor instances in order of their \
+        dependencies."""
+        return self._extractors
+
+    # MAGIC ===================================================================
 
     def __repr__(self):
         """Return a string representation of the FeatureSpace object."""
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
+
+    # API =====================================================================
 
     def extract(self, *lcs, **lc):
         """Extract the selected features from the provided light curves.
@@ -283,13 +349,7 @@ class FeatureSpace:
         Features(feature_names={'Std'}, length=2)
 
         """
-        if lc and lcs:
-            raise ValueError(
-                "Please provide either a single light curve or a list of light "
-                "curves, but not both."
-            )
-
-        lcs = [lc] if lc else lcs
+        lcs = self._coerce_lightcurves(single_lc=lc, multiple_lcs=lcs)
 
         features_by_lc = runner.run(
             extractors=self._extractors,
@@ -300,13 +360,3 @@ class FeatureSpace:
         )
 
         return Features(features=features_by_lc, extractors=self._extractors)
-
-    @property
-    def features(self):
-        """frozenset: The selected features."""
-        return self._selected_features
-
-    @property
-    def execution_plan(self):
-        """np.ndarray: The extractor instances in order of their dependencies."""
-        return self._extractors
