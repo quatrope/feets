@@ -349,7 +349,7 @@ class FeatureSpace:
         Features(feature_names={'Std'}, length=2)
 
         """
-        lcs = self._coerce_lightcurves(single_lc=lc, multiple_lcs=lcs)
+        lcs = self._coerce_lightcurves(single_lc=lc, multiple_lc=lcs)
 
         features_by_lc = runner.run(
             extractors=self._extractors,
