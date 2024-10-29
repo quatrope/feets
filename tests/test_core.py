@@ -35,12 +35,19 @@ class FakeExtractorRegistry:
 
 @pytest.fixture
 def mock_extractor_registry(mocker):
-
     def maker(extractors):
         mocker.patch(
-            "feets.core.extractors.extractor_registry",
+            "feets.extractors.extractor_registry",
             FakeExtractorRegistry(extractors),
         )
+
+    return maker
+
+
+@pytest.fixture
+def mock_available_data(mocker):
+    def maker(data):
+        mocker.patch("feets.extractors.DATAS", tuple(data))
 
     return maker
 
@@ -300,6 +307,88 @@ def test_FeatureSpace_init_only(mock_extractor_registry, fake_extractor_cls):
         fs._selected_features,
         frozenset(["feature1", "feature3"]),
     )
+
+
+@pytest.mark.parametrize(
+    ["lc", "expected_data"],
+    [
+        (
+            {"data1": [1, 2, 3]},
+            {"data1"},
+        ),
+        (
+            {"data1": [1, 2, 3], "data2": [4, 5, 6]},
+            {"data1", "data2"},
+        ),
+    ],
+)
+def test_FeatureSpace_from_lightcurves_single(
+    mock_available_data,
+    mocker,
+    lc,
+    expected_data,
+):
+    data = ["data1", "data2", "data3"]
+    mock_available_data(data)
+
+    def _fake_init(self, data):
+        self.data = data
+
+    mocker.patch.object(FeatureSpace, "__init__", _fake_init)
+
+    fs = FeatureSpace.from_lightcurves(**lc)
+
+    np.testing.assert_equal(fs.data, expected_data)
+
+
+@pytest.mark.parametrize(
+    ["lcs", "expected_data"],
+    [
+        (
+            [
+                {"data1": [1, 2, 3]},
+                {"data1": [1, 2, 3], "data2": [4, 5, 6]},
+            ],
+            {"data1"},
+        ),
+        (
+            [
+                {"data1": [1, 2, 3], "data2": [4, 5, 6]},
+                {"data2": [4, 5, 6], "data3": [7, 8, 9]},
+            ],
+            {"data2"},
+        ),
+        (
+            [{"data1": [1, 2, 3]}, {"data2": [4, 5, 6]}, {"data3": [7, 8, 9]}],
+            set(),
+        ),
+    ],
+)
+def test_FeatureSpace_from_lightcurves_multiple(
+    mock_available_data,
+    mocker,
+    lcs,
+    expected_data,
+):
+    data = ["data1", "data2", "data3"]
+    mock_available_data(data)
+
+    def _fake_init(self, data):
+        self.data = data
+
+    mocker.patch.object(FeatureSpace, "__init__", _fake_init)
+
+    fs = FeatureSpace.from_lightcurves(*lcs)
+
+    np.testing.assert_equal(fs.data, expected_data)
+
+
+def test_FeatureSpace_from_lightcurves_raises_ValueError():
+    lc = {"data1": [1, 2, 3]}
+    lcs = [lc, lc, lc]
+
+    with pytest.raises(ValueError):
+        FeatureSpace.from_lightcurves(*lcs, **lc)
 
 
 def test_FeatureSpace_repr(mock_extractor_registry, fake_extractor_cls):

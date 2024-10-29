@@ -168,9 +168,6 @@ def test_extractors_from_data_valid(registry):
     registry.register_extractor(extractorB2)
     registry.register_extractor(extractorC)
 
-    result = registry.extractors_from_features({"feature1", "feature4"})
-    np.testing.assert_equal(result, {extractorA, extractorC})
-
     result = registry.extractors_from_data({"valid_data1", "valid_data2"})
     np.testing.assert_equal(result, {extractorA, extractorB1, extractorB2})
 
