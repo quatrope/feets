@@ -51,9 +51,6 @@ class Amplitude(Extractor):
 
     features = ["Amplitude"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         N = len(magnitude)
         sorted_mag = np.sort(magnitude)

@@ -56,9 +56,6 @@ class PairSlopeTrend(Extractor):
 
     features = ["PairSlopeTrend"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         data_last = magnitude[-30:]
 

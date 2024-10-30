@@ -66,9 +66,6 @@ class SmallKurtosis(Extractor):
 
     features = ["SmallKurtosis"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         n = len(magnitude)
         mean = np.mean(magnitude)

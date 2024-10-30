@@ -68,21 +68,12 @@ class DeltamDeltat(Extractor):
     features = ["DeltamDeltat"]
 
     def __init__(self, dt_bins=None, dm_bins=None):
-        dt_bins = (
+        self.dt_bins = (
             copy.deepcopy(DEFAULT_DT_BINS) if dt_bins is None else dt_bins
         )
-        dm_bins = (
+        self.dm_bins = (
             copy.deepcopy(DEFAULT_DM_BINS) if dm_bins is None else dm_bins
         )
-
-        feature_attrs = []
-        for i in range(len(dm_bins) - 1):
-            for j in range(len(dt_bins) - 1):
-                feature_attrs.append(f"dt_{j}_dm_{i}")
-
-        self.dt_bins = dt_bins
-        self.dm_bins = dm_bins
-        self.feature_attrs = tuple(feature_attrs)
 
     def extract(self, magnitude, time):
         def delta_calc(idx):
@@ -106,11 +97,17 @@ class DeltamDeltat(Extractor):
 
         dt_bins, dm_bins = self.dt_bins, self.dm_bins
         bins = [dt_bins, dm_bins]
+        labels = tuple(
+            f"dt_{j}_dm_{i}"
+            for i in range(len(dm_bins) - 1)
+            for j in range(len(dt_bins) - 1)
+        )
+
         counts = np.histogram2d(deltat, deltam, bins=bins)[0]
         counts = np.fix(255.0 * counts / n_vals + 0.999).astype(int)
 
         result = zip(
-            self.feature_attrs,
+            labels,
             counts.reshape((len(dt_bins) - 1) * (len(dm_bins) - 1)),
         )
 

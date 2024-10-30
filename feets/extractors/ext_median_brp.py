@@ -55,9 +55,6 @@ class MedianBRP(Extractor):
 
     features = ["MedianBRP"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         median = np.median(magnitude)
         amplitude = (np.max(magnitude) - np.min(magnitude)) / 10

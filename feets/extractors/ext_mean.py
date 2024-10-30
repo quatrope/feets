@@ -54,9 +54,6 @@ class Mean(Extractor):
 
     features = ["Mean"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         B_mean = np.mean(magnitude)
         return {"Mean": B_mean}

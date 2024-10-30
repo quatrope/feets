@@ -64,8 +64,5 @@ class Skew(Extractor):
 
     features = ["Skew"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         return {"Skew": stats.skew(magnitude)}

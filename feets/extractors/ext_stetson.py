@@ -288,9 +288,6 @@ class StetsonL(Extractor):
 
     features = ["StetsonL"]
 
-    def __init__(self):
-        pass
-
     def extract(
         self,
         aligned_magnitude,

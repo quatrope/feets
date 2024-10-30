@@ -90,6 +90,9 @@ def fake_extractor_cls():
             def flatten_feature(self, feature, value):
                 return {f"flat_{feature}": value}
 
+            def to_dict(self):
+                return {"FakeExtractor": {"kwargs": self.kawrgs}}
+
         return FakeExtractor
 
     return maker
@@ -401,6 +404,27 @@ def test_FeatureSpace_repr(mock_extractor_registry, fake_extractor_cls):
     np.testing.assert_equal(
         repr(fs), f"<FeatureSpace: {fs._extractors[0]}, {fs._extractors[1]}>"
     )
+
+
+def test_FeatureSpace_to_dict(mock_extractor_registry, fake_extractor_cls):
+    extractor_clss = [
+        fake_extractor_cls(features=["feature1"], data=["data1"]),
+        fake_extractor_cls(features=["feature2"], data=["data2"]),
+    ]
+    mock_extractor_registry(extractor_clss)
+
+    fake_dask_options = {"key": "value"}
+
+    fs = FeatureSpace(dask_options=fake_dask_options)
+
+    expected = {
+        "selected_features": list(fs._selected_features),
+        "required_data": list(fs._required_data),
+        "dask_options": fake_dask_options,
+        "extractors": [ext.to_dict() for ext in fs._extractors],
+    }
+
+    np.testing.assert_equal(fs.to_dict(), expected)
 
 
 def test_FeatureSpace_extract(

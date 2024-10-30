@@ -501,6 +501,79 @@ def test_Extractor_warnings(fake_extractor_conf_cls, mock_extractor_conf):
         extractor.extractor_warning(message)
 
 
+@pytest.mark.parametrize(
+    ("kwargs", "expected"),
+    [
+        ({}, "<TestExtractor {'param1': 1, 'param2': {}}>"),
+        (
+            {"param1": 10},
+            "<TestExtractor {'param1': 10, 'param2': {}}>",
+        ),
+        (
+            {"param1": 10, "param2": {"key": "value", "key2": "value2"}},
+            "<TestExtractor {'param1': 10, 'param2': '<MANY CONFIGURATIONS>'}>",
+        ),
+    ],
+    ids=["no_params", "partial_params", "complex_params"],
+)
+def test_Extractor_repr(
+    fake_extractor_conf_cls, mock_extractor_conf, kwargs, expected
+):
+    extractor_conf_cls = fake_extractor_conf_cls(features=["feature1"])
+    mock_extractor_conf(extractor_conf_cls)
+
+    class TestExtractor(Extractor):
+        features = ["feature1"]
+
+        def __init__(self, param1=1, param2=None):
+            if param2 is None:
+                param2 = {}
+
+            self.param1 = param1
+            self.param2 = param2
+
+        def extract(self):
+            pass
+
+    test_ext = TestExtractor(**kwargs)
+    np.testing.assert_equal(repr(test_ext), expected)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {},
+        {"param1": 10},
+        {"param1": 10, "param2": {"key": "value", "key2": "value2"}},
+    ],
+    ids=["no_params", "partial_params", "complex_params"],
+)
+def test_Extractor_to_dict(
+    fake_extractor_conf_cls, mock_extractor_conf, kwargs
+):
+    extractor_conf_cls = fake_extractor_conf_cls(features=["feature1"])
+    mock_extractor_conf(extractor_conf_cls)
+
+    class TestExtractor(Extractor):
+        features = ["feature1"]
+
+        def __init__(self, param1=1, param2=None):
+            if param2 is None:
+                param2 = {}
+
+            self.param1 = param1
+            self.param2 = param2
+
+        def extract(self):
+            pass
+
+    test_ext = TestExtractor(**kwargs)
+    expected = {
+        "TestExtractor": {"param1": test_ext.param1, "param2": test_ext.param2}
+    }
+    np.testing.assert_equal(test_ext.to_dict(), expected)
+
+
 def test_Extractor_select_kwargs(fake_extractor_conf_cls, mock_extractor_conf):
     extractor_conf_cls = fake_extractor_conf_cls(
         features=["feature1"],

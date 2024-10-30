@@ -56,8 +56,5 @@ class Color(Extractor):
 
     features = ["Color"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude, magnitude2):
         return {"Color": np.mean(magnitude) - np.mean(magnitude2)}

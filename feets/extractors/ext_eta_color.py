@@ -55,9 +55,6 @@ class EtaColor(Extractor):
 
     features = ["Eta_color"]
 
-    def __init__(self):
-        pass
-
     def extract(self, aligned_magnitude, aligned_time, aligned_magnitude2):
         N = len(aligned_magnitude)
         B_Rdata = aligned_magnitude - aligned_magnitude2

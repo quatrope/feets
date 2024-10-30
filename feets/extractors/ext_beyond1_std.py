@@ -55,9 +55,6 @@ class Beyond1Std(Extractor):
 
     features = ["Beyond1Std"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude, error):
         n = len(magnitude)
 

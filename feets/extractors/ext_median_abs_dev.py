@@ -62,9 +62,6 @@ class MedianAbsDev(Extractor):
 
     features = ["MedianAbsDev"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         median = np.median(magnitude)
         devs = abs(magnitude - median)

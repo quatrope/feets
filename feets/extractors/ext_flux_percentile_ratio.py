@@ -80,9 +80,6 @@ class FluxPercentileRatioMid20(Extractor):
 
     features = ["FluxPercentileRatioMid20"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
@@ -103,9 +100,6 @@ class FluxPercentileRatioMid35(Extractor):
     __doc__ = COMMON_DOC
 
     features = ["FluxPercentileRatioMid35"]
-
-    def __init__(self):
-        pass
 
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
@@ -128,9 +122,6 @@ class FluxPercentileRatioMid50(Extractor):
 
     features = ["FluxPercentileRatioMid50"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
@@ -152,9 +143,6 @@ class FluxPercentileRatioMid65(Extractor):
 
     features = ["FluxPercentileRatioMid65"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
@@ -175,9 +163,6 @@ class FluxPercentileRatioMid80(Extractor):
     __doc__ = COMMON_DOC
 
     features = ["FluxPercentileRatioMid80"]
-
-    def __init__(self):
-        pass
 
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)

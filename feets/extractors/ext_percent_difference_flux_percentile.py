@@ -56,9 +56,6 @@ class PercentDifferenceFluxPercentile(Extractor):
 
     features = ["PercentDifferenceFluxPercentile"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         median_data = np.median(magnitude)
 

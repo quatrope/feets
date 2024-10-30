@@ -310,6 +310,23 @@ class FeatureSpace:
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
+    # PERSISTENCE ==============================================================
+
+    def to_dict(self):
+        """Represent the feature space as a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the a representation of the feature space.
+        """
+        return {
+            "selected_features": list(self._selected_features),
+            "required_data": list(self._required_data),
+            "dask_options": self._dask_options,
+            "extractors": [extractor.to_dict() for extractor in self._extractors],
+        }
+
     # API =====================================================================
 
     def extract(self, *lcs, **lc):

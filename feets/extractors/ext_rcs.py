@@ -67,9 +67,6 @@ class RCS(Extractor):
 
     features = ["Rcs"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         sigma = np.std(magnitude)
         N = len(magnitude)

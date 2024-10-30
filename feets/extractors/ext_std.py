@@ -61,8 +61,5 @@ class Std(Extractor):
 
     features = ["Std"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         return {"Std": np.std(magnitude)}

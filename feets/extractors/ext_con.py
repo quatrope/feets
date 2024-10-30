@@ -62,22 +62,22 @@ class Con(Extractor):
 
     features = ["Con"]
 
-    def __init__(self, consecutiveStar=3):
-        self.consecutiveStar = consecutiveStar
+    def __init__(self, consecutive_star=3):
+        self.consecutive_star = consecutive_star
 
     def extract(self, magnitude):
-        consecutiveStar = self.consecutiveStar
+        consecutive_star = self.consecutive_star
 
         N = len(magnitude)
-        if N < consecutiveStar:
+        if N < consecutive_star:
             return 0
         sigma = np.std(magnitude)
         m = np.mean(magnitude)
         count = 0
 
-        for i in range(N - consecutiveStar + 1):
+        for i in range(N - consecutive_star + 1):
             flag = 0
-            for j in range(consecutiveStar):
+            for j in range(consecutive_star):
                 if (
                     magnitude[i + j] > m + 2 * sigma
                     or magnitude[i + j] < m - 2 * sigma
@@ -88,4 +88,4 @@ class Con(Extractor):
                     break
             if flag:
                 count = count + 1
-        return {"Con": count * 1.0 / (N - consecutiveStar + 1)}
+        return {"Con": count * 1.0 / (N - consecutive_star + 1)}

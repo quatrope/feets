@@ -54,9 +54,6 @@ class LinearTrend(Extractor):
 
     features = ["LinearTrend"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude, time):
         regression_slope = stats.linregress(time, magnitude)[0]
         return {"LinearTrend": regression_slope}

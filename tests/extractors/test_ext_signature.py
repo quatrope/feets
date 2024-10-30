@@ -26,10 +26,9 @@ def test_Signature_extract(periodic_light_curve):
     extractor_ls = ext_lomb_scargle.LombScargle()
     extractor_amp = ext_amplitude.Amplitude()
 
-    feature_attrs = []
-    for i in range(mag_bins):
-        for j in range(phase_bins):
-            feature_attrs.append(f"ph_{j}_mag_{i}")
+    labels = [
+        f"ph_{j}_mag_{i}" for i in range(mag_bins) for j in range(phase_bins)
+    ]
 
     # init the seed
     random = np.random.default_rng(42)
@@ -53,7 +52,7 @@ def test_Signature_extract(periodic_light_curve):
         )["Signature"]
 
         np.testing.assert_(len(results) == 3)
-        for index, key in enumerate(feature_attrs):
+        for index, key in enumerate(labels):
             values[idx, index] = results[0][key]
 
     expected = [

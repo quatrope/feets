@@ -13,7 +13,7 @@ import numpy as np
 
 def test_Con_extract(normal_light_curve):
     # create the extractor
-    extractor = ext_con.Con(consecutiveStar=1)
+    extractor = ext_con.Con(consecutive_star=1)
 
     # init the seed
     random = np.random.default_rng(42)

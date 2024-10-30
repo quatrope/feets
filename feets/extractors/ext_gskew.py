@@ -47,9 +47,6 @@ class Gskew(Extractor):
 
     features = ["Gskew"]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude):
         median_mag = np.median(magnitude)
         F_3_value = np.percentile(magnitude, 3)

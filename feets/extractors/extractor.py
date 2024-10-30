@@ -472,6 +472,18 @@ class Extractor(abc.ABC):
         """
         warnings.warn(msg, ExtractorWarning, 2)
 
+    def to_dict(self):
+        """Represent the extractor as a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the a representation of the extractor.
+        """
+        cls_name = type(self).__name__
+        state = vars(self)
+        return {cls_name: state}
+
     def __repr__(self):
         cls_name = type(self).__name__
         state = {}

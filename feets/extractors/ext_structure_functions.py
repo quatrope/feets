@@ -51,9 +51,6 @@ class StructureFunctions(Extractor):
         "StructureFunction_index_32",
     ]
 
-    def __init__(self):
-        pass
-
     def extract(self, magnitude, time):
         Nsf, Np = 100, 100
         sf1, sf2, sf3 = np.zeros(Nsf), np.zeros(Nsf), np.zeros(Nsf)

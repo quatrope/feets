@@ -90,9 +90,6 @@ class Q31Color(Extractor):
 
     features = ["Q31_color"]
 
-    def __init__(self):
-        pass
-
     def extract(self, aligned_magnitude, aligned_magnitude2):
         N = len(aligned_magnitude)
         b_r = aligned_magnitude[:N] - aligned_magnitude2[:N]
