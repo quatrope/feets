@@ -473,12 +473,12 @@ class Extractor(abc.ABC):
         warnings.warn(msg, ExtractorWarning, 2)
 
     def to_dict(self):
-        """Represent the extractor as a dictionary.
+        """Convert the extractor to a dictionary representation.
 
         Returns
         -------
         dict
-            A dictionary containing the a representation of the extractor.
+            A dictionary containing the parameters of the extractor instance.
         """
         cls_name = type(self).__name__
         state = vars(self)

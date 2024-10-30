@@ -18,6 +18,8 @@
 # =============================================================================
 
 import logging
+import json
+import yaml
 from collections.abc import Sequence
 
 import attrs
@@ -313,19 +315,80 @@ class FeatureSpace:
     # PERSISTENCE ==============================================================
 
     def to_dict(self):
-        """Represent the feature space as a dictionary.
+        """Convert the feature space to a dictionary representation.
 
         Returns
         -------
         dict
-            A dictionary containing the a representation of the feature space.
+            A dictionary representation of the feature space, including selected
+            features, required data, dask options, and extractors.
         """
         return {
             "selected_features": list(self._selected_features),
             "required_data": list(self._required_data),
             "dask_options": self._dask_options,
-            "extractors": [extractor.to_dict() for extractor in self._extractors],
+            "extractors": [
+                extractor.to_dict() for extractor in self._extractors
+            ],
         }
+
+    def to_json(self, *, stream_or_buff=None, **kwargs):
+        """Convert the feature space to a JSON string representation.
+
+        Parameters
+        ----------
+        stream_or_buff : file-like object, optional
+            A file-like object or a file path to write the JSON string.
+            If ``None``, the JSON string is returned.
+        **kwargs
+            Additional parameters to pass to the `json.dump` or
+            json.dumps` function.
+
+        Returns
+        -------
+        str, None
+            A JSON string representation of the feature space if
+            `stream_or_buff` is ``None``.
+        """
+        fs_as_dict = self.to_dict()
+
+        if stream_or_buff is None:
+            return json.dumps(fs_as_dict, **kwargs)
+
+        if not isinstance(stream_or_buff, str):
+            json.dump(fs_as_dict, stream_or_buff, **kwargs)
+            return
+
+        with open(stream_or_buff, "w") as file:
+            json.dump(fs_as_dict, file, **kwargs)
+
+    def to_yaml(self, *, stream_or_buff=None, **kwargs):
+        """Convert the feature space to a YAML string representation.
+
+        Parameters
+        ----------
+        stream_or_buff : file-like object, optional
+            A file-like object or a file path to write the YAML string.
+            If ``None``, the YAML string is returned.
+        **kwargs
+
+        Returns
+        -------
+        str, None
+            A YAML string representation of the feature space if
+            `stream_or_buff` is ``None``.
+        """
+        fs_as_dict = self.to_dict()
+
+        if stream_or_buff is None:
+            return yaml.dump(fs_as_dict, **kwargs)
+
+        if not isinstance(stream_or_buff, str):
+            yaml.dump(fs_as_dict, stream_or_buff, **kwargs)
+            return
+
+        with open(stream_or_buff, "w") as file:
+            yaml.dump(fs_as_dict, file, **kwargs)
 
     # API =====================================================================
 
