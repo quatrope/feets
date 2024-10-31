@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""CAR extractor."""
 
 
 # =============================================================================
@@ -25,6 +25,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -42,7 +43,9 @@ CTE_NEG = -np.inf
 
 
 class CAR(Extractor):
-    r"""In order to model the irregular sampled times series we use CAR
+    r"""CAR extractor.
+
+    In order to model the irregular sampled times series we use CAR
     (Brockwell and Davis, 2002), a continious time auto regressive model.
 
     CAR process has three parameters, it provides a natural and consistent way
@@ -91,19 +94,17 @@ class CAR(Extractor):
     :math:`\sigma_C` and :math:`\tau` and calculate :math:`b` as the mean
     magnitude of the light-curve divided by :math:`\tau`.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(
-        ...     only=['CAR_sigma', 'CAR_tau','CAR_mean'])
-        >>> features, values = fs.extract(**lc_periodic)
-        >>> dict(zip(features, values))
-        {'CAR_mean': -9.230698873903961,
-         'CAR_sigma': -0.21928049298842511,
-         'CAR_tau': 0.64112037377348619}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["CAR_sigma", "CAR_tau", "CAR_mean"])
+    >>> features = fs.extract(**lc_periodic)
+    >>> features[0]
+    {'CAR_tau': np.float64(5.845296631165712),
+    'CAR_sigma': np.float64(0.15595686709560483),
+    'CAR_mean': np.float64(-0.020044718150113303)}
 
     References
     ----------
-
     .. [brockwell2002introduction] Brockwell, P. J., & Davis, R. A. (2002).
        Introduction toTime Seriesand Forecasting.
 
@@ -112,7 +113,6 @@ class CAR(Extractor):
        method in EROS-2 and MACHO LMC data sets. Monthly Notices of the Royal
        Astronomical Society, 427(2), 1284-1297.
        Doi:10.1111/j.1365-2966.2012.22061.x.
-
     """
 
     features = ["CAR_sigma", "CAR_tau", "CAR_mean"]
@@ -197,6 +197,7 @@ class CAR(Extractor):
         sigma, tau = res.x[0], res.x[1]
         return sigma, tau
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time, error):
         sigma, tau = self._calculate_CAR(
             time, magnitude, error, self.minimize_method

@@ -17,9 +17,8 @@
 # IMPORTS
 # =============================================================================
 
-import logging
 import json
-import yaml
+import logging
 from collections.abc import Sequence
 
 import attrs
@@ -29,6 +28,8 @@ import joblib
 import numpy as np
 
 import pandas as pd
+
+import yaml
 
 from . import extractors, runner
 
@@ -371,6 +372,7 @@ class FeatureSpace:
             A file-like object or a file path to write the YAML string.
             If ``None``, the YAML string is returned.
         **kwargs
+            Additional parameters to pass to the `yaml.dump` function.
 
         Returns
         -------

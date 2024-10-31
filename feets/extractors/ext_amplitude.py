@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Amplitude extractor."""
 
 
 # =============================================================================
@@ -23,6 +23,7 @@ import math
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -31,26 +32,34 @@ from .extractor import Extractor
 
 
 class Amplitude(Extractor):
-    """
+    """Amplitude extractor.
+
     **Amplitude**
 
     The amplitude is defined as the half of the difference between the median
-    of the maximum 5% and the median of the minimum 5% magnitudes. For a
-    sequence of numbers from 0 to 1000 the amplitude should be equal to 475.5.
+    of the maximum :math:`5%%` and the median of the minimum :math:`5%%`
+    magnitudes. For a sequence of numbers from :math:`0` to :math:`1000` the
+    amplitude should be equal to :math:`475.5`.
+
+    Examples
+    --------
+    Amplitude of increasing time series from :math:`0` to :math:`1000`:
+    >>> fs = feets.FeatureSpace(only=['Amplitude'])
+    >>> features = fs.extract(**lc_incremental)
+    >>> features[0]
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
 
     features = ["Amplitude"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         N = len(magnitude)
         sorted_mag = np.sort(magnitude)

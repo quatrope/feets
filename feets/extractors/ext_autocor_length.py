@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Auto-correlation length extractor."""
 
 
 # =============================================================================
@@ -23,6 +23,7 @@ import numpy as np
 from statsmodels.tsa import stattools
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -31,7 +32,8 @@ from .extractor import Extractor
 
 
 class AutocorLength(Extractor):
-    r"""
+    r"""Auto-correlation length extractor.
+
     **Autocor_length**
 
     The autocorrelation, also known as serial correlation, is the
@@ -41,7 +43,7 @@ class AutocorLength(Extractor):
     a periodic signal obscured by noise, or identifying the missing fundamental
     frequency in a signal implied by its harmonic frequencies.
 
-    For an observed series :math:`y_1, y_2,\dots,y_T`  with sample mean
+    For an observed series :math:`y_1, y_2,\dots,y_T` with sample mean
     :math:`\bar{y}`, the sample lag :math:`-h` autocorrelation is given by:
 
     .. math::
@@ -55,14 +57,12 @@ class AutocorLength(Extractor):
 
     References
     ----------
-
     .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
        Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
        algorithm using time variability and machine learning: Selection of
        1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
        database. The Astrophysical Journal, 735(2), 68.
        Doi:10.1088/0004-637X/735/2/68.
-
     """
 
     features = ["Autocor_length"]
@@ -70,6 +70,7 @@ class AutocorLength(Extractor):
     def __init__(self, nlags=100):
         self.nlags = nlags
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         nlags = self.nlags
 

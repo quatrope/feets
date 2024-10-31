@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Con extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,7 +30,7 @@ from .extractor import Extractor
 
 
 class Con(Extractor):
-    r"""
+    r"""Con extractor.
 
     **Con**
 
@@ -39,18 +40,19 @@ class Con(Extractor):
     and normalize the number by :math:`N−2`.
 
     For a normal distribution and by considering just one star, Con should
-    take values close to 0.045:
+    take values close to :math:`0.045`.
 
-    .. code-block:: pycon
+    Examples
+    --------
+    Con of a normal time series:
 
-        >>> fs = feets.FeatureSpace(only=['Con'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Con': 0.0476}
+    >>> fs = feets.FeatureSpace(only=["Con"], consecutive_star=1)
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Con': 0.042}
 
     References
     ----------
-
     .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
        Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
        algorithm using time variability and machine learning: Selection of
@@ -65,6 +67,7 @@ class Con(Extractor):
     def __init__(self, consecutive_star=3):
         self.consecutive_star = consecutive_star
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         consecutive_star = self.consecutive_star
 

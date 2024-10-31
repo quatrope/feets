@@ -11,8 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
-
+"""Standard deviation extractor."""
 
 # =============================================================================
 # IMPORTS
@@ -21,6 +20,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,11 +29,12 @@ from .extractor import Extractor
 
 
 class Std(Extractor):
-    r"""
-    **Std** - Standard deviation of the magnitudes
+    r"""Standard deviation extractor.
 
+    **Std**
 
-    The standard deviation :math:`\sigma` of the sample is defined as:
+    The standard deviation of the magnitudes. The standard deviation
+    :math:`\sigma` of the sample is defined as:
 
     .. math::
 
@@ -43,23 +44,27 @@ class Std(Extractor):
 
     .. code-block:: pycon
 
-        >>> fs = feets.FeatureSpace(only=['Std'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Std': 0.99320419310116881}
+    Examples
+    --------
+    Standard deviation of a white noise time series:
+
+    >>> fs = feets.FeatureSpace(only=['Std'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Std': np.float64(1.0140342446921735)}
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
 
     features = ["Std"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
-        return {"Std": np.std(magnitude)}
+        std = np.std(magnitude)
+        return {"Std": std}

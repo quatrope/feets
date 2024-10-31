@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Anderson-Darling extractor."""
 
 
 # =============================================================================
@@ -23,6 +23,7 @@ import numpy as np
 from scipy import stats
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -31,7 +32,8 @@ from .extractor import Extractor
 
 
 class AndersonDarling(Extractor):
-    """
+    """Anderson-Darling extractor.
+
     **AndersonDarling**
 
     The Anderson-Darling test is a statistical test of whether a given
@@ -41,18 +43,15 @@ class AndersonDarling(Extractor):
     departures from normality.
 
     For a normal distribution the Anderson-Darling statistic should take values
-    close to 0.25.
-
+    close to :math:`0.25`.
 
     References
     ----------
-
     .. [kim2009trending] Kim, D. W., Protopapas, P., Alcock, C.,
        Byun, Y. I., & Bianco, F. (2009). De-Trending Time Series for
        Astronomical Variability Surveys. Monthly Notices of the Royal
        Astronomical Society, 397(1), 558-568.
        Doi:10.1111/j.1365-2966.2009.14967.x.
-
     """
 
     features = {"AndersonDarling"}
@@ -64,6 +63,8 @@ class AndersonDarling(Extractor):
             "result is ~-0.60"
         )
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
-        ander = stats.anderson(magnitude)[0]
-        return {"AndersonDarling": 1 / (1.0 + np.exp(-10 * (ander - 0.3)))}
+        ander, critical, sig = stats.anderson(magnitude)
+        result = 1 / (1.0 + np.exp(-10 * (ander - 0.3)))
+        return {"AndersonDarling": result}

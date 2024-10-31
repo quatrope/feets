@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Color extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,32 +30,32 @@ from .extractor import Extractor
 
 
 class Color(Extractor):
-    """
+    """Color extractor.
+
     **Color**
 
     The color is defined as the difference between the average magnitude of
     two different bands observations.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['Color'])
-        >>> features, values = fs.extract(**lc)
-        >>> dict(zip(features, values))
-        {'Color': -0.33325502453332145}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["Color"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Color': np.float64(-0.07991933970739044)}
 
     References
     ----------
-
     .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
        Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
        algorithm using time variability and machine learning: Selection of
        1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
        database. The Astrophysical Journal, 735(2), 68.
        Doi:10.1088/0004-637X/735/2/68.
-
     """
 
     features = ["Color"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, magnitude2):
         return {"Color": np.mean(magnitude) - np.mean(magnitude2)}

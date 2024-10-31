@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Beyond-one-standard-deviation extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,32 +30,32 @@ from .extractor import Extractor
 
 
 class Beyond1Std(Extractor):
-    """
+    """Beyond-one-standard-deviation extractor.
+
     **Beyond1Std**
 
     Percentage of points beyond one standard deviation from the weighted mean.
-    For a normal distribution, it should take a value close to 0.32:
+    For a normal distribution, it should take a value close to :math:`0.32`.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['Beyond1Std'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Beyond1Std': 0.317}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['Beyond1Std'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Beyond1Std': 0.327}
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
 
     features = ["Beyond1Std"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, error):
         n = len(magnitude)
 

@@ -189,7 +189,7 @@ intersphinx_mapping = {"https://docs.python.org/": None}
 
 
 def setup(app):
-    app.add_stylesheet("custom.css")
-    app.add_javascript("transition.js")
-    app.add_javascript("collapse.js")
-    app.add_javascript("custom.js")
+    app.add_css_file("custom.css")
+    app.add_js_file("transition.js")
+    app.add_js_file("collapse.js")
+    app.add_js_file("custom.js")
