@@ -68,10 +68,10 @@ class DeltamDeltat(Extractor):
     features = ["DeltamDeltat"]
 
     def __init__(self, dt_bins=None, dm_bins=None):
-        self.dt_bins = (
+        self.dt_bins = np.asarray(
             copy.deepcopy(DEFAULT_DT_BINS) if dt_bins is None else dt_bins
         )
-        self.dm_bins = (
+        self.dm_bins = np.asarray(
             copy.deepcopy(DEFAULT_DM_BINS) if dm_bins is None else dm_bins
         )
 

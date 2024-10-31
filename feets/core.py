@@ -17,7 +17,6 @@
 # IMPORTS
 # =============================================================================
 
-import json
 import logging
 from collections.abc import Sequence
 
@@ -28,8 +27,6 @@ import joblib
 import numpy as np
 
 import pandas as pd
-
-import yaml
 
 from . import extractors, runner
 
@@ -293,6 +290,10 @@ class FeatureSpace:
             selected_data.intersection_update(lc)
         return cls(data=selected_data)
 
+    @classmethod
+    def from_dict(cls, data):
+        pass
+
     # PROPERTIES ==============================================================
 
     @property
@@ -351,17 +352,9 @@ class FeatureSpace:
             A JSON string representation of the feature space if
             `stream_or_buff` is ``None``.
         """
-        fs_as_dict = self.to_dict()
+        from . import io  # noqa
 
-        if stream_or_buff is None:
-            return json.dumps(fs_as_dict, **kwargs)
-
-        if not isinstance(stream_or_buff, str):
-            json.dump(fs_as_dict, stream_or_buff, **kwargs)
-            return
-
-        with open(stream_or_buff, "w") as file:
-            json.dump(fs_as_dict, file, **kwargs)
+        return io.store_json(self, stream_or_buff=stream_or_buff, **kwargs)
 
     def to_yaml(self, *, stream_or_buff=None, **kwargs):
         """Convert the feature space to a YAML string representation.
@@ -380,17 +373,9 @@ class FeatureSpace:
             A YAML string representation of the feature space if
             `stream_or_buff` is ``None``.
         """
-        fs_as_dict = self.to_dict()
+        from . import io  # noqa
 
-        if stream_or_buff is None:
-            return yaml.dump(fs_as_dict, **kwargs)
-
-        if not isinstance(stream_or_buff, str):
-            yaml.dump(fs_as_dict, stream_or_buff, **kwargs)
-            return
-
-        with open(stream_or_buff, "w") as file:
-            yaml.dump(fs_as_dict, file, **kwargs)
+        return io.store_yaml(self, stream_or_buff=stream_or_buff, **kwargs)
 
     # API =====================================================================
 

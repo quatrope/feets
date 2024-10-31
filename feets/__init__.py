@@ -88,6 +88,7 @@ if os.getenv("FEETS_IN_SETUP") != "True":
     from .core import *  # noqa
     from . import datasets
     from .extractors import *  # noqa
+    from .io import read_json, read_yaml
 
 __all__ = ["datasets"]
 

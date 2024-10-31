@@ -8,7 +8,7 @@
 
 # -*- coding: utf-8 -*-
 
-# This file is part of the
+# This file is basedof the
 #   Scikit-NeuroMSI Project (https://github.com/renatoparedes/scikit-neuromsi).
 # Copyright (c) 2021-2022, Renato Paredes; Cabral, Juan
 # License: BSD 3-Clause
@@ -19,23 +19,23 @@
 # DOCS
 # =============================================================================
 
-"""Custom JSON encoding and decoding module.
-
-This module provides custom JSON encoding and decoding functionality by
-extending the default JSONEncoder and providing additional converter
-functions for various data types that are not supported by the default
-encoder.
-
-"""
+""""""
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+import contextlib
 import datetime as dt
+import io
 import json
+import pathlib
+
+import yaml
 
 import numpy as np
+
+from .core import FeatureSpace
 
 # =============================================================================
 # CUSTOM JSON ENCODER
@@ -102,85 +102,57 @@ class CustomJSONEncoder(json.JSONEncoder):
 # API
 # =============================================================================
 
+@contextlib.contextmanager
+def none_open_or_buffer(path_or_buffer, mode):
+    if path_or_buffer is None:
+        yield io.StringIO()
 
-def dump(obj, fp, **kwargs):
-    """Serialize obj as a JSON formatted stream to fp (.write()-supporting \
-    file-like object).
-
-    Parameters
-    ----------
-    obj : object
-        The object to be serialized.
-    fp : file-like object
-        A .write()-supporting file-like object to write the JSON formatted
-        stream to.
-    **kwargs
-        Additional keyword arguments to be passed to the underlying json.dump()
-        function.
-
-    Returns
-    -------
-    None
-    """
-    kwargs.setdefault("cls", CustomJSONEncoder)
-    return json.dump(obj, fp, **kwargs)
+    elif isinstance(path_or_buffer, (str, pathlib.Path)):
+        with open(path_or_buffer, mode) as fp:
+            yield fp
+    else:
+        yield path_or_buffer
 
 
-def dumps(obj, **kwargs):
-    """Serialize obj to a JSON formatted str.
+def store_json(fspace, path_or_buffer=None, **kwargs):
 
-    Parameters
-    ----------
-    obj : object
-        The object to be serialized.
-    **kwargs
-        Additional keyword arguments to be passed to the underlying
-        json.dumps() function.
+    data = fspace.to_dict()
 
-    Returns
-    -------
-    str
-        The JSON formatted string representation of the object.
-    """
-    kwargs.setdefault("cls", CustomJSONEncoder)
-    return json.dumps(obj, **kwargs)
+    kwargs.setdefault("indent", 2)
+    with none_open_or_buffer(path_or_buffer, "w") as fp:
+        json.dump(data, fp=fp, cls=CustomJSONEncoder, **kwargs)
+
+    if path_or_buffer is None:
+        return fp.getvalue()
 
 
-def load(fp, **kwargs):
-    """Deserialize fp (.read()-supporting file-like object containing a JSON \
-    document) to a Python object.
+def store_yaml(fspace, path_or_buffer, **kwargs):
 
-    Parameters
-    ----------
-    fp : file-like object
-        A .read()-supporting file-like object containing a JSON document.
-    **kwargs
-        Additional keyword arguments to be passed to the underlying json.load()
-        function.
+    json_str = store_json(fspace, path_or_buffer=None, indent=None)
+    data = json.loads(json_str)
 
-    Returns
-    -------
-    object
-        The Python object deserialized from the JSON document.
-    """
-    return json.load(fp, **kwargs)
+    with none_open_or_buffer(path_or_buffer, "w") as fp:
+        yaml.safe_dump(data, stream=fp, **kwargs)
+
+    if path_or_buffer is None:
+        return fp.getvalue()
 
 
-def loads(text, **kwargs):
-    """Deserialize text (str, bytes or bytearray instance containing a JSON \
-    document) to a Python object.
+def read_json(path_or_buffer, **kwargs):
+    with none_open_or_buffer(path_or_buffer, "r") as fp:
+        data = json.load(fp)
+    return FeatureSpace.from_dict(data)
 
-    Parameters
-    ----------
-    text : str, bytes or bytearray
-        A string, bytes or bytearray instance containing a JSON document.
-    **kwargs
-        Additional keyword arguments to be passed to the underlying
-        json.loads() function.
 
-    Returns
-    -------
-    object
-        The Python object deserialized from the JSON document.
-    """
-    return json.loads(text, **kwargs)
+
+def read_yaml(path_or_buffer, **kwargs):
+    with none_open_or_buffer(path_or_buffer, "r") as fp:
+        data = yaml.safe_load(fp)
+    return FeatureSpace.from_dict(data)
+
+
+
+
+
+
+
