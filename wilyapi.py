@@ -96,10 +96,6 @@ class WilyAPI:
         # Capture the output
         buff = self._run_capture(report.report, params)
 
-        import ipdb
-
-        ipdb.set_trace()
-
         # Read results
         df = pd.read_table(buff)
 
@@ -139,7 +135,7 @@ class WilyAPI:
             "limit": None,
             "threshold": None,
             "descending": False,
-            "wrap": True,
+            "wrap": False,
         }
 
         # Capture the output
@@ -156,7 +152,7 @@ class WilyAPI:
 
     def list_files(self, *, subdir=None):
         df = self.files_rank()
-        files = sorted(df.File[df.File.str.endswith(".py")])
+        files = sorted(df.File[df.File.str.endswith(".py")].values)
 
         if subdir:
             subdir = pathlib.Path(subdir).resolve()
@@ -176,13 +172,14 @@ class WilyAPI:
                 file_report(file, metrics=[metric], add_filename=True)
                 for file in files
             )
-
         return pd.concat(results)
 
-    def plot(self, metric, *, subdir=None):
+    def metric_plot(self, metric, *, mean=True, subdir=None):
         df = self.metric_report(metric, subdir=subdir)
+        df.reset_index(inplace=True)
         df = df.pivot(
             index=["Revision", "Date"],
             columns="File",
             values="Maintainability Index",
         )
+        return df
