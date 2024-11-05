@@ -18,10 +18,8 @@
 # =============================================================================
 
 import copy
-from itertools import chain
 
 import dask
-import dask.bag as db
 from dask.delayed import delayed
 
 import numpy as np
@@ -33,9 +31,7 @@ __all__ = ["run"]
 # CONSTANTS
 # =============================================================================
 
-DEFAULT_DASK_OPTIONS = {"scheduler": "threads"}
-
-DEFAULT_CHUNK_SIZE = 4
+DEFAULT_DASK_OPTIONS = {"scheduler": "processes"}
 
 
 # =============================================================================
@@ -93,34 +89,14 @@ def _extract_selected_features(extractors, data, selected_features):
     }
 
 
-def _run_single(
-    *, extractors, selected_features, required_data, dask_options, lc
-):
+def _run_single(*, extractors, selected_features, required_data, lc):
 
     data = _preprocess_data(required_data, lc)
     delayed_features = _extract_selected_features(
         extractors, data, selected_features
     )
 
-    (features,) = dask.compute(delayed_features, **dask_options)
-    return features
-
-
-def _run_chunk(
-    *, extractors, selected_features, required_data, dask_options, lc_chunk
-):
-    features_by_lc = [
-        _run_single(
-            extractors=extractors,
-            selected_features=selected_features,
-            required_data=required_data,
-            dask_options=dask_options,
-            lc=lc,
-        )
-        for lc in lc_chunk
-    ]
-
-    return features_by_lc
+    return delayed_features
 
 
 def run(
@@ -184,22 +160,16 @@ def run(
     if dask_options is None:
         dask_options = copy.deepcopy(DEFAULT_DASK_OPTIONS)
 
-    chunks = dask_options.pop("chunks", DEFAULT_CHUNK_SIZE)
-    lc_chunks = np.array_split(lcs, chunks)
-
-    features_by_chunk = (
-        db.from_sequence(lc_chunks)
-        .map(
-            lambda lc_chunk: _run_chunk(
-                extractors=extractors,
-                selected_features=selected_features,
-                required_data=required_data,
-                dask_options=dask_options,
-                lc_chunk=lc_chunk,
-            )
+    delayed_features_by_lc = [
+        _run_single(
+            extractors=extractors,
+            selected_features=selected_features,
+            required_data=required_data,
+            lc=lc,
         )
-        .compute(**dask_options)
-    )
+        for lc in lcs
+    ]
 
-    features_by_lc = list(chain.from_iterable(features_by_chunk))
+    features_by_lc = dask.compute(*delayed_features_by_lc, **dask_options)
+
     return features_by_lc
