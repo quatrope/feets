@@ -22,6 +22,7 @@ from collections.abc import Sequence
 
 import attrs
 
+import dask
 import joblib
 
 import numpy as np
@@ -290,10 +291,6 @@ class FeatureSpace:
             selected_data.intersection_update(lc)
         return cls(data=selected_data)
 
-    @classmethod
-    def from_dict(cls, data):
-        pass
-
     # PROPERTIES ==============================================================
 
     @property
@@ -316,6 +313,35 @@ class FeatureSpace:
 
     # PERSISTENCE ==============================================================
 
+    @classmethod
+    def from_dict(cls, data):
+        """Create a FeatureSpace instance from a dictionary representation.
+
+        Parameters
+        ----------
+        data : dict
+            A dictionary representation of the feature space, including selected
+            features, required data, dask options, and extractors.
+
+        Returns
+        -------
+        FeatureSpace
+            A FeatureSpace object with the features, required data, dask options,
+            and extractors from the provided dictionary.
+        """
+        only = data["selected_features"]
+        dask_options = data["dask_options"]
+        kwargs = {}
+        for extractor in data["extractors"]:
+            name = list(extractor).pop()
+            kwargs.update(extractor[name])
+
+        return cls(
+            only=only,
+            dask_options=dask_options,
+            **kwargs,
+        )
+
     def to_dict(self):
         """Convert the feature space to a dictionary representation.
 
@@ -334,48 +360,45 @@ class FeatureSpace:
             ],
         }
 
-    def to_json(self, *, stream_or_buff=None, **kwargs):
-        """Convert the feature space to a JSON string representation.
+    def to_json(self, *, path_or_buffer=None, **kwargs):
+        """Serialize the feature space to a JSON formatted string or file.
 
         Parameters
         ----------
-        stream_or_buff : file-like object, optional
-            A file-like object or a file path to write the JSON string.
-            If ``None``, the JSON string is returned.
+        path_or_buffer : str, pathlib.Path, file-like object or None, optional
+            The file path or buffer to write the JSON data to. If `None`, the JSON
+            data is returned as a string. Defaults to `None`.
         **kwargs
-            Additional parameters to pass to the `json.dump` or
-            json.dumps` function.
+            Additional parameters to pass to `io.store_json`.
 
         Returns
         -------
-        str, None
-            A JSON string representation of the feature space if
-            `stream_or_buff` is ``None``.
+        str
+            The JSON formatted string if `path_or_buffer` is None.
         """
         from . import io  # noqa
 
-        return io.store_json(self, stream_or_buff=stream_or_buff, **kwargs)
+        return io.store_json(self, path_or_buffer=path_or_buffer, **kwargs)
 
-    def to_yaml(self, *, stream_or_buff=None, **kwargs):
-        """Convert the feature space to a YAML string representation.
+    def to_yaml(self, *, path_or_buffer=None, **kwargs):
+        """Serialize the feature space to a YAML formatted string or file.
 
         Parameters
         ----------
-        stream_or_buff : file-like object, optional
-            A file-like object or a file path to write the YAML string.
-            If ``None``, the YAML string is returned.
+        path_or_buffer : str, pathlib.Path, file-like object or None, optional
+            The file path or buffer to write the YAML data to. If `None`, the JSON
+            data is returned as a string. Defaults to `None`.
         **kwargs
-            Additional parameters to pass to the `yaml.dump` function.
+            Additional parameters to pass to `io.store_json`.
 
         Returns
         -------
-        str, None
-            A YAML string representation of the feature space if
-            `stream_or_buff` is ``None``.
+        str
+            The YAML formatted string if `path_or_buffer` is None.
         """
         from . import io  # noqa
 
-        return io.store_yaml(self, stream_or_buff=stream_or_buff, **kwargs)
+        return io.store_yaml(self, path_or_buffer=path_or_buffer, **kwargs)
 
     # API =====================================================================
 

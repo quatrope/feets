@@ -372,6 +372,8 @@ class Extractor(abc.ABC):
         cls._conf = _ExtractorConf.from_extractor_class(cls)
         del cls.features
 
+    # GETTERS =================================================================
+
     @classmethod
     def get_features(cls):
         """Retrieve the features that can be computed by the extractor.
@@ -450,6 +452,8 @@ class Extractor(abc.ABC):
         """
         return cls._conf.parameters
 
+    # WARNINGS ================================================================
+
     @classmethod
     def feature_warning(cls, msg):
         """Issue a warning about the feature extraction process.
@@ -472,6 +476,8 @@ class Extractor(abc.ABC):
         """
         warnings.warn(msg, ExtractorWarning, 2)
 
+    # PERSISTENCE =============================================================
+
     def to_dict(self):
         """Convert the extractor to a dictionary representation.
 
@@ -480,18 +486,22 @@ class Extractor(abc.ABC):
         dict
             A dictionary containing the parameters of the extractor instance.
         """
-        cls_name = type(self).__name__
+        cls_name = type(self).__qualname__
         state = vars(self)
         return {cls_name: state}
 
+    # MAGIC ===================================================================
+
     def __repr__(self):
-        cls_name = type(self).__name__
+        cls_name = type(self).__qualname__
         state = {}
         for aname, avalue in vars(self).items():
             if len(repr(avalue)) > 20:
                 avalue = "<MANY CONFIGURATIONS>"
             state[aname] = avalue
         return f"<{cls_name} {state}>" if state else f"<{cls_name}>"
+
+    # API =====================================================================
 
     def select_kwargs(self, data, dependencies):
         """Prepare keyword arguments for the `extract()` method.
