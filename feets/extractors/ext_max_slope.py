@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Maximum slope extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,7 +30,8 @@ from .extractor import Extractor
 
 
 class MaxSlope(Extractor):
-    """
+    """Maximum slope extractor.
+
     **MaxSlope**
 
     Maximum absolute magnitude slope between two consecutive observations.
@@ -37,23 +39,20 @@ class MaxSlope(Extractor):
     Examining successive (time-sorted) magnitudes, the maximal first difference
     (value of delta magnitude over delta time)
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['MaxSlope'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'MaxSlope': 5.4943105823904741}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['MaxSlope'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'MaxSlope': np.float64(4.691231287741495)}
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
-
     """
 
     features = ["MaxSlope"]
@@ -61,6 +60,7 @@ class MaxSlope(Extractor):
     def __init__(self, timesort=True):
         self.timesort = timesort
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
         if self.timesort:
             sort = np.argsort(time)

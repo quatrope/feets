@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Percent difference flux percentile extractor."""
 
 
 # =============================================================================
@@ -23,6 +23,7 @@ import math
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -31,31 +32,31 @@ from .extractor import Extractor
 
 
 class PercentDifferenceFluxPercentile(Extractor):
-    r"""
+    r"""Percent difference flux percentile extractor.
+
     **PercentDifferenceFluxPercentile**
 
     Ratio of :math:`F_{5, 95}` over the median magnitude.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['PercentDifferenceFluxPercentile'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'PercentDifferenceFluxPercentile': -134.93590403825007}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['PercentDifferenceFluxPercentile'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'PercentDifferenceFluxPercentile': np.float64(-75.68714117084457)}
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
 
     features = ["PercentDifferenceFluxPercentile"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         median_data = np.median(magnitude)
 

@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Percentage amplitude extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,32 +30,32 @@ from .extractor import Extractor
 
 
 class PercentAmplitude(Extractor):
-    r"""
+    r"""Percentage amplitude extractor.
+
     **PercentAmplitude**
 
     Largest percentage difference between either the max or min magnitude
     and the median.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['PercentAmplitude'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'PercentAmplitude': -168.991253993057}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['PercentAmplitude'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'PercentAmplitude': np.float64(-68.60468220408177)}
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
 
     features = ["PercentAmplitude"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         median_data = np.median(magnitude)
         distance_median = np.abs(magnitude - median_data)

@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Lomb-Scargle extractor."""
 
 
 # =============================================================================
@@ -25,12 +25,11 @@ from astropy.timeseries import LombScargle as _LombScargle
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
-
-EPS = np.finfo(float).eps
 
 DEFAULT_LSCARGLE_KWDS = {
     "autopower_kwds": {"normalization": "standard", "nyquist_factor": 100}
@@ -44,6 +43,7 @@ DEFAULT_FAP_KWDS = {
     "minimum_frequency": None,
     "maximum_frequency": None,
 }
+
 
 # =============================================================================
 # FUNCTIONS
@@ -59,6 +59,34 @@ def lscargle(
     autopower_kwds=None,
     fap_kwds=None,
 ):
+    """Calculate Lomb-Scargle periodogram.
+
+    Parameters
+    ----------
+    time : array-like
+        Time values of the light curve.
+    magnitude : array-like
+        Magnitude values of the light curve.
+    nfrequencies : int
+        Number of frequencies to extract.
+    error : array-like, optional
+        Error values of the light curve.
+    model_kwds : dict, optional
+        Keyword arguments for the Lomb-Scargle model.
+    autopower_kwds : dict, optional
+        Keyword arguments for the autopower method.
+    fap_kwds : dict, optional
+        Keyword arguments for the false alarm probability calculation.
+
+    Returns
+    -------
+    frequency : array-like
+        Frequency values.
+    fmax : array-like
+        Indexes of the `nfrequencies` largest power values.
+    fap : array-like
+        False alarm probability values.
+    """
     model_kwds = model_kwds or {}
     autopower_kwds = autopower_kwds or {}
     fap_kwds = fap_kwds or {}
@@ -77,7 +105,8 @@ def lscargle(
 
 
 class LombScargle(Extractor):
-    r"""
+    r"""Lomb-Scargle extractor.
+
     **PeriodLS**
 
     The Lomb-Scargle (L-S) algorithm (Scargle, 1982) is a variation of the
@@ -97,14 +126,9 @@ class LombScargle(Extractor):
     optimal for detecting signals from transiting exoplanets, where the shape
     of the periodic light-curve is not sinusoidal.
 
-    Next, we perform a test on the synthetic periodic light-curve we created
-    (which period is 20) to confirm the accuracy of the period found by the
-    L-S method
-
     **Period_fit**
 
-    The false alarm probability of the largest periodogram value. Let's
-    test it for a normal distributed data and for a periodic one.
+    The false alarm probability of the largest periodogram value.
 
     **Psi_CS** (:math:`\Psi_{CS}`)
 
@@ -113,12 +137,34 @@ class LombScargle(Extractor):
 
     **Psi_eta** (:math:`\Psi_{\eta}`)
 
-    :math:`\eta^e`  index calculated from the folded light curve.
+    :math:`\eta^e` index calculated from the folded light curve.
 
+    Parameters
+    ----------
+    lscargle_kwds : dict, optional
+        Keyword arguments for the Lomb-Scargle algorithm.
+    fap_kwds : dict, optional
+        Keyword arguments for the false alarm probability calculation.
+    nperiods : int, optional, default: `3`
+        Number of periods to extract.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=[
+    ...     "PeriodLS",
+    ...     "Period_fit",
+    ...     "Psi_CS",
+    ...     "Psi_eta",
+    ... ])
+    >>> features = fs.extract(**lc_periodic)
+    >>> features[0]
+    {'Psi_CS': array([0.23320451, 0.19688377, 0.23320451]),
+     'Psi_eta': array([0.11139146, 0.11139146, 0.11139146]),
+     'PeriodLS': array([0.02085484, 0.0204288 , 0.02001982]),
+     'Period_fit': array([6.30747594e-24, 4.58745915e-24, 3.32221561e-24])}
 
     References
     ----------
-
     .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
        Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
        algorithm using time variability and machine learning: Selection of
@@ -185,6 +231,7 @@ class LombScargle(Extractor):
         Psi_eta = self._compute_eta(folded_data, N)
         return R, Psi_eta
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
         # first we retrieve the best periods and the false alarm probability
         best_periods, fap_best_periods = self._compute_ls(

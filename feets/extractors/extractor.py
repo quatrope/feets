@@ -486,14 +486,15 @@ class Extractor(abc.ABC):
         dict
             A dictionary containing the parameters of the extractor instance.
         """
-        cls_name = type(self).__qualname__
+        cls_name = type(self).__name__
         state = vars(self)
         return {cls_name: state}
 
     # MAGIC ===================================================================
 
     def __repr__(self):
-        cls_name = type(self).__qualname__
+        """Return a string representation of the FeatureSpace object."""
+        cls_name = type(self).__name__
         state = {}
         for aname, avalue in vars(self).items():
             if len(repr(avalue)) > 20:

@@ -11,34 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = r"""These three features are based on the Welch/Stetson variability
-index :math:`I` (Stetson, 1996) defined by the equation:
-
-.. math::
-
-    I = \sqrt{\frac{1}{n(n-1)}} \sum_{i=1}^n {
-        (\frac{b_i-\hat{b}}{\sigma_{b,i}})
-        (\frac{v_i - \hat{v}}{\sigma_{v,i}})}
-
-where \:math:`b_i` and :math:`v_i` are the apparent magnitudes obtained for
-the candidate star in two observations closely spaced in time on some occasion
-:math:`i`, :math:`\sigma_{b, i}` and :math:`\sigma_{v, i}` are the standard
-errors of those magnitudes, :math:`\hat{b}` and \hat{v} are the weighted mean
-magnitudes in the two filters, and :math:`n` is the number of observation
-pairs.
-
-Since a given frame pair may include data from two filters which did not have
-equal numbers of observations overall, the "relative error" is calculated as
-follows:
-
-.. math::
-
-    \delta = \sqrt{\frac{n}{n-1}} \frac{v-\hat{v}}{\sigma_v}
-
-allowing all residuals to be compared on an equal basis.
-
-"""
-
+"""Stetson variability index extractors."""
 
 # =============================================================================
 # IMPORTS
@@ -48,7 +21,7 @@ import numpy as np
 
 from .ext_slotted_a_length import start_conditions
 from .extractor import Extractor
-from ..utils import indent
+from ..libs import doctools
 
 
 # =============================================================================
@@ -57,9 +30,7 @@ from ..utils import indent
 
 
 class StetsonJ(Extractor):
-    __doc__ = (
-        indent(__doc__)
-        + r"""
+    r"""Stetson J variability index extractor.
 
     **StetsonJ**
 
@@ -72,29 +43,56 @@ class StetsonJ(Extractor):
 
     with :math:`P_k = \delta_{i_k} \delta_{j_k}`
 
-    For a Gaussian magnitude distribution, J should take a value close to zero:
+    For a Gaussian magnitude distribution, :math:`J` should take a value close
+    to zero.
 
-    .. code-block:: pycon
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['StetsonJ'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'StetsonJ': np.float64(0.01823276018663087)}
 
-        >>> fs = feets.FeatureSpace(only=['StetsonJ'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'StetsonJ': 0.010765631555204736}
+    Notes
+    -----
+    This feature is based on the Welch/Stetson variability index :math:`I`
+    (Stetson, 1996) defined by the equation:
+
+    .. math::
+
+        I = \sqrt{\frac{1}{n(n-1)}} \sum_{i=1}^n {
+            (\frac{b_i-\hat{b}}{\sigma_{b,i}})
+            (\frac{v_i - \hat{v}}{\sigma_{v,i}})}
+
+    where :math:`b_i` and :math:`v_i` are the apparent magnitudes obtained for
+    the candidate star in two observations closely spaced in time on some
+    occasion :math:`i`, :math:`\sigma_{b, i}` and :math:`\sigma_{v, i}` are the
+    standard errors of those magnitudes, :math:`\hat{b}` and \hat{v} are the
+    weighted mean magnitudes in the two filters, and :math:`n` is the number of
+    observation pairs.
+
+    Since a given frame pair may include data from two filters which did not
+    have equal numbers of observations overall, the "relative error" is
+    calculated as follows:
+
+    .. math::
+
+        \delta = \sqrt{\frac{n}{n-1}} \frac{v-\hat{v}}{\sigma_v}
+
+    allowing all residuals to be compared on an equal basis.
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
-    )
 
     features = ["StetsonJ"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(
         self,
         aligned_magnitude,
@@ -134,10 +132,9 @@ class StetsonJ(Extractor):
         return {"StetsonJ": J}
 
 
+@doctools.doc_inherit(StetsonJ)
 class StetsonK(Extractor):
-    __doc__ = (
-        indent(__doc__)
-        + r"""
+    r"""Steason K variability index extractor.
 
     **StetsonK**
 
@@ -149,29 +146,19 @@ class StetsonK(Extractor):
 
     where the index :math:`i` runs over all :math:`N` observations available
     for the star without regard to pairing. For a Gaussian magnitude
-    distribution K should take a value close to :math:`\sqrt{2/\pi} = 0.798`:
+    distribution K should take a value close to :math:`\sqrt{2/\pi} = 0.798`.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['StetsonK'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'StetsonK': 0.79914938521401002}
-
-    References
-    ----------
-
-    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
-       Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
-       Rischard, M. (2011). On machine-learned classification of variable stars
-       with sparse and noisy time-series data.
-       The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['StetsonK'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'StetsonK': np.float64(0.14262308580718194)}
     """
-    )
 
     features = ["StetsonK"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, error):
         mean_mag = np.sum(magnitude / (error * error)) / np.sum(
             1.0 / (error * error)
@@ -190,45 +177,35 @@ class StetsonK(Extractor):
         return {"StetsonK": K}
 
 
+@doctools.doc_inherit(StetsonJ)
 class StetsonKAC(Extractor):
-    __doc__ = (
-        indent(__doc__)
-        + r"""
+    r"""Stetson K to slotted autocorrelation extractor.
 
     **StetsonK_AC**
 
     Stetson K applied to the slotted autocorrelation function of the
     light-curve.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['SlottedA_length','StetsonK_AC'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'SlottedA_length': 1.0, 'StetsonK_AC': 0.20917402545294403}
-
-    **Parameters**
-
-    - ``T``: tau - slot size in days (default=1).
-
-    References
+    Parameters
     ----------
+    T : int, optional, default: `1`
+        :math:`tau` - slot size in days.
 
-    .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
-       Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
-       algorithm using time variability and machine learning: Selection of
-       1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
-       database. The Astrophysical Journal, 735(2), 68.
-       Doi:10.1088/0004-637X/735/2/68.
-
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['SlottedA_length','StetsonK_AC'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'SlottedA_length': np.int64(1),
+     'StetsonK_AC': np.float64(0.6440898442951952)}
     """
-    )
 
     features = ["StetsonK_AC"]
 
     def __init__(self, T=1):
         self.T = T
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
         autocor_vector = start_conditions(magnitude, time, self.T)[-1]
 
@@ -249,10 +226,9 @@ class StetsonKAC(Extractor):
         return {"StetsonK_AC": K}
 
 
+@doctools.doc_inherit(StetsonJ)
 class StetsonL(Extractor):
-    __doc__ = (
-        indent(__doc__)
-        + r"""
+    r"""Stetson L variability index extractor.
 
     **StetsonL**
 
@@ -263,31 +239,20 @@ class StetsonL(Extractor):
 
         L = \frac{JK}{0.798}
 
-    Again, for a Gaussian magnitude distribution, L should take a value close
-    to zero:
+    Again, for a Gaussian magnitude distribution, :math:`L` should take a value
+    close to zero.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['SlottedL'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'StetsonL': 0.0085957106316273714}
-
-    References
-    ----------
-
-    .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
-       Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
-       algorithm using time variability and machine learning: Selection of
-       1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
-       database. The Astrophysical Journal, 735(2), 68.
-       Doi:10.1088/0004-637X/735/2/68.
-
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['StetsonL'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'StetsonL': np.float64(0.0015499030048823923)}
     """
-    )
 
     features = ["StetsonL"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(
         self,
         aligned_magnitude,

@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Linear trend extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 from scipy import stats
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,31 +30,31 @@ from .extractor import Extractor
 
 
 class LinearTrend(Extractor):
-    r"""
+    r"""Linear trend extractor.
+
     **LinearTrend**
 
     Slope of a linear fit to the light-curve.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['LinearTrend'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'LinearTrend': -3.2084065290292509e-06}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['LinearTrend'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'LinearTrend': np.float64(-0.008096282859385663)}
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
 
     features = ["LinearTrend"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
         regression_slope = stats.linregress(time, magnitude)[0]
         return {"LinearTrend": regression_slope}

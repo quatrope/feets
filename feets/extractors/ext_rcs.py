@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Range of cumulative sum extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,7 +30,8 @@ from .extractor import Extractor
 
 
 class RCS(Extractor):
-    r"""
+    r"""Range of cumulative sum extractor.
+
     **Rcs** - Range of cumulative sum (:math:`R_{cs}`)
 
     :math:`R_{cs}` is the range of a cumulative sum (Ellaway 1978) of each
@@ -40,33 +42,32 @@ class RCS(Extractor):
         R_{cs} = max(S) - min(S) \\
         S = \frac{1}{N \sigma} \sum_{i=1}^l (m_i - \bar{m})
 
-    where max(min) is the maximum (minimum) value of S and
-    :math:`l=1,2, \dots, N`.
+    where :math:`max`(:math:`min`) is the maximum (minimum) value of :math:`S`
+    and :math:`l=1,2, \dots, N`.
 
     :math:`R_{cs}` should take a value close to zero for any symmetric
-    distribution:
+    distribution.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['Rcs'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Rcs': 0.0094459606901065168}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['Rcs'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Rcs': np.float64(0.04951776697391974)}
 
     References
     ----------
-
     .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
        Khardon, R., & Trichas, M. (2011). Quasi-stellar object selection
        algorithm using time variability and machine learning: Selection of
        1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
        database. The Astrophysical Journal, 735(2), 68.
        Doi:10.1088/0004-637X/735/2/68.
-
     """
 
     features = ["Rcs"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         sigma = np.std(magnitude)
         N = len(magnitude)

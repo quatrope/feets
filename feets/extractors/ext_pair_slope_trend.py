@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Pair slope trend extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,33 +30,33 @@ from .extractor import Extractor
 
 
 class PairSlopeTrend(Extractor):
-    r"""
+    r"""Pair slope trend extractor.
+
     **PairSlopeTrend**
 
-    Considering the last 30 (time-sorted) measurements of source magnitude,
-    the fraction of increasing first differences minus the fraction of
-    decreasing first differences.
+    Considering the last :math:`30` (time-sorted) measurements of source
+    magnitude, the fraction of increasing first differences minus the fraction
+    of decreasing first differences.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['PairSlopeTrend'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'PairSlopeTrend': -0.16666666666666666}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['PairSlopeTrend'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'PairSlopeTrend': -0.1}
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
 
     features = ["PairSlopeTrend"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         data_last = magnitude[-30:]
 

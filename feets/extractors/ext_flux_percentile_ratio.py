@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Flux percentile ratio extractors."""
 
 
 # =============================================================================
@@ -23,51 +23,7 @@ import math
 import numpy as np
 
 from .extractor import Extractor
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-COMMON_DOC = r"""
-In order to caracterize the sorted magnitudes distribution we use percentiles.
-If :math:`F_{5, 95}` is the difference between 95% and 5% magnitude values,
-we calculate the following:
-
-- flux_percentile_ratio_mid20: ratio :math:`F_{40, 60}/F_{5, 95}`
-- flux_percentile_ratio_mid35: ratio :math:`F_{32.5, 67.5}/F_{5, 95}`
-- flux_percentile_ratio_mid50: ratio :math:`F_{25, 75}/F_{5, 95}`
-- flux_percentile_ratio_mid65: ratio :math:`F_{17.5, 82.5}/F_{5, 95}`
-- flux_percentile_ratio_mid80: ratio :math:`F_{10, 90}/F_{5, 95}`
-
-For the first feature for example, in the case of a normal distribution, this
-is equivalente to calculate:
-
-.. math::
-
-    \frac{erf^{-1}(2 \cdot 0.6-1)-erf^{-1}(2 \cdot 0.4-1)}
-         {erf^{-1}(2 \cdot 0.95-1)-erf^{-1}(2 \cdot 0.05-1)}
-
-
-So, the expected values for each of the flux percentile features are:
-
-- flux_percentile_ratio_mid20 = 0.154
-- flux_percentile_ratio_mid35 = 0.275
-- flux_percentile_ratio_mid50 = 0.410
-- flux_percentile_ratio_mid65 = 0.568
-- flux_percentile_ratio_mid80 = 0.779
-
-References
-----------
-
-.. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
-   Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
-   Rischard, M. (2011). On machine-learned classification of variable stars
-   with sparse and noisy time-series data.
-   The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
-
-"""
+from ..libs import doctools
 
 
 # =============================================================================
@@ -76,10 +32,56 @@ References
 
 
 class FluxPercentileRatioMid20(Extractor):
-    __doc__ = COMMON_DOC
+    r"""Flux percentile ratio mid 20 extractor.
+
+    Notes
+    -----
+    In order to caracterize the sorted magnitudes distribution we use
+    percentiles. If :math:`F_{5, 95}` is the difference between :math:`95%%`
+    and :math:`5%%` magnitude values, we calculate the following:
+
+    - FluxPercentileRatioMid20: ratio :math:`F_{40, 60}/F_{5, 95}`
+    - FluxPercentileRatioMid35: ratio :math:`F_{32.5, 67.5}/F_{5, 95}`
+    - FluxPercentileRatioMid50: ratio :math:`F_{25, 75}/F_{5, 95}`
+    - FluxPercentileRatioMid65: ratio :math:`F_{17.5, 82.5}/F_{5, 95}`
+    - FluxPercentileRatioMid80: ratio :math:`F_{10, 90}/F_{5, 95}`
+
+    For the first feature for example, in the case of a normal distribution,
+    this is equivalente to calculate:
+
+    .. math::
+
+        \frac{erf^{-1}(2 \cdot 0.6-1)-erf^{-1}(2 \cdot 0.4-1)}
+                {erf^{-1}(2 \cdot 0.95-1)-erf^{-1}(2 \cdot 0.05-1)}
+
+
+    So, the expected values for each of the flux percentile features are:
+
+    - FluxPercentileRatioMid20 = :math:`0.154`
+    - FluxPercentileRatioMid35 = :math:`0.275`
+    - FluxPercentileRatioMid50 = :math:`0.410`
+    - FluxPercentileRatioMid65 = :math:`0.568`
+    - FluxPercentileRatioMid80 = :math:`0.779`
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["FluxPercentileRatioMid20"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'FluxPercentileRatioMid20': np.float64(0.14882100252933414)}
+
+    References
+    ----------
+    .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
+        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
+        Rischard, M. (2011). On machine-learned classification of variable stars
+        with sparse and noisy time-series data.
+        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+    """
 
     features = ["FluxPercentileRatioMid20"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
@@ -96,11 +98,21 @@ class FluxPercentileRatioMid20(Extractor):
         return {"FluxPercentileRatioMid20": F_mid20}
 
 
+@doctools.doc_inherit(FluxPercentileRatioMid20)
 class FluxPercentileRatioMid35(Extractor):
-    __doc__ = COMMON_DOC
+    """Flux percentile ratio mid 35 extractor.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["FluxPercentileRatioMid35"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'FluxPercentileRatioMid35': np.float64(0.27423232011430465)}
+    """
 
     features = ["FluxPercentileRatioMid35"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
@@ -117,11 +129,21 @@ class FluxPercentileRatioMid35(Extractor):
         return {"FluxPercentileRatioMid35": F_mid35}
 
 
+@doctools.doc_inherit(FluxPercentileRatioMid20)
 class FluxPercentileRatioMid50(Extractor):
-    __doc__ = COMMON_DOC
+    """Flux percentile ratio mid 50 extractor.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["FluxPercentileRatioMid50"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'FluxPercentileRatioMid50': np.float64(0.4020921304774109)}
+    """
 
     features = ["FluxPercentileRatioMid50"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
@@ -138,11 +160,21 @@ class FluxPercentileRatioMid50(Extractor):
         return {"FluxPercentileRatioMid50": F_mid50}
 
 
+@doctools.doc_inherit(FluxPercentileRatioMid20)
 class FluxPercentileRatioMid65(Extractor):
-    __doc__ = COMMON_DOC
+    """Flux percentile ratio mid 65 extractor.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["FluxPercentileRatioMid65"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'FluxPercentileRatioMid65': np.float64(0.5808781429992802)}
+    """
 
     features = ["FluxPercentileRatioMid65"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)
@@ -159,11 +191,21 @@ class FluxPercentileRatioMid65(Extractor):
         return {"FluxPercentileRatioMid65": F_mid65}
 
 
+@doctools.doc_inherit(FluxPercentileRatioMid20)
 class FluxPercentileRatioMid80(Extractor):
-    __doc__ = COMMON_DOC
+    """Flux percentile ratio mid 80 extractor.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["FluxPercentileRatioMid80"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'FluxPercentileRatioMid80': np.float64(0.7878789796839074)}
+    """
 
     features = ["FluxPercentileRatioMid80"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         sorted_data = np.sort(magnitude)
         lc_length = len(sorted_data)

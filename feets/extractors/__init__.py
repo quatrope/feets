@@ -11,7 +11,7 @@
 # DOCS
 # =============================================================================
 
-"""Features extractors classes and register utilities"""
+"""Features extractors classes and register utilities."""
 
 # =============================================================================
 # IMPORTS

@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Delta m and Delta t extractor."""
 
 
 # =============================================================================
@@ -23,12 +23,11 @@ import copy
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
-
-EPS = np.finfo(float).eps
 
 DEFAULT_DT_BINS = np.hstack([0.0, np.logspace(-3.0, 3.5, num=23)])
 
@@ -43,26 +42,35 @@ DEFAULT_DM_BINS = np.hstack(
 
 
 class DeltamDeltat(Extractor):
-    r"""
-    Deltas features described in
-    Configure the bins as desired.
+    r"""Delta m and Delta t extractor.
 
-    It is a map of n observations to n chosen 2 dupla of observations.
-    **Eta_color** (:math:`\eta_{color}`)
+    **DeltamDeltat**
 
-    Variability index Eta_e (:math:`\eta^e`)
-    calculated from the color light-curve.
+    The 2D histogram of the differences in magnitude (Delta m) and time
+    (Delta t) between all pairs of observations in a light curve.
 
-    .. code-block:: pycon
+    Parameters
+    ----------
+    dt_bins : array-like, optional
+        The bins for the time differences.
+    dm_bins : array-like, optional
+        The bins for the magnitude differences.
 
-        >>> fs = feets.FeatureSpace(only=['Eta_color'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Eta_color': 1.991749074648397}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["DeltamDeltat"])
+    >>> features = fs.extract(**lc_normal)
+    {'DeltamDeltat': {'dt_0_dm_0': np.int64(0),
+      'dt_1_dm_0': np.int64(0),
+       ...
+     'dt_22_dm_23': np.int64(0)}}
 
     References
     ----------
-    Mahabal et. al 2017 (arxiv:1709.06257)
+    .. [astro-ph.IM] Mahabal, A. A., Sheth, K., Gieseke, F., Pai, A.,
+       Djorgovski, S. G., Drake, A. J., & Graham, M. J. (2017). Deep-learnt
+       classification of light curves. 2017 IEEE Symposium Series on
+       Computational Intelligence (SSCI), 1-8.
     """
 
     features = ["DeltamDeltat"]
@@ -75,6 +83,7 @@ class DeltamDeltat(Extractor):
             copy.deepcopy(DEFAULT_DM_BINS) if dm_bins is None else dm_bins
         )
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
         def delta_calc(idx):
             t0 = time[idx]

@@ -22,7 +22,6 @@ from collections.abc import Sequence
 
 import attrs
 
-import dask
 import joblib
 
 import numpy as np
@@ -376,9 +375,11 @@ class FeatureSpace:
         str
             The JSON formatted string if `path_or_buffer` is None.
         """
-        from . import io  # noqa
+        from . import custom_io  # noqa
 
-        return io.store_json(self, path_or_buffer=path_or_buffer, **kwargs)
+        return custom_io.store_json(
+            self, path_or_buffer=path_or_buffer, **kwargs
+        )
 
     def to_yaml(self, *, path_or_buffer=None, **kwargs):
         """Serialize the feature space to a YAML formatted string or file.
@@ -396,9 +397,11 @@ class FeatureSpace:
         str
             The YAML formatted string if `path_or_buffer` is None.
         """
-        from . import io  # noqa
+        from . import custom_io  # noqa
 
-        return io.store_yaml(self, path_or_buffer=path_or_buffer, **kwargs)
+        return custom_io.store_yaml(
+            self, path_or_buffer=path_or_buffer, **kwargs
+        )
 
     # API =====================================================================
 

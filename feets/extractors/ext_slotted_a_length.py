@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Slotted autocorrelation extractor."""
 
 
 # =============================================================================
@@ -30,7 +30,7 @@ from ..libs import doctools
 
 
 def slotted_autocorrelation(data, time, T, K, second_round=False, K1=100):
-
+    """Calculate slotted autocorrelation."""
     slots, i = np.zeros((K, 1)), 1
 
     # make time start from 0
@@ -79,6 +79,7 @@ def slotted_autocorrelation(data, time, T, K, second_round=False, K1=100):
 
 
 def start_conditions(magnitude, time, T):
+    """Get starting conditions for the slotted autocorrelation calculation."""
     N = len(time)
 
     if T is None:
@@ -100,7 +101,9 @@ def start_conditions(magnitude, time, T):
 
 
 class SlottedA_length(Extractor):
-    r"""Slotted Autocorrelation.
+    r"""Slotted autocorrelation extractor.
+
+    **SlottedA_length**
 
     In slotted autocorrelation, time lags are defined as intervals or slots
     instead of single values. The slotted autocorrelation function at a
@@ -118,26 +121,24 @@ class SlottedA_length(Extractor):
     first lag, and :math:`N_\tau` is the number of pairs that fall in the
     given slot.
 
-    .. code-block:: pycon
+    Parameters
+    ----------
+    T : int, optional, default: `1`
+        :math:`tau` - slot size in days.
 
-        >>> fs = feets.FeatureSpace(
-        ...     only=['SlottedA_length'], SlottedA_length={"t": 1})
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'SlottedA_length': 1.}
-
-    **Parameters**
-
-    - ``T``: tau - slot size in days (default=1).
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["SlottedA_length"])
+    >>> features = fs.extract(**lc)
+    >>> features[0]
+    {'SlottedA_length': np.int64(1)}
 
     References
     ----------
-
     .. [huijse2012information] Huijse, P., Estevez, P. A., Protopapas, P.,
        Zegers, P., & Principe, J. C. (2012). An information theoretic algorithm
        for finding periodicities in stellar light curves. IEEE Transactions on
        Signal Processing, 60(10), 5135-5145.
-
     """
 
     features = ["SlottedA_length"]

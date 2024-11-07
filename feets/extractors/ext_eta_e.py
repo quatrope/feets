@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Eta_e extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,7 +30,7 @@ from .extractor import Extractor
 
 
 class Eta_e(Extractor):
-    r"""
+    r"""Eta_e extractor.
 
     **Eta_e** (:math:`\eta^e`)
 
@@ -64,29 +65,24 @@ class Eta_e(Extractor):
 
         w_i = \frac{1}{(t_{i+1} - t_i)^2}
 
-
-    Example:
-
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['Eta_e'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Eta_e': 2.0028592616231866}
-
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["Eta_e"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Eta_e': np.float64(0.00011042857797097828)}
 
     References
     ----------
-
     .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
-
     """
 
     features = ["Eta_e"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
         w = 1.0 / np.power(np.subtract(time[1:], time[:-1]), 2)
         w_mean = np.mean(w)

@@ -30,9 +30,9 @@ import io
 import json
 import pathlib
 
-import yaml
-
 import numpy as np
+
+import yaml
 
 from .core import FeatureSpace
 

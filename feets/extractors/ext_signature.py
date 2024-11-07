@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Signature extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,12 +30,42 @@ from .extractor import Extractor
 
 
 class Signature(Extractor):
+    r"""Signature extractor.
+
+    **Signature**
+
+    The signature is a 2D histogram of the light-curve in the phase-magnitude
+    space. The phase is calculated as the time modulo the period, and the
+    magnitude is normalized by the amplitude.
+
+    Parameters
+    ----------
+    phase_bins : int, optional, default: `18`
+        Number of phase bins.
+    mag_bins : int, optional, default: `12`
+        Number of magnitude bins.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["Signature"])
+    >>> features = fs.extract(**lc_periodic)
+    >>> features[0]
+    {'Signature': array([{'ph_0_mag_0': np.float64(3.273060645417755), ...,
+             'ph_17_mag_11': np.float64(0.0)},
+            {'ph_0_mag_0': np.float64(6.546121290835849), ...,
+             'ph_17_mag_11': np.float64(0.0)},
+            {'ph_0_mag_0': np.float64(3.273060645418243), ...,
+             'ph_17_mag_11': np.float64(0.0)}],
+           dtype=object)}
+    """
+
     features = ["Signature"]
 
     def __init__(self, phase_bins=18, mag_bins=12):
         self.phase_bins = phase_bins
         self.mag_bins = mag_bins
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time, PeriodLS, Amplitude):
         phase_bins, mag_bins = self.phase_bins, self.mag_bins
         bins = (phase_bins, mag_bins)
@@ -46,7 +77,7 @@ class Signature(Extractor):
 
         lc_yaxis = (magnitude - np.min(magnitude)) / np.float64(Amplitude)
 
-        # SHIFT TO BEGIN AT MINIMUM
+        # Shift time to the minimum value
         loc = np.argmin(lc_yaxis)
 
         signatures = np.full(len(PeriodLS), None, dtype=object)
