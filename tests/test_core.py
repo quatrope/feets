@@ -69,7 +69,7 @@ def mock_store_json(mocker):
         def fake_store_json(*args, **kwargs):
             return fake_reuslt
 
-        mocker.patch("feets.custom_io.store_json", fake_store_json)
+        mocker.patch("feets.io.store_json", fake_store_json)
 
     return maker
 
@@ -80,7 +80,7 @@ def mock_store_yaml(mocker):
         def fake_store_yaml(*args, **kwargs):
             return fake_reuslt
 
-        mocker.patch("feets.custom_io.store_yaml", fake_store_yaml)
+        mocker.patch("feets.io.store_yaml", fake_store_yaml)
 
     return maker
 

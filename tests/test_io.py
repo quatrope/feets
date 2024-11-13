@@ -15,7 +15,7 @@ import datetime as dt
 from io import StringIO
 
 from feets.core import FeatureSpace
-from feets.custom_io import (
+from feets.io import (
     CustomJSONEncoder,
     none_open_or_buffer,
     read_json,
@@ -96,7 +96,7 @@ def test_none_open_or_buffer_none():
 
 def test_none_open_or_buffer_path(mocker):
     open_mock = mocker.mock_open()
-    mocker.patch("feets.custom_io.open", open_mock)
+    mocker.patch("feets.io.open", open_mock)
     with none_open_or_buffer("output", "w") as buffer:
         assert buffer is open_mock()
         buffer.write("test")
@@ -125,7 +125,7 @@ def test_store_json_to_file(mocker):
     fspace.to_dict.return_value = {"feature": {"key": "value"}}
 
     open_mock = mocker.mock_open()
-    mocker.patch("feets.custom_io.open", open_mock)
+    mocker.patch("feets.io.open", open_mock)
 
     writer = MockWriter()
     open_mock.return_value.write = writer.write
@@ -162,7 +162,7 @@ def test_store_yaml_to_file(mocker):
     fspace.to_dict.return_value = {"feature": {"key": "value"}}
 
     open_mock = mocker.mock_open()
-    mocker.patch("feets.custom_io.open", open_mock)
+    mocker.patch("feets.io.open", open_mock)
 
     writer = MockWriter()
     open_mock.return_value.write = writer.write
@@ -186,13 +186,13 @@ def test_store_yaml_with_kwargs(mocker):
 
 def test_read_json(mocker):
     fspace = mocker.Mock(spec=FeatureSpace)
-    mocker.patch("feets.custom_io.FeatureSpace.from_dict", return_value=fspace)
+    mocker.patch("feets.io.FeatureSpace.from_dict", return_value=fspace)
 
     json_data = '{\n  "feature": {\n    "key": "value"\n  }\n}'
     fspace_dict = {"feature": {"key": "value"}}
 
     open_mock = mocker.mock_open(read_data=json_data)
-    mocker.patch("feets.custom_io.open", open_mock)
+    mocker.patch("feets.io.open", open_mock)
 
     result = read_json("input.json")
 
@@ -203,13 +203,13 @@ def test_read_json(mocker):
 
 def test_read_yaml(mocker):
     fspace = mocker.Mock(spec=FeatureSpace)
-    mocker.patch("feets.custom_io.FeatureSpace.from_dict", return_value=fspace)
+    mocker.patch("feets.io.FeatureSpace.from_dict", return_value=fspace)
 
     yaml_data = "feature:\n  key: value\n"
     fspace_dict = {"feature": {"key": "value"}}
 
     open_mock = mocker.mock_open(read_data=yaml_data)
-    mocker.patch("feets.custom_io.open", open_mock)
+    mocker.patch("feets.io.open", open_mock)
 
     result = read_yaml("input.yaml")
 

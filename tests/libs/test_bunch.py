@@ -18,9 +18,7 @@
 # DOCS
 # =============================================================================
 
-"""test for skcriteria.utils.bunch
-
-"""
+"""test for skcriteria.utils.bunch"""
 
 
 # =============================================================================
@@ -29,10 +27,9 @@
 
 import copy
 
-import pytest
-
 from feets.libs import bunch
 
+import pytest
 
 # =============================================================================
 # TEST Bunch

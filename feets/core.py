@@ -375,11 +375,9 @@ class FeatureSpace:
         str
             The JSON formatted string if `path_or_buffer` is None.
         """
-        from . import custom_io  # noqa
+        from . import io  # noqa
 
-        return custom_io.store_json(
-            self, path_or_buffer=path_or_buffer, **kwargs
-        )
+        return io.store_json(self, path_or_buffer=path_or_buffer, **kwargs)
 
     def to_yaml(self, *, path_or_buffer=None, **kwargs):
         """Serialize the feature space to a YAML formatted string or file.
@@ -397,11 +395,9 @@ class FeatureSpace:
         str
             The YAML formatted string if `path_or_buffer` is None.
         """
-        from . import custom_io  # noqa
+        from . import io  # noqa
 
-        return custom_io.store_yaml(
-            self, path_or_buffer=path_or_buffer, **kwargs
-        )
+        return io.store_yaml(self, path_or_buffer=path_or_buffer, **kwargs)
 
     # API =====================================================================
 

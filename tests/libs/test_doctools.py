@@ -18,9 +18,7 @@
 # DOCS
 # =============================================================================
 
-"""test for skcriteria.utils.decorator
-
-"""
+"""test for skcriteria.utils.decorator"""
 
 
 # =============================================================================
@@ -30,11 +28,12 @@
 import string
 import warnings
 
+from feets.libs import doctools
+
 import numpy as np
 
 import pytest
 
-from feets.libs import doctools
 
 # =============================================================================
 # TEST CLASSES
@@ -47,18 +46,15 @@ def test_doc_inherit():
 
     doc = "".join(random.choice(chars, 1000))
 
-    def func_a():
-        ...
+    def func_a(): ...
 
     func_a.__doc__ = doc
 
     @doctools.doc_inherit(func_a)
-    def func_b():
-        ...
+    def func_b(): ...
 
     @doctools.doc_inherit(doc)
-    def func_c():
-        ...
+    def func_c(): ...
 
     assert doc == func_a.__doc__ == func_b.__doc__ == func_c.__doc__
 
