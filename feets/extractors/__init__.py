@@ -74,6 +74,16 @@ from .ext_structure_functions import *  # noqa
 from .ext_signature import *  # noqa
 from .ext_dmdt import *  # noqa
 
+from .ext_lightcurve_anderson_darling import *  # noqa
+from .ext_lightcurve_amplitude import *  # noqa
+from .ext_lightcurve_beyond_n_std import *  # noqa
+from .ext_lightcurve_cusum import *  # noqa
+from .ext_lightcurve_duration import *  # noqa
+from .ext_lightcurve_eta import *  # noqa
+from .ext_lightcurve_eta_e import *  # noqa
+from .ext_lightcurve_interpercentile_range import *  # noqa
+from .ext_lightcurve_kurtosis import *  # noqa
+
 extractor_registry = registry.ExtractorRegistry()
 for cls in Extractor.__subclasses__():
     extractor_registry.register_extractor(cls)

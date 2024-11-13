@@ -44,6 +44,7 @@ REQUIREMENTS = [
     "joblib",
     "custom_inherit",
     "dask",
+    "light-curve"
 ]
 
 

@@ -236,7 +236,7 @@ class FeatureSpace:
                 features = features.intersection(only)
             selected_features.update(features)
 
-            required_data.update(extractor_instance.get_data())
+            required_data.update(extractor_instance.get_required_data())
 
         self._extractors = np.array(extractor_instances, dtype=object)
         self._selected_features = frozenset(selected_features)
