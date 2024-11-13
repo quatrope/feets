@@ -98,8 +98,8 @@ class FluxPercentileRatioMid20(Extractor):
         return {"FluxPercentileRatioMid20": F_mid20}
 
 
-@doctools.doc_inherit(FluxPercentileRatioMid20)
-class FluxPercentileRatioMid35(Extractor):
+@doctools.doc_inherit(FluxPercentileRatioMid20, warn_class=False)
+class FluxPercentileRatioMid35(Extractor,):
     """Flux percentile ratio mid 35 extractor.
 
     Examples
@@ -129,7 +129,7 @@ class FluxPercentileRatioMid35(Extractor):
         return {"FluxPercentileRatioMid35": F_mid35}
 
 
-@doctools.doc_inherit(FluxPercentileRatioMid20)
+@doctools.doc_inherit(FluxPercentileRatioMid20, warn_class=False)
 class FluxPercentileRatioMid50(Extractor):
     """Flux percentile ratio mid 50 extractor.
 
@@ -160,7 +160,7 @@ class FluxPercentileRatioMid50(Extractor):
         return {"FluxPercentileRatioMid50": F_mid50}
 
 
-@doctools.doc_inherit(FluxPercentileRatioMid20)
+@doctools.doc_inherit(FluxPercentileRatioMid20, warn_class=False)
 class FluxPercentileRatioMid65(Extractor):
     """Flux percentile ratio mid 65 extractor.
 
@@ -191,7 +191,7 @@ class FluxPercentileRatioMid65(Extractor):
         return {"FluxPercentileRatioMid65": F_mid65}
 
 
-@doctools.doc_inherit(FluxPercentileRatioMid20)
+@doctools.doc_inherit(FluxPercentileRatioMid20, warn_class=False)
 class FluxPercentileRatioMid80(Extractor):
     """Flux percentile ratio mid 80 extractor.
 

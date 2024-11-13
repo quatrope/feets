@@ -132,7 +132,7 @@ class StetsonJ(Extractor):
         return {"StetsonJ": J}
 
 
-@doctools.doc_inherit(StetsonJ)
+@doctools.doc_inherit(StetsonJ, warn_class=False)
 class StetsonK(Extractor):
     r"""Steason K variability index extractor.
 
@@ -177,7 +177,7 @@ class StetsonK(Extractor):
         return {"StetsonK": K}
 
 
-@doctools.doc_inherit(StetsonJ)
+@doctools.doc_inherit(StetsonJ, warn_class=False)
 class StetsonKAC(Extractor):
     r"""Stetson K to slotted autocorrelation extractor.
 
@@ -226,7 +226,7 @@ class StetsonKAC(Extractor):
         return {"StetsonK_AC": K}
 
 
-@doctools.doc_inherit(StetsonJ)
+@doctools.doc_inherit(StetsonJ, warn_class=False)
 class StetsonL(Extractor):
     r"""Stetson L variability index extractor.
 
