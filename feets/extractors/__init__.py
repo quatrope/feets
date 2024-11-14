@@ -83,6 +83,30 @@ from .ext_lightcurve_eta import *  # noqa
 from .ext_lightcurve_eta_e import *  # noqa
 from .ext_lightcurve_interpercentile_range import *  # noqa
 from .ext_lightcurve_kurtosis import *  # noqa
+from .ext_lightcurve_linear_fit import *  # noqa
+from .ext_lightcurve_linear_trend import *  # noqa
+from .ext_lightcurve_max_slope import *  # noqa
+from .ext_lightcurve_max_time_interval import *  # noqa
+from .ext_lightcurve_mean import *  # noqa
+from .ext_lightcurve_mean_variance import *  # noqa
+from .ext_lightcurve_median_abs_dev import *  # noqa
+from .ext_lightcurve_median_brp import *  # noqa
+from .ext_lightcurve_min_time_interval import *  # noqa
+from .ext_lightcurve_observation_count import *  # noqa
+from .ext_lightcurve_otsu_split import *  # noqa
+from .ext_lightcurve_percent_amplitude import *  # noqa
+from .ext_lightcurve_percent_difference_magn_percentile import *  # noqa
+from .ext_lightcurve_percentage_ratio import *  # noqa
+from .ext_lightcurve_periodogram import *  # noqa
+from .ext_lightcurve_reduced_chi2 import *  # noqa
+from .ext_lightcurve_roms import *  # noqa
+from .ext_lightcurve_skew import *  # noqa
+from .ext_lightcurve_std import *  # noqa
+from .ext_lightcurve_stetson_k import *  # noqa
+from .ext_lightcurve_time_mean import *  # noqa
+from .ext_lightcurve_time_std import *  # noqa
+from .ext_lightcurve_weighted_mean import *  # noqa
+
 
 extractor_registry = registry.ExtractorRegistry()
 for cls in Extractor.__subclasses__():
