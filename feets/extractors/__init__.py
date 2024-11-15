@@ -81,6 +81,7 @@ from .ext_lightcurve_cusum import *  # noqa
 from .ext_lightcurve_duration import *  # noqa
 from .ext_lightcurve_eta import *  # noqa
 from .ext_lightcurve_eta_e import *  # noqa
+from .ext_lightcurve_excess_variance import *  # noqa
 from .ext_lightcurve_interpercentile_range import *  # noqa
 from .ext_lightcurve_kurtosis import *  # noqa
 from .ext_lightcurve_linear_fit import *  # noqa
