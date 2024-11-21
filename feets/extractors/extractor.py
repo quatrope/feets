@@ -42,6 +42,8 @@ DATA_ALIGNED_MAGNITUDE2 = "aligned_magnitude2"
 DATA_ALIGNED_TIME = "aligned_time"
 DATA_ALIGNED_ERROR = "aligned_error"
 DATA_ALIGNED_ERROR2 = "aligned_error2"
+DATA_FLUX = "flux"
+DATA_FLUX_ERROR = "flux_error"
 
 DATAS = (
     DATA_TIME,
@@ -53,6 +55,8 @@ DATAS = (
     DATA_ALIGNED_MAGNITUDE2,
     DATA_ALIGNED_ERROR,
     DATA_ALIGNED_ERROR2,
+    DATA_FLUX,
+    DATA_FLUX_ERROR,
 )
 
 

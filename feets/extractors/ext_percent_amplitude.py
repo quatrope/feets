@@ -61,6 +61,6 @@ class PercentAmplitude(Extractor):
         distance_median = np.abs(magnitude - median_data)
         max_distance = np.max(distance_median)
 
-        percent_amplitude = max_distance / median_data
+        # percent_amplitude = max_distance / median_data
 
-        return {"PercentAmplitude": percent_amplitude}
+        return {"PercentAmplitude": max_distance}
