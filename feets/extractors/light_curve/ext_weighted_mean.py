@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -39,11 +39,9 @@ class WeightedMean(LightCurveExtractor):
             if weighted_mean_kwds is None
             else weighted_mean_kwds
         )
+        self.lightcurve_ext = _WeightedMean(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [weighted_mean] = _WeightedMean(**self.lightcurve_kwds)(
-            time, magnitude, error
-        )
-
+        [weighted_mean] = self.lightcurve_ext(time, magnitude, error)
         return {"WeightedMean": weighted_mean}

@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -39,11 +39,9 @@ class MeanVariance(LightCurveExtractor):
             if mean_variance_kwds is None
             else mean_variance_kwds
         )
+        self.lightcurve_ext = _MeanVariance(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [mean_variance] = _MeanVariance(**self.lightcurve_kwds)(
-            time, magnitude, error
-        )
-
+        [mean_variance] = self.lightcurve_ext(time, magnitude, error)
         return {"MeanVariance": mean_variance}

@@ -18,6 +18,7 @@ from ..extractor import (
     Extractor,
     ExtractorBadDefinedError,
 )
+from ...libs import doctools
 
 # =============================================================================
 # LIGHT CURVE EXTRACTOR CLASS
@@ -42,6 +43,39 @@ class LightCurveExtractor(Extractor):
         cls._conf = _ExtractorConf.from_extractor_class(cls)
         del cls.features
 
+    # PERSISTENCE =============================================================
+
+    def to_dict(self):
+        """Convert the LightCurveExtractor to a dictionary representation.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the parameters of the extractor instance.
+        """
+        cls_name = type(self).__name__
+        state = vars(self)
+        if "lightcurve_ext" in state:
+            del state["lightcurve_ext"]
+        return {cls_name: state}
+
+    # MAGIC ===================================================================
+
+    def __repr__(self):
+        """Return a string representation of the LightCurveExtractor object."""
+        cls_name = type(self).__name__
+        state = {}
+        for aname, avalue in vars(self).items():
+            if aname == "lightcurve_ext":
+                continue
+            if len(repr(avalue)) > 20:
+                avalue = "<MANY CONFIGURATIONS>"
+            state[aname] = avalue
+        return f"<{cls_name} {state}>" if state else f"<{cls_name}>"
+
+    # API =====================================================================
+
+    @doctools.doc_inherit(Extractor.prepare_extract)
     def prepare_extract(self, data, dependencies):
         kwargs = super().prepare_extract(data, dependencies)
         time, magnitude, error = (
@@ -73,14 +107,3 @@ class LightCurveExtractor(Extractor):
             error,
         )
         return kwargs
-
-    # @abc.abstractmethod
-    # def extract(self):
-    #     """Extract features from the time series.
-
-    #     Returns
-    #     -------
-    #     dict
-    #         The dictionary of features extracted from the time series.
-    #     """
-    #     raise NotImplementedError()

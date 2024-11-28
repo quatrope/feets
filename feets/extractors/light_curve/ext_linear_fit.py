@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -43,13 +43,13 @@ class LinearFit(LightCurveExtractor):
             if linear_fit_kwds is None
             else linear_fit_kwds
         )
+        self.lightcurve_ext = _LinearFit(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error):
-        [slope, slope_sigma, reduced_chi2] = _LinearFit(
-            **self.lightcurve_kwds
-        )(time, magnitude, error)
-
+        [slope, slope_sigma, reduced_chi2] = self.lightcurve_ext(
+            time, magnitude, error
+        )
         return {
             "LinearFitSlope": slope,
             "LinearFitSigma": slope_sigma,

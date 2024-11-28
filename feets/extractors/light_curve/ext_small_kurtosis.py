@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,15 +33,15 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 class SmallKurtosis(LightCurveExtractor):
     features = ["SmallKurtosis"]
 
-    def __init__(self, kurtosis_kwds=None):
+    def __init__(self, small_kurtosis_kwds=None):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS)
-            if kurtosis_kwds is None
-            else kurtosis_kwds
+            if small_kurtosis_kwds is None
+            else small_kurtosis_kwds
         )
+        self.lightcurve_ext = _Kurtosis(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [kurtosis] = _Kurtosis(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [kurtosis] = self.lightcurve_ext(time, magnitude, error)
         return {"SmallKurtosis": kurtosis}

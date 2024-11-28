@@ -29,6 +29,9 @@ class OtsuSplit(LightCurveExtractor):
         "OtsuLowerToAllRatio",
     ]
 
+    def __init__(self):
+        self.lightcurve_ext = _OtsuSplit()
+
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
         [
@@ -36,8 +39,7 @@ class OtsuSplit(LightCurveExtractor):
             otsu_std_lower,
             otsu_std_upper,
             otsu_lower_to_all_ratio,
-        ] = _OtsuSplit()(time, magnitude, error)
-
+        ] = self.lightcurve_ext(time, magnitude, error)
         return {
             "OtsuMeanDiff": otsu_mean_diff,
             "OtsuStdLower": otsu_std_lower,

@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -39,9 +39,9 @@ class Median(LightCurveExtractor):
             if median_kwds is None
             else median_kwds
         )
+        self.lightcurve_ext = _Median(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [median] = _Median(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [median] = self.lightcurve_ext(time, magnitude, error)
         return {"Median": median}

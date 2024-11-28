@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -39,9 +39,9 @@ class ReducedChi2(LightCurveExtractor):
             if reduced_chi2_kwds is None
             else reduced_chi2_kwds
         )
+        self.lightcurve_ext = _ReducedChi2(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [chi2] = _ReducedChi2(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [chi2] = self.lightcurve_ext(time, magnitude, error)
         return {"ReducedChi2": chi2}

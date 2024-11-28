@@ -29,7 +29,7 @@ from ..libs import doctools
 # =============================================================================
 
 
-class WeightedBeyond1Std(Extractor):
+class WeightedBeyondNStd(Extractor):
     """Beyond-one-standard-deviation extractor.
 
     **Beyond1Std**
@@ -53,7 +53,13 @@ class WeightedBeyond1Std(Extractor):
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
     """
 
-    features = ["WeightedBeyond1Std"]
+    features = ["WeightedBeyondNStd"]
+
+    def __init__(self, nstd=1):
+        nstd = np.atleast_1d(nstd)
+        if not np.all(nstd > 0):
+            raise ValueError("nstd should be positive")
+        self.nstd = nstd
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, error):
@@ -66,11 +72,21 @@ class WeightedBeyond1Std(Extractor):
         var = sum((magnitude - weighted_mean) ** 2)
         std = np.sqrt((1.0 / (n - 1)) * var)
 
-        count = np.sum(
-            np.logical_or(
-                magnitude > weighted_mean + std,
-                magnitude < weighted_mean - std,
+        count = [
+            np.sum(
+                np.logical_or(
+                    magnitude > weighted_mean + nstd * std,
+                    magnitude < weighted_mean - nstd * std,
+                )
             )
-        )
+            for nstd in self.nstd
+        ]
 
-        return {"WeightedBeyond1Std": float(count) / n}
+        return {"WeightedBeyondNStd": np.array(count, dtype=float) / n}
+
+    @doctools.doc_inherit(Extractor.flatten_feature)
+    def flatten_feature(self, feature, value):
+        if feature == "WeightedBeyondNStd":
+            Ns = self.nstd
+            return {f"WeightedBeyond{N}Std": val for N, val in zip(Ns, value)}
+        return super().flatten_feature(feature, value)

@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -37,9 +37,9 @@ class Skew(LightCurveExtractor):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS) if skew_kwds is None else skew_kwds
         )
+        self.lightcurve_ext = _Skew(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [skew] = _Skew(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [skew] = self.lightcurve_ext(time, magnitude, error)
         return {"Skew": skew}

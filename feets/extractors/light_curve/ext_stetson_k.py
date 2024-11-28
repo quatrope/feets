@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -39,9 +39,9 @@ class StetsonK(LightCurveExtractor):
             if stetson_k_kwds is None
             else stetson_k_kwds
         )
+        self.lightcurve_ext = _StetsonK(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [stetson_k] = _StetsonK(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [stetson_k] = self.lightcurve_ext(time, magnitude, error)
         return {"StetsonK": stetson_k}

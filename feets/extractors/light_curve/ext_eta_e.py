@@ -23,7 +23,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -40,11 +40,9 @@ class EtaE(LightCurveExtractor):
             if eta_e_kwds is None
             else eta_e_kwds
         )
+        self.lightcurve_ext = _EtaE(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
-        [eta_e] = _EtaE(**self.lightcurve_kwds)(
-            time, magnitude, error
-        )
-
+        [eta_e] = self.lightcurve_ext(time, magnitude, error)
         return {"EtaE": eta_e}

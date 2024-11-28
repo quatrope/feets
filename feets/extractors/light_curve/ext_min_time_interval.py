@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,17 +33,15 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 class MinTimeInterval(LightCurveExtractor):
     features = ["MinTimeInterval"]
 
-    def __init__(self, minimum_time_interval_kwds=None):
+    def __init__(self, min_time_interval_kwds=None):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS)
-            if minimum_time_interval_kwds is None
-            else minimum_time_interval_kwds
+            if min_time_interval_kwds is None
+            else min_time_interval_kwds
         )
+        self.lightcurve_ext = _MinimumTimeInterval(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
-        [minimum_time_interval] = _MinimumTimeInterval(**self.lightcurve_kwds)(
-            time, magnitude, error
-        )
-
+        [minimum_time_interval] = self.lightcurve_ext(time, magnitude, error)
         return {"MinTimeInterval": minimum_time_interval}

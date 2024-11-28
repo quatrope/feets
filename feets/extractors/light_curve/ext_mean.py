@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -37,9 +37,9 @@ class Mean(LightCurveExtractor):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS) if mean_kwds is None else mean_kwds
         )
+        self.lightcurve_ext = _Mean(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [mean] = _Mean(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [mean] = self.lightcurve_ext(time, magnitude, error)
         return {"Mean": mean}

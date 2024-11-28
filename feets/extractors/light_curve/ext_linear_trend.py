@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -43,13 +43,13 @@ class LinearTrend(LightCurveExtractor):
             if linear_trend_kwds is None
             else linear_trend_kwds
         )
+        self.lightcurve_ext = _LinearTrend(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
-        [linear_trend, linear_trend_sigma, reduced_chi2] = _LinearTrend(
-            **self.lightcurve_kwds
-        )(time, magnitude, error)
-
+        [linear_trend, linear_trend_sigma, reduced_chi2] = self.lightcurve_ext(
+            time, magnitude, error
+        )
         return {
             "LinearTrend": linear_trend,
             "LinearTrendSigma": linear_trend_sigma,

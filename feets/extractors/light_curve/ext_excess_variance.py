@@ -23,7 +23,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -40,11 +40,9 @@ class ExcessVariance(LightCurveExtractor):
             if excess_variance_kwds is None
             else excess_variance_kwds
         )
+        self.lightcurve_ext = _ExcessVariance(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [excess_variance] = _ExcessVariance(**self.lightcurve_kwds)(
-            time, magnitude, error
-        )
-
+        [excess_variance] = self.lightcurve_ext(time, magnitude, error)
         return {"ExcessVariance": excess_variance}

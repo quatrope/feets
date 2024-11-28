@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -39,9 +39,9 @@ class Duration(LightCurveExtractor):
             if duration_kwds is None
             else duration_kwds
         )
+        self.lightcurve_ext = _Duration(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
-        [duration] = _Duration(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [duration] = self.lightcurve_ext(time, magnitude, error)
         return {"Duration": duration}

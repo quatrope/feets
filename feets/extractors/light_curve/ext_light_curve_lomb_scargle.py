@@ -41,18 +41,17 @@ LIGHTCURVE_KWDS = {
 class LightCurveLombScargle(LightCurveExtractor):
     features = ["LightCurve_PeriodLS", "Period_s_to_n"]
 
-    def __init__(self, periodogram_kwds=None):
+    def __init__(self, light_curve_lomb_scargle_kwds=None):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS)
-            if periodogram_kwds is None
-            else periodogram_kwds
+            if light_curve_lomb_scargle_kwds is None
+            else light_curve_lomb_scargle_kwds
         )
+        self.lightcurve_ext = _Periodogram(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
-        periodogram = _Periodogram(**self.lightcurve_kwds)(
-            time, magnitude, error
-        )
+        periodogram = self.lightcurve_ext(time, magnitude, error)
         transpose = np.reshape(periodogram, (-1, 2))
         [period, period_s_to_n] = np.transpose(transpose)
 

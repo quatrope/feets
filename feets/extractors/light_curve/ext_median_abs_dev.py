@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,17 +33,17 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 class MedianAbsDev(LightCurveExtractor):
     features = ["MedianAbsDev"]
 
-    def __init__(self, median_absolute_deviation_kwds=None):
+    def __init__(self, median_abs_dev_kwds=None):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS)
-            if median_absolute_deviation_kwds is None
-            else median_absolute_deviation_kwds
+            if median_abs_dev_kwds is None
+            else median_abs_dev_kwds
         )
+        self.lightcurve_ext = _MedianAbsoluteDeviation(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [median_absolute_deviation] = _MedianAbsoluteDeviation(
-            **self.lightcurve_kwds
-        )(time, magnitude, error)
-
+        [median_absolute_deviation] = self.lightcurve_ext(
+            time, magnitude, error
+        )
         return {"MedianAbsDev": median_absolute_deviation}

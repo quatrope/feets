@@ -516,7 +516,7 @@ class Extractor(abc.ABC):
     # MAGIC ===================================================================
 
     def __repr__(self):
-        """Return a string representation of the FeatureSpace object."""
+        """Return a string representation of the Extractor object."""
         cls_name = type(self).__name__
         state = {}
         for aname, avalue in vars(self).items():

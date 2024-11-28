@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,17 +33,15 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 class Std(LightCurveExtractor):
     features = ["Std"]
 
-    def __init__(self, standard_deviation_kwds=None):
+    def __init__(self, std_kwds=None):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS)
-            if standard_deviation_kwds is None
-            else standard_deviation_kwds
+            if std_kwds is None
+            else std_kwds
         )
+        self.lightcurve_ext = _StandardDeviation(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [standard_deviation] = _StandardDeviation(**self.lightcurve_kwds)(
-            time, magnitude, error
-        )
-
+        [standard_deviation] = self.lightcurve_ext(time, magnitude, error)
         return {"Std": standard_deviation}

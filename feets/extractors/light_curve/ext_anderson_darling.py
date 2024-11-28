@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -39,11 +39,9 @@ class AndersonDarling(LightCurveExtractor):
             if anderson_darling_kwds is None
             else anderson_darling_kwds
         )
+        self.lightcurve_ext = _AndersonDarlingNormal(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [anderson_darling_normal] = _AndersonDarlingNormal(
-            **self.lightcurve_kwds
-        )(time, magnitude, error)
-
+        [anderson_darling_normal] = self.lightcurve_ext(time, magnitude, error)
         return {"AndersonDarling": anderson_darling_normal}

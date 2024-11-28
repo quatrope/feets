@@ -23,7 +23,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -40,9 +40,9 @@ class Cusum(LightCurveExtractor):
             if cusum_kwds is None
             else cusum_kwds
         )
+        self.lightcurve_ext = _Cusum(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [cusum] = _Cusum(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [cusum] = self.lightcurve_ext(time, magnitude, error)
         return {"Cusum": cusum}

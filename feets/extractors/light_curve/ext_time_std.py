@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,17 +33,15 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 class TimeStd(LightCurveExtractor):
     features = ["TimeStd"]
 
-    def __init__(self, time_standard_deviation_kwds=None):
+    def __init__(self, time_std_kwds=None):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS)
-            if time_standard_deviation_kwds is None
-            else time_standard_deviation_kwds
+            if time_std_kwds is None
+            else time_std_kwds
         )
+        self.lightcurve_ext = _TimeStandardDeviation(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
-        [time_standard_deviation] = _TimeStandardDeviation(
-            **self.lightcurve_kwds
-        )(time, magnitude, error)
-
+        [time_standard_deviation] = self.lightcurve_ext(time, magnitude, error)
         return {"TimeStd": time_standard_deviation}

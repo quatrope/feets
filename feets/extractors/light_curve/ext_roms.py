@@ -22,7 +22,7 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "default"}
+LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -37,9 +37,9 @@ class Roms(LightCurveExtractor):
         self.lightcurve_kwds = (
             copy.deepcopy(LIGHTCURVE_KWDS) if roms_kwds is None else roms_kwds
         )
+        self.lightcurve_ext = _Roms(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [roms] = _Roms(**self.lightcurve_kwds)(time, magnitude, error)
-
+        [roms] = self.lightcurve_ext(time, magnitude, error)
         return {"Roms": roms}
