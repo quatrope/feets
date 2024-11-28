@@ -17,7 +17,7 @@
 # IMPORTS
 # =============================================================================
 
-from .light_curve.lc_extractor import LightCurveExtractor
+from .light_curve.light_curve_extractor import LightCurveExtractor
 from .extractor import (
     DATAS,
     Extractor,

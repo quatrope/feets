@@ -100,10 +100,10 @@ def start_conditions(magnitude, time, T):
 # =============================================================================
 
 
-class SlottedA_length(Extractor):
+class SlottedALength(Extractor):
     r"""Slotted autocorrelation extractor.
 
-    **SlottedA_length**
+    **SlottedALength**
 
     In slotted autocorrelation, time lags are defined as intervals or slots
     instead of single values. The slotted autocorrelation function at a
@@ -128,10 +128,10 @@ class SlottedA_length(Extractor):
 
     Examples
     --------
-    >>> fs = feets.FeatureSpace(only=["SlottedA_length"])
+    >>> fs = feets.FeatureSpace(only=["SlottedALength"])
     >>> features = fs.extract(**lc)
     >>> features[0]
-    {'SlottedA_length': np.int64(1)}
+    {'SlottedALength': np.int64(1)}
 
     References
     ----------
@@ -141,7 +141,7 @@ class SlottedA_length(Extractor):
        Signal Processing, 60(10), 5135-5145.
     """
 
-    features = ["SlottedA_length"]
+    features = ["SlottedALength"]
 
     def __init__(self, T=1):
         self.T = T
@@ -174,4 +174,4 @@ class SlottedA_length(Extractor):
                 )
 
         val = np.nan if k is None else slots[k] * T
-        return {"SlottedA_length": val}
+        return {"SlottedALength": val}

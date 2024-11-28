@@ -24,7 +24,7 @@ import numpy as np
 
 from scipy.optimize import curve_fit
 
-from .ext_lomb_scargle import DEFAULT_LSCARGLE_KWDS, lscargle
+from .ext_astropy_lomb_scargle import DEFAULT_LSCARGLE_KWDS, lscargle
 from .extractor import Extractor
 from ..libs import doctools
 

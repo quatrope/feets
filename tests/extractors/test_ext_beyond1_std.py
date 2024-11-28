@@ -6,14 +6,14 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_beyond1_std
+from feets.extractors import ext_weighted_beyond_1_std
 
 import numpy as np
 
 
 def test_Beyond1Std_extract(normal_light_curve):
     # create the extractor
-    extractor = ext_beyond1_std.Beyond1Std()
+    extractor = ext_weighted_beyond_1_std.WeightedBeyond1Std()
 
     # init the seed
     random = np.random.default_rng(42)

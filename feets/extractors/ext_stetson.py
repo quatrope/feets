@@ -133,51 +133,6 @@ class StetsonJ(Extractor):
 
 
 @doctools.doc_inherit(StetsonJ, warn_class=False)
-class StetsonK(Extractor):
-    r"""Steason K variability index extractor.
-
-    **StetsonK**
-
-    Stetson K is a robust kurtosis measure:
-
-    .. math::
-
-        \frac{1/N \sum_{i=1}^N |\delta_i|}{\sqrt{1/N \sum_{i=1}^N \delta_i^2}}
-
-    where the index :math:`i` runs over all :math:`N` observations available
-    for the star without regard to pairing. For a Gaussian magnitude
-    distribution K should take a value close to :math:`\sqrt{2/\pi} = 0.798`.
-
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=['StetsonK'])
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
-    {'StetsonK': np.float64(0.14262308580718194)}
-    """
-
-    features = ["StetsonK"]
-
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude, error):
-        mean_mag = np.sum(magnitude / (error * error)) / np.sum(
-            1.0 / (error * error)
-        )
-
-        N = len(magnitude)
-        sigmap = np.sqrt(N * 1.0 / (N - 1)) * (magnitude - mean_mag) / error
-
-        K = (
-            1
-            / np.sqrt(N * 1.0)
-            * np.sum(np.abs(sigmap))
-            / np.sqrt(np.sum(sigmap**2))
-        )
-
-        return {"StetsonK": K}
-
-
-@doctools.doc_inherit(StetsonJ, warn_class=False)
 class StetsonKAC(Extractor):
     r"""Stetson K to slotted autocorrelation extractor.
 
