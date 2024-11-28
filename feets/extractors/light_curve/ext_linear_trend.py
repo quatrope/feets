@@ -33,8 +33,8 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class LinearTrend(LightCurveExtractor):
     features = [
         "LinearTrend",
-        "LinearTrendSigma",
-        "LinearTrendChi2",
+        "LinearTrend_Sigma",
+        "LinearTrend_ReducedChi2",
     ]
 
     def __init__(self, linear_trend_kwds=None):
@@ -52,6 +52,6 @@ class LinearTrend(LightCurveExtractor):
         )
         return {
             "LinearTrend": linear_trend,
-            "LinearTrendSigma": linear_trend_sigma,
-            "LinearTrendChi2": reduced_chi2,
+            "LinearTrend_Sigma": linear_trend_sigma,
+            "LinearTrend_ReducedChi2": reduced_chi2,
         }

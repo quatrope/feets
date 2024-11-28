@@ -12,7 +12,7 @@
 
 import copy
 
-from light_curve import LinearFit as _LinearFit
+from light_curve import BazinFit as _BazinFit
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
@@ -22,7 +22,17 @@ from ...libs import doctools
 # CONSTANTS
 # =============================================================================
 
-LIGHTCURVE_KWDS = {"transform": "identity"}
+LIGHTCURVE_KWDS = {
+    "algorithm": "mcmc",
+    "mcmc_niter": 128,
+    "lmsder_niter": 10,
+    "ceres_niter": 10,
+    "ceres_loss_reg": None,
+    "init": None,
+    "bounds": None,
+    "ln_prior": None,
+    "transform": None,
+}
 
 
 # =============================================================================
@@ -30,11 +40,14 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 # =============================================================================
 
 
-class LinearFit(LightCurveExtractor):
+class BazinFit(LightCurveExtractor):
     features = [
-        "LinearFit_Slope",
-        "LinearFit_Sigma",
-        "LinearFit_ReducedChi2",
+        "BazinFit_Amplitude",
+        "BazinFit_Baseline",
+        "BazinFit_ReferenceTime",
+        "BazinFit_RiseTime",
+        "BazinFit_FallTime",
+        "BazinFit_ReducedChi2",
     ]
 
     def __init__(self, linear_fit_kwds=None):
@@ -43,15 +56,23 @@ class LinearFit(LightCurveExtractor):
             if linear_fit_kwds is None
             else linear_fit_kwds
         )
-        self.lightcurve_ext = _LinearFit(**self.lightcurve_kwds)
+        self.lightcurve_ext = _BazinFit(**self.lightcurve_kwds)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
-    def extract(self, time, magnitude, error):
-        [slope, slope_sigma, reduced_chi2] = self.lightcurve_ext(
-            time, magnitude, error
-        )
+    def extract(self, time, flux, flux_error):
+        [
+            amplitude,
+            baseline,
+            reference_time,
+            rise_time,
+            fall_time,
+            reduced_chi2,
+        ] = self.lightcurve_ext(time, flux, flux_error)
         return {
-            "LinearFit_Slope": slope,
-            "LinearFit_Sigma": slope_sigma,
-            "LinearFit_ReducedChi2": reduced_chi2,
+            "BazinFit_Amplitude": amplitude,
+            "BazinFit_Baseline": baseline,
+            "BazinFit_ReferenceTime": reference_time,
+            "BazinFit_RiseTime": rise_time,
+            "BazinFit_FallTime": fall_time,
+            "BazinFit_ReducedChi2": reduced_chi2,
         }

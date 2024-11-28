@@ -77,14 +77,19 @@ class LightCurveExtractor(Extractor):
 
     @doctools.doc_inherit(Extractor.prepare_extract)
     def prepare_extract(self, data, dependencies):
-        kwargs = super().prepare_extract(data, dependencies)
-        time, magnitude, error = (
-            kwargs["time"],
-            kwargs["magnitude"],
-            kwargs["error"],
+        time, magnitude, flux, error, flux_error = (
+            data.get("time"),
+            data.get("magnitude"),
+            data.get("flux"),
+            data.get("error"),
+            data.get("flux_error"),
         )
 
-        shape = len(time) if time is not None else len(magnitude)
+        shape = (
+            len(time)
+            if time is not None
+            else len(magnitude) if magnitude is not None else len(flux)
+        )
 
         time = (
             np.arange(shape, dtype=np.float64)
@@ -96,14 +101,31 @@ class LightCurveExtractor(Extractor):
             if magnitude is None
             else np.array(magnitude, dtype=np.float64)
         )
+        flux = (
+            np.zeros(shape, dtype=np.float64)
+            if flux is None
+            else np.array(flux, dtype=np.float64)
+        )
         error = (
             np.ones(shape, dtype=np.float64)
             if error is None
             else np.array(1 / error**2, dtype=np.float64)
         )
-        kwargs["time"], kwargs["magnitude"], kwargs["error"] = (
-            time,
-            magnitude,
-            error,
+        flux_error = (
+            np.ones(shape, dtype=np.float64)
+            if flux_error is None
+            else np.array(1 / flux_error**2, dtype=np.float64)
         )
+
+        data.update(
+            {
+                "time": time,
+                "magnitude": magnitude,
+                "flux": flux,
+                "error": error,
+                "flux_error": flux_error,
+            }
+        )
+
+        kwargs = super().prepare_extract(data, dependencies)
         return kwargs

@@ -61,6 +61,7 @@ from .ext_weighted_beyond_N_std import WeightedBeyondNStd
 
 from .light_curve.ext_amplitude import Amplitude
 from .light_curve.ext_anderson_darling import AndersonDarling
+from .light_curve.ext_bazin_fit import BazinFit
 from .light_curve.ext_beyond_n_std import BeyondNStd
 from .light_curve.ext_cusum import Cusum
 from .light_curve.ext_duration import Duration
@@ -71,6 +72,7 @@ from .light_curve.ext_inter_percentile_range import InterPercentileRange
 from .light_curve.ext_light_curve_lomb_scargle import LightCurveLombScargle
 from .light_curve.ext_linear_fit import LinearFit
 from .light_curve.ext_linear_trend import LinearTrend
+from .light_curve.ext_linexp_fit import LinexpFit
 from .light_curve.ext_max_slope import MaxSlope
 from .light_curve.ext_max_time_interval import MaxTimeInterval
 from .light_curve.ext_mean import Mean
@@ -90,14 +92,16 @@ from .light_curve.ext_std import Std
 from .light_curve.ext_stetson_k import StetsonK
 from .light_curve.ext_time_mean import TimeMean
 from .light_curve.ext_time_std import TimeStd
+from .light_curve.ext_villar_fit import VillarFit
 from .light_curve.ext_weighted_mean import WeightedMean
 
 
 extractors = [
     Amplitude,
     AndersonDarling,
+    AstropyLombScargle,
     AutocorLength,
-    WeightedBeyondNStd,
+    BazinFit,
     BeyondNStd,
     CAR,
     Color,
@@ -112,15 +116,16 @@ extractors = [
     FourierComponents,
     Gskew,
     InterPercentileRange,
+    LightCurveLombScargle,
     LinearFit,
     LinearTrend,
-    AstropyLombScargle,
-    LightCurveLombScargle,
+    LinexpFit,
     MaxSlope,
     MaxTimeInterval,
     Mean,
     MeanVariance,
     MedianAbsDev,
+    MedianAmplitude,
     MedianBRP,
     MinTimeInterval,
     OtsuSplit,
@@ -133,7 +138,6 @@ extractors = [
     RCS,
     ReducedChi2,
     Roms,
-    MedianAmplitude,
     Signature,
     Skew,
     SlottedALength,
@@ -146,6 +150,8 @@ extractors = [
     StructureFunctions,
     TimeMean,
     TimeStd,
+    VillarFit,
+    WeightedBeyondNStd,
     WeightedMean,
 ]
 
