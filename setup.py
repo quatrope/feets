@@ -37,7 +37,7 @@ REQUIREMENTS = [
     "scipy>=1,<2",
     "pytest",
     "statsmodels",
-    "astropy>=6,<7",
+    "astropy>=7,<8",
     "pandas>=2,<3",
     "requests",
     "attrs",
