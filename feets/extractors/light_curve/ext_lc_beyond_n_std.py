@@ -15,8 +15,7 @@ import copy
 
 from light_curve import BeyondNStd
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -32,7 +31,7 @@ LIGHTCURVE_KWDS = {"nstd": 1, "transform": "default"}
 # =============================================================================
 
 
-class LightCurveBeyondNStd(Extractor):
+class LightCurveBeyondNStd(LightCurveExtractor):
     lc_feature_ext = BeyondNStd
     features = ["lc_beyond_n_std"]
 
@@ -43,12 +42,10 @@ class LightCurveBeyondNStd(Extractor):
             else beyond_n_std_wkds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [beyond_n_std] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_beyond_n_std": beyond_n_std}

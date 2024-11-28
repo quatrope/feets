@@ -14,8 +14,7 @@ import copy
 
 from light_curve import PercentDifferenceMagnitudePercentile
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"quantile": 0.05, "transform": "default"}
 # =============================================================================
 
 
-class LightCurvePercentDifferenceMagnitudePercentile(Extractor):
+class LightCurvePercentDifferenceMagnitudePercentile(LightCurveExtractor):
     lc_feature_ext = PercentDifferenceMagnitudePercentile
     features = ["lc_percent_difference_magnitude_percentile"]
 
@@ -42,13 +41,11 @@ class LightCurvePercentDifferenceMagnitudePercentile(Extractor):
             else percent_difference_magnitude_percentile_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [percent_difference_magnitude_percentile] = self.lc_feature_ext(
             **self.lightcurve_kwds
-        )(time, magnitude, sigma)
+        )(time, magnitude, error)
 
         return {
             "lc_percent_difference_magnitude_percentile": percent_difference_magnitude_percentile

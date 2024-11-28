@@ -26,7 +26,7 @@ from .. import (
     FeatureSpace,
     Extractor,
     register_extractor,
-    ExtractorContractError,
+    ExtractorValidationError,
 )
 
 from .core import FeetsTestCase
@@ -105,11 +105,11 @@ class FeatureSpaceTestCase(FeetsTestCase):
         FeatureSpace(only=["CAR_sigma"], CAR={"minimize_method": "powell"})
 
         # invalid parameter
-        with self.assertRaises(ExtractorContractError):
+        with self.assertRaises(ExtractorValidationError):
             FeatureSpace(only=["CAR_sigma"], CAR={"o": 1})
 
         # invalid parameter with valid parameter
-        with self.assertRaises(ExtractorContractError):
+        with self.assertRaises(ExtractorValidationError):
             FeatureSpace(
                 only=["CAR_sigma"], CAR={"o": 1, "minimize_method": "powell"}
             )

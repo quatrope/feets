@@ -14,8 +14,7 @@ import copy
 
 from light_curve import StetsonK
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveStetsonK(Extractor):
+class LightCurveStetsonK(LightCurveExtractor):
     lc_feature_ext = StetsonK
     features = ["lc_stetson_k"]
 
@@ -42,14 +41,10 @@ class LightCurveStetsonK(Extractor):
             else stetson_k_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude, error):
-        time, magnitude, sigma = preprocess_data(
-            magnitude=magnitude, error=error
-        )
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, error, time=None):
         [stetson_k] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_stetson_k": stetson_k}

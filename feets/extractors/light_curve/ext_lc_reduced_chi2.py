@@ -14,8 +14,7 @@ import copy
 
 from light_curve import ReducedChi2
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveReducedChi2(Extractor):
+class LightCurveReducedChi2(LightCurveExtractor):
     lc_feature_ext = ReducedChi2
     features = ["lc_chi2"]
 
@@ -42,14 +41,10 @@ class LightCurveReducedChi2(Extractor):
             else reduced_chi2_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude, error):
-        time, magnitude, sigma = preprocess_data(
-            magnitude=magnitude, error=error
-        )
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, error, time=None):
         [chi2] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_chi2": chi2}

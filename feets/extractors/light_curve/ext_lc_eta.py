@@ -15,8 +15,7 @@ import copy
 
 from light_curve import Eta
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -32,7 +31,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveEta(Extractor):
+class LightCurveEta(LightCurveExtractor):
     lc_feature_ext = Eta
     features = ["lc_eta"]
 
@@ -41,12 +40,10 @@ class LightCurveEta(Extractor):
             copy.deepcopy(LIGHTCURVE_KWDS) if eta_kwds is None else eta_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [eta] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_eta": eta}

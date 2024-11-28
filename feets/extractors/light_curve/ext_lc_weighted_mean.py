@@ -14,8 +14,7 @@ import copy
 
 from light_curve import WeightedMean
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveWeightedMean(Extractor):
+class LightCurveWeightedMean(LightCurveExtractor):
     lc_feature_ext = WeightedMean
     features = ["lc_weighted_mean"]
 
@@ -42,14 +41,10 @@ class LightCurveWeightedMean(Extractor):
             else weighted_mean_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude, error):
-        time, magnitude, sigma = preprocess_data(
-            magnitude=magnitude, error=error
-        )
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, error, time=None):
         [weighted_mean] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_weighted_mean": weighted_mean}

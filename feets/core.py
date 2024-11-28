@@ -113,8 +113,9 @@ class Features(Sequence):
         data = {}
         for fname, fvalue in features.items():
             extractor = extractors_by_feature[fname]
-            fflattened = extractor.flatten_feature(fname, fvalue)
-            data.update(fflattened)
+            flattened = extractor.flatten_feature(fname, fvalue)
+            extractor.validate_flatten(fname, flattened)
+            data.update(flattened)
         return pd.Series(data)
 
     def as_frame(self, **kwargs):
@@ -443,7 +444,6 @@ class FeatureSpace:
         features_by_lc = runner.run(
             extractors=self._extractors,
             selected_features=self._selected_features,
-            required_data=self._required_data,
             dask_options=self._dask_options,
             lcs=lcs,
         )

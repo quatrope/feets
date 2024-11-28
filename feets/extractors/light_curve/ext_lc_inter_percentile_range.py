@@ -14,8 +14,7 @@ import copy
 
 from light_curve import InterPercentileRange
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"quantile": 0.25, "transform": "default"}
 # =============================================================================
 
 
-class LightCurveInterPercentileRange(Extractor):
+class LightCurveInterPercentileRange(LightCurveExtractor):
     lc_feature_ext = InterPercentileRange
     features = ["lc_inter_percentile_range"]
 
@@ -42,12 +41,10 @@ class LightCurveInterPercentileRange(Extractor):
             else inter_percentile_range_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [inter_percentile_range] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_inter_percentile_range": inter_percentile_range}

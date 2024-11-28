@@ -14,8 +14,7 @@ import copy
 
 from light_curve import Kurtosis
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveKurtosis(Extractor):
+class LightCurveKurtosis(LightCurveExtractor):
     lc_feature_ext = Kurtosis
     features = ["lc_kurtosis"]
 
@@ -42,12 +41,10 @@ class LightCurveKurtosis(Extractor):
             else kurtosis_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [lc_kurtosis] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_kurtosis": lc_kurtosis}

@@ -14,8 +14,7 @@ import copy
 
 from light_curve import StandardDeviation
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveStandardDeviation(Extractor):
+class LightCurveStandardDeviation(LightCurveExtractor):
     lc_feature_ext = StandardDeviation
     features = ["lc_standard_deviation"]
 
@@ -42,12 +41,10 @@ class LightCurveStandardDeviation(Extractor):
             else standard_deviation_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [standard_deviation] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_standard_deviation": standard_deviation}

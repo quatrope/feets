@@ -15,8 +15,7 @@ import copy
 
 from light_curve import Cusum
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -32,7 +31,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveCusum(Extractor):
+class LightCurveCusum(LightCurveExtractor):
     lc_feature_ext = Cusum
     features = ["lc_cusum"]
 
@@ -43,12 +42,10 @@ class LightCurveCusum(Extractor):
             else cusum_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [cusum] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_cusum": cusum}

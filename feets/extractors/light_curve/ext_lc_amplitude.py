@@ -14,8 +14,7 @@ import copy
 
 from light_curve import Amplitude
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,9 +30,9 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveAmplitude(Extractor):
+class LightCurveAmplitude(LightCurveExtractor):
     lc_feature_ext = Amplitude
-    features = {"lc_amplitude"}
+    features = ["lc_amplitude"]
 
     def __init__(self, amplitude_kwds=None):
         self.lightcurve_kwds = (
@@ -42,12 +41,10 @@ class LightCurveAmplitude(Extractor):
             else amplitude_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [amplitude] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_amplitude": amplitude}

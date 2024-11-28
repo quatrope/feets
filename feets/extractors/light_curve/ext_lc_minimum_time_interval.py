@@ -14,8 +14,7 @@ import copy
 
 from light_curve import MinimumTimeInterval
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveMinimumTimeInterval(Extractor):
+class LightCurveMinimumTimeInterval(LightCurveExtractor):
     lc_feature_ext = MinimumTimeInterval
     features = ["lc_minimum_time_interval"]
 
@@ -42,12 +41,10 @@ class LightCurveMinimumTimeInterval(Extractor):
             else minimum_time_interval_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, time):
-        time, magnitude, sigma = preprocess_data(time=time)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, time, magnitude=None, error=None):
         [minimum_time_interval] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_minimum_time_interval": minimum_time_interval}

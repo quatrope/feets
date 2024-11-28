@@ -22,8 +22,6 @@ import copy
 import dask
 from dask.delayed import delayed
 
-import numpy as np
-
 __all__ = ["run"]
 
 
@@ -32,24 +30,6 @@ __all__ = ["run"]
 # =============================================================================
 
 DEFAULT_DASK_OPTIONS = {"scheduler": "processes"}
-
-
-# =============================================================================
-# EXCEPTIONS
-# =============================================================================
-
-
-class DataRequiredError(ValueError):
-    """Some required data is missing.
-
-    Parameters
-    ----------
-    data : str
-        The name of the required data that was not found.
-    """
-
-    def __init__(self, data):
-        super().__init__(f"Required data '{data}' not found")
 
 
 # =============================================================================
@@ -62,38 +42,30 @@ def _get_feature(results, feature):
     return results[feature]
 
 
-def _preprocess_data(required_data, kwargs):
-    datas = {}
-    for required in required_data:
-        data = kwargs.get(required)
-        if data is None:
-            raise DataRequiredError(required)
-        datas[required] = np.asarray(data)
-
-    return datas
+@delayed
+def _extract_and_validate(extractor, kwargs):
+    results = extractor.extract(**kwargs)
+    extractor.validate_extract(results)
+    return results
 
 
 def _extract_selected_features(extractors, data, selected_features):
     delayed_features = {}
 
     for extractor in extractors:
-        kwargs = extractor.select_kwargs(data, delayed_features)
-
-        results = delayed(extractor.extract_and_validate)(kwargs)
-
+        kwargs = extractor.prepare_extract(data, delayed_features)
+        delayed_results = _extract_and_validate(extractor, kwargs)
         for feature in extractor.get_features():
-            delayed_features[feature] = _get_feature(results, feature)
+            delayed_features[feature] = _get_feature(delayed_results, feature)
 
     return {
         feature: delayed_features[feature] for feature in selected_features
     }
 
 
-def _run_single(*, extractors, selected_features, required_data, lc):
-
-    data = _preprocess_data(required_data, lc)
+def _run_single(*, extractors, selected_features, lc):
     delayed_features = _extract_selected_features(
-        extractors, data, selected_features
+        extractors, lc, selected_features
     )
 
     return delayed_features
@@ -103,7 +75,6 @@ def run(
     *,
     extractors,
     selected_features,
-    required_data,
     dask_options=None,
     lcs,
 ):
@@ -122,8 +93,6 @@ def run(
         Array of extractor instances to run. Must be sorted based on dependencies.
     selected_features : array-like of str
         The features to extract.
-    required_data : array-like of str
-        The data required by the extractors.
     dask_options : dict, optional
         Options to be passed to the Dask scheduler.
     lcs : list of dict
@@ -134,11 +103,6 @@ def run(
     list of dict
         The extracted features for each light curve. The order of the list is preserved.
 
-    Raises
-    ------
-    DataRequiredError
-        If any required data is missing from the light curves.
-
     Examples
     --------
     >>> import numpy as np
@@ -146,7 +110,6 @@ def run(
     >>> lcs = [{"magnitude": [1, 2, 3]}, {"magnitude": [4, 5, 6]}]
     >>> run(extractors=np.array([Mean()]),
     ...     selected_features=["Mean"],
-    ...     required_data=["magnitude"],
     ...     lcs=lcs)
     [{'Mean': np.float64(2.0)}, {'Mean': np.float64(5.0)}]
 
@@ -164,7 +127,6 @@ def run(
         _run_single(
             extractors=extractors,
             selected_features=selected_features,
-            required_data=required_data,
             lc=lc,
         )
         for lc in lcs

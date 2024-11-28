@@ -22,17 +22,19 @@ from .extractor import (
     DATAS,
     Extractor,
     ExtractorBadDefinedError,
-    ExtractorContractError,
+    ExtractorValidationError,
     ExtractorWarning,
 )
 
+from .light_curve.lc_extractor import LightCurveExtractor
 
 __all__ = [
     "DATAS",
     "ExtractorBadDefinedError",
-    "ExtractorContractError",
+    "ExtractorValidationError",
     "ExtractorWarning",
     "Extractor",
+    "LightCurveExtractor",
     "registry",
 ]
 
@@ -109,7 +111,13 @@ from .light_curve.ext_lc_weighted_mean import *  # noqa
 
 
 extractor_registry = registry.ExtractorRegistry()
+
 for cls in Extractor.__subclasses__():
+    if cls.is_abstract():
+        continue
+    extractor_registry.register_extractor(cls)
+
+for cls in LightCurveExtractor.__subclasses__():
     extractor_registry.register_extractor(cls)
 
 del cls

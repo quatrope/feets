@@ -14,8 +14,7 @@ import copy
 
 from light_curve import Skew
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveSkew(Extractor):
+class LightCurveSkew(LightCurveExtractor):
     lc_feature_ext = Skew
     features = ["lc_skew"]
 
@@ -40,12 +39,10 @@ class LightCurveSkew(Extractor):
             copy.deepcopy(LIGHTCURVE_KWDS) if skew_kwds is None else skew_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [skew] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_skew": skew}

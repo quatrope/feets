@@ -15,8 +15,7 @@ import copy
 
 from light_curve import ExcessVariance
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -32,7 +31,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveEta(Extractor):
+class LightCurveEta(LightCurveExtractor):
     lc_feature_ext = ExcessVariance
     features = ["lc_excess_variance"]
 
@@ -43,14 +42,10 @@ class LightCurveEta(Extractor):
             else excess_variance_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude, error):
-        time, magnitude, sigma = preprocess_data(
-            magnitude=magnitude, error=error
-        )
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, error, time=None):
         [excess_variance] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_excess_variance": excess_variance}

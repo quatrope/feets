@@ -18,7 +18,7 @@ from attr import dataclass
 from feets.extractors.extractor import (
     Extractor,
     ExtractorBadDefinedError,
-    ExtractorContractError,
+    ExtractorValidationError,
     ExtractorTransformError,
     ExtractorWarning,
     FeatureExtractionWarning,
@@ -591,7 +591,7 @@ def test_Extractor_select_kwargs(fake_extractor_conf_cls, mock_extractor_conf):
 
     data = {f"data{i+1}": i + 1 for i in range(10)}
     dependencies = {f"dependency{i+1}": i + 11 for i in range(10)}
-    kwargs = TestExtractor().select_kwargs(data, dependencies)
+    kwargs = TestExtractor().prepare_extract(data, dependencies)
 
     np.testing.assert_equal(
         kwargs,
@@ -628,17 +628,17 @@ def test_Extractor_select_kwargs_raises_KeyError(
     # missing required data
     data = {"data3": 3, "data4": 4}
     with pytest.raises(KeyError):
-        TestExtractor().select_kwargs(data, dependencies)
+        TestExtractor().prepare_extract(data, dependencies)
 
     # missing optional data
     data = {"data1": 1, "data2": 2}
     with pytest.raises(KeyError):
-        TestExtractor().select_kwargs(data, dependencies)
+        TestExtractor().prepare_extract(data, dependencies)
 
     # missing dependencies
     data = {"data1": 1, "data2": 2, "data3": 3, "data4": 4}
     with pytest.raises(KeyError):
-        TestExtractor().select_kwargs(data, {})
+        TestExtractor().prepare_extract(data, {})
 
 
 def test_Extractor_extract_and_validate(
@@ -664,7 +664,7 @@ def test_Extractor_extract_and_validate(
     np.testing.assert_equal(results, {"feature1": 6})
 
 
-def test_Extractor_extract_and_validate_raises_ExtractorContractError(
+def test_Extractor_extract_and_validate_raises_ExtractorValidationError(
     fake_extractor_conf_cls,
     mock_extractor_conf,
 ):
@@ -682,7 +682,7 @@ def test_Extractor_extract_and_validate_raises_ExtractorContractError(
         def extract(self, data1, dependency1, data2=2):
             return {"feature2": data1 + dependency1 + data2}
 
-    with pytest.raises(ExtractorContractError):
+    with pytest.raises(ExtractorValidationError):
         TestExtractor().extract_and_validate(
             {"data1": 1, "data2": 2, "dependency1": 3}
         )
@@ -707,7 +707,7 @@ def test_Extractor_flatten_and_validate(
             return {feature: value}
 
     np.testing.assert_equal(
-        TestExtractor().flatten_and_validate("feature1", 1),
+        TestExtractor().validate_flatten("feature1", 1),
         {"feature1": 1},
     )
 
@@ -717,7 +717,7 @@ def test_Extractor_flatten_and_validate(
     ["feature1", {("feature1", 1): 1}, {"feature1": [1, 2, 3]}],
     ids=["not_dict", "name_not_str", "value_not_scalar"],
 )
-def test_Extractor_flatten_and_validate_raises_ExtractorContractError(
+def test_Extractor_flatten_and_validate_raises_ExtractorValidationError(
     fake_extractor_conf_cls,
     mock_extractor_conf,
     flatten_result,
@@ -736,8 +736,8 @@ def test_Extractor_flatten_and_validate_raises_ExtractorContractError(
         def flatten_feature(self, feature, value):
             return flatten_result
 
-    with pytest.raises(ExtractorContractError):
-        TestExtractor().flatten_and_validate("feature1", 1)
+    with pytest.raises(ExtractorValidationError):
+        TestExtractor().validate_flatten("feature1", 1)
 
 
 def test_Extractor_extract_default(

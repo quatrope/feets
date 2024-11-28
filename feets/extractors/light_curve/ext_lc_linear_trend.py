@@ -14,8 +14,7 @@ import copy
 
 from light_curve import LinearTrend
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveLinearTrend(Extractor):
+class LightCurveLinearTrend(LightCurveExtractor):
     lc_feature_ext = LinearTrend
     features = [
         "lc_linear_trend",
@@ -46,15 +45,11 @@ class LightCurveLinearTrend(Extractor):
             else linear_trend_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, time, magnitude):
-        time, magnitude, sigma = preprocess_data(
-            time=time, magnitude=magnitude
-        )
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, time, magnitude, error=None):
         [linear_trend, linear_trend_sigma, reduced_chi2] = self.lc_feature_ext(
             **self.lightcurve_kwds
-        )(time, magnitude, sigma)
+        )(time, magnitude, error)
 
         return {
             "lc_linear_trend": linear_trend,

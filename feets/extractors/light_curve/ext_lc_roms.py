@@ -14,8 +14,7 @@ import copy
 
 from light_curve import Roms
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveRoms(Extractor):
+class LightCurveRoms(LightCurveExtractor):
     lc_feature_ext = Roms
     features = ["lc_roms"]
 
@@ -40,14 +39,10 @@ class LightCurveRoms(Extractor):
             copy.deepcopy(LIGHTCURVE_KWDS) if roms_kwds is None else roms_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude, error):
-        time, magnitude, sigma = preprocess_data(
-            magnitude=magnitude, error=error
-        )
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, error, time=None):
         [roms] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_roms": roms}

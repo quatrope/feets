@@ -16,8 +16,7 @@ from light_curve import Periodogram
 
 import numpy as np
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -39,7 +38,7 @@ LIGHTCURVE_KWDS = {
 # =============================================================================
 
 
-class LightCurvePeriodogram(Extractor):
+class LightCurvePeriodogram(LightCurveExtractor):
     lc_feature_ext = Periodogram
     features = ["lc_period", "lc_period_s_to_n"]
 
@@ -50,14 +49,10 @@ class LightCurvePeriodogram(Extractor):
             else periodogram_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, time, magnitude):
-        time, magnitude, sigma = preprocess_data(
-            time=time, magnitude=magnitude
-        )
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, time, magnitude, error=None):
         periodogram = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
         transpose = np.reshape(periodogram, (-1, 2))
         [period, period_s_to_n] = np.transpose(transpose)

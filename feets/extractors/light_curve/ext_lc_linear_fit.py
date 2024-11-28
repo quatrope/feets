@@ -14,8 +14,7 @@ import copy
 
 from light_curve import LinearFit
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveLinearFit(Extractor):
+class LightCurveLinearFit(LightCurveExtractor):
     lc_feature_ext = LinearFit
     features = [
         "lc_linear_fit_slope",
@@ -46,14 +45,10 @@ class LightCurveLinearFit(Extractor):
             else linear_fit_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
+    @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error):
-        time, magnitude, sigma = preprocess_data(
-            time=time, magnitude=magnitude, error=error
-        )
-
         [slope, slope_sigma, reduced_chi2] = LinearFit(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {

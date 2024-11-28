@@ -14,8 +14,7 @@ import copy
 
 from light_curve import MagnitudePercentageRatio
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -35,7 +34,7 @@ LIGHTCURVE_KWDS = {
 # =============================================================================
 
 
-class LightCurveMagnitudePercentageRatio(Extractor):
+class LightCurveMagnitudePercentageRatio(LightCurveExtractor):
     lc_feature_ext = MagnitudePercentageRatio
     features = ["lc_magnitude_percentage_ratio"]
 
@@ -46,12 +45,10 @@ class LightCurveMagnitudePercentageRatio(Extractor):
             else magnitude_percentage_ratio_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [magnitude_percentage_ratio] = self.lc_feature_ext(
             **self.lightcurve_kwds
-        )(time, magnitude, sigma)
+        )(time, magnitude, error)
 
         return {"lc_magnitude_percentage_ratio": magnitude_percentage_ratio}

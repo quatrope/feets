@@ -14,8 +14,7 @@ import copy
 
 from light_curve import MaximumSlope
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveMaximumSlope(Extractor):
+class LightCurveMaximumSlope(LightCurveExtractor):
     lc_feature_ext = MaximumSlope
     features = ["lc_maximum_slope"]
 
@@ -42,14 +41,10 @@ class LightCurveMaximumSlope(Extractor):
             else maximum_slope_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, time, magnitude):
-        time, magnitude, sigma = preprocess_data(
-            time=time, magnitude=magnitude
-        )
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, time, magnitude, error=None):
         [maximum_slope] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_maximum_slope": maximum_slope}

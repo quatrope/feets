@@ -17,6 +17,7 @@
 # IMPORTS
 # =============================================================================
 
+from .light_curve.lc_extractor import LightCurveExtractor
 from .extractor import (
     DATAS,
     Extractor,
@@ -94,7 +95,9 @@ class ExtractorRegistry:
         TypeError
             If the class is not a subclass of Extractor.
         """
-        if not issubclass(cls, Extractor):
+        if not issubclass(cls, Extractor) and not issubclass(
+            cls, LightCurveExtractor
+        ):
             raise TypeError(
                 f"Only Extractor subclasses are allowed. Found: '{cls}'."
             )

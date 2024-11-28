@@ -14,8 +14,7 @@ import copy
 
 from light_curve import Mean
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveMean(Extractor):
+class LightCurveMean(LightCurveExtractor):
     lc_feature_ext = Mean
     features = ["lc_mean"]
 
@@ -40,12 +39,10 @@ class LightCurveMean(Extractor):
             copy.deepcopy(LIGHTCURVE_KWDS) if mean_kwds is None else mean_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [mean] = self.lc_feature_ext(**self.lightcurve_kwds)(
-            time, magnitude, sigma
+            time, magnitude, error
         )
 
         return {"lc_mean": mean}

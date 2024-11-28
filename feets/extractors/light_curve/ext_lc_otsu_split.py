@@ -12,8 +12,7 @@
 
 from light_curve import OtsuSplit
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -22,7 +21,7 @@ from ...libs import doctools
 # =============================================================================
 
 
-class LightCurveOtsuSplit(Extractor):
+class LightCurveOtsuSplit(LightCurveExtractor):
     lc_feature_ext = OtsuSplit
     features = [
         "lc_otsu_mean_diff",
@@ -31,16 +30,14 @@ class LightCurveOtsuSplit(Extractor):
         "lc_otsu_lower_to_all_ratio",
     ]
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [
             otsu_mean_diff,
             otsu_std_lower,
             otsu_std_upper,
             otsu_lower_to_all_ratio,
-        ] = self.lc_feature_ext()(time, magnitude, sigma)
+        ] = self.lc_feature_ext()(time, magnitude, error)
 
         return {
             "lc_otsu_mean_diff": otsu_mean_diff,

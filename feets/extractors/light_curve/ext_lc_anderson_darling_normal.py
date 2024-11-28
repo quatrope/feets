@@ -14,8 +14,7 @@ import copy
 
 from light_curve import AndersonDarlingNormal
 
-from .utils import preprocess_data
-from ..extractor import Extractor
+from .lc_extractor import LightCurveExtractor
 from ...libs import doctools
 
 
@@ -31,7 +30,7 @@ LIGHTCURVE_KWDS = {"transform": "default"}
 # =============================================================================
 
 
-class LightCurveAndersonDarlingNormal(Extractor):
+class LightCurveAndersonDarlingNormal(LightCurveExtractor):
     lc_feature_ext = AndersonDarlingNormal
     features = {"lc_anderson_darling_normal"}
 
@@ -42,12 +41,10 @@ class LightCurveAndersonDarlingNormal(Extractor):
             else anderson_darling_kwds
         )
 
-    @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude):
-        time, magnitude, sigma = preprocess_data(magnitude=magnitude)
-
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, time=None, error=None):
         [anderson_darling_normal] = self.lc_feature_ext(
             **self.lightcurve_kwds
-        )(time, magnitude, sigma)
+        )(time, magnitude, error)
 
         return {"lc_anderson_darling_normal": anderson_darling_normal}
