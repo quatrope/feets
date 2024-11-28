@@ -23,7 +23,7 @@ import numpy as np
 
 from scipy.interpolate import interp1d
 
-from .extractor import Extractor
+from .extractor import Extractor, feature_warning
 from ..libs import doctools
 
 
@@ -99,19 +99,19 @@ class StructureFunctions(Extractor):
         if len(sf1_log) and len(sf2_log):
             m_21, b_21 = np.polyfit(sf1_log, sf2_log, 1)
         else:
-            self.feature_warning("Can't compute StructureFunction_index_21")
+            feature_warning("Can't compute StructureFunction_index_21")
             m_21 = np.nan
 
         if len(sf1_log) and len(sf3_log):
             m_31, b_31 = np.polyfit(sf1_log, sf3_log, 1)
         else:
-            self.feature_warning("Can't compute StructureFunction_index_31")
+            feature_warning("Can't compute StructureFunction_index_31")
             m_31 = np.nan
 
         if len(sf2_log) and len(sf3_log):
             m_32, b_32 = np.polyfit(sf2_log, sf3_log, 1)
         else:
-            self.feature_warning("Can't compute StructureFunction_index_32")
+            feature_warning("Can't compute StructureFunction_index_32")
             m_32 = np.nan
 
         return {

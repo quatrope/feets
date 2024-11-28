@@ -23,6 +23,8 @@ from feets.extractors.extractor import (
     ExtractorWarning,
     FeatureExtractionWarning,
     _ExtractorConf,
+    extractor_warning,
+    feature_warning,
 )
 
 import numpy as np
@@ -481,24 +483,14 @@ def test_Extractor_getters(
     np.testing.assert_equal(getattr(TestExtractor, method)(), expected)
 
 
-def test_Extractor_warnings(fake_extractor_conf_cls, mock_extractor_conf):
-    extractor_conf_cls = fake_extractor_conf_cls(features=["feature1"])
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_warnings():
     message = "Test warning message"
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
-
-        def extract(self):
-            pass
-
-    extractor = TestExtractor()
-
     with pytest.warns(FeatureExtractionWarning, match=message):
-        extractor.feature_warning(message)
+        feature_warning(message)
 
     with pytest.warns(ExtractorWarning, match=message):
-        extractor.extractor_warning(message)
+        extractor_warning(message)
 
 
 @pytest.mark.parametrize(

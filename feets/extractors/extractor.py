@@ -94,6 +94,28 @@ warnings.simplefilter("always", ExtractorWarning)
 warnings.simplefilter("always", FeatureExtractionWarning)
 
 
+def extractor_warning(msg):
+    """Issue a warning about the extractor behaviour.
+
+    Parameters
+    ----------
+    msg : str
+        The warning message to be issued.
+    """
+    warnings.warn(msg, ExtractorWarning, 1)
+
+
+def feature_warning(msg):
+    """Issue a warning about the feature extraction process.
+
+    Parameters
+    ----------
+    msg : str
+        The warning message to be issued.
+    """
+    warnings.warn(msg, FeatureExtractionWarning, 1)
+
+
 # =============================================================================
 # EXTRACTOR CONF & UTILS FOR META PROGRAMMING
 # =============================================================================
@@ -474,30 +496,6 @@ class Extractor(abc.ABC):
             defined in the `__init__()` method of the extractor class.
         """
         return cls._conf.parameters
-
-    # WARNINGS ================================================================
-
-    @classmethod
-    def feature_warning(cls, msg):
-        """Issue a warning about the feature extraction process.
-
-        Parameters
-        ----------
-        msg : str
-            The warning message to be issued.
-        """
-        warnings.warn(msg, FeatureExtractionWarning, 2)
-
-    @classmethod
-    def extractor_warning(cls, msg):
-        """Issue a warning about the extractor behaviour.
-
-        Parameters
-        ----------
-        msg : str
-            The warning message to be issued.
-        """
-        warnings.warn(msg, ExtractorWarning, 2)
 
     # PERSISTENCE =============================================================
 
