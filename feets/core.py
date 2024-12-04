@@ -57,19 +57,14 @@ class Features(Sequence):
 
     Attributes
     ----------
-    features : np.ndarray of dict
+    features : np.ndarray
         The extracted features by light curve.
-    extractors : np.ndarray of Extractor
+    extractors : np.ndarray
         The extractors used to compute the features.
-    feature_names : frozenset of str
+    feature_names : frozenset
         The names of the extracted features.
     length : int
         The number of light curves.
-
-    Methods
-    -------
-    as_frame(**kwargs)
-        Return the features as a pandas DataFrame.
     """
 
     # CONSTRUCTOR =============================================================
@@ -82,15 +77,18 @@ class Features(Sequence):
 
     @property
     def feature_names(self):
+        """frozenset: The names of the extracted features."""
         return frozenset(self.features[0])
 
     @property
     def length(self):
+        """int: The number of light curves."""
         return len(self.features)
 
     # MAGIC ===================================================================
 
     def __repr__(self):
+        """String representation of the Features object."""
         return f"<Features feature_names={set(self.feature_names)}, length={self.length}>"
 
     def __getattr__(self, feature_name):
@@ -195,10 +193,16 @@ class FeatureSpace:
     **kwargs
         Extra parameters that are passed to the feature extractors.
 
-    Methods
-    -------
-    extract(**kwargs)
-        Extract all the selected features from the provided data.
+    Attributes
+    ----------
+    features : frozenset
+        The selected features.
+    extractors : np.ndarray
+        The extractor instances in order of their dependencies.
+    required_data : frozenset
+        The data vectors required by the extractors.
+    dask_options : dict
+        Options to be passed to the Dask scheduler.
 
     Examples
     --------
@@ -206,13 +210,13 @@ class FeatureSpace:
 
     >>> fs = feets.FeatureSpace(only=['Std'])
     >>> fs.extract(**lc)
-    Features(feature_names={'Std'}, length=1)
+    <Features feature_names={'Std'}, length=1>
 
     **List of available data as an input:**
 
     >>> fs = feets.FeatureSpace(data=['magnitude','time'])
     >>> fs.extract(**lc)
-    Features(feature_names={...}, length=1)
+    <Features feature_names={...}, length=1>
 
     **List of features and available data as an input:**
 
@@ -223,16 +227,16 @@ class FeatureSpace:
 
     >>> fs = feets.FeatureSpace(data=['magnitude','time'])
     >>> fs.extract(**lc)
-    Features(feature_names={'Mean', 'Beyond1Std'}, length=1)
+    <Features feature_names={'Mean', 'Beyond1Std'}, length=1>
 
     **List of exclusions as an input:**
 
     >>> fs = feets.FeatureSpace(data=['magnitude'])
     >>> fs.extract(**lc)
-    Features(feature_names={'Mean', 'Std', ...}, length=1)
+    <Features feature_names={'Mean', 'Std', ...}, length=1>
     >>> fs = feets.FeatureSpace(data=['magnitude'], exclude=['Mean'])
     >>> fs.extract(**lc)
-    Features(feature_names={'Std', ...}, length=1)
+    <Features feature_names={'Std', ...}, length=1>
     """
 
     # CONSTRUCTOR =============================================================
@@ -270,7 +274,7 @@ class FeatureSpace:
         self._extractors = np.array(extractor_instances, dtype=object)
         self._selected_features = frozenset(selected_features)
         self._required_data = frozenset(required_data)
-        self._dask_options = dask_options
+        self.dask_options = dask_options
 
     # FROM LC =================================================================
 
@@ -322,20 +326,24 @@ class FeatureSpace:
     # PROPERTIES ==============================================================
 
     @property
-    def features(self):
+    def selected_features(self):
         """frozenset: The selected features."""
         return self._selected_features
 
     @property
-    def execution_plan(self):
-        """np.ndarray: The extractor instances in order of their \
-        dependencies."""
+    def extractors(self):
+        """np.ndarray: The extractor instances in order of their dependencies."""
         return self._extractors
+
+    @property
+    def required_data(self):
+        """frozenset: The data vectors required by the extractors."""
+        return self._required_data
 
     # MAGIC ===================================================================
 
     def __repr__(self):
-        """Return a string representation of the FeatureSpace object."""
+        """String representation of the FeatureSpace object."""
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
@@ -382,7 +390,7 @@ class FeatureSpace:
         return {
             "selected_features": list(self._selected_features),
             "required_data": list(self._required_data),
-            "dask_options": self._dask_options,
+            "dask_options": self.dask_options,
             "extractors": [
                 extractor.to_dict() for extractor in self._extractors
             ],
@@ -472,7 +480,8 @@ class FeatureSpace:
         features_by_lc = runner.run(
             extractors=self._extractors,
             selected_features=self._selected_features,
-            dask_options=self._dask_options,
+            required_data=self._required_data,
+            dask_options=self.dask_options,
             lcs=lcs,
         )
 

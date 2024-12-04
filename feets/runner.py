@@ -31,10 +31,41 @@ __all__ = ["run"]
 
 DEFAULT_DASK_OPTIONS = {"scheduler": "processes"}
 
+# =============================================================================
+# EXCEPTIONS
+# =============================================================================
+
+
+class DataRequiredError(ValueError):
+    """Raised when required data is missing from a light curve."""
+
+    pass
+
 
 # =============================================================================
 # RUNNER
 # =============================================================================
+
+
+def _validate_required_data_single(*, required_data, lc):
+    diff = set(required_data).difference(lc)
+    if diff:
+        missing_str = ", ".join(diff)
+        raise DataRequiredError(
+            f"Missing required data in light curve: {missing_str}"
+        )
+
+
+def validate_required_data(*, required_data, lcs, dask_options):
+    validations = [
+        _validate_required_data_single(
+            required_data=required_data,
+            lc=lc,
+        )
+        for lc in lcs
+    ]
+
+    dask.compute(*validations, **dask_options)
 
 
 @delayed
@@ -75,6 +106,7 @@ def run(
     *,
     extractors,
     selected_features,
+    required_data,
     dask_options=None,
     lcs,
 ):
@@ -122,6 +154,10 @@ def run(
     """
     if dask_options is None:
         dask_options = copy.deepcopy(DEFAULT_DASK_OPTIONS)
+
+    validate_required_data(
+        required_data=required_data, lcs=lcs, dask_options=dask_options
+    )
 
     delayed_features_by_lc = [
         _run_single(
