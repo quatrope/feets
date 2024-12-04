@@ -20,8 +20,6 @@
 import logging
 from collections.abc import Sequence
 
-import attrs
-
 import joblib
 
 import numpy as np
@@ -47,38 +45,53 @@ logger.setLevel(logging.WARNING)
 # =============================================================================
 
 
-@attrs.define(frozen=True)
 class Features(Sequence):
     """Class to manage and manipulate feature extraction results.
 
+    Parameters
+    ----------
+    features : array_like
+        The extracted features by light curve.
+    extractors : array_like
+        The extractors used to compute the features.
+
     Attributes
     ----------
-    features : np.ndarray
+    features : np.ndarray of dict
         The extracted features by light curve.
-    extractors : np.ndarray
-        The extractors used to generate the features.
-    feature_names : set
+    extractors : np.ndarray of Extractor
+        The extractors used to compute the features.
+    feature_names : frozenset of str
         The names of the extracted features.
     length : int
         The number of light curves.
+
+    Methods
+    -------
+    as_frame(**kwargs)
+        Return the features as a pandas DataFrame.
     """
 
-    features: np.ndarray = attrs.field(converter=np.array, repr=False)
-    extractors: np.ndarray = attrs.field(converter=tuple, repr=False)
-    feature_names: set = attrs.field(init=False, repr=True)
-    length: int = attrs.field(init=False, repr=True)
+    # CONSTRUCTOR =============================================================
 
-    @feature_names.default
-    def _feature_names_defaults(self):
-        return set(self.features[0])
+    def __init__(self, features, extractors):
+        self.features = np.array(features, dtype=dict)
+        self.extractors = np.array(extractors, dtype=object)
 
-    @length.default
-    def _length_defaults(self):
+    # PROPERTIES ==============================================================
+
+    @property
+    def feature_names(self):
+        return frozenset(self.features[0])
+
+    @property
+    def length(self):
         return len(self.features)
 
-    def __attrs_post_init__(self):
-        """Prevent the modification of features."""
-        self.features.setflags(write=False)
+    # MAGIC ===================================================================
+
+    def __repr__(self):
+        return f"<Features feature_names={set(self.feature_names)}, length={self.length}>"
 
     def __getattr__(self, feature_name):
         """Access feature values by using name as attribute."""
@@ -96,6 +109,8 @@ class Features(Sequence):
         """Return the list of attributes of the object."""
         return list(vars(type(self))) + list(self.feature_names)
 
+    # API =====================================================================
+
     def _extractors_by_features(self):
         all_extractors_by_features = {}
         for extractor in self.extractors:
@@ -109,7 +124,8 @@ class Features(Sequence):
         jobs = min(len(self.features), joblib.cpu_count())
         return jobs
 
-    def _features_as_serie(self, features, extractors_by_feature):
+    @staticmethod
+    def _features_as_serie(features, extractors_by_feature):
         data = {}
         for fname, fvalue in features.items():
             extractor = extractors_by_feature[fname]
@@ -119,7 +135,18 @@ class Features(Sequence):
         return pd.Series(data)
 
     def as_frame(self, **kwargs):
-        """Return the features as a pandas DataFrame."""
+        """Return the features as a pandas DataFrame.
+
+        Parameters
+        ----------
+        **kwargs
+            Extra parameters that are passed to the joblib.Parallel constructor.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame with the extracted features by lightcurve.
+        """
         extractors_by_features = self._extractors_by_features()
 
         kwargs.setdefault("prefer", "processes")
@@ -132,6 +159,7 @@ class Features(Sequence):
                 for features in self.features
             )
         df = pd.DataFrame(all_series)
+        df.index.name = "Light Curve"
         df.columns.name = "Features"
         return df
 

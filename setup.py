@@ -40,7 +40,6 @@ REQUIREMENTS = [
     "astropy>=7,<8",
     "pandas>=2,<3",
     "requests",
-    "attrs",
     "joblib",
     "custom_inherit",
     "dask",
