@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import LinearFit as _LinearFit
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -37,17 +28,13 @@ class LinearFit(LightCurveExtractor):
         "LinearFit_ReducedChi2",
     ]
 
-    def __init__(self, linear_fit_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if linear_fit_kwds is None
-            else linear_fit_kwds
-        )
-        self.lightcurve_ext = _LinearFit(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _LinearFit(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error):
-        [slope, slope_sigma, reduced_chi2] = self.lightcurve_ext(
+        [slope, slope_sigma, reduced_chi2] = self._extract(
             time, magnitude, error
         )
         return {

@@ -10,19 +10,11 @@
 # IMPORTS
 # =============================================================================
 
-import copy
 
 from light_curve import Roms as _Roms
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,13 +25,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class Roms(LightCurveExtractor):
     features = ["Roms"]
 
-    def __init__(self, roms_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS) if roms_kwds is None else roms_kwds
-        )
-        self.lightcurve_ext = _Roms(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _Roms(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [roms] = self.lightcurve_ext(time, magnitude, error)
+        [roms] = self._extract(time, magnitude, error)
         return {"Roms": roms}

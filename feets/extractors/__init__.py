@@ -57,7 +57,7 @@ from .ext_signature import Signature
 from .ext_slotted_a_length import SlottedALength
 from .ext_stetson import StetsonJ, StetsonKAC, StetsonL
 from .ext_structure_functions import StructureFunctions
-from .ext_weighted_beyond_N_std import WeightedBeyondNStd
+from .ext_weighted_beyond_n_std import WeightedBeyondNStd
 
 from .light_curve.ext_amplitude import Amplitude
 from .light_curve.ext_anderson_darling import AndersonDarling

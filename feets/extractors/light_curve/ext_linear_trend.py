@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import LinearTrend as _LinearTrend
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -37,17 +28,13 @@ class LinearTrend(LightCurveExtractor):
         "LinearTrend_ReducedChi2",
     ]
 
-    def __init__(self, linear_trend_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if linear_trend_kwds is None
-            else linear_trend_kwds
-        )
-        self.lightcurve_ext = _LinearTrend(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _LinearTrend(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
-        [linear_trend, linear_trend_sigma, reduced_chi2] = self.lightcurve_ext(
+        [linear_trend, linear_trend_sigma, reduced_chi2] = self._extract(
             time, magnitude, error
         )
         return {

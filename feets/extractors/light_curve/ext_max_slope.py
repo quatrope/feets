@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import MaximumSlope as _MaximumSlope
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,15 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class MaxSlope(LightCurveExtractor):
     features = ["MaxSlope"]
 
-    def __init__(self, max_slope_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if max_slope_kwds is None
-            else max_slope_kwds
-        )
-        self.lightcurve_ext = _MaximumSlope(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _MaximumSlope(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
-        [maximum_slope] = self.lightcurve_ext(time, magnitude, error)
+        [maximum_slope] = self._extract(time, magnitude, error)
         return {"MaxSlope": maximum_slope}

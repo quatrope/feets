@@ -10,20 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import Mean as _Mean
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
-
 
 # =============================================================================
 # EXTRACTOR CLASS
@@ -33,13 +23,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class Mean(LightCurveExtractor):
     features = ["Mean"]
 
-    def __init__(self, mean_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS) if mean_kwds is None else mean_kwds
-        )
-        self.lightcurve_ext = _Mean(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _Mean(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [mean] = self.lightcurve_ext(time, magnitude, error)
+        [mean] = self._extract(time, magnitude, error)
         return {"Mean": mean}

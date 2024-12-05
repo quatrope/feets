@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import WeightedMean as _WeightedMean
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,15 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class WeightedMean(LightCurveExtractor):
     features = ["WeightedMean"]
 
-    def __init__(self, weighted_mean_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if weighted_mean_kwds is None
-            else weighted_mean_kwds
-        )
-        self.lightcurve_ext = _WeightedMean(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _WeightedMean(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [weighted_mean] = self.lightcurve_ext(time, magnitude, error)
+        [weighted_mean] = self._extract(time, magnitude, error)
         return {"WeightedMean": weighted_mean}

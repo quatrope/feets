@@ -11,18 +11,9 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import Duration as _Duration
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,15 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class Duration(LightCurveExtractor):
     features = ["Duration"]
 
-    def __init__(self, duration_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if duration_kwds is None
-            else duration_kwds
-        )
-        self.lightcurve_ext = _Duration(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _Duration(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
-        [duration] = self.lightcurve_ext(time, magnitude, error)
+        [duration] = self._extract(time, magnitude, error)
         return {"Duration": duration}

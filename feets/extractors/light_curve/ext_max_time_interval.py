@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import MaximumTimeInterval as _MaximumTimeInterval
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,15 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class MaxTimeInterval(LightCurveExtractor):
     features = ["MaxTimeInterval"]
 
-    def __init__(self, max_time_interval_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if max_time_interval_kwds is None
-            else max_time_interval_kwds
-        )
-        self.lightcurve_ext = _MaximumTimeInterval(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _MaximumTimeInterval(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
-        [maximum_time_interval] = self.lightcurve_ext(time, magnitude, error)
+        [maximum_time_interval] = self._extract(time, magnitude, error)
         return {"MaxTimeInterval": maximum_time_interval}

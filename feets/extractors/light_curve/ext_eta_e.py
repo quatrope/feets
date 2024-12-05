@@ -11,19 +11,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import EtaE as _EtaE
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -34,15 +25,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class EtaE(LightCurveExtractor):
     features = ["EtaE"]
 
-    def __init__(self, eta_e_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if eta_e_kwds is None
-            else eta_e_kwds
-        )
-        self.lightcurve_ext = _EtaE(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _EtaE(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
-        [eta_e] = self.lightcurve_ext(time, magnitude, error)
+        [eta_e] = self._extract(time, magnitude, error)
         return {"EtaE": eta_e}

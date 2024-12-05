@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import AndersonDarlingNormal as _AndersonDarlingNormal
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,15 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class AndersonDarling(LightCurveExtractor):
     features = ["AndersonDarling"]
 
-    def __init__(self, anderson_darling_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if anderson_darling_kwds is None
-            else anderson_darling_kwds
-        )
-        self.lightcurve_ext = _AndersonDarlingNormal(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _AndersonDarlingNormal(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [anderson_darling_normal] = self.lightcurve_ext(time, magnitude, error)
+        [anderson_darling_normal] = self._extract(time, magnitude, error)
         return {"AndersonDarling": anderson_darling_normal}

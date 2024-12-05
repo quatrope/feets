@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import StetsonK as _StetsonK
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,15 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class StetsonK(LightCurveExtractor):
     features = ["StetsonK"]
 
-    def __init__(self, stetson_k_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if stetson_k_kwds is None
-            else stetson_k_kwds
-        )
-        self.lightcurve_ext = _StetsonK(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _StetsonK(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [stetson_k] = self.lightcurve_ext(time, magnitude, error)
+        [stetson_k] = self._extract(time, magnitude, error)
         return {"StetsonK": stetson_k}

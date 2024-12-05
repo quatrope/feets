@@ -11,19 +11,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import Cusum as _Cusum
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -34,15 +25,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class Cusum(LightCurveExtractor):
     features = ["Cusum"]
 
-    def __init__(self, cusum_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if cusum_kwds is None
-            else cusum_kwds
-        )
-        self.lightcurve_ext = _Cusum(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _Cusum(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [cusum] = self.lightcurve_ext(time, magnitude, error)
+        [cusum] = self._extract(time, magnitude, error)
         return {"Cusum": cusum}

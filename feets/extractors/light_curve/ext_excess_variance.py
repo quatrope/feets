@@ -11,19 +11,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import ExcessVariance as _ExcessVariance
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -34,15 +25,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class ExcessVariance(LightCurveExtractor):
     features = ["ExcessVariance"]
 
-    def __init__(self, excess_variance_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if excess_variance_kwds is None
-            else excess_variance_kwds
-        )
-        self.lightcurve_ext = _ExcessVariance(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _ExcessVariance(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
-        [excess_variance] = self.lightcurve_ext(time, magnitude, error)
+        [excess_variance] = self._extract(time, magnitude, error)
         return {"ExcessVariance": excess_variance}

@@ -109,14 +109,15 @@ class Features(Sequence):
 
     # API =====================================================================
 
-    def _extractors_by_features(self):
-        all_extractors_by_features = {}
+    def _extractors_by_feature(self):
+        extractors_by_feature = {}
         for extractor in self.extractors:
             extractor_by_feature = dict.fromkeys(
                 extractor.get_features(), extractor
             )
-            all_extractors_by_features.update(extractor_by_feature)
-        return all_extractors_by_features
+            extractors_by_feature.update(extractor_by_feature)
+
+        return extractors_by_feature
 
     def _get_default_jobs(self):
         jobs = min(len(self.features), joblib.cpu_count())
@@ -145,7 +146,7 @@ class Features(Sequence):
         pd.DataFrame
             A DataFrame with the extracted features by lightcurve.
         """
-        extractors_by_features = self._extractors_by_features()
+        extractors_by_feature = self._extractors_by_feature()
 
         kwargs.setdefault("prefer", "processes")
         kwargs.setdefault("n_jobs", self._get_default_jobs())
@@ -153,7 +154,7 @@ class Features(Sequence):
         with joblib.Parallel(**kwargs) as P:
             features_as_serie = joblib.delayed(self._features_as_serie)
             all_series = P(
-                features_as_serie(features, extractors_by_features)
+                features_as_serie(features, extractors_by_feature)
                 for features in self.features
             )
         df = pd.DataFrame(all_series)
@@ -242,12 +243,14 @@ class FeatureSpace:
     # CONSTRUCTOR =============================================================
 
     def _init_extractor(self, extractor_cls, **kwargs):
+        ext_kwargs = kwargs.get(extractor_cls.__name__, {})
         default_params = extractor_cls.get_default_params()
         params = {
-            param: kwargs.get(param, default)
+            param: ext_kwargs.get(param, default)
             for param, default in default_params.items()
         }
-        return extractor_cls(**params)
+        ext = extractor_cls(**params)
+        return ext
 
     def __init__(
         self, data=None, only=None, exclude=None, dask_options=None, **kwargs
@@ -264,12 +267,12 @@ class FeatureSpace:
             extractor_instance = self._init_extractor(extractor_cls, **kwargs)
             extractor_instances.append(extractor_instance)
 
-            features = extractor_instance.get_features()
+            features = extractor_cls.get_features()
             if only is not None:
                 features = features.intersection(only)
             selected_features.update(features)
 
-            required_data.update(extractor_instance.get_required_data())
+            required_data.update(extractor_cls.get_required_data())
 
         self._extractors = np.array(extractor_instances, dtype=object)
         self._selected_features = frozenset(selected_features)
@@ -369,8 +372,8 @@ class FeatureSpace:
         dask_options = data["dask_options"]
         kwargs = {}
         for extractor in data["extractors"]:
-            name = list(extractor).pop()
-            kwargs.update(extractor[name])
+            (ename, ekwargs), = extractor.items()
+            kwargs.update({ename: ekwargs})
 
         return cls(
             only=only,

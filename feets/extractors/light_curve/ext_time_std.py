@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import TimeStandardDeviation as _TimeStandardDeviation
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,15 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class TimeStd(LightCurveExtractor):
     features = ["TimeStd"]
 
-    def __init__(self, time_std_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if time_std_kwds is None
-            else time_std_kwds
-        )
-        self.lightcurve_ext = _TimeStandardDeviation(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _TimeStandardDeviation(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
-        [time_standard_deviation] = self.lightcurve_ext(time, magnitude, error)
-        return {"TimeStd": time_standard_deviation}
+        [time_std] = self._extract(time, magnitude, error)
+        return {"TimeStd": time_std}

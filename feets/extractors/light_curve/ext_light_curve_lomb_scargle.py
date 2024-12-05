@@ -10,7 +10,6 @@
 # IMPORTS
 # =============================================================================
 
-import copy
 
 from light_curve import Periodogram as _Periodogram
 
@@ -21,19 +20,6 @@ from ...libs import doctools
 
 
 # =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {
-    "peaks": 3,
-    "resolution": 10,
-    "max_freq_factor": 1,
-    "nyquist": "average",
-    "fast": True,
-}
-
-
-# =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
 
@@ -41,17 +27,25 @@ LIGHTCURVE_KWDS = {
 class LightCurveLombScargle(LightCurveExtractor):
     features = ["LightCurve_PeriodLS", "Period_s_to_n"]
 
-    def __init__(self, light_curve_lomb_scargle_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if light_curve_lomb_scargle_kwds is None
-            else light_curve_lomb_scargle_kwds
-        )
-        self.lightcurve_ext = _Periodogram(**self.lightcurve_kwds)
+    def __init__(
+        self,
+        peaks=3,
+        resolution=10,
+        max_freq_factor=1,
+        nyquist="average",
+        fast=True,
+    ):
+        self.peaks = peaks
+        self.resolution = resolution
+        self.max_freq_factor = max_freq_factor
+        self.nyquist = nyquist
+        self.fast = fast
+
+        self._extract = _Periodogram(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
-        periodogram = self.lightcurve_ext(time, magnitude, error)
+        periodogram = self._extract(time, magnitude, error)
         transpose = np.reshape(periodogram, (-1, 2))
         [period, period_s_to_n] = np.transpose(transpose)
 

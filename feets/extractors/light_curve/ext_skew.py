@@ -10,19 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import Skew as _Skew
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
 
 
 # =============================================================================
@@ -33,13 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class Skew(LightCurveExtractor):
     features = ["Skew"]
 
-    def __init__(self, skew_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS) if skew_kwds is None else skew_kwds
-        )
-        self.lightcurve_ext = _Skew(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _Skew(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [skew] = self.lightcurve_ext(time, magnitude, error)
+        [skew] = self._extract(time, magnitude, error)
         return {"Skew": skew}

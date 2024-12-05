@@ -10,20 +10,11 @@
 # IMPORTS
 # =============================================================================
 
-import copy
 
 from light_curve import PercentAmplitude as _PercentAmplitude
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {"transform": "identity"}
-
 
 # =============================================================================
 # EXTRACTOR CLASS
@@ -33,15 +24,11 @@ LIGHTCURVE_KWDS = {"transform": "identity"}
 class PercentAmplitude(LightCurveExtractor):
     features = ["PercentAmplitude"]
 
-    def __init__(self, percent_amplitude_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if percent_amplitude_kwds is None
-            else percent_amplitude_kwds
-        )
-        self.lightcurve_ext = _PercentAmplitude(**self.lightcurve_kwds)
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _PercentAmplitude(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
-        [percent_amplitude] = self.lightcurve_ext(time, magnitude, error)
+        [percent_amplitude] = self._extract(time, magnitude, error)
         return {"PercentAmplitude": percent_amplitude}

@@ -17,6 +17,11 @@ from ..extractor import (
     _is_abstract_method,
     Extractor,
     ExtractorBadDefinedError,
+    DATA_TIME,
+    DATA_MAGNITUDE,
+    DATA_FLUX,
+    DATA_ERROR,
+    DATA_FLUX_ERROR,
 )
 from ...libs import doctools
 
@@ -43,46 +48,16 @@ class LightCurveExtractor(Extractor):
         cls._conf = _ExtractorConf.from_extractor_class(cls)
         del cls.features
 
-    # PERSISTENCE =============================================================
-
-    def to_dict(self):
-        """Convert the LightCurveExtractor to a dictionary representation.
-
-        Returns
-        -------
-        dict
-            A dictionary containing the parameters of the extractor instance.
-        """
-        cls_name = type(self).__name__
-        state = vars(self)
-        if "lightcurve_ext" in state:
-            del state["lightcurve_ext"]
-        return {cls_name: state}
-
-    # MAGIC ===================================================================
-
-    def __repr__(self):
-        """Return a string representation of the LightCurveExtractor object."""
-        cls_name = type(self).__name__
-        state = {}
-        for aname, avalue in vars(self).items():
-            if aname == "lightcurve_ext":
-                continue
-            if len(repr(avalue)) > 20:
-                avalue = "<MANY CONFIGURATIONS>"
-            state[aname] = avalue
-        return f"<{cls_name} {state}>" if state else f"<{cls_name}>"
-
     # API =====================================================================
 
     @doctools.doc_inherit(Extractor.prepare_extract)
     def prepare_extract(self, data, dependencies):
         time, magnitude, flux, error, flux_error = (
-            data.get("time"),
-            data.get("magnitude"),
-            data.get("flux"),
-            data.get("error"),
-            data.get("flux_error"),
+            data.get(DATA_TIME),
+            data.get(DATA_MAGNITUDE),
+            data.get(DATA_FLUX),
+            data.get(DATA_ERROR),
+            data.get(DATA_FLUX_ERROR),
         )
 
         shape = (
@@ -119,11 +94,11 @@ class LightCurveExtractor(Extractor):
 
         data.update(
             {
-                "time": time,
-                "magnitude": magnitude,
-                "flux": flux,
-                "error": error,
-                "flux_error": flux_error,
+                DATA_TIME: time,
+                DATA_MAGNITUDE: magnitude,
+                DATA_FLUX: flux,
+                DATA_ERROR: error,
+                DATA_FLUX_ERROR: flux_error,
             }
         )
 

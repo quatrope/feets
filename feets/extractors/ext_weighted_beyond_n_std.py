@@ -56,9 +56,9 @@ class WeightedBeyondNStd(Extractor):
     features = ["WeightedBeyondNStd"]
 
     def __init__(self, nstd=1):
-        nstd = np.atleast_1d(nstd)
-        if not np.all(nstd > 0):
+        if nstd <= 0:
             raise ValueError("nstd should be positive")
+
         self.nstd = nstd
 
     @doctools.doc_inherit(Extractor.extract)
@@ -72,21 +72,18 @@ class WeightedBeyondNStd(Extractor):
         var = sum((magnitude - weighted_mean) ** 2)
         std = np.sqrt((1.0 / (n - 1)) * var)
 
-        count = [
-            np.sum(
-                np.logical_or(
-                    magnitude > weighted_mean + nstd * std,
-                    magnitude < weighted_mean - nstd * std,
-                )
+        count = np.sum(
+            np.logical_or(
+                magnitude > weighted_mean + self.nstd * std,
+                magnitude < weighted_mean - self.nstd * std,
             )
-            for nstd in self.nstd
-        ]
+        )
 
-        return {"WeightedBeyondNStd": np.array(count, dtype=float) / n}
+        return {"WeightedBeyondNStd": float(count) / n}
 
     @doctools.doc_inherit(Extractor.flatten_feature)
     def flatten_feature(self, feature, value):
         if feature == "WeightedBeyondNStd":
-            Ns = self.nstd
-            return {f"WeightedBeyond{N}Std": val for N, val in zip(Ns, value)}
+            N = self.nstd
+            return {f"WeightedBeyond{N}Std": value}
         return super().flatten_feature(feature, value)

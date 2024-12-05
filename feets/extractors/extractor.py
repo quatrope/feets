@@ -493,6 +493,11 @@ class Extractor(abc.ABC):
 
     # PERSISTENCE =============================================================
 
+    @property
+    def params(self):
+        param_names = self.get_default_params().keys()
+        return {pname: getattr(self, pname) for pname in param_names}
+
     def to_dict(self):
         """Convert the extractor to a dictionary representation.
 
@@ -502,19 +507,20 @@ class Extractor(abc.ABC):
             A dictionary containing the parameters of the extractor instance.
         """
         cls_name = type(self).__name__
-        state = vars(self)
-        return {cls_name: state}
+        params = self.params
+        return {cls_name: params}
 
     # MAGIC ===================================================================
 
     def __repr__(self):
         """Return a string representation of the Extractor object."""
         cls_name = type(self).__name__
+        params = self.params
         state = {}
-        for aname, avalue in vars(self).items():
-            if len(repr(avalue)) > 20:
-                avalue = "<MANY CONFIGURATIONS>"
-            state[aname] = avalue
+        for pname, pvalue in params.items():
+            if len(repr(pvalue)) > 20:
+                pvalue = "<MANY CONFIGURATIONS>"
+            state[pname] = pvalue
         return f"<{cls_name} {state}>" if state else f"<{cls_name}>"
 
     # API =====================================================================

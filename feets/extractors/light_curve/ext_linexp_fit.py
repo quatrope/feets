@@ -10,29 +10,10 @@
 # IMPORTS
 # =============================================================================
 
-import copy
-
 from light_curve import LinexpFit as _LinexpFit
 
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-LIGHTCURVE_KWDS = {
-    "algorithm": "mcmc",
-    "mcmc_niter": 128,
-    "lmsder_niter": 10,
-    "ceres_niter": 10,
-    "ceres_loss_reg": None,
-    "init": None,
-    "bounds": None,
-    "ln_prior": None,
-    "transform": None,
-}
 
 
 # =============================================================================
@@ -49,13 +30,29 @@ class LinexpFit(LightCurveExtractor):
         "LinexpFit_ReducedChi2",
     ]
 
-    def __init__(self, linear_fit_kwds=None):
-        self.lightcurve_kwds = (
-            copy.deepcopy(LIGHTCURVE_KWDS)
-            if linear_fit_kwds is None
-            else linear_fit_kwds
-        )
-        self.lightcurve_ext = _LinexpFit(**self.lightcurve_kwds)
+    def __init__(
+        self,
+        algorithm="mcmc",
+        mcmc_niter=128,
+        lmsder_niter=10,
+        ceres_niter=10,
+        ceres_loss_reg=None,
+        init=None,
+        bounds=None,
+        ln_prior=None,
+        transform=None,
+    ):
+        self.algorithm = algorithm
+        self.mcmc_niter = mcmc_niter
+        self.lmsder_niter = lmsder_niter
+        self.ceres_niter = ceres_niter
+        self.ceres_loss_reg = ceres_loss_reg
+        self.init = init
+        self.bounds = bounds
+        self.ln_prior = ln_prior
+        self.transform = transform
+
+        self._extract = _LinexpFit(**self.params)
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, flux, flux_error):
@@ -65,7 +62,8 @@ class LinexpFit(LightCurveExtractor):
             fall_time,
             baseline,
             reduced_chi2,
-        ] = self.lightcurve_ext(time, flux, flux_error)
+        ] = self._extract(time, flux, flux_error)
+
         return {
             "LinexpFit_Amplitude": amplitude,
             "LinexpFit_Baseline": baseline,
