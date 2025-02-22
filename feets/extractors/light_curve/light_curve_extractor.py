@@ -52,55 +52,41 @@ class LightCurveExtractor(Extractor):
 
     @doctools.doc_inherit(Extractor.prepare_extract)
     def prepare_extract(self, data, dependencies):
-        time, magnitude, flux, error, flux_error = (
-            data.get(DATA_TIME),
-            data.get(DATA_MAGNITUDE),
-            data.get(DATA_FLUX),
-            data.get(DATA_ERROR),
-            data.get(DATA_FLUX_ERROR),
-        )
 
         shape = (
-            len(time)
-            if time is not None
-            else len(magnitude) if magnitude is not None else len(flux)
+            len(data.get(DATA_TIME))
+            or data.get(DATA_MAGNITUDE)
+            or data.get(DATA_FLUX)
         )
+        dtype = np.float64
 
-        time = (
-            np.arange(shape, dtype=np.float64)
-            if time is None
-            else np.array(time, dtype=np.float64)
-        )
-        magnitude = (
-            np.zeros(shape, dtype=np.float64)
-            if magnitude is None
-            else np.array(magnitude, dtype=np.float64)
-        )
-        flux = (
-            np.zeros(shape, dtype=np.float64)
-            if flux is None
-            else np.array(flux, dtype=np.float64)
-        )
-        error = (
-            np.ones(shape, dtype=np.float64)
-            if error is None
-            else np.array(1 / error**2, dtype=np.float64)
-        )
-        flux_error = (
-            np.ones(shape, dtype=np.float64)
-            if flux_error is None
-            else np.array(1 / flux_error**2, dtype=np.float64)
-        )
+        preprocessed_data = {
+            DATA_TIME: (
+                np.arange(shape, dtype=dtype)
+                if data.get(DATA_TIME) is None
+                else np.array(data.get(DATA_TIME), dtype=dtype)
+            ),
+            DATA_MAGNITUDE: (
+                np.zeros(shape, dtype=dtype)
+                if data.get(DATA_MAGNITUDE) is None
+                else np.array(data.get(DATA_MAGNITUDE), dtype=dtype)
+            ),
+            DATA_FLUX: (
+                np.zeros(shape, dtype=dtype)
+                if data.get(DATA_FLUX) is None
+                else np.array(data.get(DATA_FLUX), dtype=dtype)
+            ),
+            DATA_ERROR: (
+                np.ones(shape, dtype=dtype)
+                if data.get(DATA_ERROR) is None
+                else np.array(1 / data.get(DATA_ERROR)**2, dtype=dtype)
+            ),
+            DATA_FLUX_ERROR: (
+                np.ones(shape, dtype=dtype)
+                if data.get(DATA_FLUX_ERROR) is None
+                else np.array(1 / data.get(DATA_FLUX_ERROR)**2, dtype=dtype)
+            ),
+        }
 
-        data.update(
-            {
-                DATA_TIME: time,
-                DATA_MAGNITUDE: magnitude,
-                DATA_FLUX: flux,
-                DATA_ERROR: error,
-                DATA_FLUX_ERROR: flux_error,
-            }
-        )
-
-        kwargs = super().prepare_extract(data, dependencies)
+        kwargs = super().prepare_extract(preprocessed_data, dependencies)
         return kwargs

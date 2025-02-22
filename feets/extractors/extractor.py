@@ -572,7 +572,7 @@ class Extractor(abc.ABC):
             kwargs[d] = np.asarray(data[d])
 
         for d in self.get_optional_data():
-            if d not in data:
+            if d not in data or d in kwargs:
                 continue
             kwargs[d] = np.asarray(data[d])
 
