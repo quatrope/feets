@@ -6,13 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_amplitude
+from feets.extractors import ext_median_amplitude
 
 import numpy as np
 
 
 def test_Amplitude_extract():
-    extractor = ext_amplitude.Amplitude()
+    extractor = ext_median_amplitude.MedianAmplitude()
     magnitude = np.arange(1002)
     value = extractor.extract(magnitude=magnitude)["Amplitude"]
     np.testing.assert_allclose(value, 475.5)

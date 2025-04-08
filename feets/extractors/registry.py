@@ -6,11 +6,18 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+# =============================================================================
+# DOCS
+# =============================================================================
+
+"""Register and manage feature extractors."""
+
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+from .light_curve.light_curve_extractor import LightCurveExtractor
 from .extractor import (
     DATAS,
     Extractor,
@@ -23,6 +30,8 @@ from .extractor import (
 
 
 class DependencyNotFound(ValueError):
+    """A dependency was not found."""
+
     def __init__(self, dependencies) -> None:
         if isinstance(dependencies, str):
             dependencies = [dependencies]
@@ -31,6 +40,8 @@ class DependencyNotFound(ValueError):
 
 
 class FeatureNotFound(ValueError):
+    """A feature was not found."""
+
     def __init__(self, features):
         if isinstance(features, str):
             features = [features]
@@ -39,6 +50,8 @@ class FeatureNotFound(ValueError):
 
 
 class FeatureAlreadyRegistered(ValueError):
+    """A feature is already registered."""
+
     def __init__(self, features):
         if isinstance(features, str):
             features = [features]
@@ -52,18 +65,66 @@ class FeatureAlreadyRegistered(ValueError):
 
 
 class ExtractorRegistry:
+    """Extractor registry for managing feature extractors.
+
+    The `ExtractorRegistry` class is responsible for managing the registration
+    and unregistration of feature extractors. It ensures that all dependencies
+    are met before registering an extractor and prevents duplicate feature
+    registrations.
+
+    It also provides methods to check if a feature or extractor is registered,
+    retrieve the extractor for a specific feature, and generate an execution
+    plan for extractors based on provided data and feature constraints.
+    """
+
     def __init__(self):
         self._feature_extractors = {}
         self._features = set()
         self._extractors = set()
 
     def validate_is_extractor(self, cls):
-        if not issubclass(cls, Extractor):
+        """Validate that a class is a subclass of Extractor.
+
+        Parameters
+        ----------
+        cls : class
+            The class to validate.
+
+        Raises
+        ------
+        TypeError
+            If the class is not a subclass of Extractor.
+        """
+        if not issubclass(cls, Extractor) and not issubclass(
+            cls, LightCurveExtractor
+        ):
             raise TypeError(
                 f"Only Extractor subclasses are allowed. Found: '{cls}'."
             )
 
     def register_extractor(self, cls):
+        """Add a feature extractor to the registry.
+
+        Ensure that all dependencies are met before registering the extractor.
+
+        Parameters
+        ----------
+        cls : class
+            The feature extractor class to register.
+
+        Returns
+        -------
+        Extractor
+            The registered feature extractor class.
+
+        Raises
+        ------
+        DependencyNotFound
+            If one of the dependencies of the extractor is not available
+            in the registry.
+        FeatureAlreadyRegistered
+            If one of the features of the extractor is already registered.
+        """
         self.validate_is_extractor(cls)
 
         # check dependencies
@@ -87,6 +148,19 @@ class ExtractorRegistry:
         return cls
 
     def unregister_extractor(self, cls):
+        """Remove a feature extractor from the registry.
+
+        Parameters
+        ----------
+        cls : class
+            The feature extractor class to unregister.
+
+        Raises
+        ------
+        ValueError
+            If the extractor is not registered, or if one of its features
+            is a dependency of another extractor in the registry.
+        """
         self.validate_is_extractor(cls)
 
         # check if the extractor is registered
@@ -110,20 +184,83 @@ class ExtractorRegistry:
         self._extractors.remove(cls)
 
     def is_feature_registered(self, feature):
+        """Check if a feature is extracted by any registered extractor.
+
+        Parameters
+        ----------
+        feature : str
+            The name of the feature to check.
+
+        Returns
+        -------
+        bool
+            `True` if the feature is registered, `False` otherwise.
+        """
         return feature in self._features
 
     def is_extractor_registered(self, extractor):
+        """Check if an extractor is present in the registry.
+
+        Parameters
+        ----------
+        extractor : class
+            The feature extractor class to check.
+
+        Returns
+        -------
+        bool
+            `True` if the extractor is registered, `False` otherwise.
+
+        Raises
+        ------
+        TypeError
+            If the class is not a subclass of Extractor.
+        """
         self.validate_is_extractor(extractor)
 
         return extractor in self._extractors
 
     def extractor_of(self, feature):
+        """Get the extractor that extracts a specific feature.
+
+        Parameters
+        ----------
+        feature : str
+            The name of the feature to get the extractor of.
+
+        Returns
+        -------
+        Extractor
+            The feature extractor class that extracts the specified feature.
+
+        Raises
+        ------
+        FeatureNotFound
+            If the feature is not registered in the registry.
+        """
         if not self.is_feature_registered(feature):
             raise FeatureNotFound(feature)
 
         return self._feature_extractors[feature]
 
     def extractors_from_data(self, data):
+        """Filter the extractors that require the specified data.
+
+        Parameters
+        ----------
+        data : iterable of str
+            The required data to filter extractors by.
+
+        Returns
+        -------
+        set of Extractor
+            The extractors that require all of the specified data.
+
+        Raises
+        ------
+        ValueError
+            If any of the specified data is invalid.
+        """
         diff = set(data).difference(DATAS)
         if diff:
             raise ValueError(f"Invalid data: {', '.join(diff)}.")
@@ -135,6 +272,23 @@ class ExtractorRegistry:
         }
 
     def extractors_from_features(self, features):
+        """Filter the extractors that extract the specified features.
+
+        Parameters
+        ----------
+        features : iterable of str
+            The features to filter extractors by.
+
+        Returns
+        -------
+        set of Extractor
+            The extractors that extract the specified features.
+
+        Raises
+        ------
+        FeatureNotFound
+            If any of the specified features are not registered in the registry.
+        """
         extractors = set()
         for feature in features:
             if not self.is_feature_registered(feature):
@@ -143,7 +297,23 @@ class ExtractorRegistry:
         return extractors
 
     def sort_extractors_by_dependencies(self, extractors):
-        """Calculate the Feature Extractor Resolution Order."""
+        """Calculate the feature extractor dependecy resolution order.
+
+        Parameters
+        ----------
+        extractors : iterable of Extractor
+            The extractors to sort by dependencies.
+
+        Returns
+        -------
+        tuple of Extractor
+            The sorted extractors based on their dependencies.
+
+        Raises
+        ------
+        ValueError
+            If any of the specified extractors are not registered in the registry.
+        """
         selected_extractors = []
         features_from_selected = set()
         pending = list(extractors)
@@ -175,6 +345,27 @@ class ExtractorRegistry:
         return tuple(selected_extractors)
 
     def get_execution_plan(self, *, data=None, only=None, exclude=None):
+        """Generate an execution plan for feature extractors.
+
+        Parameters
+        ----------
+        data : iterable of str, optional
+            The required data for the extractors.
+        only : iterable of str, optional
+            The features to include in the execution plan.
+        exclude : iterable of str, optional
+            The features to exclude from the execution plan.
+
+        Returns
+        -------
+        tuple of Extractor
+            The sorted extractors based on the provided constraints.
+
+        Raises
+        ------
+        ValueError
+            If the same feature is passed in both `only` and `exclude`.
+        """
         if not set(only or []).isdisjoint(exclude or []):
             raise ValueError(
                 "Features in 'only' and 'exclude' must be disjoint."
@@ -204,8 +395,10 @@ class ExtractorRegistry:
 
     @property
     def registered_extractors(self):
+        """frozenset: The extractors registered in the registry."""
         return frozenset(self._extractors)
 
     @property
     def available_features(self):
+        """frozenset: The features available in the registry."""
         return frozenset(self._features)

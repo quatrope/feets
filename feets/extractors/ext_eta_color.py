@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Color Eta_e extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,32 +30,31 @@ from .extractor import Extractor
 
 
 class EtaColor(Extractor):
-    r"""
+    r"""Color Eta_e extractor.
 
     **Eta_color** (:math:`\eta_{color}`)
 
-    Variability index Eta_e (:math:`\eta^e`)
-    calculated from the color light-curve.
+    Variability index Eta_e (:math:`\eta^e`) calculated from the color
+    light-curve.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['Eta_color'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Eta_color': 1.991749074648397}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["Eta_color"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Eta_color': np.float64(0.0007871260219202687)}
 
     References
     ----------
-
     .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
-
     """
 
     features = ["Eta_color"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, aligned_magnitude, aligned_time, aligned_magnitude2):
         N = len(aligned_magnitude)
         B_Rdata = aligned_magnitude - aligned_magnitude2

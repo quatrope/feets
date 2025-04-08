@@ -11,16 +11,19 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Amplitude extractor."""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from scipy import stats
+import math
+
+import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -28,32 +31,41 @@ from .extractor import Extractor
 # =============================================================================
 
 
-class LinearTrend(Extractor):
-    r"""
-    **LinearTrend**
+class MedianAmplitude(Extractor):
+    """Amplitude extractor.
 
-    Slope of a linear fit to the light-curve.
+    **Amplitude**
 
-    .. code-block:: pycon
+    The amplitude is defined as the half of the difference between the median
+    of the maximum :math:`5%%` and the median of the minimum :math:`5%%`
+    magnitudes. For a sequence of numbers from :math:`0` to :math:`1000` the
+    amplitude should be equal to :math:`475.5`.
 
-        >>> fs = feets.FeatureSpace(only=['LinearTrend'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'LinearTrend': -3.2084065290292509e-06}
+    Examples
+    --------
+    Amplitude of increasing time series from :math:`0` to :math:`1000`:
+    >>> fs = feets.FeatureSpace(only=['Amplitude'])
+    >>> features = fs.extract(**lc_incremental)
+    >>> features[0]
 
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
     """
 
-    features = ["LinearTrend"]
+    features = ["MedianAmplitude"]
 
-    def extract(self, magnitude, time):
-        regression_slope = stats.linregress(time, magnitude)[0]
-        return {"LinearTrend": regression_slope}
+    @doctools.doc_inherit(Extractor.extract)
+    def extract(self, magnitude):
+        N = len(magnitude)
+        sorted_mag = np.sort(magnitude)
+
+        amplitude = (
+            np.median(sorted_mag[-int(math.ceil(0.05 * N)) :])
+            - np.median(sorted_mag[0 : int(math.ceil(0.05 * N))])
+        ) / 2.0
+        return {"MedianAmplitude": amplitude}

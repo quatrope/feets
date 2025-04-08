@@ -29,7 +29,7 @@ from ..libs import doctools
 # =============================================================================
 
 
-class Beyond1Std(Extractor):
+class WeightedBeyondNStd(Extractor):
     """Beyond-one-standard-deviation extractor.
 
     **Beyond1Std**
@@ -53,7 +53,13 @@ class Beyond1Std(Extractor):
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
     """
 
-    features = ["Beyond1Std"]
+    features = ["WeightedBeyondNStd"]
+
+    def __init__(self, nstd=1):
+        if nstd <= 0:
+            raise ValueError("nstd should be positive")
+
+        self.nstd = nstd
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, error):
@@ -68,9 +74,16 @@ class Beyond1Std(Extractor):
 
         count = np.sum(
             np.logical_or(
-                magnitude > weighted_mean + std,
-                magnitude < weighted_mean - std,
+                magnitude > weighted_mean + self.nstd * std,
+                magnitude < weighted_mean - self.nstd * std,
             )
         )
 
-        return {"Beyond1Std": float(count) / n}
+        return {"WeightedBeyondNStd": float(count) / n}
+
+    @doctools.doc_inherit(Extractor.flatten_feature)
+    def flatten_feature(self, feature, value):
+        if feature == "WeightedBeyondNStd":
+            N = self.nstd
+            return {f"WeightedBeyond{N}Std": value}
+        return super().flatten_feature(feature, value)

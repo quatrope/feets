@@ -6,7 +6,7 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_lomb_scargle
+from feets.extractors import ext_astropy_lomb_scargle
 
 import numpy as np
 
@@ -22,7 +22,7 @@ def test_LombScargle_extract(periodic_light_curve):
             "nyquist_factor": 1,
         }
     }
-    extractor = ext_lomb_scargle.LombScargle(lscargle_kwds=lscargle_kwds)
+    extractor = ext_astropy_lomb_scargle.AstropyLombScargle(lscargle_kwds=lscargle_kwds)
     features = [
         "PeriodLS",
         "Period_fit",

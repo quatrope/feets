@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Fourier components extractor."""
 
 
 # =============================================================================
@@ -24,8 +24,9 @@ import numpy as np
 
 from scipy.optimize import curve_fit
 
-from .ext_lomb_scargle import DEFAULT_LSCARGLE_KWDS, lscargle
+from .ext_astropy_lomb_scargle import DEFAULT_LSCARGLE_KWDS, lscargle
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -34,9 +35,10 @@ from .extractor import Extractor
 
 
 class FourierComponents(Extractor):
-    r"""
-    **Periodic features extracted from light-curves using Lomb–Scargle**
-    **(Richards et al., 2011)**
+    r"""Fourier components extractor.
+
+    Periodic features extracted from light-curves using Lomb–Scargle (Richards
+    et al., 2011)
 
     Here, we adopt a model where the time series of the photometric magnitudes
     of variable stars is modeled as a superposition of sines and cosines:
@@ -128,16 +130,18 @@ class FourierComponents(Extractor):
 
     and remapped to :math:`|-\pi, +\pi|`
 
+    Parameters
+    ----------
+    lscargle_kwds : dict, optional
+        Keyword arguments to pass to the Lomb-Scargle periodogram function.
+
     References
     ----------
-
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
        Bloom, J. S., Brewer, J. M., Crellin-Quick, A., ... &
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
-
-
     """
 
     features = [
@@ -228,6 +232,7 @@ class FourierComponents(Extractor):
 
         return A, scaledPH
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
         lscargle_kwds = self.lscargle_kwds
         A, sPH = self._components(magnitude, time, lscargle_kwds)

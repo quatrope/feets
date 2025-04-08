@@ -11,8 +11,6 @@
 # IMPORTS
 # =============================================================================
 
-from io import StringIO
-
 from feets.core import FeatureSpace, Features
 
 import numpy as np
@@ -66,16 +64,42 @@ def mock_run(mocker):
 
 
 @pytest.fixture
+def mock_store_json(mocker):
+    def maker(fake_reuslt):
+        def fake_store_json(*args, **kwargs):
+            return fake_reuslt
+
+        mocker.patch("feets.io.store_json", fake_store_json)
+
+    return maker
+
+
+@pytest.fixture
+def mock_store_yaml(mocker):
+    def maker(fake_reuslt):
+        def fake_store_yaml(*args, **kwargs):
+            return fake_reuslt
+
+        mocker.patch("feets.io.store_yaml", fake_store_yaml)
+
+    return maker
+
+
+@pytest.fixture
 def fake_extractor_cls():
-    def maker(features, data=None, default_params=None):
+    def maker(features, data=None, default_params=None, name="FakeExtractor"):
         if data is None:
             data = []
         if default_params is None:
             default_params = {}
 
         class FakeExtractor:
+            __name__ = name
+
             def __init__(self, **kwargs):
-                self.kawrgs = kwargs
+                for key, value in default_params.items():
+                    value = kwargs.get(key, value)
+                    setattr(self, key, value)
 
             @classmethod
             def get_features(cls):
@@ -93,7 +117,12 @@ def fake_extractor_cls():
                 return {f"flat_{feature}": value}
 
             def to_dict(self):
-                return {"FakeExtractor": {"kwargs": self.kawrgs}}
+                return {
+                    name: {
+                        key: getattr(self, key)
+                        for key in default_params.keys()
+                    }
+                }
 
         return FakeExtractor
 
@@ -294,8 +323,8 @@ def test_FeatureSpace_init_kwargs(mock_extractor_registry, fake_extractor_cls):
 
     fs = FeatureSpace()
 
-    np.testing.assert_equal(fs._extractors[0].kawrgs, {"param1": 1})
-    np.testing.assert_equal(fs._extractors[1].kawrgs, {"param2": 2})
+    np.testing.assert_equal(fs._extractors[0].param1, 1)
+    np.testing.assert_equal(fs._extractors[1].param2, 2)
 
 
 def test_FeatureSpace_init_only(mock_extractor_registry, fake_extractor_cls):
@@ -408,56 +437,159 @@ def test_FeatureSpace_repr(mock_extractor_registry, fake_extractor_cls):
     )
 
 
-def test_FeatureSpace_to_dict(mock_extractor_registry, fake_extractor_cls):
+def test_FeatureSpace_from_dict(
+    mock_available_data,
+    mock_extractor_registry,
+    fake_extractor_cls,
+):
+    data = ["data1", "data2", "data3"]
+    mock_available_data(data)
+
     extractor_clss = [
-        fake_extractor_cls(features=["feature1"], data=["data1"]),
-        fake_extractor_cls(features=["feature2"], data=["data2"]),
+        fake_extractor_cls(
+            features=["feature1"],
+            data=["data1"],
+            default_params={"param1": 1},
+            name="FakeExtractor1",
+        ),
+        fake_extractor_cls(
+            features=["feature2"],
+            data=["data2", "data3"],
+            default_params={"param2": 2, "param3": 3},
+            name="FakeExtractor2",
+        ),
     ]
     mock_extractor_registry(extractor_clss)
 
-    fake_dask_options = {"key": "value"}
+    only = ["feature1", "feature2"]
+    dask_options = {"key": "value"}
+    kwargs = {"param1": -1, "param2": -2, "param3": -3}
 
-    fs = FeatureSpace(dask_options=fake_dask_options)
-
-    expected = {
-        "selected_features": list(fs._selected_features),
-        "required_data": list(fs._required_data),
-        "dask_options": fs._dask_options,
-        "extractors": [ext.to_dict() for ext in fs._extractors],
+    fs_dict = {
+        "selected_features": only,
+        "required_data": data,
+        "dask_options": dask_options,
+        "extractors": [
+            {"FakeExtractor1": {"param1": kwargs["param1"]}},
+            {
+                "FakeExtractor2": {
+                    "param2": kwargs["param2"],
+                    "param3": kwargs["param3"],
+                }
+            },
+        ],
     }
 
-    np.testing.assert_equal(fs.to_dict(), expected)
+    fs = FeatureSpace.from_dict(fs_dict)
+
+    assert isinstance(fs._extractors[0], extractor_clss[0])
+    assert isinstance(fs._extractors[1], extractor_clss[1])
+
+    np.testing.assert_equal(fs._extractors[0].param1, -1)
+    np.testing.assert_equal(fs._extractors[1].param2, -2)
+    np.testing.assert_equal(fs._extractors[1].param3, -3)
+    np.testing.assert_equal(fs._selected_features, frozenset(only))
+    np.testing.assert_equal(fs._required_data, frozenset(data))
 
 
-@pytest.mark.parametrize(
-    ("method", "expected"),
-    [
-        (
-            "to_json",
-            [
-                '{"selected_features": ["feature1", "feature2"], "required_data": ["data1", "data2"], "dask_options": {"key": "value"}, "extractors": [{"FakeExtractor": {"kwargs": {}}}, {"FakeExtractor": {"kwargs": {}}}]}',
-                '{"selected_features": ["feature2", "feature1"], "required_data": ["data2", "data1"], "dask_options": {"key": "value"}, "extractors": [{"FakeExtractor": {"kwargs": {}}}, {"FakeExtractor": {"kwargs": {}}}]}',
-                '{"selected_features": ["feature1", "feature2"], "required_data": ["data2", "data1"], "dask_options": {"key": "value"}, "extractors": [{"FakeExtractor": {"kwargs": {}}}, {"FakeExtractor": {"kwargs": {}}}]}',
-                '{"selected_features": ["feature2", "feature1"], "required_data": ["data1", "data2"], "dask_options": {"key": "value"}, "extractors": [{"FakeExtractor": {"kwargs": {}}}, {"FakeExtractor": {"kwargs": {}}}]}',
-            ],
-        ),
-        (
-            "to_yaml",
-            [
-                "dask_options:\n  key: value\nextractors:\n- FakeExtractor:\n    kwargs: {}\n- FakeExtractor:\n    kwargs: {}\nrequired_data:\n- data1\n- data2\nselected_features:\n- feature1\n- feature2\n",
-                "dask_options:\n  key: value\nextractors:\n- FakeExtractor:\n    kwargs: {}\n- FakeExtractor:\n    kwargs: {}\nrequired_data:\n- data2\n- data1\nselected_features:\n- feature2\n- feature1\n",
-                "dask_options:\n  key: value\nextractors:\n- FakeExtractor:\n    kwargs: {}\n- FakeExtractor:\n    kwargs: {}\nrequired_data:\n- data2\n- data1\nselected_features:\n- feature1\n- feature2\n",
-                "dask_options:\n  key: value\nextractors:\n- FakeExtractor:\n    kwargs: {}\n- FakeExtractor:\n    kwargs: {}\nrequired_data:\n- data1\n- data2\nselected_features:\n- feature2\n- feature1\n",
-            ],
-        ),
-    ],
-    ids=["json", "yaml"],
-)
-def test_FeatureSpace_persistence_string(
+def test_FeatureSpace_to_dict(
+    mock_available_data,
     mock_extractor_registry,
     fake_extractor_cls,
-    method,
-    expected,
+):
+    data = ["data1", "data2", "data3"]
+    mock_available_data(data)
+
+    extractor_clss = [
+        fake_extractor_cls(
+            features=["feature1"],
+            data=["data1"],
+            default_params={"param1": 1},
+            name="FakeExtractor1",
+        ),
+        fake_extractor_cls(
+            features=["feature2"],
+            data=["data2", "data3"],
+            default_params={"param2": 2, "param3": 3},
+            name="FakeExtractor2",
+        ),
+    ]
+    mock_extractor_registry(extractor_clss)
+
+    only = ["feature1", "feature2"]
+    dask_options = {"key": "value"}
+    kwargs = {"param1": -1, "param2": -2, "param3": -3}
+
+    fs = FeatureSpace(only=only, dask_options=dask_options, **kwargs)
+
+    extractors = [
+        extractor_clss[0](param1=kwargs["param1"]),
+        extractor_clss[1](param2=kwargs["param2"], param3=kwargs["param3"]),
+    ]
+
+    expected = {
+        "selected_features": list(only),
+        "required_data": list(data),
+        "dask_options": dask_options,
+        "extractors": list([ext.to_dict() for ext in extractors]),
+    }
+
+    fs_dict = fs.to_dict()
+    fs_dict["selected_features"].sort()
+    fs_dict["required_data"].sort()
+
+    np.testing.assert_equal(fs_dict, expected)
+
+
+def test_FeatureSpace_to_dict_from_dict(
+    mock_available_data,
+    mock_extractor_registry,
+    fake_extractor_cls,
+):
+
+    data = ["data1", "data2", "data3"]
+    mock_available_data(data)
+
+    extractor_clss = [
+        fake_extractor_cls(
+            features=["feature1"],
+            data=["data1"],
+            default_params={"param1": 1},
+            name="FakeExtractor1",
+        ),
+        fake_extractor_cls(
+            features=["feature2"],
+            data=["data2", "data3"],
+            default_params={"param2": 2, "param3": 3},
+            name="FakeExtractor2",
+        ),
+    ]
+    mock_extractor_registry(extractor_clss)
+
+    only = ["feature1", "feature2"]
+    dask_options = {"key": "value"}
+    kwargs = {"param1": -1, "param2": -2, "param3": -3}
+
+    fs_dict = FeatureSpace(
+        only=only, dask_options=dask_options, **kwargs
+    ).to_dict()
+
+    fs = FeatureSpace.from_dict(fs_dict)
+
+    assert isinstance(fs._extractors[0], extractor_clss[0])
+    assert isinstance(fs._extractors[1], extractor_clss[1])
+
+    np.testing.assert_equal(fs._extractors[0].param1, -1)
+    np.testing.assert_equal(fs._extractors[1].param2, -2)
+    np.testing.assert_equal(fs._extractors[1].param3, -3)
+    np.testing.assert_equal(fs._selected_features, frozenset(only))
+    np.testing.assert_equal(fs._required_data, frozenset(data))
+
+
+def test_FeatureSpace_to_json(
+    mock_store_json,
+    mock_extractor_registry,
+    fake_extractor_cls,
 ):
     extractor_clss = [
         fake_extractor_cls(features=["feature1"], data=["data1"]),
@@ -465,42 +597,20 @@ def test_FeatureSpace_persistence_string(
     ]
     mock_extractor_registry(extractor_clss)
 
+    fake_json = "fake_json"
+    mock_store_json(fake_json)
+
     fake_dask_options = {"key": "value"}
 
     fs = FeatureSpace(dask_options=fake_dask_options)
 
-    assert getattr(fs, method)() in expected
+    np.testing.assert_equal(fs.to_json(), fake_json)
 
 
-@pytest.mark.parametrize(
-    ("method", "expected"),
-    [
-        (
-            "to_json",
-            [
-                '{"selected_features": ["feature1", "feature2"], "required_data": ["data1", "data2"], "dask_options": {"key": "value"}, "extractors": [{"FakeExtractor": {"kwargs": {}}}, {"FakeExtractor": {"kwargs": {}}}]}',
-                '{"selected_features": ["feature2", "feature1"], "required_data": ["data2", "data1"], "dask_options": {"key": "value"}, "extractors": [{"FakeExtractor": {"kwargs": {}}}, {"FakeExtractor": {"kwargs": {}}}]}',
-                '{"selected_features": ["feature1", "feature2"], "required_data": ["data2", "data1"], "dask_options": {"key": "value"}, "extractors": [{"FakeExtractor": {"kwargs": {}}}, {"FakeExtractor": {"kwargs": {}}}]}',
-                '{"selected_features": ["feature2", "feature1"], "required_data": ["data1", "data2"], "dask_options": {"key": "value"}, "extractors": [{"FakeExtractor": {"kwargs": {}}}, {"FakeExtractor": {"kwargs": {}}}]}',
-            ],
-        ),
-        (
-            "to_yaml",
-            [
-                "dask_options:\n  key: value\nextractors:\n- FakeExtractor:\n    kwargs: {}\n- FakeExtractor:\n    kwargs: {}\nrequired_data:\n- data1\n- data2\nselected_features:\n- feature1\n- feature2\n",
-                "dask_options:\n  key: value\nextractors:\n- FakeExtractor:\n    kwargs: {}\n- FakeExtractor:\n    kwargs: {}\nrequired_data:\n- data2\n- data1\nselected_features:\n- feature2\n- feature1\n",
-                "dask_options:\n  key: value\nextractors:\n- FakeExtractor:\n    kwargs: {}\n- FakeExtractor:\n    kwargs: {}\nrequired_data:\n- data2\n- data1\nselected_features:\n- feature1\n- feature2\n",
-                "dask_options:\n  key: value\nextractors:\n- FakeExtractor:\n    kwargs: {}\n- FakeExtractor:\n    kwargs: {}\nrequired_data:\n- data1\n- data2\nselected_features:\n- feature2\n- feature1\n",
-            ],
-        ),
-    ],
-    ids=["json", "yaml"],
-)
-def test_FeatureSpace_persistence_file(
+def test_FeatureSpace_to_yaml(
+    mock_store_yaml,
     mock_extractor_registry,
     fake_extractor_cls,
-    method,
-    expected,
 ):
     extractor_clss = [
         fake_extractor_cls(features=["feature1"], data=["data1"]),
@@ -508,46 +618,14 @@ def test_FeatureSpace_persistence_file(
     ]
     mock_extractor_registry(extractor_clss)
 
-    fake_dask_options = {"key": "value"}
-
-    fs = FeatureSpace(dask_options=fake_dask_options)
-
-    outfile = StringIO()
-    getattr(fs, method)(stream_or_buff=outfile)
-    outfile.seek(0)
-    content = outfile.read()
-
-    assert content in expected
-
-
-@pytest.mark.parametrize(
-    "method",
-    ["to_json", "to_yaml"],
-    ids=["json", "yaml"],
-)
-def test_FeatureSpace_persistence_path(
-    mock_extractor_registry,
-    fake_extractor_cls,
-    mocker,
-    method,
-):
-    extractor_clss = [
-        fake_extractor_cls(features=["feature1"], data=["data1"]),
-        fake_extractor_cls(features=["feature2"], data=["data2"]),
-    ]
-    mock_extractor_registry(extractor_clss)
+    fake_yaml = "fake_yaml"
+    mock_store_yaml(fake_yaml)
 
     fake_dask_options = {"key": "value"}
 
     fs = FeatureSpace(dask_options=fake_dask_options)
 
-    fake_path = "output"
-    open_mock = mocker.mock_open()
-
-    mocker.patch("feets.core.open", open_mock, create=True)
-    getattr(fs, method)(stream_or_buff=fake_path)
-
-    open_mock.assert_called_with("output", "w")
+    np.testing.assert_equal(fs.to_yaml(), fake_yaml)
 
 
 def test_FeatureSpace_extract(

@@ -65,7 +65,8 @@ def doc_inherit(parent, warn_class=True):
         if isclass(obj) and warn_class:
             warnings.warn(
                 f"{obj} is a class, check if the "
-                "documentation was inherited properly "
+                "documentation was inherited properly ",
+                stacklevel=1,
             )
         dec = _doc_inherit(parent, style="numpy")
         return dec(obj)

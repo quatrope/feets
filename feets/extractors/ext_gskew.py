@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Gskew extractor."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,7 +30,11 @@ from .extractor import Extractor
 
 
 class Gskew(Extractor):
-    r"""Median-of-magnitudes based measure of the skew.
+    r"""Gskew extractor.
+
+    **Gskew**
+
+    Median-of-magnitudes based measure of the skew.
 
     .. math::
 
@@ -42,11 +47,11 @@ class Gskew(Extractor):
     - :math:`m_{q97}` is the median of magnitudes greater or equal than the
       quantile 97.
     - :math:`m` is the median of magnitudes.
-
     """
 
     features = ["Gskew"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         median_mag = np.median(magnitude)
         F_3_value = np.percentile(magnitude, 3)

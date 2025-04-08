@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-__doc__ = """"""
+"""Q31 related extractors."""
 
 
 # =============================================================================
@@ -21,6 +21,7 @@ __doc__ = """"""
 import numpy as np
 
 from .extractor import Extractor
+from ..libs import doctools
 
 
 # =============================================================================
@@ -29,7 +30,8 @@ from .extractor import Extractor
 
 
 class Q31(Extractor):
-    r"""
+    r"""Q31 extractor.
+
     **Q31** (:math:`Q_{3-1}`)
 
     :math:`Q_{3-1}` is the difference between the third quartile, :math:`Q_3`,
@@ -37,59 +39,55 @@ class Q31(Extractor):
     :math:`Q_1` is a split between the lowest 25% and the highest 75% of data.
     :math:`Q_3` is a split between the lowest 75% and the highest 25% of data.
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['Q31'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Q31': 1.3320376563134508}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['Q31'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Q31': np.float64(1.3329778116209337)}
 
     References
     ----------
-
     .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
-
     """
 
     features = ["Q31"]
 
-    def __init__(self):
-        pass
-
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
         q31 = np.percentile(magnitude, 75) - np.percentile(magnitude, 25)
         return {"Q31": q31}
 
 
 class Q31Color(Extractor):
-    r"""
+    r"""Q31 color extractor.
+
     **Q31_color** (:math:`Q_{3-1|B-R}`)
 
     :math:`Q_{3-1}` applied to the difference between both bands of a light
     curve (B-R).
 
-    .. code-block:: pycon
-
-        >>> fs = feets.FeatureSpace(only=['Q31_color'])
-        >>> features, values = fs.extract(**lc_normal)
-        >>> dict(zip(features, values))
-        {'Q31_color': 1.8840489594535512}
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['Q31_color'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Q31_color': 1.9517477838539978}
 
     References
     ----------
-
     .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
-
     """
 
     features = ["Q31_color"]
 
+    @doctools.doc_inherit(Extractor.extract)
     def extract(self, aligned_magnitude, aligned_magnitude2):
         N = len(aligned_magnitude)
         b_r = aligned_magnitude[:N] - aligned_magnitude2[:N]

@@ -6,31 +6,30 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-
 # =============================================================================
-# DOCS
-# =============================================================================
-
-"""Utilities for feets."""
-
-
-# =============================================================================
-# FUNCTIONS
+# IMPORTS
 # =============================================================================
 
 
-def indent(s, c=" ", n=4):
-    """Indent the string 's' with the character 'c', 'n' times.
+from light_curve import Roms as _Roms
 
-    Parameters
-    ----------
-    s : str
-        String to indent
-    c : str, default space
-        String to use as indentation
-    n : int, default 4
-        Number of chars to indent
+from .light_curve_extractor import LightCurveExtractor
+from ...libs import doctools
 
-    """
-    indentation = c * n
-    return "\n".join([indentation + line for line in s.splitlines()])
+
+# =============================================================================
+# EXTRACTOR CLASS
+# =============================================================================
+
+
+class Roms(LightCurveExtractor):
+    features = ["Roms"]
+
+    def __init__(self, transform="identity"):
+        self.transform = transform
+        self._extract = _Roms(**self.params)
+
+    @doctools.doc_inherit(LightCurveExtractor.extract)
+    def extract(self, magnitude, error, time=None):
+        [roms] = self._extract(time, magnitude, error)
+        return {"Roms": roms}

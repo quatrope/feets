@@ -24,7 +24,7 @@ import numpy as np
 
 from scipy.optimize import minimize
 
-from .extractor import Extractor
+from .extractor import Extractor, feature_warning
 from ..libs import doctools
 
 
@@ -170,7 +170,7 @@ class CAR(Extractor):
             loglik = loglik + loglik_inter
 
             if loglik <= CTE_NEG:
-                self.feature_warning("CAR log-likelihood to inf")
+                feature_warning("CAR log-likelihood to inf")
                 return -np.inf
 
         # the minus one is to perfor maximization using the minimize function

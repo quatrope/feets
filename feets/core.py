@@ -20,8 +20,6 @@
 import logging
 from collections.abc import Sequence
 
-import attrs
-
 import joblib
 
 import numpy as np
@@ -47,38 +45,51 @@ logger.setLevel(logging.WARNING)
 # =============================================================================
 
 
-@attrs.define(frozen=True)
 class Features(Sequence):
     """Class to manage and manipulate feature extraction results.
+
+    Parameters
+    ----------
+    features : array_like
+        The extracted features by light curve.
+    extractors : array_like
+        The extractors used to compute the features.
 
     Attributes
     ----------
     features : np.ndarray
         The extracted features by light curve.
     extractors : np.ndarray
-        The extractors used to generate the features.
-    feature_names : set
+        The extractors used to compute the features.
+    feature_names : frozenset
         The names of the extracted features.
     length : int
         The number of light curves.
     """
 
-    features: np.ndarray = attrs.field(converter=np.array, repr=False)
-    extractors: np.ndarray = attrs.field(converter=tuple, repr=False)
-    feature_names: set = attrs.field(init=False, repr=True)
-    length: int = attrs.field(init=False, repr=True)
+    # CONSTRUCTOR =============================================================
 
-    @feature_names.default
-    def _feature_names_defaults(self):
-        return set(self.features[0])
+    def __init__(self, features, extractors):
+        self.features = np.array(features, dtype=dict)
+        self.extractors = np.array(extractors, dtype=object)
 
-    @length.default
-    def _length_defaults(self):
+    # PROPERTIES ==============================================================
+
+    @property
+    def feature_names(self):
+        """frozenset: The names of the extracted features."""
+        return frozenset(self.features[0])
+
+    @property
+    def length(self):
+        """int: The number of light curves."""
         return len(self.features)
 
-    def __attrs_post_init__(self):
-        """Prevent the modification of features."""
-        self.features.setflags(write=False)
+    # MAGIC ===================================================================
+
+    def __repr__(self):
+        """String representation of the Features object."""
+        return f"<Features feature_names={set(self.feature_names)}, length={self.length}>"
 
     def __getattr__(self, feature_name):
         """Access feature values by using name as attribute."""
@@ -96,30 +107,46 @@ class Features(Sequence):
         """Return the list of attributes of the object."""
         return list(vars(type(self))) + list(self.feature_names)
 
-    def _extractors_by_features(self):
-        all_extractors_by_features = {}
+    # API =====================================================================
+
+    def _extractors_by_feature(self):
+        extractors_by_feature = {}
         for extractor in self.extractors:
             extractor_by_feature = dict.fromkeys(
                 extractor.get_features(), extractor
             )
-            all_extractors_by_features.update(extractor_by_feature)
-        return all_extractors_by_features
+            extractors_by_feature.update(extractor_by_feature)
+
+        return extractors_by_feature
 
     def _get_default_jobs(self):
         jobs = min(len(self.features), joblib.cpu_count())
         return jobs
 
-    def _features_as_serie(self, features, extractors_by_feature):
+    @staticmethod
+    def _features_as_serie(features, extractors_by_feature):
         data = {}
         for fname, fvalue in features.items():
             extractor = extractors_by_feature[fname]
-            fflattened = extractor.flatten_feature(fname, fvalue)
-            data.update(fflattened)
+            flattened = extractor.flatten_feature(fname, fvalue)
+            extractor.validate_flatten(fname, flattened)
+            data.update(flattened)
         return pd.Series(data)
 
     def as_frame(self, **kwargs):
-        """Return the features as a pandas DataFrame."""
-        extractors_by_features = self._extractors_by_features()
+        """Return the features as a pandas DataFrame.
+
+        Parameters
+        ----------
+        **kwargs
+            Extra parameters that are passed to the joblib.Parallel constructor.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame with the extracted features by lightcurve.
+        """
+        extractors_by_feature = self._extractors_by_feature()
 
         kwargs.setdefault("prefer", "processes")
         kwargs.setdefault("n_jobs", self._get_default_jobs())
@@ -127,10 +154,11 @@ class Features(Sequence):
         with joblib.Parallel(**kwargs) as P:
             features_as_serie = joblib.delayed(self._features_as_serie)
             all_series = P(
-                features_as_serie(features, extractors_by_features)
+                features_as_serie(features, extractors_by_feature)
                 for features in self.features
             )
         df = pd.DataFrame(all_series)
+        df.index.name = "Light Curve"
         df.columns.name = "Features"
         return df
 
@@ -166,10 +194,16 @@ class FeatureSpace:
     **kwargs
         Extra parameters that are passed to the feature extractors.
 
-    Methods
-    -------
-    extract(**kwargs)
-        Extract all the selected features from the provided data.
+    Attributes
+    ----------
+    features : frozenset
+        The selected features.
+    extractors : np.ndarray
+        The extractor instances in order of their dependencies.
+    required_data : frozenset
+        The data vectors required by the extractors.
+    dask_options : dict
+        Options to be passed to the Dask scheduler.
 
     Examples
     --------
@@ -177,13 +211,13 @@ class FeatureSpace:
 
     >>> fs = feets.FeatureSpace(only=['Std'])
     >>> fs.extract(**lc)
-    Features(feature_names={'Std'}, length=1)
+    <Features feature_names={'Std'}, length=1>
 
     **List of available data as an input:**
 
     >>> fs = feets.FeatureSpace(data=['magnitude','time'])
     >>> fs.extract(**lc)
-    Features(feature_names={...}, length=1)
+    <Features feature_names={...}, length=1>
 
     **List of features and available data as an input:**
 
@@ -194,27 +228,29 @@ class FeatureSpace:
 
     >>> fs = feets.FeatureSpace(data=['magnitude','time'])
     >>> fs.extract(**lc)
-    Features(feature_names={'Mean', 'Beyond1Std'}, length=1)
+    <Features feature_names={'Mean', 'Beyond1Std'}, length=1>
 
     **List of exclusions as an input:**
 
     >>> fs = feets.FeatureSpace(data=['magnitude'])
     >>> fs.extract(**lc)
-    Features(feature_names={'Mean', 'Std', ...}, length=1)
+    <Features feature_names={'Mean', 'Std', ...}, length=1>
     >>> fs = feets.FeatureSpace(data=['magnitude'], exclude=['Mean'])
     >>> fs.extract(**lc)
-    Features(feature_names={'Std', ...}, length=1)
+    <Features feature_names={'Std', ...}, length=1>
     """
 
     # CONSTRUCTOR =============================================================
 
     def _init_extractor(self, extractor_cls, **kwargs):
+        ext_kwargs = kwargs.get(extractor_cls.__name__, {})
         default_params = extractor_cls.get_default_params()
         params = {
-            param: kwargs.get(param, default)
+            param: ext_kwargs.get(param, default)
             for param, default in default_params.items()
         }
-        return extractor_cls(**params)
+        ext = extractor_cls(**params)
+        return ext
 
     def __init__(
         self, data=None, only=None, exclude=None, dask_options=None, **kwargs
@@ -231,17 +267,17 @@ class FeatureSpace:
             extractor_instance = self._init_extractor(extractor_cls, **kwargs)
             extractor_instances.append(extractor_instance)
 
-            features = extractor_instance.get_features()
+            features = extractor_cls.get_features()
             if only is not None:
                 features = features.intersection(only)
             selected_features.update(features)
 
-            required_data.update(extractor_instance.get_data())
+            required_data.update(extractor_cls.get_required_data())
 
         self._extractors = np.array(extractor_instances, dtype=object)
         self._selected_features = frozenset(selected_features)
         self._required_data = frozenset(required_data)
-        self._dask_options = dask_options
+        self.dask_options = dask_options
 
     # FROM LC =================================================================
 
@@ -290,31 +326,60 @@ class FeatureSpace:
             selected_data.intersection_update(lc)
         return cls(data=selected_data)
 
-    @classmethod
-    def from_dict(cls, data):
-        pass
-
     # PROPERTIES ==============================================================
 
     @property
-    def features(self):
+    def selected_features(self):
         """frozenset: The selected features."""
         return self._selected_features
 
     @property
-    def execution_plan(self):
-        """np.ndarray: The extractor instances in order of their \
-        dependencies."""
+    def extractors(self):
+        """np.ndarray: The extractor instances in order of their dependencies."""
         return self._extractors
+
+    @property
+    def required_data(self):
+        """frozenset: The data vectors required by the extractors."""
+        return self._required_data
 
     # MAGIC ===================================================================
 
     def __repr__(self):
-        """Return a string representation of the FeatureSpace object."""
+        """String representation of the FeatureSpace object."""
         space = ", ".join(str(extractor) for extractor in self._extractors)
         return f"<FeatureSpace: {space}>"
 
     # PERSISTENCE ==============================================================
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a FeatureSpace instance from a dictionary representation.
+
+        Parameters
+        ----------
+        data : dict
+            A dictionary representation of the feature space, including selected
+            features, required data, dask options, and extractors.
+
+        Returns
+        -------
+        FeatureSpace
+            A FeatureSpace object with the features, required data, dask options,
+            and extractors from the provided dictionary.
+        """
+        only = data["selected_features"]
+        dask_options = data["dask_options"]
+        kwargs = {}
+        for extractor in data["extractors"]:
+            (ename, ekwargs), = extractor.items()
+            kwargs.update({ename: ekwargs})
+
+        return cls(
+            only=only,
+            dask_options=dask_options,
+            **kwargs,
+        )
 
     def to_dict(self):
         """Convert the feature space to a dictionary representation.
@@ -328,54 +393,51 @@ class FeatureSpace:
         return {
             "selected_features": list(self._selected_features),
             "required_data": list(self._required_data),
-            "dask_options": self._dask_options,
+            "dask_options": self.dask_options,
             "extractors": [
                 extractor.to_dict() for extractor in self._extractors
             ],
         }
 
-    def to_json(self, *, stream_or_buff=None, **kwargs):
-        """Convert the feature space to a JSON string representation.
+    def to_json(self, *, path_or_buffer=None, **kwargs):
+        """Serialize the feature space to a JSON formatted string or file.
 
         Parameters
         ----------
-        stream_or_buff : file-like object, optional
-            A file-like object or a file path to write the JSON string.
-            If ``None``, the JSON string is returned.
+        path_or_buffer : str, pathlib.Path, file-like object or None, optional
+            The file path or buffer to write the JSON data to. If `None`, the JSON
+            data is returned as a string. Defaults to `None`.
         **kwargs
-            Additional parameters to pass to the `json.dump` or
-            json.dumps` function.
+            Additional parameters to pass to `io.store_json`.
 
         Returns
         -------
-        str, None
-            A JSON string representation of the feature space if
-            `stream_or_buff` is ``None``.
+        str
+            The JSON formatted string if `path_or_buffer` is None.
         """
         from . import io  # noqa
 
-        return io.store_json(self, stream_or_buff=stream_or_buff, **kwargs)
+        return io.store_json(self, path_or_buffer=path_or_buffer, **kwargs)
 
-    def to_yaml(self, *, stream_or_buff=None, **kwargs):
-        """Convert the feature space to a YAML string representation.
+    def to_yaml(self, *, path_or_buffer=None, **kwargs):
+        """Serialize the feature space to a YAML formatted string or file.
 
         Parameters
         ----------
-        stream_or_buff : file-like object, optional
-            A file-like object or a file path to write the YAML string.
-            If ``None``, the YAML string is returned.
+        path_or_buffer : str, pathlib.Path, file-like object or None, optional
+            The file path or buffer to write the YAML data to. If `None`, the JSON
+            data is returned as a string. Defaults to `None`.
         **kwargs
-            Additional parameters to pass to the `yaml.dump` function.
+            Additional parameters to pass to `io.store_json`.
 
         Returns
         -------
-        str, None
-            A YAML string representation of the feature space if
-            `stream_or_buff` is ``None``.
+        str
+            The YAML formatted string if `path_or_buffer` is None.
         """
         from . import io  # noqa
 
-        return io.store_yaml(self, stream_or_buff=stream_or_buff, **kwargs)
+        return io.store_yaml(self, path_or_buffer=path_or_buffer, **kwargs)
 
     # API =====================================================================
 
@@ -422,7 +484,7 @@ class FeatureSpace:
             extractors=self._extractors,
             selected_features=self._selected_features,
             required_data=self._required_data,
-            dask_options=self._dask_options,
+            dask_options=self.dask_options,
             lcs=lcs,
         )
 

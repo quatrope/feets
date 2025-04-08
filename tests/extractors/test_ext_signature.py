@@ -6,7 +6,7 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_amplitude, ext_lomb_scargle, ext_signature
+from feets.extractors import ext_astropy_lomb_scargle, ext_median_amplitude, ext_signature
 
 import numpy as np
 
@@ -23,8 +23,8 @@ def test_Signature_extract(periodic_light_curve):
     extractor_sig = ext_signature.Signature(
         phase_bins=phase_bins, mag_bins=mag_bins
     )
-    extractor_ls = ext_lomb_scargle.LombScargle()
-    extractor_amp = ext_amplitude.Amplitude()
+    extractor_ls = ext_astropy_lomb_scargle.AstropyLombScargle()
+    extractor_amp = ext_median_amplitude.MedianAmplitude()
 
     labels = [
         f"ph_{j}_mag_{i}" for i in range(mag_bins) for j in range(phase_bins)
@@ -48,7 +48,7 @@ def test_Signature_extract(periodic_light_curve):
         PeriodLS = extractor_ls.extract(**lc, time=time)["PeriodLS"]
 
         results = extractor_sig.extract(
-            **lc, time=time, PeriodLS=PeriodLS, Amplitude=Amplitude
+            **lc, time=time, Astropy_PeriodLS=PeriodLS, MedianAmplitude=Amplitude
         )["Signature"]
 
         np.testing.assert_(len(results) == 3)
