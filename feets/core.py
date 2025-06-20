@@ -155,19 +155,12 @@ class FeatureSpace:
     # FROM LC =================================================================
 
     @classmethod
-    def _coerce_lightcurves(cls, *, single_lc, multiple_lc):
-        if single_lc and multiple_lc:
-            raise ValueError(
-                "Please provide either a single light curve or a list of light "
-                "curves, but not both."
-            )
+    def from_lightcurves(cls, *lcs):
+        """Create a FeatureSpace for the provided light curves.
 
-        return [single_lc] if single_lc else multiple_lc
-
-    @classmethod
-    def from_lightcurves(cls, *lcs, **lc):
-        """Return a FeatureSpace object from a set of light curves data \
-        present in one of multiple lightcurves.
+        The resulting FeatureSpace will include all the features that can be
+        extracted from the intersection of the data vectors in the provided
+        light curves.
 
         Parameters
         ----------
@@ -179,25 +172,53 @@ class FeatureSpace:
         Returns
         -------
         FeatureSpace
-            A FeatureSpace object with the features that can be extracted from
-            the provided light curves.
+            A FeatureSpace object with all the features that can be possibly
+            extracted from the data vectors available in the intersection of
+            all the provided light curves.
 
         Examples
         --------
-        >>> fs = feets.FeatureSpace.from_lightcurves(lc)
-        >>> fs.extract(**lc)
-        Features(feature_names={...}, length=1)
-
+        >>> lcs = [
+        ...     {'magnitude': [1, 2, 3]},
+        ...     {'time': [1, 2, 3], 'magnitude': [4, 5, 6]}
+        ... ]
         >>> fs = feets.FeatureSpace.from_lightcurves(*lcs)
         >>> fs.extract(*lcs)
-        Features(feature_names={...}, length=1)
+        Features(feature_names={...}, length=2)
 
         """
-        lcs = cls._coerce_lightcurves(single_lc=lc, multiple_lc=lcs)
         selected_data = set(extractors.DATAS)
         for lc in lcs:
             selected_data.intersection_update(lc)
         return cls(data=selected_data)
+
+    @classmethod
+    def from_lightcurve(cls, **lc):
+        """Create a FeatureSpace for the provided light curve.
+
+        The resulting FeatureSpace will include all the features that can be
+        extracted from the data vectors in the provided light curve.
+
+        Parameters
+        ----------
+        lc : dict
+            A light curve represented as a dictionary.
+
+        Returns
+        -------
+        FeatureSpace
+            A FeatureSpace object with all the features that can be possibly
+            extracted from the data vectors available in the provided light curve.
+
+        Examples
+        --------
+        >>> lc = {'magnitude': [1, 2, 3]}
+        >>> fs = feets.FeatureSpace.from_lightcurve(**lc)
+        >>> fs.extract(**lc)
+        Features(feature_names={...}, length=1)
+
+        """
+        return cls.from_lightcurves(lc)
 
     # PROPERTIES ==============================================================
 
@@ -314,22 +335,13 @@ class FeatureSpace:
 
     # API =====================================================================
 
-    def extract(self, *lcs, **lc):
+    def extract_many(self, *lcs):
         """Extract the selected features from the provided light curves.
-
-        Note that only one of `lcs` or `lc` can be provided.
 
         Parameters
         ----------
-        *lcs : array_like of dict, optional
+        *lcs : array_like of dict
             A list of light curves represented as dictionaries.
-        **lc : dict, optional
-            A single light curve represented as a dictionary.
-
-        Raises
-        ------
-        ValueError
-            Both `lc` and `lcs` are provided.
 
         Returns
         -------
@@ -338,21 +350,11 @@ class FeatureSpace:
 
         Examples
         --------
-        **Single light curve:**
-
         >>> fs = feets.FeatureSpace(only=['Std'])
-        >>> fs.extract(magnitude=[1, 2, 3])
-        Features(feature_names={'Std'}, length=1)
-
-        **Multiple light curves:**
-
-        >>> fs = feets.FeatureSpace(only=['Std'])
-        >>> fs.extract({'magnitude': [1, 2, 3]}, {'magnitude': [4, 5, 6]})
+        >>> fs.extract_many({'magnitude': [1, 2, 3]}, {'magnitude': [4, 5, 6]})
         Features(feature_names={'Std'}, length=2)
 
         """
-        lcs = self._coerce_lightcurves(single_lc=lc, multiple_lc=lcs)
-
         features_by_lc = runner.run(
             extractors=self._extractors,
             selected_features=self._selected_features,
@@ -362,3 +364,24 @@ class FeatureSpace:
         )
 
         return Features(features=features_by_lc, extractors=self._extractors)
+
+    def extract(self, **lc):
+        """Extract the selected features from the provided light curve.
+
+        Parameters
+        ----------
+        **lc : dict
+            A light curve represented as a dictionary.
+
+        Returns
+        -------
+        Features
+            A collection of extracted features of the provided light curves.
+
+        Examples
+        --------
+        >>> fs = feets.FeatureSpace(only=['Std'])
+        >>> fs.extract(magnitude=[1, 2, 3])
+        Features(feature_names={'Std'}, length=1)
+        """
+        return self.extract_many(lc)
