@@ -9,10 +9,10 @@
 
 from feets.extractors.extractor import Extractor
 from feets.extractors.registry import (
-    DependencyNotFound,
+    DependenciesNotFound,
     ExtractorRegistry,
-    FeatureAlreadyRegistered,
-    FeatureNotFound,
+    FeaturesAlreadyRegistered,
+    FeaturesNotFound,
 )
 
 import numpy as np
@@ -99,14 +99,14 @@ def test_register_extractor_missing_dependencies(mocker, registry):
     mocker.patch.object(
         extractor, "get_dependencies", result_value={"missing_feature"}
     )
-    with assert_raises(DependencyNotFound):
+    with assert_raises(DependenciesNotFound):
         registry.register_extractor(extractor)
 
 
 def test_register_extractor_feature_already_registered(registry):
     extractor = MockExtractorA
     registry.register_extractor(extractor)
-    with assert_raises(FeatureAlreadyRegistered):
+    with assert_raises(FeaturesAlreadyRegistered):
         registry.register_extractor(extractor)
 
 
@@ -153,7 +153,7 @@ def test_extractor_of_valid(registry):
 
 
 def test_extractor_of_invalid(registry):
-    with assert_raises(FeatureNotFound):
+    with assert_raises(FeaturesNotFound):
         registry.extractor_of("feature1")
 
 
@@ -195,7 +195,7 @@ def test_extractors_from_features_valid(registry):
 
 
 def test_extractors_from_features_invalid(registry):
-    with assert_raises(FeatureNotFound):
+    with assert_raises(FeaturesNotFound):
         registry.extractors_from_features({"feature1"})
 
 

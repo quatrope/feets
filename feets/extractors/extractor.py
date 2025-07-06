@@ -76,6 +76,15 @@ class ExtractorTransformError(RuntimeError):
     """The extractor can't transform the data into the expected format."""
 
 
+class InvalidDataError(ValueError):
+    """The provided data vectors are invalid."""
+
+    def __init__(self, invalid_data):
+        super().__init__(
+            f"Invalid data vectors: {", ".join(map(repr, invalid_data))}."
+        )
+
+
 class ExtractorWarning(UserWarning):
     """Warn about the Extractor behavior."""
 
@@ -600,8 +609,8 @@ class Extractor(abc.ABC):
 
         if diff:
             cls_name = type(self).__qualname__
-            expected_str = ", ".join(expected_features)
-            results_str = ", ".join(features.keys())
+            expected_str = ", ".join(map(repr, expected_features))
+            results_str = ", ".join(map(repr, features.keys()))
             raise ExtractorValidationError(
                 f"The extractor '{cls_name}' expected the features "
                 f"{expected_str}. Found: {results_str!r}"

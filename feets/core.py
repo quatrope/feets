@@ -21,8 +21,11 @@ import logging
 
 import numpy as np
 
-from . import extractors, runner
+from .extractors.registry import RegistryError
+
+from .extractors import DATAS, extractor_registry
 from .features import Features
+from .runner import run
 
 __all__ = ["Features", "FeatureSpace"]
 
@@ -78,6 +81,11 @@ class FeatureSpace:
     dask_options : dict
         Options to be passed to the Dask scheduler.
 
+    Raises
+    ------
+    ValueError
+        If an invalid combination of `data`, `only`, and `exclude` is provided.
+
     Examples
     --------
     **List of features as an input:**
@@ -116,21 +124,19 @@ class FeatureSpace:
     # CONSTRUCTOR =============================================================
 
     def _init_extractor(self, extractor_cls, **kwargs):
-        ext_kwargs = kwargs.get(extractor_cls.__name__, {})
-        default_params = extractor_cls.get_default_params()
-        params = {
-            param: ext_kwargs.get(param, default)
-            for param, default in default_params.items()
-        }
-        ext = extractor_cls(**params)
-        return ext
+        params = kwargs.get(extractor_cls.__name__, {})
+        extractor = extractor_cls(**params)
+        return extractor
 
     def __init__(
         self, data=None, only=None, exclude=None, dask_options=None, **kwargs
     ):
-        extractor_clss = extractors.extractor_registry.get_execution_plan(
-            data=data, only=only, exclude=exclude
-        )
+        try:
+            extractor_clss = extractor_registry.get_execution_plan(
+                data=data, only=only, exclude=exclude
+            )
+        except RegistryError as exc:
+            raise ValueError from exc
 
         extractor_instances = []
         selected_features = set()
@@ -187,7 +193,7 @@ class FeatureSpace:
         Features(feature_names={...}, length=2)
 
         """
-        selected_data = set(extractors.DATAS)
+        selected_data = set(DATAS)
         for lc in lcs:
             selected_data.intersection_update(lc)
         return cls(data=selected_data)
@@ -241,7 +247,7 @@ class FeatureSpace:
 
     def __repr__(self):
         """String representation of the FeatureSpace object."""
-        space = ", ".join(str(extractor) for extractor in self._extractors)
+        space = ", ".join(map(repr, self._extractors))
         return f"<FeatureSpace: {space}>"
 
     # PERSISTENCE ==============================================================
@@ -285,8 +291,8 @@ class FeatureSpace:
             features, required data, dask options, and extractors.
         """
         return {
-            "selected_features": list(self._selected_features),
-            "required_data": list(self._required_data),
+            "selected_features": set(self._selected_features),
+            "required_data": set(self._required_data),
             "dask_options": self.dask_options,
             "extractors": [
                 extractor.to_dict() for extractor in self._extractors
@@ -355,12 +361,12 @@ class FeatureSpace:
         Features(feature_names={'Std'}, length=2)
 
         """
-        features_by_lc = runner.run(
+        features_by_lc = run(
             extractors=self._extractors,
             selected_features=self._selected_features,
             required_data=self._required_data,
             dask_options=self.dask_options,
-            lcs=lcs,
+            lcs=list(lcs),
         )
 
         return Features(features=features_by_lc, extractors=self._extractors)

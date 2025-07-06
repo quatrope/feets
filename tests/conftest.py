@@ -28,7 +28,7 @@ def normal_light_curve():
         data = extractor.DATAS if data is None else data
         diff = set(data).difference(extractor.DATAS)
         if diff:
-            raise ValueError(f"Invalid data/s {diff}")
+            raise extractor.InvalidDataError(diff)
 
         lc = {}
         for data_name in data:
@@ -48,7 +48,7 @@ def uniform_light_curve():
         data = extractor.DATAS if data is None else data
         diff = set(data).difference(extractor.DATAS)
         if diff:
-            raise ValueError(f"Invalid data/s {diff}")
+            raise extractor.InvalidDataError(diff)
 
         lc = {}
         for data_name in data:
@@ -68,7 +68,7 @@ def periodic_light_curve():
         data = extractor.DATAS if data is None else data
         diff = set(data).difference(extractor.DATAS)
         if diff:
-            raise ValueError(f"Invalid data/s {diff}")
+            raise extractor.InvalidDataError(diff)
 
         lc = {}
         for data_name in data:
