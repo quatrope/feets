@@ -21,9 +21,8 @@ import logging
 
 import numpy as np
 
-from .extractors.registry import RegistryError
-
 from .extractors import DATAS, extractor_registry
+from .extractors.registry import RegistryError
 from .features import Features
 from .runner import run
 
@@ -100,7 +99,7 @@ class FeatureSpace:
     >>> # The resulting `FeatureSpace` will only extract the features that
     >>> # depend on 'magnitude' and/or 'time'.
     >>> fs.extract(**lc)
-    <Features feature_names={'Mean', 'Std', 'Amplitude', 'PeriodLS', 'Signature', ...}, length=1>
+    <Features feature_names={'Mean', 'Std', 'PeriodLS', 'Signature', ...}, length=1>
 
     Using `only` to select specific features for extraction:
 
@@ -116,7 +115,7 @@ class FeatureSpace:
     >>> # The resulting `FeatureSpace` will extract all features except for
     >>> # 'Mean' and 'Std', regardless of the available data vectors.
     >>> fs.extract(**lc)
-    <Features feature_names={'Amplitude', 'PeriodLS', 'Signature', ...}, length=1>
+    <Features feature_names={'PeriodLS', 'Signature', ...}, length=1>
 
     Configuring the extractors with additional parameters:
     >>> fs = FeatureSpace(
@@ -128,7 +127,7 @@ class FeatureSpace:
     >>> # 'magnitude' and 'time', with the specified parameters for the
     >>> # `PeriodLS` and `Signature` extractors.
     >>> fs.extract(**lc)
-    <Features feature_names={'Mean', 'Std', 'Amplitude', 'PeriodLS', 'Signature', ...}, length=1>
+    <Features feature_names={'Mean', 'Std', 'PeriodLS', 'Signature', ...}, length=1>
 
     """
 

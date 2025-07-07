@@ -52,9 +52,8 @@ class LightCurveExtractor(Extractor):
 
     @doctools.doc_inherit(Extractor.prepare_extract)
     def prepare_extract(self, data, dependencies):
-
-        shape = (
-            len(data.get(DATA_TIME))
+        shape = len(
+            data.get(DATA_TIME)
             or data.get(DATA_MAGNITUDE)
             or data.get(DATA_FLUX)
         )
@@ -79,12 +78,12 @@ class LightCurveExtractor(Extractor):
             DATA_ERROR: (
                 np.ones(shape, dtype=dtype)
                 if data.get(DATA_ERROR) is None
-                else np.array(1 / data.get(DATA_ERROR)**2, dtype=dtype)
+                else np.array(1 / data.get(DATA_ERROR) ** 2, dtype=dtype)
             ),
             DATA_FLUX_ERROR: (
                 np.ones(shape, dtype=dtype)
                 if data.get(DATA_FLUX_ERROR) is None
-                else np.array(1 / data.get(DATA_FLUX_ERROR)**2, dtype=dtype)
+                else np.array(1 / data.get(DATA_FLUX_ERROR) ** 2, dtype=dtype)
             ),
         }
 

@@ -52,16 +52,16 @@ def Extractor_mocker(mocker):
     def maker(
         *,
         name="Extractor",
-        features=set(),
-        required_data=set(),
-        params=dict(),
+        features=None,
+        required_data=None,
+        params=None,
     ):
         mock = mocker.Mock()
         mock.__name__ = name
-        mock.get_features.return_value = frozenset(features)
-        mock.get_required_data.return_value = frozenset(required_data)
-        mock.return_value.params.return_value = dict(params)
-        mock.return_value.to_dict.return_value = {name: params}
+        mock.get_features.return_value = frozenset(features or [])
+        mock.get_required_data.return_value = frozenset(required_data or [])
+        mock.return_value.params.return_value = dict(params or {})
+        mock.return_value.to_dict.return_value = {name: params or {}}
 
         return mock
 
@@ -164,7 +164,7 @@ def test_FeatureSpace_init_filters(get_execution_plan_mock):
         "exclude": {FEATURE_3},
     }
 
-    fs = FeatureSpace(**filters)
+    FeatureSpace(**filters)
 
     get_execution_plan_mock.assert_called_once_with(**filters)
 
@@ -199,7 +199,7 @@ def test_FeatureSpace_from_lightcurves(DATAS_mock, get_execution_plan_mock):
     lc1 = {DATA_1: 1, DATA_2: 2, DATA_3: 3}
     lc2 = {DATA_2: 2, DATA_3: 3, DATA_4: 4}
 
-    fs = FeatureSpace.from_lightcurves(lc1, lc2)
+    FeatureSpace.from_lightcurves(lc1, lc2)
 
     get_execution_plan_mock.assert_called_once_with(
         data={DATA_2, DATA_3}, only=None, exclude=None
@@ -209,7 +209,7 @@ def test_FeatureSpace_from_lightcurves(DATAS_mock, get_execution_plan_mock):
 def test_FeatureSpace_from_lightcurves_empty(
     DATAS_mock, get_execution_plan_mock
 ):
-    fs = FeatureSpace.from_lightcurves()
+    FeatureSpace.from_lightcurves()
 
     get_execution_plan_mock.assert_called_once_with(
         data=set(ALL_DATA), only=None, exclude=None
@@ -229,7 +229,7 @@ def test_FeatureSpace_from_lightcurves_disjoint(
 def test_FeatureSpace_from_lightcurve(DATAS_mock, get_execution_plan_mock):
     lc = {DATA_1: 1, DATA_2: 2, DATA_3: 3}
 
-    fs = FeatureSpace.from_lightcurve(**lc)
+    FeatureSpace.from_lightcurve(**lc)
 
     get_execution_plan_mock.assert_called_once_with(
         data={DATA_1, DATA_2, DATA_3}, only=None, exclude=None
