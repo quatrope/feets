@@ -169,6 +169,13 @@ def test_FeatureSpace_init_filters(get_execution_plan_mock):
     get_execution_plan_mock.assert_called_once_with(**filters)
 
 
+def test_FeatureSpace_init_conflicting_filters(get_execution_plan_mock):
+    get_execution_plan_mock.side_effect = RegistryError()
+
+    with pytest.raises(ValueError):
+        FeatureSpace(only={FEATURE_1}, exclude={FEATURE_1})
+
+
 def test_FeatureSpace_init_kwargs(Extractor_mocker, get_execution_plan_mock):
     Extractor1 = Extractor_mocker(name="Extractor1")
     Extractor2 = Extractor_mocker(name="Extractor2")
@@ -186,13 +193,6 @@ def test_FeatureSpace_init_kwargs(Extractor_mocker, get_execution_plan_mock):
 
     Extractor1.assert_called_once_with(**{PARAM_1: 1, PARAM_2: 2})
     Extractor2.assert_called_once_with(**{PARAM_3: 3})
-
-
-def test_FeatureSpace_init_conflicting_filters(get_execution_plan_mock):
-    get_execution_plan_mock.side_effect = RegistryError()
-
-    with pytest.raises(ValueError):
-        FeatureSpace(only={FEATURE_1}, exclude={FEATURE_1})
 
 
 def test_FeatureSpace_from_lightcurves(DATAS_mock, get_execution_plan_mock):
@@ -222,11 +222,8 @@ def test_FeatureSpace_from_lightcurves_disjoint(
     lc1 = {DATA_1: 1, DATA_2: 2}
     lc2 = {DATA_3: 3, DATA_4: 4}
 
-    fs = FeatureSpace.from_lightcurves(lc1, lc2)
-
-    get_execution_plan_mock.assert_called_once_with(
-        data=set(), only=None, exclude=None
-    )
+    with pytest.raises(ValueError):
+        FeatureSpace.from_lightcurves(lc1, lc2)
 
 
 def test_FeatureSpace_from_lightcurve(DATAS_mock, get_execution_plan_mock):

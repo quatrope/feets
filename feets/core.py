@@ -62,22 +62,24 @@ class FeatureSpace:
         of the selected data will be included.
     only : array_like, optional
         List of features to be included in the output. If provided, only the
-        selected features will be extracted.
+        selected features will be extracted. It must be disjoint with
+        `exclude`.
     exclude : array_like, optional
         List of features to be excluded from the output. If provided, all
         features except the selected ones will be extracted. It must be
         disjoint with `only`.
     **kwargs
-        Extra parameters that are passed to the feature extractors.
+        Extra parameters used to initialize the extractors.
 
     Attributes
     ----------
     features : frozenset
-        The selected features.
+        The features selected for extraction, based on the provided filters.
     extractors : np.ndarray
-        The extractor instances in order of their dependencies.
+        The extractor instances used to compute the features, ordered by their
+        dependencies.
     required_data : frozenset
-        The data vectors required by the extractors.
+        The data vectors required for the extraction.
     dask_options : dict
         Options to be passed to the Dask scheduler.
 
@@ -88,37 +90,46 @@ class FeatureSpace:
 
     Examples
     --------
-    **List of features as an input:**
+    The `FeatureSpace` can be initialized with different combinations of
+    `data`, `only`, and `exclude` parameters to control the features that will
+    be extracted from the light curves.
 
-    >>> fs = feets.FeatureSpace(only=['Std'])
+    Using `data` to specify the available data vectors:
+
+    >>> fs = FeatureSpace(data=['magnitude', 'time'])
+    >>> # The resulting `FeatureSpace` will only extract the features that
+    >>> # depend on 'magnitude' and/or 'time'.
     >>> fs.extract(**lc)
-    <Features feature_names={'Std'}, length=1>
+    <Features feature_names={'Mean', 'Std', 'Amplitude', 'PeriodLS', 'Signature', ...}, length=1>
 
-    **List of available data as an input:**
+    Using `only` to select specific features for extraction:
 
-    >>> fs = feets.FeatureSpace(data=['magnitude','time'])
+    >>> fs = FeatureSpace(only=['Mean', 'Std'])
+    >>> # The resulting `FeatureSpace` will only extract the 'Mean' and 'Std'
+    >>> # features, regardless of the available data vectors.
     >>> fs.extract(**lc)
-    <Features feature_names={...}, length=1>
+    <Features feature_names={'Mean', 'Std'}, length=1>
 
-    **List of features and available data as an input:**
+    Using `exclude` to exclude specific features from extraction:
 
-    >>> fs = feets.FeatureSpace(
-    ...     only=['Mean','Beyond1Std', 'CAR_sigma','Color'],
-    ...     data=['magnitude', 'error'])
+    >>> fs = FeatureSpace(exclude=['Mean', 'Std'])
+    >>> # The resulting `FeatureSpace` will extract all features except for
+    >>> # 'Mean' and 'Std', regardless of the available data vectors.
     >>> fs.extract(**lc)
+    <Features feature_names={'Amplitude', 'PeriodLS', 'Signature', ...}, length=1>
 
-    >>> fs = feets.FeatureSpace(data=['magnitude','time'])
+    Configuring the extractors with additional parameters:
+    >>> fs = FeatureSpace(
+    ...     data=['magnitude', 'time'],
+    ...     PeriodLS={'nperiods': 5},
+    ...     Signature={'phase_bins': 20, 'mag_bins': 15}
+    ... )
+    >>> # The resulting `FeatureSpace` will extract features that depend on
+    >>> # 'magnitude' and 'time', with the specified parameters for the
+    >>> # `PeriodLS` and `Signature` extractors.
     >>> fs.extract(**lc)
-    <Features feature_names={'Mean', 'Beyond1Std'}, length=1>
+    <Features feature_names={'Mean', 'Std', 'Amplitude', 'PeriodLS', 'Signature', ...}, length=1>
 
-    **List of exclusions as an input:**
-
-    >>> fs = feets.FeatureSpace(data=['magnitude'])
-    >>> fs.extract(**lc)
-    <Features feature_names={'Mean', 'Std', ...}, length=1>
-    >>> fs = feets.FeatureSpace(data=['magnitude'], exclude=['Mean'])
-    >>> fs.extract(**lc)
-    <Features feature_names={'Std', ...}, length=1>
     """
 
     # CONSTRUCTOR =============================================================
@@ -136,7 +147,7 @@ class FeatureSpace:
                 data=data, only=only, exclude=exclude
             )
         except RegistryError as exc:
-            raise ValueError from exc
+            raise ValueError(str(exc))
 
         extractor_instances = []
         selected_features = set()
@@ -162,66 +173,88 @@ class FeatureSpace:
 
     @classmethod
     def from_lightcurves(cls, *lcs):
-        """Create a FeatureSpace for the provided light curves.
+        """Create a `FeatureSpace` for the provided light curves.
 
-        The resulting FeatureSpace will include all the features that can be
-        extracted from the intersection of the data vectors in the provided
-        light curves.
+        This method determines the common data vectors (e.g., 'magnitude',
+        'time') present across all provided light curves. It then creates a
+        `FeatureSpace` configured to extract only the features that can be
+        computed from this common set of data vectors.
 
         Parameters
         ----------
-        *lcs : optional
-            A list of light curves represented as dictionaries.
-        **lc : optional
-            A single light curve represented as a dictionary.
+        *lcs : list of dict
+            A list of light curves, where each light curve is a dictionary
+            mapping data vector names to their values.
 
         Returns
         -------
         FeatureSpace
-            A FeatureSpace object with all the features that can be possibly
-            extracted from the data vectors available in the intersection of
-            all the provided light curves.
+            A `FeatureSpace` instance configured for the common data vectors.
+
+        Raises
+        ------
+        ValueError
+            If no common data vectors are found among the light curves.
+
+        See Also
+        --------
+        from_lightcurve
 
         Examples
         --------
-        >>> lcs = [
-        ...     {'magnitude': [1, 2, 3]},
-        ...     {'time': [1, 2, 3], 'magnitude': [4, 5, 6]}
-        ... ]
-        >>> fs = feets.FeatureSpace.from_lightcurves(*lcs)
-        >>> fs.extract(*lcs)
-        Features(feature_names={...}, length=2)
+        >>> lc1 = {'magnitude': [1, 2, 3]}
+        >>> lc2 = {'time': [0.1, 0.2, 0.3], 'magnitude': [4, 5, 6]}
+        >>>
+        >>> # The common data vector is 'magnitude'.
+        >>> fs = FeatureSpace.from_lightcurves(lc1, lc2)
+        >>>
+        >>> # The resulting `FeatureSpace` will only extract features that
+        >>> # depend on 'magnitude'.
+        >>> fs.extract(**lc1)
+        Features(feature_names={'Mean', 'Std', ...}, length=1)
 
         """
         selected_data = set(DATAS)
         for lc in lcs:
             selected_data.intersection_update(lc)
+        if not selected_data:
+            raise ValueError(
+                "No common data vectors found in the provided light curves."
+            )
         return cls(data=selected_data)
 
     @classmethod
     def from_lightcurve(cls, **lc):
-        """Create a FeatureSpace for the provided light curve.
+        """Create a `FeatureSpace` for the provided light curve.
 
-        The resulting FeatureSpace will include all the features that can be
-        extracted from the data vectors in the provided light curve.
+        The resulting `FeatureSpace` will be configured to extract only the
+        features that can be computed from the data vectors present in the
+        provided light curve.
 
         Parameters
         ----------
-        lc : dict
-            A light curve represented as a dictionary.
+        **lc : dict
+            A light curve represented as a dictionary, mapping data vector names
+            to their values.
 
         Returns
         -------
         FeatureSpace
-            A FeatureSpace object with all the features that can be possibly
-            extracted from the data vectors available in the provided light curve.
+            A `FeatureSpace` instance configured for the provided light curve.
+
+        See Also
+        --------
+        from_lightcurves
 
         Examples
         --------
         >>> lc = {'magnitude': [1, 2, 3]}
-        >>> fs = feets.FeatureSpace.from_lightcurve(**lc)
+        >>> fs = FeatureSpace.from_lightcurve(**lc)
+        >>>
+        >>> # The resulting `FeatureSpace` will only extract features that
+        >>> # depend on 'magnitude'.
         >>> fs.extract(**lc)
-        Features(feature_names={...}, length=1)
+        Features(feature_names={'Mean', 'Std', ...}, length=1)
 
         """
         return cls.from_lightcurves(lc)
@@ -230,23 +263,28 @@ class FeatureSpace:
 
     @property
     def selected_features(self):
-        """frozenset: The selected features."""
+        """frozenset: The features selected for extraction."""
         return self._selected_features
 
     @property
     def extractors(self):
-        """np.ndarray: The extractor instances in order of their dependencies."""
+        """np.ndarray: The extractor instances used to compute the features.
+
+        The extractors are ordered according to their dependencies, meaning that
+        the extractors that depend on others come after those they depend on.
+
+        """
         return self._extractors
 
     @property
     def required_data(self):
-        """frozenset: The data vectors required by the extractors."""
+        """frozenset: The data vectors required for the extraction."""
         return self._required_data
 
     # MAGIC ===================================================================
 
     def __repr__(self):
-        """String representation of the FeatureSpace object."""
+        """String representation of the `FeatureSpace` object."""
         space = ", ".join(map(repr, self._extractors))
         return f"<FeatureSpace: {space}>"
 
@@ -254,19 +292,26 @@ class FeatureSpace:
 
     @classmethod
     def from_dict(cls, data):
-        """Create a FeatureSpace instance from a dictionary representation.
+        """Create a `FeatureSpace` object from a dictionary representation.
 
         Parameters
         ----------
         data : dict
-            A dictionary representation of the feature space, including selected
-            features, required data, dask options, and extractors.
+            A dictionary representation of the `FeatureSpace`, including the data
+            vectors required for extraction, the selected features, the list of
+            extractors with their parameters, and the Dask options.
 
         Returns
         -------
         FeatureSpace
-            A FeatureSpace object with the features, required data, dask options,
-            and extractors from the provided dictionary.
+            A `FeatureSpace` object configured with the features, required
+            data vectors, dask options, and extractors from the provided
+            dictionary.
+
+        See Also
+        --------
+        to_dict
+
         """
         only = data["selected_features"]
         dask_options = data["dask_options"]
@@ -282,13 +327,19 @@ class FeatureSpace:
         )
 
     def to_dict(self):
-        """Convert the feature space to a dictionary representation.
+        """Convert the `FeatureSpace` object to a dictionary representation.
 
         Returns
         -------
         dict
-            A dictionary representation of the feature space, including selected
-            features, required data, dask options, and extractors.
+            A dictionary representation of the `FeatureSpace`, including the data
+            vectors required for extraction, the selected features, the list of
+            extractors with their parameters, and the Dask options.
+
+        See Also
+        --------
+        from_dict, to_json, to_yaml
+
         """
         return {
             "selected_features": set(self._selected_features),
@@ -300,7 +351,7 @@ class FeatureSpace:
         }
 
     def to_json(self, *, path_or_buffer=None, **kwargs):
-        """Serialize the feature space to a JSON formatted string or file.
+        """Serialize the `FeatureSpace` to a JSON formatted string or file.
 
         Parameters
         ----------
@@ -314,13 +365,18 @@ class FeatureSpace:
         -------
         str
             The JSON formatted string if `path_or_buffer` is None.
+
+        See Also
+        --------
+        to_dict, to_yaml
+
         """
         from . import io  # noqa
 
         return io.store_json(self, path_or_buffer=path_or_buffer, **kwargs)
 
     def to_yaml(self, *, path_or_buffer=None, **kwargs):
-        """Serialize the feature space to a YAML formatted string or file.
+        """Serialize the `FeatureSpace` to a YAML formatted string or file.
 
         Parameters
         ----------
@@ -334,6 +390,7 @@ class FeatureSpace:
         -------
         str
             The YAML formatted string if `path_or_buffer` is None.
+
         """
         from . import io  # noqa
 
@@ -346,19 +403,25 @@ class FeatureSpace:
 
         Parameters
         ----------
-        *lcs : array_like of dict
-            A list of light curves represented as dictionaries.
+        *lcs : list of dict
+            A list of light curves, where each light curve is a dictionary
+            mapping data vector names to their values.
 
         Returns
         -------
         Features
             A collection of extracted features of the provided light curves.
 
+        See Also
+        --------
+        Features : Class to manage and manipulate feature extraction results.
+        extract
+
         Examples
         --------
-        >>> fs = feets.FeatureSpace(only=['Std'])
+        >>> fs = FeatureSpace(only=['Mean'])
         >>> fs.extract_many({'magnitude': [1, 2, 3]}, {'magnitude': [4, 5, 6]})
-        Features(feature_names={'Std'}, length=2)
+        Features(feature_names={'Mean'}, length=2)
 
         """
         features_by_lc = run(
@@ -377,17 +440,24 @@ class FeatureSpace:
         Parameters
         ----------
         **lc : dict
-            A light curve represented as a dictionary.
+            A light curve represented as a dictionary, mapping data vector names
+            to their values.
 
         Returns
         -------
         Features
             A collection of extracted features of the provided light curves.
 
+        See Also
+        --------
+        Features : Class to manage and manipulate feature extraction results.
+        extract_many
+
         Examples
         --------
-        >>> fs = feets.FeatureSpace(only=['Std'])
+        >>> fs = FeatureSpace(only=['Mean'])
         >>> fs.extract(magnitude=[1, 2, 3])
-        Features(feature_names={'Std'}, length=1)
+        Features(feature_names={'Mean'}, length=1)
+
         """
         return self.extract_many(lc)
