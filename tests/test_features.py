@@ -44,7 +44,7 @@ def features():
 
 
 @pytest.fixture
-def extractor_mock(mocker):
+def extractor_mocker(mocker):
     def maker(feature):
         extractor = mocker.Mock()
         extractor.get_features.return_value = frozenset({feature})
@@ -55,8 +55,8 @@ def extractor_mock(mocker):
 
 
 @pytest.fixture
-def extractors(extractor_mock):
-    return [extractor_mock(FEATURE_1), extractor_mock(FEATURE_2)]
+def extractors(extractor_mocker):
+    return [extractor_mocker(FEATURE_1), extractor_mocker(FEATURE_2)]
 
 
 @pytest.fixture

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017-2024, Cabral, Juan
 # Copyright (c) 2024, QuatroPe, Felipe Clariá
@@ -13,11 +12,12 @@
 # License: BSD 3-Clause (https://tldrlegal.com/license/bsd-3-clause-license-(revised))
 # All rights reserved.
 
+
 # =============================================================================
 # DOCS
 # =============================================================================
 
-"""Functionalities for serializing and deserializing FeatureSpace objects."""
+"""Serialize and deserialize `feets.FeatureSpace` objects."""
 
 # =============================================================================
 # IMPORTS
@@ -41,27 +41,35 @@ from .core import FeatureSpace
 
 
 class CustomJSONEncoder(json.JSONEncoder):
-    """
-    Custom JSON encoder class that extends the default JSONEncoder.
+    """Custom JSON <https://json.org> encoder for `feets.FeatureSpace` objects.
 
-    This class provides additional functionality for encoding various data
-    types that are not supported by the default JSONEncoder, such as tuples,
-    sets, frozensets, datetime objects, NumPy types, and NumPy arrays.
+    This class extends the `json.JSONEncoder` to add support for the following
+    objects and types:
+
+    +----------------------------------------------------+---------------+
+    | Python                                             | JSON          |
+    +====================================================+===============+
+    | tuple, set, frozenset, np.ndarray                  | array         |
+    +----------------------------------------------------+---------------+
+    | datetime                                           | string        |
+    +----------------------------------------------------+---------------+
+    | np.integer, np.floating, np.complexfloating        | number        |
+    +----------------------------------------------------+---------------+
+    | np.True_                                           | true          |
+    +----------------------------------------------------+---------------+
+    | np.False_                                          | false         |
+    +----------------------------------------------------+---------------+
 
     Attributes
     ----------
     CONVERTERS : dict
         A dictionary mapping data types to their corresponding converter
-        functions. The converter functions are used to convert the data types
-        to JSON-serializable representations.
+        functions.
 
-    Methods
-    -------
-    default(obj)
-        Overrides the default method of JSONEncoder to handle additional data
-        types. If the object is an instance of any of the data types specified
-        in the CONVERTERS dictionary, the corresponding converter function is
-        applied. Otherwise, the default behavior of the superclass is used.
+    See Also
+    --------
+    json.JSONEncoder : Extensible JSON encoder for Python data structures.
+
     """
 
     CONVERTERS = (
@@ -77,18 +85,23 @@ class CustomJSONEncoder(json.JSONEncoder):
     )
 
     def default(self, obj):
-        """
-        Override the default method to handle additional data types.
+        """Serialize an object to a JSON-serializable format.
 
-        Parameters
-        ----------
-        obj : object
-            The object to be encoded.
+        This method overrides the default method of the `json.JSONEncoder`
+        class to provide custom serialization for the data structures defined
+        in the `CONVERTERS` attribute, or calls the base implementation for
+        any other object.
 
         Returns
         -------
         object
             The JSON-serializable representation of the object.
+
+        Raises
+        ------
+        TypeError
+            If the object does not match any of the types in `CONVERTERS`.
+
         """
         for cls, converter in self.CONVERTERS:
             if isinstance(obj, cls):
@@ -103,28 +116,33 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 @contextlib.contextmanager
 def none_open_or_buffer(path_or_buffer, mode):
-    """Context manager that yields a file-like object for reading or writing.
+    """Context manager to handle file paths or buffers as file-like objects.
 
-    This context manager handles opening a file or a file-like object for
-    reading or writing.
-
-    If `path_or_buffer` is `None`, it creates and yields a `StringIO` object.
-    Otherwise, it opens the file using the specified mode.
+    This function provides a unified way to handle file paths, buffers, or
+    in-memory buffers, and yields a file-like object for reading or writing.
 
     Parameters
     ----------
     path_or_buffer : str, pathlib.Path, file-like object or None
-        The file path or file-like object to read from or write to. If `None`,
-        a `StringIO` object is yielded.
+        - If `str` or `pathlib.Path`, the file at this given path is opened
+            with the specified `mode`.
+        - If a file-like object, it is yielded directly.
+        - If `None`, an `io.StringIO` in-memory buffer is created and yielded.
     mode : str
-        The mode in which to open the file, determining whether it is for
-        reading, writing, or both, and whether to create the file if it
-        does not exist.
+        The mode in which to open the file (e.g., 'r', 'w'). This is ignored
+        if `path_or_buffer` is not a path.
 
     Yields
     ------
     file-like object
-        A file-like object for reading or writing data.
+        An open, ready-to-use file-like object.
+
+    See Also
+    --------
+    pathlib.Path : Object-oriented filesystem paths.
+    io.StringIO : In-memory text buffer.
+    open : Built-in function to open a file.
+
     """
     if path_or_buffer is None:
         yield io.StringIO()
@@ -137,27 +155,41 @@ def none_open_or_buffer(path_or_buffer, mode):
 
 
 def store_json(fspace, path_or_buffer=None, **kwargs):
-    """Serialize a feature space to a JSON formatted string or file.
+    """Serialize a `feets.FeatureSpace` to a JSON formatted string or file.
 
     Parameters
     ----------
-    fspace : FeatureSpace
-        The feature space to serialize.
-    path_or_buffer : str, pathlib.Path, file-like object or None, optional
-        The file path or buffer to write the JSON data to. If `None`, the JSON
-        data is returned as a string. Defaults to `None`.
+    fspace : feets.FeatureSpace
+        The `feets.FeatureSpace` object to serialize. This object must
+        implement a `to_dict` method that returns a serializable
+        representation.
+    path_or_buffer : str, pathlib.Path, file-like object or None, default=None
+        The file path, buffer, or stream to write the JSON data to.
+        If `None`, the JSON data is returned as a string.
     **kwargs
-        Additional keyword arguments to pass to `json.dump`.
+        Additional keyword arguments passed to `json.dump` when serializing
+        the feature space.
 
     Returns
     -------
-    str
-        The JSON formatted string if `path_or_buffer` is None.
+    str or None
+        If `path_or_buffer` is `None`, returns a JSON formatted string
+        representing the feature space. Otherwise, writes the JSON data to the
+        specified file or buffer and returns `None`.
 
     Raises
     ------
     TypeError
-        If the dictionary contains non-serializable objects.
+        If the provided feature space contains non-serializable objects.
+
+    See Also
+    --------
+    CustomJSONEncoder : Custom JSON encoder for `feets.FeatureSpace` objects.
+    read_json :
+        Deserialize a JSON formatted string or file to a `feets.FeatureSpace`.
+    store_yaml :
+        Serialize a `feets.FeatureSpace` to a YAML formatted string or file.
+    json.dump : Serialize a Python object as a JSON formatted stream.
     """
     data = fspace.to_dict()
 
@@ -170,27 +202,41 @@ def store_json(fspace, path_or_buffer=None, **kwargs):
 
 
 def store_yaml(fspace, path_or_buffer=None, **kwargs):
-    """Serialize a feature space to a YAML formatted string or file.
+    """Serialize a `feets.FeatureSpace` to a YAML formatted string or file.
 
     Parameters
     ----------
-    fspace : FeatureSpace
-        The feature space to serialize.
-    path_or_buffer : str, pathlib.Path, file-like object or None, optional
-        The file path or buffer to write the YAML data to. If `None`, the JSON
-        data is returned as a string. Defaults to `None`.
+    fspace : feets.FeatureSpace
+        The `feets.FeatureSpace` object to serialize. This object must
+        implement a `to_dict` method that returns a serializable
+        representation.
+    path_or_buffer : str, pathlib.Path, file-like object or None, default=None
+        The file path, buffer, or stream to write the YAML data to.
+        If `None`, the YAML data is returned as a string.
     **kwargs
-        Additional keyword arguments to pass to `json.dump`.
+        Additional keyword arguments passed to `yaml.safe_dump` when serializing
+        the feature space.
 
     Returns
     -------
-    str
-        The YAML formatted string if `path_or_buffer` is None.
+    str or None
+        If `path_or_buffer` is `None`, returns a YAML formatted string
+        representing the feature space. Otherwise, writes the YAML data to the
+        specified file or buffer and returns `None`.
 
     Raises
     ------
     TypeError
-        If the dictionary contains non-serializable objects.
+        If the provided feature space contains non-serializable objects.
+
+    See Also
+    --------
+    CustomJSONEncoder : Custom JSON encoder for `feets.FeatureSpace` objects.
+    read_yaml :
+        Deserialize a YAML formatted string or file to a `feets.FeatureSpace`.
+    store_json :
+        Serialize a `feets.FeatureSpace` to a JSON formatted string or file.
+    json.dump : Serialize a Python object as a JSON formatted stream.
     """
     json_str = store_json(fspace, path_or_buffer=None, indent=None)
     data = json.loads(json_str)
@@ -203,17 +249,25 @@ def store_yaml(fspace, path_or_buffer=None, **kwargs):
 
 
 def read_json(path_or_buffer):
-    """Deserialize a JSON formatted string or file to a feature space.
+    """Deserialize a JSON formatted string or file to `feets.FeatureSpace`.
 
     Parameters
     ----------
-    path_or_buffer : str, pathlib.Path, file-like object
-        The file path or buffer to read the JSON data from.
+    path_or_buffer : str, pathlib.Path or file-like object
+        The file path, buffer, or stream to read the JSON data from.
 
     Returns
     -------
-    FeatureSpace
-        The deserialized feature space.
+    feets.FeatureSpace
+        A `feets.FeatureSpace` object containing the deserialized data.
+
+    See Also
+    --------
+    store_json :
+        Serialize a `feets.FeatureSpace` to a JSON formatted string or file.
+    read_yaml :
+        Deserialize a YAML formatted string or file to a `feets.FeatureSpace`.
+    json.load : Deserialize a JSON formatted stream to a Python object.
     """
     with none_open_or_buffer(path_or_buffer, "r") as fp:
         data = json.load(fp)
@@ -221,17 +275,25 @@ def read_json(path_or_buffer):
 
 
 def read_yaml(path_or_buffer):
-    """Deserialize a YAML formatted string or file to a feature space.
+    """Deserialize a YAML formatted string or file to `feets.FeatureSpace`.
 
     Parameters
     ----------
-    path_or_buffer : str, pathlib.Path, file-like object
-        The file path or buffer to read the YAML data from.
+    path_or_buffer : str, pathlib.Path or file-like object
+        The file path, buffer, or stream to read the YAML data from.
 
     Returns
     -------
-    FeatureSpace
-        The deserialized feature space.
+    feets.FeatureSpace
+        A `feets.FeatureSpace` object containing the deserialized data.
+
+    See Also
+    --------
+    store_yaml :
+        Serialize a `feets.FeatureSpace` to a YAML formatted string or file.
+    read_json :
+        Deserialize a JSON formatted string or file to a `feets.FeatureSpace`.
+    yaml.safe_load : Deserialize a YAML formatted stream to a Python object.
     """
     with none_open_or_buffer(path_or_buffer, "r") as fp:
         data = yaml.safe_load(fp)

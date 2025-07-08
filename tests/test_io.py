@@ -14,7 +14,6 @@
 import datetime as dt
 from io import StringIO
 
-from feets.core import FeatureSpace
 from feets.io import (
     CustomJSONEncoder,
     none_open_or_buffer,
@@ -28,19 +27,38 @@ import numpy as np
 
 import pytest
 
+
 # =============================================================================
-# MOCKS AND FIXTURES FOR TESTING
+# FIXTURES
 # =============================================================================
 
 
-class MockWriter:
-    """Collect all written data."""
+@pytest.fixture
+def patch_open(mocker):
+    def maker(*args, **kwargs):
+        mocked_open = mocker.mock_open(*args, **kwargs)
+        mocked_open.return_value.write = mocker.Mock()
+        return mocker.patch("feets.io.open", mocked_open)
 
-    def __init__(self):
-        self.contents = ""
+    return maker
 
-    def write(self, data):
-        self.contents += data
+
+@pytest.fixture
+def patch_from_dict(mocker):
+    def maker(*args, **kwargs):
+        return mocker.patch("feets.io.FeatureSpace.from_dict", *args, **kwargs)
+
+    return maker
+
+
+@pytest.fixture
+def fspace_mock(mocker):
+    fspace = mocker.Mock()
+
+    fs_dict = {"nested": {"foo": "bar"}}
+
+    fspace.to_dict.return_value = fs_dict
+    return fspace
 
 
 # =============================================================================
@@ -49,170 +67,143 @@ class MockWriter:
 
 
 @pytest.mark.parametrize(
-    ["data", "expected"],
+    ["obj", "expected"],
     [
         ((1, 2, 3), [1, 2, 3]),
         ({1, 2, 3}, [1, 2, 3]),
-        (frozenset([1, 2, 3]), [1, 2, 3]),
+        (frozenset({1, 2, 3}), [1, 2, 3]),
+        (np.array([1, 2, 3]), [1, 2, 3]),
         (
             dt.datetime(2024, 11, 6, 0, 41, 57, 812214),
-            dt.datetime(2024, 11, 6, 0, 41, 57, 812214).isoformat(),
+            "2024-11-06T00:41:57.812214",
         ),
-        (np.int32(42), int(42)),
-        (np.float32(3.14), float(np.float32(3.14))),
-        (np.complex64(1 + 2j), complex(1, 2)),
-        (np.bool_(True), True),
-        (np.array([1, 2, 3]), [1, 2, 3]),
-    ],
-    ids=[
-        "tuple",
-        "set",
-        "frozenset",
-        "datetime",
-        "numpy_int",
-        "numpy_float",
-        "numpy_complex",
-        "numpy_bool",
-        "numpy_array",
+        (np.int64(42), int(42)),
+        (np.float64(3.14), 3.14),
+        (np.complex128(1 + 2j), complex(1, 2)),
+        (np.True_, True),
+        (np.False_, False),
     ],
 )
-def test_CustomJSONEncoder_default(data, expected):
+def test_CustomJSONEncoder_default(obj, expected):
     encoder = CustomJSONEncoder()
-    np.testing.assert_equal(encoder.default(data), expected)
+    np.testing.assert_equal(encoder.default(obj), expected)
 
 
-def test_CustomJSONEncoder_default_raises_TypeError():
+def test_CustomJSONEncoder_default_invalid_type():
     encoder = CustomJSONEncoder()
     with pytest.raises(TypeError):
-        encoder.default(object())
+        encoder.default("invalid_type")
 
 
 def test_none_open_or_buffer_none():
-    with none_open_or_buffer(None, "w") as buffer:
-        assert isinstance(buffer, StringIO)
-        buffer.write("test")
-        np.testing.assert_equal(buffer.getvalue(), "test")
+    with none_open_or_buffer(None, "w") as fp:
+        assert isinstance(fp, StringIO)
+        fp.write("test")
+        np.testing.assert_equal(fp.getvalue(), "test")
 
 
-def test_none_open_or_buffer_path(mocker):
-    open_mock = mocker.mock_open()
-    mocker.patch("feets.io.open", open_mock)
-    with none_open_or_buffer("output", "w") as buffer:
-        assert buffer is open_mock()
-        buffer.write("test")
-        open_mock().write.assert_called_with("test")
+def test_none_open_or_buffer_path(patch_open):
+    open_mock = patch_open()
+    with none_open_or_buffer("output", "w") as fp:
+        assert fp is open_mock.return_value
+        fp.write("test")
+        open_mock.return_value.write.assert_called_with("test")
 
 
 def test_none_open_or_buffer_file_like():
     file_like = StringIO()
-    with none_open_or_buffer(file_like, "w") as buffer:
-        buffer.write("test")
-        np.testing.assert_equal(buffer.getvalue(), "test")
+    with none_open_or_buffer(file_like, "w") as fp:
+        fp.write("test")
+        np.testing.assert_equal(fp.getvalue(), "test")
 
 
-def test_store_json_to_string(mocker):
-    fspace = mocker.Mock(spec=FeatureSpace)
-    fspace.to_dict.return_value = {"feature": {"key": "value"}}
-
-    result = store_json(fspace)
-    expected = '{\n  "feature": {\n    "key": "value"\n  }\n}'
+def test_store_json_to_string(fspace_mock):
+    result = store_json(fspace_mock)
+    expected = '{\n  "nested": {\n    "foo": "bar"\n  }\n}'
 
     np.testing.assert_equal(result, expected)
 
 
-def test_store_json_to_file(mocker):
-    fspace = mocker.Mock(spec=FeatureSpace)
-    fspace.to_dict.return_value = {"feature": {"key": "value"}}
+def test_store_json_to_file(patch_open, fspace_mock):
+    open_mock = patch_open()
 
-    open_mock = mocker.mock_open()
-    mocker.patch("feets.io.open", open_mock)
+    store_json(fspace_mock, "output.json")
+    expected = '{\n  "nested": {\n    "foo": "bar"\n  }\n}'
 
-    writer = MockWriter()
-    open_mock.return_value.write = writer.write
-
-    store_json(fspace, "output.json")
-    expected = '{\n  "feature": {\n    "key": "value"\n  }\n}'
+    calls = open_mock.return_value.write.mock_calls
+    contents = "".join(call.args[0] for call in calls)
 
     open_mock.assert_called_once_with("output.json", "w")
-    np.testing.assert_equal(writer.contents, expected)
+    np.testing.assert_equal(contents, expected)
 
 
-def test_store_json_with_kwargs(mocker):
-    fspace = mocker.Mock(spec=FeatureSpace)
-    fspace.to_dict.return_value = {"feature": {"key": "value"}}
-
-    result = store_json(fspace, indent=4)
-    expected = '{\n    "feature": {\n        "key": "value"\n    }\n}'
+def test_store_json_kwargs(fspace_mock):
+    result = store_json(fspace_mock, indent=4)
+    expected = '{\n    "nested": {\n        "foo": "bar"\n    }\n}'
 
     np.testing.assert_equal(result, expected)
 
 
-def test_store_yaml_to_string(mocker):
-    fspace = mocker.Mock(spec=FeatureSpace)
-    fspace.to_dict.return_value = {"feature": {"key": "value"}}
+def test_store_json_unserializable(fspace_mock):
+    fspace_mock.to_dict.return_value = {"nested": {"foo": object()}}
+    with pytest.raises(TypeError):
+        store_json(fspace_mock)
 
-    result = store_yaml(fspace)
-    expected = "feature:\n  key: value\n"
+
+def test_store_yaml_to_string(fspace_mock):
+    result = store_yaml(fspace_mock)
+    expected = "nested:\n  foo: bar\n"
 
     np.testing.assert_equal(result, expected)
 
 
-def test_store_yaml_to_file(mocker):
-    fspace = mocker.Mock(spec=FeatureSpace)
-    fspace.to_dict.return_value = {"feature": {"key": "value"}}
+def test_store_yaml_to_file(patch_open, fspace_mock):
+    open_mock = patch_open()
 
-    open_mock = mocker.mock_open()
-    mocker.patch("feets.io.open", open_mock)
+    store_yaml(fspace_mock, "output.json")
+    expected = "nested:\n  foo: bar\n"
 
-    writer = MockWriter()
-    open_mock.return_value.write = writer.write
-
-    store_yaml(fspace, "output.json")
-    expected = "feature:\n  key: value\n"
+    calls = open_mock.return_value.write.mock_calls
+    contents = "".join(call.args[0] for call in calls)
 
     open_mock.assert_called_once_with("output.json", "w")
-    np.testing.assert_equal(writer.contents, expected)
+    np.testing.assert_equal(contents, expected)
 
 
-def test_store_yaml_with_kwargs(mocker):
-    fspace = mocker.Mock(spec=FeatureSpace)
-    fspace.to_dict.return_value = {"feature": {"key": "value"}}
-
-    result = store_yaml(fspace, indent=4)
-    expected = "feature:\n    key: value\n"
+def test_store_yaml_kwargs(fspace_mock):
+    result = store_yaml(fspace_mock, indent=4)
+    expected = "nested:\n    foo: bar\n"
 
     np.testing.assert_equal(result, expected)
 
 
-def test_read_json(mocker):
-    fspace = mocker.Mock(spec=FeatureSpace)
-    mocker.patch("feets.io.FeatureSpace.from_dict", return_value=fspace)
-
-    json_data = '{\n  "feature": {\n    "key": "value"\n  }\n}'
-    fspace_dict = {"feature": {"key": "value"}}
-
-    open_mock = mocker.mock_open(read_data=json_data)
-    mocker.patch("feets.io.open", open_mock)
-
-    result = read_json("input.json")
-
-    open_mock.assert_called_once_with("input.json", "r")
-    FeatureSpace.from_dict.assert_called_once_with(fspace_dict)
-    assert result is fspace
+def test_store_yaml_unserializable(fspace_mock):
+    fspace_mock.to_dict.return_value = {"nested": {"foo": object()}}
+    with pytest.raises(TypeError):
+        store_yaml(fspace_mock)
 
 
-def test_read_yaml(mocker):
-    fspace = mocker.Mock(spec=FeatureSpace)
-    mocker.patch("feets.io.FeatureSpace.from_dict", return_value=fspace)
+def test_read_json(patch_open, patch_from_dict, fspace_mock):
+    from_dict_mock = patch_from_dict(return_value=fspace_mock)
 
-    yaml_data = "feature:\n  key: value\n"
-    fspace_dict = {"feature": {"key": "value"}}
+    json_data = '{\n  "nested": {\n    "foo": "bar"\n  }\n}'
+    open_mock = patch_open(read_data=json_data)
 
-    open_mock = mocker.mock_open(read_data=yaml_data)
-    mocker.patch("feets.io.open", open_mock)
+    result = read_json("test")
 
-    result = read_yaml("input.yaml")
+    open_mock.assert_called_once_with("test", "r")
+    from_dict_mock.assert_called_once_with(fspace_mock.to_dict())
+    np.testing.assert_equal(result, fspace_mock)
 
-    open_mock.assert_called_once_with("input.yaml", "r")
-    FeatureSpace.from_dict.assert_called_once_with(fspace_dict)
-    assert result is fspace
+
+def test_read_yaml(patch_open, patch_from_dict, fspace_mock):
+    from_dict_mock = patch_from_dict(return_value=fspace_mock)
+
+    yaml_data = "nested:\n  foo: bar\n"
+    open_mock = patch_open(read_data=yaml_data)
+
+    result = read_yaml("test")
+
+    open_mock.assert_called_once_with("test", "r")
+    from_dict_mock.assert_called_once_with(fspace_mock.to_dict())
+    np.testing.assert_equal(result, fspace_mock)
