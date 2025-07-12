@@ -10,7 +10,7 @@
 # DOC
 # =============================================================================
 
-"""Functionalities for running multiple extractors in parallel."""
+"""Run multiple feature extractors in parallel."""
 
 
 # =============================================================================
@@ -37,7 +37,7 @@ DEFAULT_DASK_OPTIONS = {"scheduler": "processes"}
 
 
 class DataRequiredError(ValueError):
-    """Raised when required data is missing from a light curve."""
+    """A required data vector is missing from the light curve."""
 
     pass
 
@@ -48,15 +48,15 @@ class DataRequiredError(ValueError):
 
 
 def _validate_required_data_single(*, required_data, lc):
-    diff = set(required_data).difference(lc)
-    if diff:
-        missing_str = ", ".join(diff)
+    missing_data = set(required_data).difference(lc)
+    if missing_data:
+        missing_str = ", ".join(missing_data)
         raise DataRequiredError(
-            f"Missing required data in light curve: {missing_str}"
+            f"Missing required data vectors in light curve: {missing_str}"
         )
 
 
-def validate_required_data(*, required_data, lcs, dask_options):
+def _validate_required_data(*, required_data, lcs, dask_options):
     validations = [
         _validate_required_data_single(
             required_data=required_data,
@@ -107,55 +107,82 @@ def run(
     extractors,
     selected_features,
     required_data,
-    dask_options=None,
     lcs,
+    dask_options=None,
 ):
-    """Run extractors and select features from the given light curves.
+    """Run instances of feature extractors on a collection of light curves.
 
-    This function runs a series of feature extractors on the provided light
-    curves and selects only the desired features. The result is a list
-    containing the selected features for each light curve.
-
-    The extractors should be sorted based on their dependencies to ensure
-    proper execution.
+    Executes the specified extractor instances on each provided light curve,
+    returning the extracted features for each. Feature extraction is performed
+    in parallel using Dask, enabling efficient computation across multiple
+    light curves. The order of execution respects dependencies between
+    extractors; ensure that the `extractors` list is topologically sorted so
+    that dependencies are satisfied.
 
     Parameters
     ----------
-    extractors : np.ndarray of Extractor
-        Array of extractor instances to run. Must be sorted based on dependencies.
-    selected_features : array-like of str
-        The features to extract.
+    extractors : array_like of feets.extractors.Extractor
+        Feature extractor instances to apply. Must be sorted so that any
+        extractor appears after those it depends on.
+    selected_features : array_like of str
+        Names of features to extract from each light curve.
+    required_data : array_like of str
+        Names of required data fields that must be present in each light curve.
+    lcs : array_like of dict
+        Light curves to process, each represented as a dictionary of data
+        vectors.
     dask_options : dict, optional
-        Options to be passed to the Dask scheduler.
-    lcs : list of dict
-        The light curves to process.
+        Options for the Dask scheduler. Defaults to
+        ``{"scheduler": "processes"}``.
 
     Returns
     -------
     list of dict
-        The extracted features for each light curve. The order of the list is preserved.
+        List of dictionaries, one per input light curve, with the extracted
+        feature values. Each dictionary contains the extracted features
+        specified in `selected_features`. The order of the list matches the
+        input `lcs`.
 
-    Examples
+    Raises
+    ------
+    DataRequiredError
+        If any of the required data vectors are missing from a light curve.
+
+    See Also
     --------
-    >>> import numpy as np
-    >>> from feets.extractors.ext_mean import Mean
-    >>> lcs = [{"magnitude": [1, 2, 3]}, {"magnitude": [4, 5, 6]}]
-    >>> run(extractors=np.array([Mean()]),
-    ...     selected_features=["Mean"],
-    ...     lcs=lcs)
-    [{'Mean': np.float64(2.0)}, {'Mean': np.float64(5.0)}]
+    feets.Extractor : Base class for feature extractors.
+    feets.FeatureSpace : Class for managing feature extraction and validation.
 
     Notes
     -----
-    The feature extraction is performed in parallel using Dask, and can be
-    configured using the `dask_options` parameter.
+    Feature extraction is parallelized using Dask. You can control parallelism
+    and scheduler behavior via the `dask_options` parameter.
 
-    For more information on Dask, visit: https://docs.dask.org/en/stable/
+    For more information on Dask, see: https://docs.dask.org/en/stable/
+
+    Examples
+    --------
+    >>> from feets.extractors import Mean
+    >>>
+    >>> # Instantiate the feature extractor
+    >>> mean_extractor = Mean()
+    >>>
+    >>> # Light curves to process
+    >>> lcs = [{"magnitude": [1, 2, 3]}, {"magnitude": [4, 5, 6]}]
+    >>>
+    >>> # Run the feature extraction
+    >>> run(
+    ...     extractors=[mean_extractor],
+    ...     selected_features=["Mean"],
+    ...     required_data=["magnitude"],
+    ...     lcs=lcs
+    ... )
+    [{'Mean': np.float64(2.0)}, {'Mean': np.float64(5.0)}]
     """
     if dask_options is None:
         dask_options = copy.deepcopy(DEFAULT_DASK_OPTIONS)
 
-    validate_required_data(
+    _validate_required_data(
         required_data=required_data, lcs=lcs, dask_options=dask_options
     )
 
@@ -170,4 +197,4 @@ def run(
 
     features_by_lc = dask.compute(*delayed_features_by_lc, **dask_options)
 
-    return features_by_lc
+    return list(features_by_lc)

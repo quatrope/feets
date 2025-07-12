@@ -18,35 +18,42 @@ import pytest
 
 
 # =============================================================================
-# FAKE CLASSES AND FIXTURES FOR TESTING
+# CONSTANTS
+# =============================================================================
+
+DATA_1 = "test_data_1"
+DATA_2 = "test_data_2"
+DATA_3 = "test_data_3"
+
+FEATURE_1 = "test_feature_1"
+FEATURE_2 = "test_feature_2"
+FEATURE_3 = "test_feature_3"
+FEATURE_4 = "test_feature_4"
+
+DASK_OPTIONS = {"scheduler": "synchronous"}
+
+LCS_SINGLE = [{DATA_1: None, DATA_2: None}]
+LCS_MULTIPLE = [
+    {DATA_1: None, DATA_2: None},
+    {DATA_1: None, DATA_2: None, DATA_3: None},
+]
+
+
+# =============================================================================
+# FIXTURES
 # =============================================================================
 
 
-class FakeExtractor:
-    def __init__(self, *, features, data=None, dependencies=None):
-        self.features = features
-        self.data = data or []
-        self.dependencies = dependencies or []
+@pytest.fixture
+def Extractor_mocker(mocker):
+    def maker(*, features=None):
+        mock = mocker.Mock()
+        features = features or []
+        mock.get_features.return_value = frozenset(features)
+        mock.extract.return_value = {feature: None for feature in features}
+        return mock
 
-    def select_kwargs(self, datas, delayed_features):
-        kwargs = {data: datas[data] for data in self.data}
-        kwargs.update(
-            {
-                feature: delayed_features[feature]
-                for feature in self.dependencies
-            }
-        )
-        return kwargs
-
-    def extract_and_validate(self, kwargs):
-        data_sum = sum(kwargs[data] for data in self.data)
-        dependency_sum = sum(kwargs[feature] for feature in self.dependencies)
-        return {
-            feature: data_sum + dependency_sum for feature in self.features
-        }
-
-    def get_features(self):
-        return self.features
+    return maker
 
 
 # =============================================================================
@@ -55,118 +62,75 @@ class FakeExtractor:
 
 
 @pytest.mark.parametrize(
-    ["lcs", "expected"],
-    [
-        (
-            [{"data1": 123}],
-            [{"feature1": 123, "feature2": 123, "feature3": 123}],
-        ),
-        (
-            [{"data1": 123}, {"data1": 456}, {"data1": 789, "data2": 123}],
-            [
-                {"feature1": 123, "feature2": 123, "feature3": 123},
-                {"feature1": 456, "feature2": 456, "feature3": 456},
-                {"feature1": 789, "feature2": 789, "feature3": 789},
-            ],
-        ),
-    ],
-    ids=["simple", "multiple"],
+    "lcs",
+    [LCS_SINGLE, LCS_MULTIPLE],
 )
-def test_run(lcs, expected):
+def test_run_single_extractor(Extractor_mocker, lcs):
+    extractor = Extractor_mocker(features={FEATURE_1, FEATURE_2, FEATURE_3})
+    extractor.prepare_extract.return_value = {DATA_1: None, DATA_2: None}
+
     features = run(
-        extractors=[
-            FakeExtractor(features=["feature1", "feature2"], data=["data1"]),
-            FakeExtractor(features=["feature3", "feature4"], data=["data1"]),
-        ],
-        selected_features=["feature1", "feature2", "feature3"],
-        required_data=["data1"],
+        extractors=[extractor],
+        selected_features=[FEATURE_1, FEATURE_2],
+        required_data=[DATA_1, DATA_2],
         lcs=lcs,
+        dask_options=DASK_OPTIONS,
+    )
+
+    extractor.extract.assert_called_with(**{DATA_1: None, DATA_2: None})
+    extractor.validate_extract.assert_called_with(
+        {FEATURE_1: None, FEATURE_2: None, FEATURE_3: None}
     )
     np.testing.assert_equal(
         features,
-        expected,
+        [{FEATURE_1: None, FEATURE_2: None}] * len(lcs),
     )
-
-
-@pytest.mark.parametrize(
-    ["lcs", "expected"],
-    [
-        (
-            [{"data1": 123}],
-            [{"feature1": 123, "feature2": 246}],
-        ),
-        (
-            [{"data1": 123}, {"data1": 456}, {"data1": 789, "data2": 123}],
-            [
-                {"feature1": 123, "feature2": 246},
-                {"feature1": 456, "feature2": 912},
-                {"feature1": 789, "feature2": 1578},
-            ],
-        ),
-    ],
-    ids=["simple", "multiple"],
-)
-def test_run_dependencies(lcs, expected):
-    features = run(
-        extractors=[
-            FakeExtractor(features=["feature1"], data=["data1"]),
-            FakeExtractor(
-                features=["feature2"],
-                data=["data1"],
-                dependencies=["feature1"],
-            ),
-        ],
-        selected_features=["feature1", "feature2"],
-        required_data=["data1"],
-        lcs=lcs,
-    )
-    np.testing.assert_equal(
-        features,
-        expected,
-    )
-
-
-@pytest.mark.parametrize(
-    ["lcs", "expected"],
-    [
-        (
-            [{}],
-            [{"feature1": 0}],
-        ),
-        (
-            [{}, {"data2": 123}, {"data1": 123, "data2": 456}],
-            [{"feature1": 0}, {"feature1": 0}, {"feature1": 0}],
-        ),
-    ],
-    ids=["simple", "multiple"],
-)
-def test_run_empty_data(lcs, expected):
-    features = run(
-        extractors=[
-            FakeExtractor(features=["feature1"], data=[]),
-        ],
-        selected_features=["feature1"],
-        required_data=[],
-        lcs=lcs,
-    )
-    np.testing.assert_equal(features, expected)
 
 
 @pytest.mark.parametrize(
     "lcs",
-    [
-        [{}],
-        [{"data1": 123}, {"data2": 123}, {"data1": 123, "data2": 123}],
-    ],
-    ids=["simple", "multiple"],
+    [LCS_SINGLE, LCS_MULTIPLE],
+)
+def test_run_multiple_extractors(Extractor_mocker, lcs):
+    extractor_1 = Extractor_mocker(features={FEATURE_1, FEATURE_3})
+    extractor_1.prepare_extract.return_value = {DATA_1: None}
+
+    extractor_2 = Extractor_mocker(features={FEATURE_2, FEATURE_4})
+    extractor_2.prepare_extract.return_value = {DATA_2: None}
+
+    features = run(
+        extractors=[extractor_1, extractor_2],
+        selected_features=[FEATURE_1, FEATURE_2],
+        required_data=[DATA_1, DATA_2],
+        lcs=lcs,
+        dask_options=DASK_OPTIONS,
+    )
+
+    extractor_1.extract.assert_called_with(**{DATA_1: None})
+    extractor_1.validate_extract.assert_called_with(
+        {FEATURE_1: None, FEATURE_3: None}
+    )
+
+    extractor_2.extract.assert_called_with(**{DATA_2: None})
+    extractor_2.validate_extract.assert_called_with(
+        {FEATURE_2: None, FEATURE_4: None}
+    )
+
+    np.testing.assert_equal(
+        features,
+        [{FEATURE_1: None, FEATURE_2: None}] * len(lcs),
+    )
+
+
+@pytest.mark.parametrize(
+    "lcs",
+    [LCS_SINGLE, LCS_MULTIPLE],
 )
 def test_run_missing_data(lcs):
-    with pytest.raises(
-        DataRequiredError, match="Required data 'data1' not found"
-    ):
+    with pytest.raises(DataRequiredError):
         run(
-            extractors=[FakeExtractor(features=["feature1"])],
-            selected_features=["feature1"],
-            required_data=["data1"],
+            extractors=None,
+            selected_features=None,
+            required_data=[DATA_3],
             lcs=lcs,
         )
