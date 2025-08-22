@@ -44,31 +44,31 @@ logger.setLevel(logging.WARNING)
 
 
 class FeatureSpace:
-    """Class to manage the selection and extraction of features from a time series.
+    """Class to select and extract features from a time series.
 
-    The `FeatureSpace` class allows for the selection of features based on the
-    available time series vectors (e.g., magnitude, time, error, second magnitude),
-    or on a specified list of features.
+    The `FeatureSpace` class allows for the extraction of selected features
+    from the available data vectors (e.g., magnitude, time, error,
+    second magnitude) of one or more time series.
 
-    The final set of features for the execution plan are those that satisfy all
-    the provided filters. If no filter is provided, all features are included.
+    The `data`, `only`, and `exclude` filters can be combined to control the
+    selection of features to be extracted. If no filter is provided, the
+    selection will include all the available features.
 
     Parameters
     ----------
     data : array_like, optional
-        List of available time series vectors to be used by the feature
-        extractors. If provided, only the extractors that require some subset
-        of the selected data will be included.
+        List of available data vectors to extract from. If provided, only the
+        features that can be computed on some of the selected vectors will be
+        included.
     only : array_like, optional
-        List of features to be included in the output. If provided, only the
-        selected features will be extracted. It must be disjoint with
-        `exclude`.
+        List of features to be extracted. If provided, only the selected
+        features will be included. It must be disjoint with `exclude`.
     exclude : array_like, optional
-        List of features to be excluded from the output. If provided, all
-        features except the selected ones will be extracted. It must be
+        List of features to be excluded from the extraction. If provided, all
+        features except the selected ones will be included. It must be
         disjoint with `only`.
     **kwargs
-        Extra parameters used to initialize the extractors.
+        Additional parameters used to initialize the extractors.
 
     Attributes
     ----------
@@ -89,11 +89,7 @@ class FeatureSpace:
 
     Examples
     --------
-    The `FeatureSpace` can be initialized with different combinations of
-    `data`, `only`, and `exclude` parameters to control the features that will
-    be extracted from the light curves.
-
-    Using `data` to specify the available data vectors:
+    Using `data` filter to specify the available data vectors:
 
     >>> fs = FeatureSpace(data=['magnitude', 'time'])
     >>> # The resulting `FeatureSpace` will only extract the features that
@@ -101,7 +97,7 @@ class FeatureSpace:
     >>> fs.extract(**lc)
     <Features feature_names={'Mean', 'Std', 'PeriodLS', 'Signature', ...}, length=1>
 
-    Using `only` to select specific features for extraction:
+    Using `only` filter to select specific features for extraction:
 
     >>> fs = FeatureSpace(only=['Mean', 'Std'])
     >>> # The resulting `FeatureSpace` will only extract the 'Mean' and 'Std'
@@ -109,7 +105,7 @@ class FeatureSpace:
     >>> fs.extract(**lc)
     <Features feature_names={'Mean', 'Std'}, length=1>
 
-    Using `exclude` to exclude specific features from extraction:
+    Using `exclude` filter to exclude specific features from extraction:
 
     >>> fs = FeatureSpace(exclude=['Mean', 'Std'])
     >>> # The resulting `FeatureSpace` will extract all features except for
@@ -118,6 +114,7 @@ class FeatureSpace:
     <Features feature_names={'PeriodLS', 'Signature', ...}, length=1>
 
     Configuring the extractors with additional parameters:
+
     >>> fs = FeatureSpace(
     ...     data=['magnitude', 'time'],
     ...     PeriodLS={'nperiods': 5},

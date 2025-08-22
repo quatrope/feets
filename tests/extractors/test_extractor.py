@@ -8,21 +8,16 @@
 
 
 # =============================================================================
-# IMPORRTS
+# IMPORTS
 # =============================================================================
-
-from typing import OrderedDict
-
-from attr import dataclass
 
 from feets.extractors.extractor import (
     Extractor,
     ExtractorBadDefinedError,
-    ExtractorValidationError,
     ExtractorTransformError,
+    ExtractorValidationError,
     ExtractorWarning,
     FeatureExtractionWarning,
-    _ExtractorConf,
     extractor_warning,
     feature_warning,
 )
@@ -33,360 +28,56 @@ import pytest
 
 
 # =============================================================================
-# FAKE CLASSES AND FIXTURES FOR TESTING
+# FIXTURES
 # =============================================================================
 
 
 @pytest.fixture
-def mock_DATAS(mocker):
-    def maker(fake_DATAS=None):
-        if fake_DATAS is None:
-            fake_DATAS = ("data1", "data2", "data3")
+def TestExtractor():
+    class TestExtractor(Extractor):
+        features = {"test_feature_1", "test_feature_2"}
 
-        mocker.patch("feets.extractors.extractor.DATAS", fake_DATAS)
+        def __init__(
+            self, test_param_1=None, test_param_2=None, test_param_3=None
+        ):
+            self.test_param_1 = test_param_1
+            self.test_param_2 = test_param_2
+            self.test_param_3 = test_param_3
 
-    return maker
+        def extract(
+            self,
+            time,
+            magnitude,
+            test_dependency_1,
+            test_dependency_2,
+            error=None,
+            magnitude2=None,
+        ):
+            pass
 
-
-@pytest.fixture
-def fake_ecls():
-    def maker(feature_names=None, init_method=None, extract_method=None):
-        if feature_names is None:
-            feature_names = ["feature1", "feature2"]
-
-        if init_method is None:
-
-            def init_method(self):
-                pass
-
-        if extract_method is None:
-
-            def extract_method(self):
-                pass
-
-        class FakeExtractor:
-            features = feature_names
-            __init__ = init_method
-            extract = extract_method
-
-        return FakeExtractor
-
-    return maker
+    return TestExtractor
 
 
 @pytest.fixture
-def fake_extractor_conf_cls():
-    def maker(
-        *,
-        features,
-        required=None,
-        optional=None,
-        dependencies=None,
-        default_params=None,
-    ):
-        if required is None:
-            required = []
-        if optional is None:
-            optional = []
-        if dependencies is None:
-            dependencies = []
-        if default_params is None:
-            default_params = {}
-
-        @dataclass
-        class FakeExtractorConf:
-            features: frozenset
-            data: frozenset
-            required: frozenset
-            optional: frozenset
-            dependencies: frozenset
-            parameters: dict
-
-            @classmethod
-            def from_extractor_class(cls, *args, **kwargs):
-                return FakeExtractorConf(
-                    frozenset(features),
-                    frozenset(required + optional),
-                    frozenset(required),
-                    frozenset(optional),
-                    frozenset(dependencies),
-                    dict(default_params),
-                )
-
-        return FakeExtractorConf
-
-    return maker
-
-
-@pytest.fixture
-def mock_extractor_conf(mocker):
-    def maker(extractor_conf_cls):
-        mocker.patch(
-            "feets.extractors.extractor._ExtractorConf", extractor_conf_cls
-        )
-
-    return maker
+def test_extractor(TestExtractor):
+    return TestExtractor(
+        test_param_1=1, test_param_2={"sub_param_1": 21, "sub_param_2": 22}
+    )
 
 
 # =============================================================================
-# EXTRACTOR CONF TESTS
+# WARNINGS TESTS
 # =============================================================================
 
 
-@pytest.mark.parametrize(
-    ["features", "expected"],
-    [
-        (["feature1"], {"feature1"}),
-        (
-            ["feature1", "feature2", "feature3"],
-            {"feature1", "feature2", "feature3"},
-        ),
-    ],
-    ids=[
-        "single_feature",
-        "multiple_features",
-    ],
-)
-def test_ExtractorConf_get_feature_conf(
-    mock_DATAS, fake_ecls, features, expected
-):
-    mock_DATAS()
-    ecls = fake_ecls(feature_names=features)
-    feature_conf = _ExtractorConf._get_feature_conf(ecls)
-    np.testing.assert_equal(feature_conf, expected)
+def test_extractor_warning():
+    with pytest.warns(ExtractorWarning):
+        extractor_warning("test warning")
 
 
-@pytest.mark.parametrize(
-    "features",
-    [[], [123], ["data1"], ["duplicate_feature", "duplicate_feature"]],
-    ids=[
-        "no_features",
-        "feature_is_not_string",
-        "feature_in_DATAS",
-        "duplicate_feature",
-    ],
-)
-def test_ExtractorConf_get_feature_conf_raises_ExtractorBadDefinedError(
-    mock_DATAS, fake_ecls, features
-):
-    mock_DATAS()
-    ecls = fake_ecls(feature_names=features)
-    with pytest.raises(ExtractorBadDefinedError):
-        _ExtractorConf._get_feature_conf(ecls)
-
-
-@pytest.mark.parametrize(
-    [
-        "extract_method",
-        "expected_required",
-        "expected_optional",
-        "expected_dependencies",
-    ],
-    [
-        (None, set(), set(), set()),
-        (
-            lambda self, data1, data2, data3: None,
-            {"data1", "data2", "data3"},
-            set(),
-            set(),
-        ),
-        (
-            lambda self, data1=123, data2=456, data3=789: None,
-            set(),
-            {"data1", "data2", "data3"},
-            set(),
-        ),
-        (
-            lambda self, dependency1, dependency2: None,
-            set(),
-            set(),
-            {"dependency1", "dependency2"},
-        ),
-        (
-            lambda self, data1, dependency1, data2=123: None,
-            {"data1"},
-            {"data2"},
-            {"dependency1"},
-        ),
-    ],
-    ids=[
-        "no_params",
-        "required_data",
-        "optional_data",
-        "dependencies",
-        "multiple_params",
-    ],
-)
-def test_ExtractorConf_get_extract_method_parameters(
-    mock_DATAS,
-    fake_ecls,
-    extract_method,
-    expected_required,
-    expected_optional,
-    expected_dependencies,
-):
-    mock_DATAS()
-    ecls = fake_ecls(extract_method=extract_method)
-    required, optional, dependencies = (
-        _ExtractorConf._get_extract_method_parameters(ecls)
-    )
-    np.testing.assert_equal(required, expected_required)
-    np.testing.assert_equal(optional, expected_optional)
-    np.testing.assert_equal(dependencies, expected_dependencies)
-
-
-@pytest.mark.parametrize(
-    "extract_method",
-    [lambda self, dependency1=123: None],
-    ids=["dependency_has_default"],
-)
-def test_ExtractorConf_get_extract_method_parameters_raises_ExtractorBadDefinedError(
-    mock_DATAS, fake_ecls, extract_method
-):
-    mock_DATAS()
-    ecls = fake_ecls(extract_method=extract_method)
-    with pytest.raises(ExtractorBadDefinedError):
-        _ExtractorConf._get_extract_method_parameters(ecls)
-
-
-@pytest.mark.parametrize(
-    ["init_method", "expected"],
-    [
-        (lambda self: None, {}),
-        (
-            lambda self, param1=123, param2=456, param3=789: None,
-            {"param1": 123, "param2": 456, "param3": 789},
-        ),
-    ],
-    ids=["no_params", "multiple_params"],
-)
-def test_ExtractorConf_get_init_method_parameters(
-    mock_DATAS, fake_ecls, init_method, expected
-):
-    mock_DATAS()
-    ecls = fake_ecls(init_method=init_method)
-    parameters = _ExtractorConf._get_init_method_parameters(ecls)
-    np.testing.assert_equal(parameters, expected)
-
-
-@pytest.mark.parametrize(
-    "init_method",
-    [lambda self, param1: None],
-    ids=["missing_default"],
-)
-def test_ExtractorConf_get_init_method_parameters_raises_ExtractorBadDefinedError(
-    mock_DATAS, fake_ecls, init_method
-):
-    mock_DATAS()
-    ecls = fake_ecls(init_method=init_method)
-    with pytest.raises(ExtractorBadDefinedError):
-        _ExtractorConf._get_init_method_parameters(ecls)
-
-
-@pytest.mark.parametrize(
-    ["features", "init_method", "extract_method", "expected"],
-    [
-        (
-            ["feature1", "feature2", "feature3"],
-            None,
-            None,
-            _ExtractorConf(
-                features={"feature1", "feature2", "feature3"},
-                required=set(),
-                optional=set(),
-                dependencies=set(),
-                parameters={},
-            ),
-        ),
-        (
-            None,
-            lambda self, param1=123, param2=456: None,
-            None,
-            _ExtractorConf(
-                features={"feature1", "feature2"},
-                required=set(),
-                optional=set(),
-                dependencies=set(),
-                parameters={"param1": 123, "param2": 456},
-            ),
-        ),
-        (
-            None,
-            None,
-            lambda self, data1, data2, featureA, featureB, data3=123: None,
-            _ExtractorConf(
-                features={"feature1", "feature2"},
-                required={"data1", "data2"},
-                optional={"data3"},
-                dependencies={"featureA", "featureB"},
-                parameters={},
-            ),
-        ),
-        (
-            ["feature1", "feature2", "feature3"],
-            lambda self, param1=123, param2=456: None,
-            lambda self, data1, data2, featureA, featureB, data3=123: None,
-            _ExtractorConf(
-                features={"feature1", "feature2", "feature3"},
-                required={"data1", "data2"},
-                optional={"data3"},
-                dependencies={"featureA", "featureB"},
-                parameters={"param1": 123, "param2": 456},
-            ),
-        ),
-    ],
-    ids=[
-        "no_params",
-        "init_params",
-        "extract_params",
-        "multiple_params",
-    ],
-)
-def test_ExtractorConf_from_extractor_class(
-    mock_DATAS,
-    fake_ecls,
-    features,
-    init_method,
-    extract_method,
-    expected,
-):
-    mock_DATAS()
-    ecls = fake_ecls(
-        feature_names=features,
-        init_method=init_method,
-        extract_method=extract_method,
-    )
-    conf = _ExtractorConf.from_extractor_class(ecls)
-    np.testing.assert_equal(conf, expected)
-
-
-@pytest.mark.parametrize(
-    ["required", "optional", "expected"],
-    [
-        (set(), set(), set()),
-        ({"data1", "data2"}, set(), {"data1", "data2"}),
-        (set(), {"data1", "data2"}, {"data1", "data2"}),
-        ({"data1"}, {"data2", "data3"}, {"data1", "data2", "data3"}),
-    ],
-    ids=[
-        "no_data",
-        "required",
-        "optional",
-        "required_and_optional",
-    ],
-)
-def test_ExtractorConf_data(
-    mock_DATAS, fake_ecls, required, optional, expected
-):
-    mock_DATAS()
-    extractor_conf = _ExtractorConf(
-        required=required,
-        optional=optional,
-        features=set(),
-        dependencies=set(),
-        parameters={},
-    )
-    np.testing.assert_equal(extractor_conf.data, expected)
+def test_feature_warning():
+    with pytest.warns(FeatureExtractionWarning):
+        feature_warning("test warning")
 
 
 # =============================================================================
@@ -394,420 +85,344 @@ def test_ExtractorConf_data(
 # =============================================================================
 
 
-def test_Extractor_init_subclass(fake_extractor_conf_cls, mock_extractor_conf):
-    extractor_conf_cls = fake_extractor_conf_cls(
-        features=["feature1", "feature2"],
-        required=["data1"],
-        optional=["data2"],
-        dependencies=["dependency1"],
-        default_params={
-            "parameter1": 1,
-            "parameter2": 2,
-            "parameter3": 3,
-        },
-    )
-    mock_extractor_conf(extractor_conf_cls)
-
-    class TestExtractor(Extractor):
-        features = ["feature1"]
-
-        def extract(self):
-            pass
-
-    np.testing.assert_equal(
-        TestExtractor._conf, extractor_conf_cls.from_extractor_class()
-    )
+def test_Extractor_init():
+    with pytest.raises(TypeError):
+        Extractor()
 
 
-def test_Extractor_init_subclass_raises_ExtractorBadDefinedError():
+def test_Extractor_init_subclass(TestExtractor):
+    class AbstractExtractor(Extractor):
+        __abstractclass__ = True
+
+    with pytest.raises(AttributeError):
+        TestExtractor.features
+
+
+def test_Extractor_no_features():
     with pytest.raises(ExtractorBadDefinedError):
 
-        class TestExtractorA(Extractor):
+        class BadExtractor(Extractor):
             def extract(self):
                 pass
 
+
+def test_Extractor_invalid_feature():
     with pytest.raises(ExtractorBadDefinedError):
 
-        class TestExtractorB(Extractor):
-            features = ["feature1"]
+        class BadExtractor(Extractor):
+            features = ["magnitude"]
+
+            def extract(self):
+                pass
 
 
 @pytest.mark.parametrize(
-    ["method", "expected"],
-    (
-        ("get_features", {"feature1", "feature2"}),
-        ("get_data", {"data1", "data2"}),
-        ("get_required_data", {"data1"}),
-        ("get_optional", {"data2"}),
-        ("get_dependencies", {"dependency1"}),
-        (
-            "get_default_params",
-            {
-                "parameter1": 1,
-                "parameter2": 2,
-                "parameter3": 3,
-            },
-        ),
-    ),
-    ids=(
-        "features",
-        "data",
-        "required_data",
-        "optional",
-        "dependencies",
-        "default_params",
-    ),
-)
-def test_Extractor_getters(
-    fake_extractor_conf_cls, mock_extractor_conf, method, expected
-):
-    extractor_conf_cls = fake_extractor_conf_cls(
-        features=["feature1", "feature2"],
-        required=["data1"],
-        optional=["data2"],
-        dependencies=["dependency1"],
-        default_params={
-            "parameter1": 1,
-            "parameter2": 2,
-            "parameter3": 3,
-        },
-    )
-    mock_extractor_conf(extractor_conf_cls)
-
-    class TestExtractor(Extractor):
-        features = ["feature1"]
-
-        def extract(self):
-            return None
-
-    np.testing.assert_equal(getattr(TestExtractor, method)(), expected)
-
-
-def test_Extractor_warnings():
-    message = "Test warning message"
-
-    with pytest.warns(FeatureExtractionWarning, match=message):
-        feature_warning(message)
-
-    with pytest.warns(ExtractorWarning, match=message):
-        extractor_warning(message)
-
-
-@pytest.mark.parametrize(
-    ("kwargs", "expected"),
+    "feature",
     [
-        ({}, "<TestExtractor {'param1': 1, 'param2': {}}>"),
-        (
-            {"param1": 10},
-            "<TestExtractor {'param1': 10, 'param2': {}}>",
-        ),
-        (
-            {"param1": 10, "param2": {"key": "value", "key2": "value2"}},
-            "<TestExtractor {'param1': 10, 'param2': '<MANY CONFIGURATIONS>'}>",
-        ),
+        None,
+        0,
+        (1, 2, 3),
     ],
-    ids=["no_params", "partial_params", "complex_params"],
 )
-def test_Extractor_repr(
-    fake_extractor_conf_cls, mock_extractor_conf, kwargs, expected
-):
-    extractor_conf_cls = fake_extractor_conf_cls(features=["feature1"])
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_invalid_feature_format(feature):
+    with pytest.raises(ExtractorBadDefinedError):
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
+        class BadExtractor(Extractor):
+            features = [feature]
 
-        def __init__(self, param1=1, param2=None):
-            if param2 is None:
-                param2 = {}
-
-            self.param1 = param1
-            self.param2 = param2
-
-        def extract(self):
-            pass
-
-    test_ext = TestExtractor(**kwargs)
-    np.testing.assert_equal(repr(test_ext), expected)
+            def extract(self):
+                pass
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    "feature",
     [
-        {},
-        {"param1": 10},
-        {"param1": 10, "param2": {"key": "value", "key2": "value2"}},
+        "   ",
+        "while",
+        "(1, 2, 3)",
     ],
-    ids=["no_params", "partial_params", "complex_params"],
 )
-def test_Extractor_to_dict(
-    fake_extractor_conf_cls, mock_extractor_conf, kwargs
-):
-    extractor_conf_cls = fake_extractor_conf_cls(features=["feature1"])
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_invalid_feature_name(feature):
+    with pytest.raises(ExtractorBadDefinedError):
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
+        class BadExtractor(Extractor):
+            features = [feature]
 
-        def __init__(self, param1=1, param2=None):
-            if param2 is None:
-                param2 = {}
-
-            self.param1 = param1
-            self.param2 = param2
-
-        def extract(self):
-            pass
-
-    test_ext = TestExtractor(**kwargs)
-    expected = {
-        "TestExtractor": {"param1": test_ext.param1, "param2": test_ext.param2}
-    }
-    np.testing.assert_equal(test_ext.to_dict(), expected)
+            def extract(self):
+                pass
 
 
-def test_Extractor_select_kwargs(fake_extractor_conf_cls, mock_extractor_conf):
-    extractor_conf_cls = fake_extractor_conf_cls(
-        features=["feature1"],
-        required=["data1", "data2"],
-        optional=["data3", "data4"],
-        dependencies=["dependency1", "dependency2"],
-    )
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_repeated_feature():
+    with pytest.raises(ExtractorBadDefinedError):
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
+        class BadExtractor(Extractor):
+            features = ["test_feature", "test_feature"]
 
-        def extract(self):
-            pass
-
-    data = {f"data{i+1}": i + 1 for i in range(10)}
-    dependencies = {f"dependency{i+1}": i + 11 for i in range(10)}
-    kwargs = TestExtractor().prepare_extract(data, dependencies)
-
-    np.testing.assert_equal(
-        kwargs,
-        {
-            "data1": 1,
-            "data2": 2,
-            "data3": 3,
-            "data4": 4,
-            "dependency1": 11,
-            "dependency2": 12,
-        },
-    )
+            def extract(self):
+                pass
 
 
-def test_Extractor_select_kwargs_raises_KeyError(
-    fake_extractor_conf_cls, mock_extractor_conf
-):
-    extractor_conf_cls = fake_extractor_conf_cls(
-        features=["feature1"],
-        required=["data1", "data2"],
-        optional=["data3", "data4"],
-        dependencies=["dependency1", "dependency2"],
-    )
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_dependency_has_default():
+    with pytest.raises(ExtractorBadDefinedError):
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
+        class BadExtractor(Extractor):
+            features = ["test_feature"]
 
-        def extract(self):
-            pass
-
-    dependencies = {"dependency1": 11, "dependency2": 12}
-
-    # missing required data
-    data = {"data3": 3, "data4": 4}
-    with pytest.raises(KeyError):
-        TestExtractor().prepare_extract(data, dependencies)
-
-    # missing optional data
-    data = {"data1": 1, "data2": 2}
-    with pytest.raises(KeyError):
-        TestExtractor().prepare_extract(data, dependencies)
-
-    # missing dependencies
-    data = {"data1": 1, "data2": 2, "data3": 3, "data4": 4}
-    with pytest.raises(KeyError):
-        TestExtractor().prepare_extract(data, {})
+            def extract(self, test_dependency=None):
+                pass
 
 
-def test_Extractor_extract_and_validate(
-    fake_extractor_conf_cls, mock_extractor_conf
-):
-    extractor_conf_cls = fake_extractor_conf_cls(
-        features=["feature1"],
-        required=["data1"],
-        optional=["data2"],
-        dependencies=["dependency1"],
-    )
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_parameter_has_no_default():
+    with pytest.raises(ExtractorBadDefinedError):
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
+        class BadExtractor(Extractor):
+            features = ["test_feature"]
 
-        def extract(self, data1, dependency1, data2=2):
-            return {"feature1": data1 + dependency1 + data2}
+            def __init__(self, test_param_1):
+                pass
 
-    results = TestExtractor().extract_and_validate(
-        {"data1": 1, "data2": 2, "dependency1": 3}
-    )
-    np.testing.assert_equal(results, {"feature1": 6})
+            def extract(self):
+                pass
 
 
-def test_Extractor_extract_and_validate_raises_ExtractorValidationError(
-    fake_extractor_conf_cls,
-    mock_extractor_conf,
-):
-    extractor_conf_cls = fake_extractor_conf_cls(
-        features=["feature1"],
-        required=["data1"],
-        optional=["data2"],
-        dependencies=["dependency1"],
-    )
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_no_extract_method():
+    with pytest.raises(ExtractorBadDefinedError):
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
-
-        def extract(self, data1, dependency1, data2=2):
-            return {"feature2": data1 + dependency1 + data2}
-
-    with pytest.raises(ExtractorValidationError):
-        TestExtractor().extract_and_validate(
-            {"data1": 1, "data2": 2, "dependency1": 3}
-        )
+        class BadExtractor(Extractor):
+            features = ["test_feature"]
 
 
-def test_Extractor_flatten_and_validate(
-    fake_extractor_conf_cls,
-    mock_extractor_conf,
-):
-    extractor_conf_cls = fake_extractor_conf_cls(
-        features=["feature1"],
-    )
-    mock_extractor_conf(extractor_conf_cls)
-
-    class TestExtractor(Extractor):
-        features = ["feature1"]
-
-        def extract(self, data1, dependency1, data2=2):
-            return {"feature1": 1}
-
-        def flatten_feature(self, feature, value):
-            return {feature: value}
-
-    np.testing.assert_equal(
-        TestExtractor().validate_flatten("feature1", 1),
-        {"feature1": 1},
-    )
-
-
-@pytest.mark.parametrize(
-    "flatten_result",
-    ["feature1", {("feature1", 1): 1}, {"feature1": [1, 2, 3]}],
-    ids=["not_dict", "name_not_str", "value_not_scalar"],
-)
-def test_Extractor_flatten_and_validate_raises_ExtractorValidationError(
-    fake_extractor_conf_cls,
-    mock_extractor_conf,
-    flatten_result,
-):
-    extractor_conf_cls = fake_extractor_conf_cls(
-        features=["feature1"],
-    )
-    mock_extractor_conf(extractor_conf_cls)
-
-    class TestExtractor(Extractor):
-        features = ["feature1"]
-
-        def extract(self, data1, dependency1, data2=2):
-            pass
-
-        def flatten_feature(self, feature, value):
-            return flatten_result
-
-    with pytest.raises(ExtractorValidationError):
-        TestExtractor().validate_flatten("feature1", 1)
-
-
-def test_Extractor_extract_default(
-    fake_extractor_conf_cls, mock_extractor_conf
-):
-    extractor_conf_cls = fake_extractor_conf_cls(features=["feature1"])
-    mock_extractor_conf(extractor_conf_cls)
-
-    class TestExtractor(Extractor):
-        features = ["feature1"]
+def test_Extractor_extract_not_implemented():
+    class BadExtractor(Extractor):
+        features = ["test_feature"]
 
         def extract(self):
             super().extract()
 
     with pytest.raises(NotImplementedError):
-        TestExtractor().extract()
+        BadExtractor().extract()
+
+
+def test_Extractor_is_abstract():
+    class AbstractExtractor(Extractor):
+        __abstractclass__ = True
+
+    np.testing.assert_equal(AbstractExtractor.is_abstract(), True)
+
+
+def test_Extractor_is_not_abstract(TestExtractor):
+    np.testing.assert_equal(TestExtractor.is_abstract(), False)
+
+
+def test_Extractor_get_features(TestExtractor):
+    np.testing.assert_equal(
+        TestExtractor.get_features(), {"test_feature_1", "test_feature_2"}
+    )
+
+
+def test_Extractor_get_data(TestExtractor):
+    np.testing.assert_equal(
+        TestExtractor.get_data(), {"time", "magnitude", "error", "magnitude2"}
+    )
+
+
+def test_Extractor_get_optional_data(TestExtractor):
+    np.testing.assert_equal(
+        TestExtractor.get_optional_data(), {"error", "magnitude2"}
+    )
+
+
+def test_Extractor_get_required_data(TestExtractor):
+    np.testing.assert_equal(
+        TestExtractor.get_required_data(), {"time", "magnitude"}
+    )
+
+
+def test_Extractor_get_dependencies(TestExtractor):
+    np.testing.assert_equal(
+        TestExtractor.get_dependencies(),
+        {"test_dependency_1", "test_dependency_2"},
+    )
+
+
+def test_Extractor_get_default_params(TestExtractor):
+    print(TestExtractor.get_default_params())
+    np.testing.assert_equal(
+        TestExtractor.get_default_params(),
+        {"test_param_1": None, "test_param_2": None, "test_param_3": None},
+    )
+
+
+def test_Extractor_prepare_extract(TestExtractor):
+    data = {
+        "time": [0, 1, 2],
+        "magnitude": [10, 20, 30],
+        "error": [0.1, 0.2, 0.3],
+        "flux": [100, 200, 300],
+    }
+    dependencies = {
+        "test_dependency_1": 1,
+        "test_dependency_2": 2,
+        "test_dependency_3": 3,
+        "test_dependency_4": 4,
+    }
+
+    np.testing.assert_equal(
+        TestExtractor.prepare_extract(data, dependencies),
+        {
+            "time": [0, 1, 2],
+            "magnitude": [10, 20, 30],
+            "error": [0.1, 0.2, 0.3],
+            "test_dependency_1": 1,
+            "test_dependency_2": 2,
+        },
+    )
+
+
+def test_Extractor_prepare_extract_missing_required_dependency(TestExtractor):
+    data = {
+        "time": [0, 1, 2],
+        "magnitude": [10, 20, 30],
+    }
+    dependencies = {
+        "test_dependency_1": 1,
+    }
+
+    with pytest.raises(ExtractorValidationError):
+        TestExtractor.prepare_extract(data, dependencies)
+
+
+def test_Extractor_prepare_extract_missing_required_data(TestExtractor):
+    data = {
+        "time": [0, 1, 2],
+    }
+    dependencies = {
+        "test_dependency_1": 1,
+        "test_dependency_2": 2,
+    }
+
+    with pytest.raises(ExtractorValidationError):
+        TestExtractor.prepare_extract(data, dependencies)
+
+
+def test_Extractor_validate_extract(TestExtractor):
+    features = {
+        "test_feature_1": 1,
+        "test_feature_2": 2,
+    }
+
+    np.testing.assert_equal(TestExtractor.validate_extract(features), None)
 
 
 @pytest.mark.parametrize(
-    ["raw_value", "expected"],
+    "features",
     [
-        (1, {"feature1": 1}),
-        ("string", {"feature1": "string"}),
-        ((0, 1, 2), {"feature1_0": 0, "feature1_1": 1, "feature1_2": 2}),
-        ([0, 1, 2], {"feature1_0": 0, "feature1_1": 1, "feature1_2": 2}),
-        ({"key": "value"}, {"feature1_key": "value"}),
-        (
-            {"key": np.array([0, 1, {"first": 2, "last": 3}])},
-            {
-                "feature1_key_0": 0,
-                "feature1_key_1": 1,
-                "feature1_key_2_first": 2,
-                "feature1_key_2_last": 3,
-            },
-        ),
-        (
-            OrderedDict([("key1", 1), ("key2", 2)]),
-            {"feature1_key1": 1, "feature1_key2": 2},
-        ),
+        {"test_feature_1": 1},
+        {"test_feature_1": 1, "test_feature_2": 2, "test_feature_3": 3},
+        {"test_feature_3": 3},
     ],
 )
-def test_Extractor_flatten_feature_default(
-    fake_extractor_conf_cls, mock_extractor_conf, raw_value, expected
-):
-    extractor_conf_cls = fake_extractor_conf_cls(features=["feature1"])
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_validate_extract_features_mismatch(TestExtractor, features):
+    with pytest.raises(ExtractorValidationError):
+        TestExtractor.validate_extract(features)
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
 
-        def extract(self):
-            return {"feature1": raw_value}
+def test_Extractor_validate_flatten(TestExtractor):
+    feature = "test_feature_1"
+    flattened = {
+        "test_feature_1_0": 0,
+        "test_feature_1_1": 1,
+        "test_feature_1_2": 2,
+    }
 
     np.testing.assert_equal(
-        TestExtractor().flatten_feature("feature1", raw_value), expected
+        TestExtractor.validate_flatten(feature, flattened), None
     )
 
 
 @pytest.mark.parametrize(
-    "raw_value",
+    "flattened",
     [
         None,
-        {"result1", "result2"},
-        lambda x: x,
+        (1, 2, 3),
+        {None: 1},
+        {(1, 2, 3): 1},
+        {"test_feature_1_0": None},
+        {"test_feature_1_0": (1, 2, 3)},
     ],
-    ids=["none", "set", "function"],
 )
-def test_Extractor_flatten_feature_default_raises_ExtractorTransformError(
-    fake_extractor_conf_cls, mock_extractor_conf, raw_value
-):
-    extractor_conf_cls = fake_extractor_conf_cls(features=["feature1"])
-    mock_extractor_conf(extractor_conf_cls)
+def test_Extractor_validate_flatten_invalid_format(TestExtractor, flattened):
+    feature = "test_feature_1"
+    with pytest.raises(ExtractorValidationError):
+        TestExtractor.validate_flatten(feature, flattened)
 
-    class TestExtractor(Extractor):
-        features = ["feature1"]
 
-        def extract(self):
-            return {"feature1": raw_value}
+def test_Extractor_params(test_extractor):
+    params = {
+        "test_param_1": 1,
+        "test_param_2": {"sub_param_1": 21, "sub_param_2": 22},
+        "test_param_3": None,
+    }
+    np.testing.assert_equal(test_extractor.params, params)
 
+
+def test_Extractor_to_dict(test_extractor):
+    params = {
+        "test_param_1": 1,
+        "test_param_2": {"sub_param_1": 21, "sub_param_2": 22},
+        "test_param_3": None,
+    }
+    np.testing.assert_equal(
+        test_extractor.to_dict(),
+        {"TestExtractor": params},
+    )
+
+
+def test_Extractor_repr(test_extractor):
+    np.testing.assert_equal(
+        repr(test_extractor),
+        f"<TestExtractor test_param_1=1 test_param_2=<MANY CONFIGURATIONS> test_param_3=None>",
+    )
+
+
+@pytest.mark.parametrize(
+    ["value", "flattened"],
+    [
+        [1, {"test_feature_1": 1}],
+        ["value", {"test_feature_1": "value"}],
+        [
+            [0, 1, 2],
+            {
+                "test_feature_1_0": 0,
+                "test_feature_1_1": 1,
+                "test_feature_1_2": 2,
+            },
+        ],
+        [
+            {"key": "value"},
+            {"test_feature_1_key": "value"},
+        ],
+        [
+            {"key": [0, 1, 2]},
+            {
+                "test_feature_1_key_0": 0,
+                "test_feature_1_key_1": 1,
+                "test_feature_1_key_2": 2,
+            },
+        ],
+    ],
+)
+def test_Extractor_flatten_feature(test_extractor, value, flattened):
+    np.testing.assert_equal(
+        test_extractor.flatten_feature("test_feature_1", value),
+        flattened,
+    )
+
+
+@pytest.mark.parametrize(
+    "value",
+    [set(), map(lambda x: x, [1, 2, 3])],
+)
+def test_Extractor_flatten_feature_invalid_value_format(test_extractor, value):
     with pytest.raises(ExtractorTransformError):
-        TestExtractor().flatten_feature("feature1", raw_value)
+        test_extractor.flatten_feature("test_feature_1", value)

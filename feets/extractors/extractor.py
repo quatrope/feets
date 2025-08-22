@@ -11,8 +11,7 @@
 # DOCS
 # =============================================================================
 
-"""Feature extractors base classes."""
-
+"""Feature extractor base classes."""
 
 # =============================================================================
 # IMPORTS
@@ -23,6 +22,7 @@ import inspect
 import warnings
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from keyword import iskeyword
 
 import numpy as np
 
@@ -67,30 +67,31 @@ DATAS = (
 class ExtractorBadDefinedError(TypeError):
     """The extractor class is not defined properly."""
 
+    pass
+
 
 class ExtractorValidationError(ValueError):
     """Some value used by the extractor is missing or invalid."""
+
+    pass
 
 
 class ExtractorTransformError(RuntimeError):
     """The extractor can't transform the data into the expected format."""
 
-
-class InvalidDataError(ValueError):
-    """The provided data vectors are invalid."""
-
-    def __init__(self, invalid_data):
-        super().__init__(
-            f"Invalid data vectors: {", ".join(map(repr, invalid_data))}."
-        )
+    pass
 
 
 class ExtractorWarning(UserWarning):
     """Warn about the Extractor behavior."""
 
+    pass
+
 
 class FeatureExtractionWarning(UserWarning):
     """Warn about the calculation of some feature."""
+
+    pass
 
 
 warnings.simplefilter("always", ExtractorWarning)
@@ -138,6 +139,10 @@ def _iter_method_parameters(method):
     return iter(parameters)
 
 
+def _is_valid_name(name):
+    return name.isidentifier() and not iskeyword(name)
+
+
 def _flatten_data(data, prefix):
     result = {}
 
@@ -172,6 +177,11 @@ class _ExtractorConf:
             raise ExtractorBadDefinedError(
                 f"Feature name must be an instance of string. "
                 f"Found {type(feature)}, please check {features_attr!r}"
+            )
+        if not _is_valid_name(feature):
+            raise ExtractorBadDefinedError(
+                f"Feature name must be a valid variable identifier. "
+                f"Found {feature!r}, please check {features_attr!r}"
             )
         if feature in DATAS:
             raise ExtractorBadDefinedError(
@@ -286,114 +296,153 @@ class _ExtractorConf:
 
 
 class Extractor(abc.ABC):
-    """Abstract base class for all feature extractors.
+    """Abstract base class for feature extractors.
 
-    Extractors are classes that implement feature extraction logic. They must
-    override the `extract()` method, which is called by the `FeatureSpace`
-    class to extract features from a time series.
+    To create a feature extractor, define a subclass of the `Extractor` class
+    that defines a `features` attribute with the names of the new features, and
+    implement the `extract()` method with the logic needed to compute them.
 
-    An extractor class may also override the `__init__()` method with custom
-    arguments that are considered parameters of the extractor. All of these
-    parameters must have default values.
+    A feature extractor may also expose optional parameters to customize its
+    behavior. To add such parameters, implement the `__init__()` method and
+    specify them as keyword arguments.
 
-    Extractors must define a `features` attribute, which is the list of
-    features that the extractor can compute.
+    For representation purposes, the features returned by the `extract()`
+    method must be normalizable into a flat dictionary of scalar values. This
+    is internally accomplished by the `flatten_feature()` method, which can
+    be extended to add support for custom formats.
 
-    Additionally, extractors can override the `flatten_feature` method to
-    normalize a feature into a dictionary of scalar subfeatures for
-    representation purposes.
+    Parameters
+    ----------
+    **kwargs
+        Optional parameters to change the behavior of the extractor.
 
     Attributes
     ----------
-    features : array_like
-        The features computed by the extractor.
+    features : array_like of str
+        The features that can be computed with the `extract()` method.
 
     Methods
     -------
     extract(**kwargs)
-        Extract features from the time series.
+        Extract features from time series data vectors and/or from other
+        dependency features
+    flatten_feature(feature, value)
+        Normalize a feature into a dictionary of scalar values.
 
-    flatten_feature(feature, data)
-        Flatten the feature value for representation.
-
-    Notes on the `extract()` method
-    -------------------------------
-    The `extract()` method must be overridden by the user to implement the
-    feature extraction logic.
-
-    It must accept as arguments the data vectors present in the time series
-    (e.g., magnitude, time, error) from which it will compute the features, as
-    well as the features computed by other extractors on which the calculation
-    may also depend.
-
-    The return value must be a dictionary containing the results of the feature
-    extraction, where the keys represent the feature names and the values are
-    the computed results. Additionally, the features returned in the dictionary
-    must be those defined in the `features` attribute.
-
-    Notes on the `flatten_feature()` method
-    ---------------------------------------
-    The `flatten_feature()` method can be overridden by the user to normalize a
-    feature whose value comes in a complex format into a flat dictionary of
-    subfeatures for representation purposes.
-
-    It must accept as arguments the feature name and the feature computed
-    value, and return a flat dictionary where the keys represent the
-    subfeature names and the values are the normalized results as numpy
-    scalars.
-
-    The built-in implementation of `flatten_feature()` is already able to
-    handle dictionaries and sequences, but it may need to be overridden if the
-    feature comes in a different format.
+    See Also
+    --------
+    extract, flatten_feature
 
     Examples
     --------
-    **An extractor that computes the sum of the magnitude vector:**
+    Extractor that computes the sum of the `magnitude` data vector:
+
+    >>> magnitude = [1, 2, 3, 4]
+    ...
     >>> class SumExtractor(Extractor):
-    ...     features = ["sum_feature"]
+    ...     features = ["Sum"]
     ...
     ...     def extract(self, magnitude):
-    ...         return {"sum_feature": sum(magnitude)}
-    >>> ext = SumExtractor()
-    >>> ext.extract(magnitude=[1, 2, 3, 4])
-    {'sum_feature': 10}
+    ...         return {"Sum": sum(magnitude)}
+    ...
+    >>> sum_ext = SumExtractor()
+    >>> sum_results = ext.extract(magnitude)
+    >>> sum_results
+    {'Sum': 10}
 
-    **An extractor that depends on the previously computed sum feature and
-    computes the mean of the magnitude vector:**
+    Extractor that depends on the previously computed `Sum` feature to compute
+    the mean of the `magnitude` data vector:
+
     >>> class MeanExtractor(Extractor):
-    ...     features = ["mean_feature"]
+    ...     features = ["Mean"]
     ...
-    ...     def extract(self, magnitude, sum_feature):
-    ...         return {"mean_feature": sum_feature / len(magnitude)}
-    >>> ext = MeanExtractor()
-    >>> ext.extract(magnitude=[1, 2, 3, 4], sum_feature=10)
-    {'mean_feature': 2.5}
+    ...     def extract(self, magnitude, Sum):
+    ...         return {"Mean": Sum / len(magnitude)}
+    ...
+    >>> mean_ext = MeanExtractor()
+    >>> mean_results = mean_ext.extract(magnitude, sum_results['Sum'])
+    >>> mean_results
+    {'Mean': 2.5}
 
-    **An extractor that flattens a feature into subfeatures:**
-    >>> class FlattenExtractor(Extractor):
-    ...     features = ["my_feature"]
+    Extractor that implements normalization for custom feature formats:
+
+    >>> class CustomFormatExtractor(Extractor):
+    ...     features = ["Min", "Parity", "NoDuplicates", "Squared"]
     ...
     ...     def extract(self, magnitude):
-    ...         return {"my_feature": magnitude}
+    ...         return {
+    ...             "Min": min(magnitude), # number
+    ...             "Parity": {
+    ...                  "even": [x for x in magnitude if int(x) % 2 == 0],
+    ...                  "odd": [x for x in magnitude if int(x) % 2 != 0]
+    ...             }, # dict[string, list of number]
+    ...             "NoDuplicates": set(magnitude), # set of number
+    ...             "Squared": map(lambda x: x**2, magnitude) # map of number
+    ...         }
     ...
-    ...     def flatten_feature(self, feature, data):
-    ...         return {f"{feature}_{i}": val for i, val in enumerate(data)}
-    >>> ext = FlattenExtractor()
-    >>> ext.flatten_feature("my_feature", [1, 2, 3])
-    {'my_feature_0': 1, 'my_feature_1': 2, 'my_feature_2': 3}
+    ...     def flatten_feature(self, feature, value):
+    ...         if feature in ("NoDuplicates", "Squared"):
+    ...             # add support for sets and maps
+    ...             return {
+    ...                 f"{feature}_{i}": item for i, item in enumerate(value)
+    ...             }
+    ...         else:
+    ...             # fallback to default behavior
+    ...             return super().flatten_feature(feature, value)
+    ...
+    >>> custom_format_ext = CustomFormatExtractor()
+    >>> custom_format_results = custom_format_ext.extract(magnitude)
+    >>> custom_format_results
+    {
+        'Min': 1,
+        'Parity': {'even': [2, 4], 'odd': [1, 3]},
+        'NoDuplicates': {1, 2, 3, 4},
+        'Squared': <map object at 0x7fc9c3d7a350>
+    }
+    >>> custom_format_ext.flatten_feature(
+    ...     "Min", custom_format_results['Min']
+    ... )
+    {'Min': 1}
+    >>> custom_format_ext.flatten_feature(
+    ...     "Parity", custom_format_results['Parity']
+    ... )
+    {
+        'Parity_even_0': 2,
+        'Parity_even_1': 4,
+        'Parity_odd_0': 1,
+        'Parity_odd_1': 3
+    }
+    >>> custom_format_ext.flatten_feature(
+    ...     "NoDuplicates", custom_format_results['NoDuplicates']
+    ... )
+    {
+        'NoDuplicates_0': 1,
+        'NoDuplicates_1': 2,
+        'NoDuplicates_2': 3,
+        'NoDuplicates_3': 4
+    }
+    >>> custom_format_ext.flatten_feature(
+    ...     "Squared", custom_format_results['Squared']
+    ... )
+    {
+        'Squared_0': 1,
+        'Squared_1': 4,
+        'Squared_2': 9,
+        'Squared_3': 16
+    }
     """
 
     def __init_subclass__(cls):
-        """Initialize the extractor subclass and validate its definition.
+        """Initialize and validate an `Extractor` subclass.
 
-        This method is called when a new subclass of the Extractor class is
-        created. It validates that the subclass implements the `extract()`
-        method and sets the configuration attributes for the extractor.
+        Upon creation of an `Extractor` subclass, set the class attributes
+        and validate that the `extract()` method is implemented.
 
         Raises
         ------
         ExtractorBadDefinedError
-            If the extractor subclass does not implement the `extract()` method.
+            If the `Extractor` subclass does not implement the `extract()`
+            method.
 
         """
         cls_name = cls.__qualname__
@@ -407,139 +456,140 @@ class Extractor(abc.ABC):
             )
 
         cls._conf = _ExtractorConf.from_extractor_class(cls)
+
+        cls_init = cls.__init__
+
+        def __init__(self, **kwargs):
+            cls_init(self, **kwargs)
+            cls._init_kwargs = kwargs
+
+        cls.__init__ = __init__
+
         del cls.features
 
     # GETTERS =================================================================
 
     @classmethod
     def is_abstract(cls):
-        """Check if the extractor class is an abstract class.
+        """Check if the class is abstract.
 
         Returns
         -------
         bool
-            True if the extractor class is an abstract class, False otherwise.
+            True if it's an abstract class, False otherwise.
         """
         return _is_abstract_class(cls)
 
     @classmethod
     def get_features(cls):
-        """Retrieve the features that can be computed by the extractor.
+        """Get the features that can be computed by the feature extractor.
 
         Returns
         -------
         frozenset
-            A set of features that the extractor computes from the time series
-            data. These features are the ones returned by the `extract()` method.
+            The features that the `extract()` method can compute.
+
+        See Also
+        --------
+        extract
         """
         return cls._conf.features
 
     @classmethod
     def get_data(cls):
-        """Retrieve the data vectors utilized by the extractor.
+        """Get the data vectors that can be used by the feature extractor.
+
+        The result is the union of the required and optional data vectors.
 
         Returns
         -------
         frozenset
-            A set of time series data vectors that are used by the extractor
-            during feature extraction. This includes both required and optional
-            data vectors.
+            Time series data vectors that the `extract()` method can use to
+            compute the features.
 
-            These vectors are passed as arguments to the `extract()` method.
+        See Also
+        --------
+        get_optional_data, get_required_data,
+        extract
         """
         return cls._conf.data
 
     @classmethod
     def get_optional_data(cls):
-        """Retrieve the optional data vectors for the extractor.
+        """Get the data vectors optionally used by the feature extractor.
 
         Returns
         -------
         frozenset
-            A set of optional time series data vectors that the extractor can
-            use to compute its features. These data vectors may be provided as
-            arguments to the `extract()` method, but they are not required.
+            Time series data vectors that can be optionally passed to the
+            `extract()` method to compute the features.
+
+        See Also
+        --------
+        get_data, get_required_data,
+        extract
         """
         return cls._conf.optional
 
     @classmethod
     def get_required_data(cls):
-        """Retrieve the required data vectors for the extractor.
+        """Get the data vectors required by the feature extractor.
 
         Returns
         -------
         frozenset
-            A set of time series data vectors that that are necessary for the
-            extractor to compute its features. These data vectors must be
-            provided as arguments to the `extract()` method.
+            Time series data vectors that are required for the `extract()`
+            method to compute the features.
+
+        See Also
+        --------
+        get_data, get_optional_data,
+        extract
         """
         return cls._conf.required
 
     @classmethod
     def get_dependencies(cls):
-        """Retrieve the dependencies required by the extractor.
+        """Get the feature dependencies required by the feature extractor.
 
         Returns
         -------
         frozenset
-            A set of features computed by other extractors that are necessary
-            for this extractor to compute its own features. These dependencies
-            must be provided as arguments to the `extract()` method.
+            Features that should be previously computed by other extractors,
+            and are required for the `extract()` method to compute its own
+            features.
+
+        See Also
+        --------
+        extract
         """
         return cls._conf.dependencies
 
     @classmethod
     def get_default_params(cls):
-        """Retrieve the default parameters for the extractor.
+        """Get the default values for the feature extractor parameters.
 
         Returns
         -------
         dict
-            A dictionary containing the default values for the parameters
-            defined in the `__init__()` method of the extractor class.
+            The default values for the parameters defined by the `__init__()`
+            method.
+
+        See Also
+        --------
+        Extractor, params
         """
         return cls._conf.parameters
 
-    # PERSISTENCE =============================================================
-
-    @property
-    def params(self):
-        param_names = self.get_default_params().keys()
-        return {pname: getattr(self, pname) for pname in param_names}
-
-    def to_dict(self):
-        """Convert the extractor to a dictionary representation.
-
-        Returns
-        -------
-        dict
-            A dictionary containing the parameters of the extractor instance.
-        """
-        cls_name = type(self).__name__
-        params = self.params
-        return {cls_name: params}
-
-    # MAGIC ===================================================================
-
-    def __repr__(self):
-        """Return a string representation of the Extractor object."""
-        cls_name = type(self).__name__
-        params = self.params
-        state = {}
-        for pname, pvalue in params.items():
-            if len(repr(pvalue)) > 20:
-                pvalue = "<MANY CONFIGURATIONS>"
-            state[pname] = pvalue
-        return f"<{cls_name} {state}>" if state else f"<{cls_name}>"
-
     # API =====================================================================
 
-    def prepare_extract(self, data, dependencies):
-        """Prepare keyword arguments for the `extract()` method.
+    @classmethod
+    def prepare_extract(cls, data, dependencies):
+        """Build keyword arguments for the `extract()` method.
 
-        Combine the necessary features from the `dependencies` and the required
-        data from the provided `data` into a dictionary of keyword arguments
-        that should be passed to the `extract()` method.
+        Combine the required features from `dependencies` and the data vectors
+        from `data` into the dictionary of keyword arguments that should be
+        passed to the `extract()` method.
 
         Parameters
         ----------
@@ -551,21 +601,20 @@ class Extractor(abc.ABC):
         Raises
         ------
         ExtractorValidationError
-            If any required data or dependency is missing from the provided
-            inputs.
+            A required data vector or feature dependency is missing from the
+            provided values.
 
         Returns
         -------
         dict
-            A dictionary containing the keyword arguments for the `extract()`
-            method.
+            The keyword arguments for the `extract()` method.
         """
-        cls_name = type(self).__qualname__
+        cls_name = cls.__qualname__
 
         kwargs = {}
 
         # select dependencies
-        for d in self.get_dependencies():
+        for d in cls.get_dependencies():
             if d not in dependencies:
                 raise ExtractorValidationError(
                     f"Missing required dependency {d!r} for extractor {cls_name}"
@@ -573,42 +622,42 @@ class Extractor(abc.ABC):
             kwargs[d] = dependencies[d]
 
         # select data
-        for d in self.get_required_data():
+        for d in cls.get_required_data():
             if d not in data:
                 raise ExtractorValidationError(
                     f"Missing required data {d!r} for extractor {cls_name}"
                 )
             kwargs[d] = np.asarray(data[d])
 
-        for d in self.get_optional_data():
+        for d in cls.get_optional_data():
             if d not in data or d in kwargs:
                 continue
             kwargs[d] = np.asarray(data[d])
 
         return kwargs
 
-    def validate_extract(self, features):
-        """Validate the extracted features.
+    @classmethod
+    def validate_extract(cls, features):
+        """Validate the results of the `extract()` method.
 
-        Validate that the extracted features match the expected features
-        defined in the extractor.
+        Validate that the extracted features match the `features` attribute.
 
         Parameters
         ----------
         features : dict
-            The extracted features from the time series.
+            The results extracted with the `extract()` method.
 
         Raises
         ------
         ExtractorValidationError
-            If the extracted features don't match the expected features defined
-            in the `features` attribute.
+            If the extracted features don't match the ones defined in the
+            `features` attribute.
         """
-        expected_features = self.get_features()
+        expected_features = cls.get_features()
         diff = expected_features.symmetric_difference(features)
 
         if diff:
-            cls_name = type(self).__qualname__
+            cls_name = cls.__qualname__
             expected_str = ", ".join(map(repr, expected_features))
             results_str = ", ".join(map(repr, features.keys()))
             raise ExtractorValidationError(
@@ -616,14 +665,15 @@ class Extractor(abc.ABC):
                 f"{expected_str}. Found: {results_str!r}"
             )
 
-    def validate_flatten(self, feature, flattened):
-        """Validate that a flattened feature is a dictionary of numpy scalars.
+    @classmethod
+    def validate_flatten(cls, feature, flattened):
+        """Validate the results of the `flatten_feature()` method.
 
         Parameters
         ----------
         feature : str
             The name of the flattened feature.
-        flattend : object
+        flattened : object
             The flattened feature value.
 
         Raises
@@ -649,35 +699,118 @@ class Extractor(abc.ABC):
                     f"Found {type(val)} for feature {feature!r}"
                 )
 
+    # PERSISTENCE =============================================================
+
+    @property
+    def params(self):
+        """Feature extractor initial parameters.
+
+        Returns
+        -------
+        dict
+            The parameters passed to the `__init__()` method.
+
+        See Also
+        --------
+        Extractor, get_default_params
+        """
+        params = self.get_default_params()
+        params.update(self._init_kwargs)
+        return params
+
+    def to_dict(self):
+        """Convert the `Extractor` object to a dictionary representation.
+
+        Returns
+        -------
+        dict
+            A dictionary representation of the `Extractor`, including the
+            values of the parameters.
+        """
+        cls_name = type(self).__name__
+        params = self.params
+        print(cls_name)
+        return {cls_name: params}
+
+    # MAGIC ===================================================================
+
+    def __repr__(self):
+        """String representation of the `Extractor` object."""
+        cls_name = type(self).__name__
+        params = self.params
+
+        param_strs = [
+            (
+                f" {pname}=<MANY CONFIGURATIONS>"
+                if len(repr(pvalue)) > 20
+                else f" {pname}={pvalue!r}"
+            )
+            for pname, pvalue in params.items()
+        ]
+        state_str = "".join(param_strs)
+        extractor_str = f"<{cls_name}" + state_str + ">"
+
+        return extractor_str
+
     # TO REDEFINE =============================================================
 
     def __init__(self):
         pass
 
     @abc.abstractmethod
-    def extract(self):
-        """Extract features from the time series.
+    def extract(self, *args, **kwargs):
+        """Extract features from time series data and/or from other features.
+
+        Implement this method in a subclass such that it returns a dictionary
+        containing the computed values for all of the features defined in the
+        `features` attribute.
+
+        Parameters
+        ----------
+        *args
+            Includes the time series data vectors that are required as inputs
+            for the extraction, as well as the necessary feature dependencies.
+        **kwargs
+            Additional time series data vectors that can be used as optional
+            inputs for the extraction.
 
         Returns
         -------
         dict
-            The dictionary of features extracted from the time series.
+            The computed values for all of the features defined in the
+            `features` attribute.
+
+        See Also
+        --------
+        get_data, get_optional_data, get_required_data, get_dependencies,
+        Extractor
         """
         raise NotImplementedError()
 
     def flatten_feature(self, feature, value):
-        """Flatten the feature value for representation.
+        """Normalize a feature value into a dictionary of scalars.
+
+        This method is called internally to better reepresent the returned
+        features of the `extract()` method.
+
+        By default, it handles the normalization of scalars, sequences and
+        dictionaries. Extend this method to add support to more complex
+        formats.
 
         Parameters
         ----------
         feature : str
-            The name of the feature to flatten.
+            The name of the feature.
         value : object
-            The value of the feature.
+            The raw value as received by the `extract()` method.
 
         Returns
         -------
         dict
-            A dictionary containing the flattened feature value as subfeatures.
+            A dictionary of scalars representing the flattened feature.
+
+        See Also
+        --------
+        extract, Extractor
         """
         return _flatten_data(value, feature)

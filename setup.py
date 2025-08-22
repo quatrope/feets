@@ -11,9 +11,7 @@
 # DOCS
 # =============================================================================
 
-"""This file is for distribute feets
-
-"""
+"""Setup script for the `feets` package."""
 
 
 # =============================================================================
@@ -43,7 +41,7 @@ REQUIREMENTS = [
     "joblib",
     "custom_inherit",
     "dask",
-    "light-curve"
+    "light-curve",
 ]
 
 
