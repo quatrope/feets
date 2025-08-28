@@ -7,322 +7,452 @@
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
 
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+
 from feets.extractors.extractor import Extractor
 from feets.extractors.registry import (
-    DependenciesNotFound,
+    EntityNotFoundError,
     ExtractorRegistry,
-    FeaturesAlreadyRegistered,
-    FeaturesNotFound,
+    RegistryConflictError,
+    RegistryValidationError,
 )
 
 import numpy as np
-from numpy.testing import assert_raises
 
 import pytest
 
 
-# Mock Extractor classes for testing
-class MockExtractorA(Extractor):
-    features = ["feature1"]
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 
-    @staticmethod
-    def get_data():
-        return {"valid_data1"}
+DATA_1 = "test_data_1"
+DATA_2 = "test_data_2"
+DATA_3 = "test_data_3"
+DATA_4 = "test_data_4"
+ALL_DATA = (DATA_1, DATA_2, DATA_3, DATA_4)
+INVALID_DATA = "test_data_5"
 
-    def extract(self):
-        pass
+FEATURE_1 = "test_feature_1"
+FEATURE_2 = "test_feature_2"
+FEATURE_3 = "test_feature_3"
+FEATURE_4 = "test_feature_4"
 
-
-class MockExtractorB1(Extractor):
-    features = ["feature2"]
-
-    @staticmethod
-    def get_data():
-        return {"valid_data1", "valid_data2"}
-
-    def extract(self, feature1):
-        pass
-
-
-class MockExtractorB2(Extractor):
-    features = ["feature3"]
-
-    @staticmethod
-    def get_data():
-        return {"valid_data1", "valid_data2"}
-
-    def extract(self, feature1):
-        pass
-
-
-class MockExtractorC(Extractor):
-    features = ["feature4"]
-
-    @staticmethod
-    def get_data():
-        return {"valid_data3"}
-
-    def extract(self, feature2, feature3):
-        pass
+# =============================================================================
+# FIXTURES
+# =============================================================================
 
 
 @pytest.fixture
-def registry(mocker):
-    mocker.patch(
-        "feets.extractors.registry.DATAS",
-        ("valid_data1", "valid_data2", "valid_data3"),
-    )
+def empty_registry(mocker):
+    mocker.patch("feets.extractors.registry.DATAS", ALL_DATA)
     return ExtractorRegistry()
 
 
-def test_validate_is_extractor_valid(registry):
-    registry.validate_is_extractor(MockExtractorA)
+@pytest.fixture
+def extractor_DATAS_mock(mocker):
+    return mocker.patch("feets.extractors.extractor.DATAS", ALL_DATA)
 
 
-def test_validate_is_extractor_invalid(registry):
-    with assert_raises(TypeError):
-        registry.validate_is_extractor(object)
+@pytest.fixture
+def TestExtractor1(extractor_DATAS_mock):
+    class TestExtractor1(Extractor):
+        features = {FEATURE_1}
+
+        def extract(self, test_data_1, test_data_2, test_data_3, test_data_4):
+            pass
+
+    return TestExtractor1
 
 
-def test_register_extractor_valid(registry):
-    extractor = MockExtractorA
-    registry.register_extractor(extractor)
-    np.testing.assert_equal(registry._features, {"feature1"})
-    np.testing.assert_equal(registry._extractors, {extractor})
+@pytest.fixture
+def TestExtractor2(extractor_DATAS_mock):
+
+    class TestExtractor2(Extractor):
+        features = {FEATURE_2}
+
+        def extract(self, test_data_2, test_feature_1):
+            pass
+
+    return TestExtractor2
+
+
+@pytest.fixture
+def TestExtractor3(extractor_DATAS_mock):
+
+    class TestExtractor3(Extractor):
+        features = {FEATURE_3}
+
+        def extract(self, test_data_3, test_feature_1):
+            pass
+
+    return TestExtractor3
+
+
+@pytest.fixture
+def TestExtractor4(extractor_DATAS_mock):
+
+    class TestExtractor4(Extractor):
+        features = {FEATURE_4}
+
+        def extract(self, test_data_4, test_feature_2, test_feature_3):
+            pass
+
+    return TestExtractor4
+
+
+@pytest.fixture
+def TestConflictiveExtractor(extractor_DATAS_mock):
+
+    class TestConflictiveExtractor(Extractor):
+        features = {FEATURE_1}
+
+        def extract(self):
+            pass
+
+    return TestConflictiveExtractor
+
+
+@pytest.fixture
+def registry(
+    mocker, TestExtractor1, TestExtractor2, TestExtractor3, TestExtractor4
+):
+    mocker.patch("feets.extractors.registry.DATAS", ALL_DATA)
+    reg = ExtractorRegistry()
+    reg.register_extractor(TestExtractor1)
+    reg.register_extractor(TestExtractor2)
+    reg.register_extractor(TestExtractor3)
+    reg.register_extractor(TestExtractor4)
+    return reg
+
+
+# =============================================================================
+# TESTS
+# =============================================================================
+
+
+def test_ExtractorRegistry_validate_is_extractor(
+    empty_registry, TestExtractor1
+):
+    empty_registry.validate_is_extractor(TestExtractor1)
+
+
+def test_ExtractorRegistry_validate_is_extractor_abstract_subclass(
+    empty_registry,
+):
+    class AbstractExtractor(Extractor):
+        __abstractclass__ = True
+
+    with pytest.raises(TypeError):
+        empty_registry.validate_is_extractor(AbstractExtractor)
+
+
+def test_ExtractorRegistry_validate_is_extractor_not_an_extractor(
+    empty_registry,
+):
+    class NotAnExtractor:
+        pass
+
+    with pytest.raises(TypeError):
+        empty_registry.validate_is_extractor(NotAnExtractor)
+
+
+def test_ExtractorRegistry_register_extractor(
+    empty_registry, TestExtractor1, TestExtractor2
+):
+    empty_registry.register_extractor(TestExtractor1)
+    empty_registry.register_extractor(TestExtractor2)
+
+
+def test_ExtractorRegistry_register_extractor_missing_dependencies(
+    empty_registry, TestExtractor2
+):
+    with pytest.raises(EntityNotFoundError):
+        empty_registry.register_extractor(TestExtractor2)
+
+
+def test_ExtractorRegistry_register_extractor_feature_conflict(
+    empty_registry, TestExtractor1, TestConflictiveExtractor
+):
+    empty_registry.register_extractor(TestExtractor1)
+    with pytest.raises(RegistryConflictError):
+        empty_registry.register_extractor(TestConflictiveExtractor)
+
+
+def test_ExtractorRegistry_unregister_extractor(
+    empty_registry, TestExtractor1, TestExtractor2
+):
+    empty_registry.register_extractor(TestExtractor1)
+    empty_registry.register_extractor(TestExtractor2)
+
+    empty_registry.unregister_extractor(TestExtractor2)
+    empty_registry.unregister_extractor(TestExtractor1)
+
+
+def test_ExtractorRegistry_unregister_extractor_missing_extractor(
+    empty_registry, TestExtractor1
+):
+    with pytest.raises(EntityNotFoundError):
+        empty_registry.unregister_extractor(TestExtractor1)
+
+
+def test_ExtractorRegistry_unregister_extractor_dependency_conflict(
+    empty_registry, TestExtractor1, TestExtractor2
+):
+    empty_registry.register_extractor(TestExtractor1)
+    empty_registry.register_extractor(TestExtractor2)
+    with pytest.raises(RegistryConflictError):
+        empty_registry.unregister_extractor(TestExtractor1)
+
+
+def test_ExtractorRegistry_is_feature_registered(
+    empty_registry, TestExtractor1, TestExtractor2
+):
+    assert not empty_registry.is_feature_registered(FEATURE_1)
+    assert not empty_registry.is_feature_registered(FEATURE_2)
+
+    empty_registry.register_extractor(TestExtractor1)
+    assert empty_registry.is_feature_registered(FEATURE_1)
+    assert not empty_registry.is_feature_registered(FEATURE_2)
+
+    empty_registry.register_extractor(TestExtractor2)
+    assert empty_registry.is_feature_registered(FEATURE_1)
+    assert empty_registry.is_feature_registered(FEATURE_2)
+
+    empty_registry.unregister_extractor(TestExtractor2)
+    assert empty_registry.is_feature_registered(FEATURE_1)
+    assert not empty_registry.is_feature_registered(FEATURE_2)
+
+    empty_registry.unregister_extractor(TestExtractor1)
+    assert not empty_registry.is_feature_registered(FEATURE_1)
+    assert not empty_registry.is_feature_registered(FEATURE_2)
+
+
+def test_ExtractorRegistry_is_extractor_registered(
+    empty_registry, TestExtractor1, TestExtractor2
+):
+    assert not empty_registry.is_extractor_registered(TestExtractor1)
+    assert not empty_registry.is_extractor_registered(TestExtractor2)
+
+    empty_registry.register_extractor(TestExtractor1)
+    assert empty_registry.is_extractor_registered(TestExtractor1)
+    assert not empty_registry.is_extractor_registered(TestExtractor2)
+
+    empty_registry.register_extractor(TestExtractor2)
+    assert empty_registry.is_extractor_registered(TestExtractor1)
+    assert empty_registry.is_extractor_registered(TestExtractor2)
+
+    empty_registry.unregister_extractor(TestExtractor2)
+    assert empty_registry.is_extractor_registered(TestExtractor1)
+    assert not empty_registry.is_extractor_registered(TestExtractor2)
+
+    empty_registry.unregister_extractor(TestExtractor1)
+    assert not empty_registry.is_extractor_registered(TestExtractor1)
+    assert not empty_registry.is_extractor_registered(TestExtractor2)
+
+
+def test_ExtractorRegistry_extractor_of(empty_registry, TestExtractor1):
+    empty_registry.register_extractor(TestExtractor1)
     np.testing.assert_equal(
-        registry._feature_extractors, {"feature1": extractor}
+        empty_registry.extractor_of(FEATURE_1), TestExtractor1
     )
 
 
-def test_register_extractor_missing_dependencies(mocker, registry):
-    extractor = MockExtractorA
-    mocker.patch.object(
-        extractor, "get_dependencies", result_value={"missing_feature"}
+def test_ExtractorRegistry_extractor_of_missing_feature(empty_registry):
+    with pytest.raises(EntityNotFoundError):
+        empty_registry.extractor_of(FEATURE_1)
+
+
+pytest.mark.parametrize(
+    ["data", "expected_extractors"],
+    [
+        ([DATA_1], set()),
+        ([DATA_2], {TestExtractor2}),
+        ([DATA_3, DATA_4], {TestExtractor3, TestExtractor4}),
+        (
+            [DATA_1, DATA_2, DATA_3, DATA_4],
+            {TestExtractor1, TestExtractor2, TestExtractor3, TestExtractor4},
+        ),
+    ],
+)
+
+
+def test_ExtractorRegistry_extractors_from_data(
+    registry,
+    TestExtractor1,
+    TestExtractor2,
+    TestExtractor3,
+    TestExtractor4,
+):
+
+    np.testing.assert_equal(registry.extractors_from_data([DATA_1]), set())
+    np.testing.assert_equal(
+        registry.extractors_from_data([DATA_2]), {TestExtractor2}
     )
-    with assert_raises(DependenciesNotFound):
-        registry.register_extractor(extractor)
-
-
-def test_register_extractor_feature_already_registered(registry):
-    extractor = MockExtractorA
-    registry.register_extractor(extractor)
-    with assert_raises(FeaturesAlreadyRegistered):
-        registry.register_extractor(extractor)
-
-
-def test_unregister_extractor_valid(registry):
-    extractor = MockExtractorA
-    registry.register_extractor(extractor)
-    registry.unregister_extractor(extractor)
-    np.testing.assert_equal(registry._features, set())
-    np.testing.assert_equal(registry._extractors, set())
-    np.testing.assert_equal(registry._feature_extractors, {})
-
-
-def test_unregister_extractor_nonexistent(registry):
-    extractor = MockExtractorA
-    with assert_raises(ValueError):
-        registry.unregister_extractor(extractor)
-
-
-def test_is_feature_registered_valid(registry):
-    extractor = MockExtractorA
-    registry.register_extractor(extractor)
-    assert registry.is_feature_registered("feature1")
-
-
-def test_is_feature_registered_invalid(registry):
-    assert not registry.is_feature_registered("feature2")
-
-
-def test_is_extractor_registered_valid(registry):
-    extractor = MockExtractorA
-    registry.register_extractor(extractor)
-    assert registry.is_extractor_registered(extractor)
-
-
-def test_is_extractor_registered_invalid(registry):
-    extractor = MockExtractorA
-    assert not registry.is_extractor_registered(extractor)
-
-
-def test_extractor_of_valid(registry):
-    extractor = MockExtractorA
-    registry.register_extractor(extractor)
-    np.testing.assert_equal(registry.extractor_of("feature1"), extractor)
-
-
-def test_extractor_of_invalid(registry):
-    with assert_raises(FeaturesNotFound):
-        registry.extractor_of("feature1")
-
-
-def test_extractors_from_data_valid(registry):
-    extractorA = MockExtractorA
-    extractorB1 = MockExtractorB1
-    extractorB2 = MockExtractorB2
-    extractorC = MockExtractorC
-
-    registry.register_extractor(extractorA)
-    registry.register_extractor(extractorB1)
-    registry.register_extractor(extractorB2)
-    registry.register_extractor(extractorC)
-
-    result = registry.extractors_from_data({"valid_data1", "valid_data2"})
-    np.testing.assert_equal(result, {extractorA, extractorB1, extractorB2})
-
-
-def test_extractors_from_data_invalid(registry):
-    extractor = MockExtractorA
-    registry.register_extractor(extractor)
-    with assert_raises(ValueError):
-        registry.extractors_from_data({"invalid_data"})
-
-
-def test_extractors_from_features_valid(registry):
-    extractorA = MockExtractorA
-    extractorB1 = MockExtractorB1
-    extractorB2 = MockExtractorB2
-    extractorC = MockExtractorC
-
-    registry.register_extractor(extractorA)
-    registry.register_extractor(extractorB1)
-    registry.register_extractor(extractorB2)
-    registry.register_extractor(extractorC)
-
-    result = registry.extractors_from_features({"feature1", "feature4"})
-    np.testing.assert_equal(result, {extractorA, extractorC})
-
-
-def test_extractors_from_features_invalid(registry):
-    with assert_raises(FeaturesNotFound):
-        registry.extractors_from_features({"feature1"})
-
-
-def test_sort_extractors_by_dependencies_valid(registry):
-    extractorA = MockExtractorA
-    extractorB1 = MockExtractorB1
-    extractorB2 = MockExtractorB2
-    extractorC = MockExtractorC
-
-    registry.register_extractor(extractorA)
-    registry.register_extractor(extractorB1)
-    registry.register_extractor(extractorB2)
-    registry.register_extractor(extractorC)
-
-    extractors = [extractorB1, extractorC, extractorB2, extractorA]
-    result = registry.sort_extractors_by_dependencies(extractors)
-
-    np.testing.assert_equal(result[0], extractorA)
-    np.testing.assert_equal(result[3], extractorC)
-    assert result[1] in {extractorB1, extractorB2}
-    assert result[2] in {extractorB1, extractorB2}
-
-
-def test_sort_extractors_by_dependencies_missing_dependencies(registry):
-    extractorA = MockExtractorA
-    extractorB1 = MockExtractorB1
-    extractorB2 = MockExtractorB2
-    extractorC = MockExtractorC
-
-    registry.register_extractor(extractorA)
-    registry.register_extractor(extractorB1)
-    registry.register_extractor(extractorB2)
-    registry.register_extractor(extractorC)
-
-    extractors = [extractorC]
-    result = registry.sort_extractors_by_dependencies(extractors)
-
-    np.testing.assert_equal(result[0], extractorA)
-    np.testing.assert_equal(result[3], extractorC)
-    assert result[1] in {extractorB1, extractorB2}
-    assert result[2] in {extractorB1, extractorB2}
-
-
-def test_sort_extractors_by_dependencies_invalid(registry):
-    with assert_raises(TypeError):
-        registry.sort_extractors_by_dependencies([object])
-
-
-def test_get_execution_plan_data(registry):
-    extractorA = MockExtractorA
-    extractorB1 = MockExtractorB1
-    extractorB2 = MockExtractorB2
-    extractorC = MockExtractorC
-
-    registry.register_extractor(extractorA)
-    registry.register_extractor(extractorB1)
-    registry.register_extractor(extractorB2)
-    registry.register_extractor(extractorC)
-
-    result = registry.get_execution_plan(
-        data={"valid_data1"},
+    np.testing.assert_equal(
+        registry.extractors_from_data([DATA_3, DATA_4]),
+        {TestExtractor3, TestExtractor4},
+    )
+    np.testing.assert_equal(
+        registry.extractors_from_data([DATA_1, DATA_2, DATA_3, DATA_4]),
+        {TestExtractor1, TestExtractor2, TestExtractor3, TestExtractor4},
     )
 
-    np.testing.assert_array_equal(result, [extractorA])
+
+def test_ExtractorRegistry_extractors_from_data_invalid_data(
+    empty_registry, TestExtractor1
+):
+    empty_registry.register_extractor(TestExtractor1)
+    with pytest.raises(RegistryValidationError):
+        empty_registry.extractors_from_data([INVALID_DATA])
 
 
-def test_get_execution_plan_only(registry):
-    extractorA = MockExtractorA
-    extractorB1 = MockExtractorB1
-    extractorB2 = MockExtractorB2
-    extractorC = MockExtractorC
-
-    registry.register_extractor(extractorA)
-    registry.register_extractor(extractorB1)
-    registry.register_extractor(extractorB2)
-    registry.register_extractor(extractorC)
-
-    result = registry.get_execution_plan(
-        only={"feature2"},
+def test_ExtractorRegistry_extractors_from_features(
+    registry,
+    TestExtractor1,
+    TestExtractor2,
+    TestExtractor3,
+    TestExtractor4,
+):
+    np.testing.assert_equal(
+        registry.extractors_from_features([FEATURE_1]), {TestExtractor1}
+    )
+    np.testing.assert_equal(
+        registry.extractors_from_features([FEATURE_2]), {TestExtractor2}
+    )
+    np.testing.assert_equal(
+        registry.extractors_from_features([FEATURE_3, FEATURE_4]),
+        {TestExtractor3, TestExtractor4},
+    )
+    np.testing.assert_equal(
+        registry.extractors_from_features(
+            [FEATURE_1, FEATURE_2, FEATURE_3, FEATURE_4]
+        ),
+        {TestExtractor1, TestExtractor2, TestExtractor3, TestExtractor4},
     )
 
-    np.testing.assert_array_equal(result, [extractorA, extractorB1])
+
+def test_ExtractorRegistry_extractors_from_features_missing_feature(
+    empty_registry, TestExtractor1
+):
+    empty_registry.register_extractor(TestExtractor1)
+    with pytest.raises(EntityNotFoundError):
+        empty_registry.extractors_from_features([FEATURE_2])
 
 
-def test_get_execution_plan_exclude(registry):
-    extractorA = MockExtractorA
-    extractorB1 = MockExtractorB1
-    extractorB2 = MockExtractorB2
-    extractorC = MockExtractorC
+def test_ExtractorRegistry_sort_extractors_by_dependencies(
+    registry,
+    TestExtractor1,
+    TestExtractor2,
+    TestExtractor3,
+    TestExtractor4,
+):
+    np.testing.assert_equal(registry.sort_extractors_by_dependencies([]), [])
 
-    registry.register_extractor(extractorA)
-    registry.register_extractor(extractorB1)
-    registry.register_extractor(extractorB2)
-    registry.register_extractor(extractorC)
-
-    result = registry.get_execution_plan(
-        exclude={"feature4"},
+    np.testing.assert_equal(
+        registry.sort_extractors_by_dependencies(
+            [TestExtractor2, TestExtractor1]
+        ),
+        (TestExtractor1, TestExtractor2),
     )
 
-    np.testing.assert_equal(result[0], extractorA)
-    assert result[1] in {extractorB1, extractorB2}
-    assert result[2] in {extractorB1, extractorB2}
+    result = registry.sort_extractors_by_dependencies([TestExtractor4])
+    np.testing.assert_equal(
+        (result[0], set(result[1:3]), result[3]),
+        (TestExtractor1, {TestExtractor2, TestExtractor3}, TestExtractor4),
+    )
 
 
-def test_get_execution_plan_all(registry):
-    extractorA = MockExtractorA
-    extractorB1 = MockExtractorB1
-    extractorB2 = MockExtractorB2
-    extractorC = MockExtractorC
+def test_ExtractorRegistry_sort_extractors_by_dependencies_missing_extractor(
+    empty_registry, TestExtractor1, TestExtractor2
+):
+    empty_registry.register_extractor(TestExtractor1)
+    with pytest.raises(EntityNotFoundError):
+        empty_registry.sort_extractors_by_dependencies([TestExtractor2])
 
-    registry.register_extractor(extractorA)
-    registry.register_extractor(extractorB1)
-    registry.register_extractor(extractorB2)
-    registry.register_extractor(extractorC)
 
+def test_ExtractorRegistry_get_execution_plan(
+    registry, TestExtractor1, TestExtractor2, TestExtractor3, TestExtractor4
+):
     result = registry.get_execution_plan()
+    np.testing.assert_equal(
+        (result[0], set(result[1:3]), result[3]),
+        (TestExtractor1, {TestExtractor2, TestExtractor3}, TestExtractor4),
+    )
 
-    np.testing.assert_equal(result[0], extractorA)
-    np.testing.assert_equal(result[3], extractorC)
-    assert result[1] in {extractorB1, extractorB2}
-    assert result[2] in {extractorB1, extractorB2}
+
+def test_ExtractorRegistry_get_execution_plan_filters(
+    registry, TestExtractor1, TestExtractor2, TestExtractor3
+):
+    filters = {
+        "data": [DATA_2, DATA_3],
+        "only": [FEATURE_1, FEATURE_2],
+    }
+    np.testing.assert_equal(
+        registry.get_execution_plan(**filters),
+        (TestExtractor1, TestExtractor2),
+    )
+
+    filters = {
+        "data": [DATA_2, DATA_3],
+        "exclude": [FEATURE_2],
+    }
+    np.testing.assert_equal(
+        registry.get_execution_plan(**filters),
+        (TestExtractor1, TestExtractor3),
+    )
 
 
-def test_get_execution_plan_disjoint(registry):
-    extractor = MockExtractorA
-    registry.register_extractor(extractor)
-    with assert_raises(ValueError):
-        registry.get_execution_plan(
-            data={"valid_data"}, only={"feature1"}, exclude={"feature1"}
-        )
+def test_ExtractorRegistry_get_execution_plan_filters_invalid_data(
+    empty_registry, TestExtractor1
+):
+    empty_registry.register_extractor(TestExtractor1)
+    filters = {"data": [INVALID_DATA]}
+    with pytest.raises(RegistryValidationError):
+        empty_registry.get_execution_plan(**filters)
+
+
+def test_ExtractorRegistry_get_execution_plan_filters_conflictive_filters(
+    empty_registry, TestExtractor1
+):
+    empty_registry.register_extractor(TestExtractor1)
+    filters = {"only": [FEATURE_1], "exclude": [FEATURE_1]}
+    with pytest.raises(RegistryValidationError):
+        empty_registry.get_execution_plan(**filters)
+
+
+def test_ExtractorRegistry_get_execution_plan_filters_missing_only(
+    empty_registry, TestExtractor1
+):
+    empty_registry.register_extractor(TestExtractor1)
+    filters = {"only": [FEATURE_2]}
+    with pytest.raises(EntityNotFoundError):
+        empty_registry.get_execution_plan(**filters)
+
+
+def test_ExtractorRegistry_get_execution_plan_filters_missing_exclude(
+    empty_registry, TestExtractor1
+):
+    empty_registry.register_extractor(TestExtractor1)
+    filters = {"exclude": [FEATURE_2]}
+    with pytest.raises(EntityNotFoundError):
+        empty_registry.get_execution_plan(**filters)
+
+
+def test_ExtractorRegistry_registered_extractors(
+    registry, TestExtractor1, TestExtractor2, TestExtractor3, TestExtractor4
+):
+    np.testing.assert_equal(
+        registry.registered_extractors,
+        {TestExtractor1, TestExtractor2, TestExtractor3, TestExtractor4},
+    )
+
+
+def test_ExtractorRegistry_registered_features(registry):
+    np.testing.assert_equal(
+        registry.registered_features,
+        {FEATURE_1, FEATURE_2, FEATURE_3, FEATURE_4},
+    )

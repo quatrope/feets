@@ -10,14 +10,13 @@
 # DOCS
 # =============================================================================
 
-"""Register and manage feature extractors."""
+"""Manage the available feature extractors."""
 
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from .light_curve.light_curve_extractor import LightCurveExtractor
 from .extractor import DATAS, Extractor
 
 
@@ -33,7 +32,7 @@ class RegistryError(Exception):
 
 
 class EntityNotFoundError(RegistryError):
-    """An extractor or feature is not present in the registry."""
+    """An extractor or feature is not available in the registry."""
 
     pass
 
@@ -58,14 +57,38 @@ class RegistryValidationError(RegistryError):
 class ExtractorRegistry:
     """Extractor registry for managing feature extractors.
 
-    The `ExtractorRegistry` class is responsible for managing the registration
-    and unregistration of feature extractors. It ensures that all dependencies
-    are met before registering an extractor and prevents duplicate feature
-    registrations.
+    The `ExtractorRegistry` class is responsible for managing the available
+    feature extractors. It ensures that all dependencies are met before
+    registering an extractor and prevents duplicate features.
 
     It also provides methods to check if a feature or extractor is registered,
     retrieve the extractor for a specific feature, and generate an execution
     plan for extractors based on provided data and feature constraints.
+
+    See Also
+    --------
+    `feets.Extractor` : Abstract base class for feature extractors.
+    `feets.FeatureSpace` :
+        Class to select and extract features from a time series.
+
+    Examples
+    --------
+    Add a custom extractor to the existing feature extractor registry:
+
+    >>> from feets.extractors import Extractor, extractor_registry
+
+    >>> class CustomSumExtractor(Extractor):
+    ...     features = ["CustomSum"]
+    ...
+    ...     def extract(self, magnitude):
+    ...         return {"CustomSum": sum(magnitude)}
+    ...
+    >>> extractor_registry.register_extractor(CustomSumExtractor)
+
+    Check if a feature is available:
+
+    >>> extractor_registry.is_feature_registered("CustomSum")
+    True
     """
 
     def __init__(self):
@@ -74,7 +97,10 @@ class ExtractorRegistry:
         self._extractors = set()
 
     def validate_is_extractor(self, cls):
-        """Validate that a class is a subclass of Extractor.
+        """Validate if a class is a valid feature extractor.
+
+        It does so by checking if the class is a non-abstract subclass of
+        Extractor.
 
         Parameters
         ----------
@@ -84,13 +110,12 @@ class ExtractorRegistry:
         Raises
         ------
         TypeError
-            If the class is not a subclass of Extractor.
+            If the class is not a valid feature extractor.
         """
-        if not issubclass(cls, Extractor) and not issubclass(
-            cls, LightCurveExtractor
-        ):
+        if not issubclass(cls, Extractor) or cls.is_abstract():
             raise TypeError(
-                f"Only Extractor subclasses are allowed. Found: '{cls}'."
+                f"Only non-abstract subclasses of Extractor are allowed. "
+                f"Found: '{cls}'."
             )
 
     def register_extractor(self, cls):
@@ -111,8 +136,7 @@ class ExtractorRegistry:
         Raises
         ------
         EntityNotFoundError
-            If one of the dependencies of the extractor is not present in the
-            registry.
+            If one of the dependencies of the extractor is not registered.
         RegistryConflictError
             If one of the features of the extractor is already registered.
         """
@@ -123,15 +147,15 @@ class ExtractorRegistry:
             self._features
         )
         if missing_dependencies:
-            raise EntityNotFoundError(
-                f"Extractors not found: {', '.join(map(repr, missing_dependencies))}"
-            )
+            deps = ", ".join(map(repr, missing_dependencies))
+            raise EntityNotFoundError(f"Dependencies not found: {deps}")
 
         # check if features are already registered
         registered_features = cls.get_features().intersection(self._features)
         if registered_features:
+            feats = ", ".join(map(repr, registered_features))
             raise RegistryConflictError(
-                f"Features already registered: {', '.join(map(repr, registered_features))}"
+                f"Features already registered: {feats}"
             )
 
         # register the extractor
@@ -153,8 +177,7 @@ class ExtractorRegistry:
         Raises
         ------
         EntityNotFoundError
-            If the extractor is not present in the registry
-
+            If the extractor is not registered.
         RegistryConflictError
             If the extractor is a dependency of another extractor in the registry.
         """
@@ -190,12 +213,13 @@ class ExtractorRegistry:
         Returns
         -------
         bool
-            `True` if the feature is registered, `False` otherwise.
+            `True` if the feature is computed by any of the registered
+            feature extractors.
         """
         return feature in self._features
 
     def is_extractor_registered(self, extractor):
-        """Check if an extractor is present in the registry.
+        """Check if an extractor is available in the registry.
 
         Parameters
         ----------
@@ -205,19 +229,14 @@ class ExtractorRegistry:
         Returns
         -------
         bool
-            `True` if the extractor is registered, `False` otherwise.
-
-        Raises
-        ------
-        TypeError
-            If the class is not a subclass of Extractor.
+            `True` if the feature extractor is already registered.
         """
         self.validate_is_extractor(extractor)
 
         return extractor in self._extractors
 
     def extractor_of(self, feature):
-        """Get the extractor that extracts a specific feature.
+        """Get the extractor that can extract a given feature.
 
         Parameters
         ----------
@@ -227,12 +246,12 @@ class ExtractorRegistry:
         Returns
         -------
         Extractor
-            The feature extractor class that extracts the specified feature.
+            The feature extractor that can extract the given feature.
 
         Raises
         ------
         EntityNotFoundError
-            If the feature is not present in the registry.
+            If the feature is not registered.
         """
         if not self.is_feature_registered(feature):
             raise EntityNotFoundError(f"Feature '{feature}' not found.")
@@ -240,17 +259,18 @@ class ExtractorRegistry:
         return self._feature_extractors[feature]
 
     def extractors_from_data(self, data):
-        """Filter the extractors that require the specified data.
+        """Get the extractors that can be executed from the available data.
 
         Parameters
         ----------
         data : iterable of str
-            The required data to filter extractors by.
+            The data vectors to filter extractors by.
 
         Returns
         -------
         set of Extractor
-            The extractors that require all of the specified data.
+            The feature extractors that can be executed from the available
+            data vectors.
 
         Raises
         ------
@@ -259,7 +279,10 @@ class ExtractorRegistry:
         """
         invalid_data = set(data).difference(DATAS)
         if invalid_data:
-            raise RegistryValidationError(invalid_data)
+            print(invalid_data)
+            raise RegistryValidationError(
+                f"Invalid data vectors: {', '.join(map(repr, invalid_data))}"
+            )
 
         return {
             extractor
@@ -268,7 +291,7 @@ class ExtractorRegistry:
         }
 
     def extractors_from_features(self, features):
-        """Filter the extractors that extract the specified features.
+        """Get the extractors that can compute the given features.
 
         Parameters
         ----------
@@ -278,12 +301,12 @@ class ExtractorRegistry:
         Returns
         -------
         set of Extractor
-            The extractors that extract the specified features.
+            The feature extractors that can compute the given features.
 
         Raises
         ------
         EntityNotFoundError
-            If any of the specified features are not present in the registry.
+            If any of the specified features is not registered.
         """
         extractors = set()
         for feature in features:
@@ -293,22 +316,27 @@ class ExtractorRegistry:
         return extractors
 
     def sort_extractors_by_dependencies(self, extractors):
-        """Calculate the feature extractor dependecy resolution order.
+        """Compute the feature extractor dependency resolution order.
+
+        This method determines the order in which feature extractors should be
+        executed to ensure all their dependencies are met. It may introduce
+        additional extractors if their outputs are required by other
+        extractors.
 
         Parameters
         ----------
         extractors : iterable of Extractor
-            The extractors to sort by dependencies.
+            The extractors to sort.
 
         Returns
         -------
         tuple of Extractor
-            The sorted extractors based on their dependencies.
+            The feature extractors sorted by their dependencies.
 
         Raises
         ------
         EntityNotFoundError
-            If any of the specified extractors are not present in the registry.
+            If any of the specified extractors is not registered.
         """
         selected_extractors = []
         features_from_selected = set()
@@ -357,16 +385,18 @@ class ExtractorRegistry:
         Returns
         -------
         tuple of Extractor
-            The sorted extractors based on the provided constraints.
+            The feature extractors that match the provided filters, in the
+            order they should be executed to ensure all their dependencies are
+            met.
 
         Raises
         ------
         RegistryValidationError
             If the same feature is passed in both `only` and `exclude` or if
-            any of the specified data vectors in `data` are not valid.
+            any of the specified data vectors in `data` is not valid.
         EntityNotFoundError
-            If any of the features passed in `only` or `exclude` are not
-            present in the registry.
+            If any of the features passed in `only` or `exclude` is not
+            registered.
         """
         if not set(only or []).isdisjoint(exclude or []):
             raise RegistryValidationError(
@@ -397,10 +427,10 @@ class ExtractorRegistry:
 
     @property
     def registered_extractors(self):
-        """frozenset: The extractors registered in the registry."""
+        """frozenset: The extractors that are available in the registry."""
         return frozenset(self._extractors)
 
     @property
-    def available_features(self):
-        """frozenset: The features available in the registry."""
+    def registered_features(self):
+        """frozenset: The features that are available in the registry."""
         return frozenset(self._features)

@@ -302,6 +302,10 @@ class Extractor(abc.ABC):
     that defines a `features` attribute with the names of the new features, and
     implement the `extract()` method with the logic needed to compute them.
 
+    Once defined, the new extractor class must be registered in the
+    extractor registry to make it available to new `FeatureSpace` instances for
+    automatic discovery and usage.
+
     A feature extractor may also expose optional parameters to customize its
     behavior. To add such parameters, implement the `__init__()` method and
     specify them as keyword arguments.
@@ -331,7 +335,9 @@ class Extractor(abc.ABC):
 
     See Also
     --------
-    extract, flatten_feature
+    extract, flatten_feature,
+    feets.FeatureSpace,
+    feets.extractors.extractor_registry
 
     Examples
     --------
