@@ -6,45 +6,56 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_car
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from feets.extractors.ext_car import CAR
 
 import numpy as np
 
 import pytest
 
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 
-@pytest.mark.slow
-def test_CAR_extract(periodic_light_curve):
-    # create the extractor
-    extractor = ext_car.CAR()
-    features = ["CAR_mean", "CAR_sigma", "CAR_tau"]
+LC_LENGTH = 100
+MAX_ITERS = 100
+RANDOM_SEED = 42
 
-    # init the seed
-    random = np.random.default_rng(42)
+# =============================================================================
+# TESTS
+# =============================================================================
 
-    # excute the simulation
-    sims = 100
-    size = 100
 
-    time = np.arange(size)
-    values = np.empty([sims, 3])
-    for idx in range(sims):
-        lc = periodic_light_curve(
-            random=random,
-            size=size,
-            data=["magnitude"],
-        )
-        lc["time"] = time
-        lc["error"] = random.normal(loc=1, scale=0.008, size=size)
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_CAR_extract(periodic, normal):
+    # init extractor
+    extractor = CAR()
 
-        results = extractor.extract(**lc)
-        for index, feature in enumerate(features):
-            values[idx, index] = results[feature]
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
 
-    # test
+    # simulate results
+    lcs = [
+        {
+            "time": np.arange(LC_LENGTH),
+            "magnitude": periodic(random=random, size=LC_LENGTH),
+            "error": normal(random=random, size=LC_LENGTH, loc=1, scale=0.008),
+        }
+        for _ in range(MAX_ITERS)
+    ]
+    results = [extractor.extract(**lc) for lc in lcs]
+
+    # transform results into ndarray
+    values = np.array([list(result.values()) for result in results])
+
+    # assert mean is close to expected value
     expected = [
-        -0.11888100485725793,
-        0.008015313327483975,
-        0.6470569371786853,
+        0.008015313327483975,  # CAR_sigma
+        0.6475047826376705,  # CAR_tau
+        -0.11911673512729966,  # CAR_mean
     ]
     np.testing.assert_allclose(values.mean(axis=0), expected)

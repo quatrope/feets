@@ -6,26 +6,50 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_slotted_a_length
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from feets.extractors.ext_slotted_a_length import SlottedALength
 
 import numpy as np
 
 import pytest
 
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 
-@pytest.mark.slow
-def test_SlottedA_length_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_slotted_a_length.SlottedA_length()
+LC_LENGTH = 100
+MAX_ITERS = 100
+RANDOM_SEED = 42
 
-    # init the seed
-    random = np.random.default_rng(42)
+# =============================================================================
+# TESTS
+# =============================================================================
 
-    # excute the simulation
-    values = np.empty(1000)
-    for idx in range(values.size):
-        lc = normal_light_curve(random=random, size=1000, data=["magnitude"])
-        lc["time"] = np.arange(1000)
-        values[idx] = extractor.extract(**lc)["SlottedA_length"]
 
-    np.testing.assert_allclose(values.mean(), 1.0)
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_SlottedALength_extract(normal):
+    extractor = SlottedALength()
+
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
+
+    # simulate results
+    lcs = [
+        {
+            "time": np.arange(LC_LENGTH),
+            "magnitude": normal(random=random, size=LC_LENGTH),
+        }
+        for _ in range(MAX_ITERS)
+    ]
+    results = [extractor.extract(**lc) for lc in lcs]
+
+    # transform results into ndarray
+    values = np.array([list(result.values()) for result in results])
+
+    # assert mean is close to expected value
+    expected = 1.0  # SlottedALength
+    np.testing.assert_allclose(values.mean(axis=0), expected)

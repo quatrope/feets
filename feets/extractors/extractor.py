@@ -328,10 +328,14 @@ class Extractor(abc.ABC):
     Methods
     -------
     extract(**kwargs)
-        Extract features from time series data vectors and/or from other
-        dependency features
+        Implement this method in a subclass such that it returns a dictionary
+        containing the computed values for all of the features defined in the
+        `features` attribute.
     flatten_feature(feature, value)
-        Normalize a feature into a dictionary of scalar values.
+        By default, it handles the normalization of scalars, sequences and
+        dictionaries. Extend this method to add support to more complex
+        formats.
+
 
     See Also
     --------
@@ -765,11 +769,7 @@ class Extractor(abc.ABC):
 
     @abc.abstractmethod
     def extract(self, *args, **kwargs):
-        """Extract features from time series data and/or from other features.
-
-        Implement this method in a subclass such that it returns a dictionary
-        containing the computed values for all of the features defined in the
-        `features` attribute.
+        """Extract `features` from time series data vectors.
 
         Parameters
         ----------
@@ -788,20 +788,15 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        get_data, get_optional_data, get_required_data, get_dependencies,
-        Extractor
+        feets.Extractor
         """
         raise NotImplementedError()
 
     def flatten_feature(self, feature, value):
         """Normalize a feature value into a dictionary of scalars.
 
-        This method is called internally to better reepresent the returned
+        This method is called internally to better represent the returned
         features of the `extract()` method.
-
-        By default, it handles the normalization of scalars, sequences and
-        dictionaries. Extend this method to add support to more complex
-        formats.
 
         Parameters
         ----------
@@ -817,6 +812,6 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        extract, Extractor
+        feets.Extractor
         """
         return _flatten_data(value, feature)

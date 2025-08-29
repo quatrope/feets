@@ -58,4 +58,10 @@ class Color(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, magnitude2):
+        """
+        Parameters
+        ----------
+        magnitude : array_like
+        magnitude2 : array_like
+        """
         return {"Color": np.mean(magnitude) - np.mean(magnitude2)}

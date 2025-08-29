@@ -6,22 +6,48 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_autocor_length
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from feets.extractors.ext_autocor_length import AutocorLength
 
 import numpy as np
 
+import pytest
 
-def test_AutocorLength_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_autocor_length.AutocorLength()
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 
-    # init the seed
-    random = np.random.default_rng(42)
+LC_LENGTH = 1000
+MAX_ITERS = 1000
+RANDOM_SEED = 42
 
-    # excute the simulation
-    values = np.empty(1000)
-    for idx in range(values.size):
-        lc = normal_light_curve(random=random, size=1000, data=["magnitude"])
-        values[idx] = extractor.extract(**lc)["Autocor_length"]
+# =============================================================================
+# TESTS
+# =============================================================================
 
-    np.testing.assert_allclose(values.mean(), 1.0)
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_AutocorLength_extract(normal):
+    # init extractor
+    extractor = AutocorLength()
+
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
+
+    # simulate results
+    lcs = [
+        {"magnitude": normal(random=random, size=LC_LENGTH)}
+        for _ in range(MAX_ITERS)
+    ]
+    results = [extractor.extract(**lc) for lc in lcs]
+
+    # transform results into ndarray
+    values = np.array([list(result.values()) for result in results])
+
+    # assert mean is close to expected value
+    expected = 1.0  # Autocor_length
+    np.testing.assert_allclose(values.mean(axis=0), expected)

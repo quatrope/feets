@@ -178,7 +178,7 @@ class AstropyLombScargle(Extractor):
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
     """
 
-    features = ["Astropy_PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
+    features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
 
     def __init__(self, lscargle_kwds=None, fap_kwds=None, nperiods=3):
         self.lscargle_kwds = (
@@ -233,6 +233,12 @@ class AstropyLombScargle(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like
+        """
         # first we retrieve the best periods and the false alarm probability
         best_periods, fap_best_periods = self._compute_ls(
             magnitude, time, self.nperiods, self.lscargle_kwds, self.fap_kwds
@@ -249,7 +255,7 @@ class AstropyLombScargle(Extractor):
         Psi_eta = results[:, 1]
 
         return {
-            "Astropy_PeriodLS": best_periods,
+            "PeriodLS": best_periods,
             "Period_fit": fap_best_periods,
             "Psi_CS": R,
             "Psi_eta": Psi_eta,

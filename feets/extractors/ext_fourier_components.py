@@ -234,6 +234,12 @@ class FourierComponents(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like
+        """
         lscargle_kwds = self.lscargle_kwds
         A, sPH = self._components(magnitude, time, lscargle_kwds)
         result = {

@@ -8,6 +8,12 @@
 
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Eta-E extractor."""
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
@@ -31,5 +37,12 @@ class EtaE(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like
+        error : array-like, optional
+        """
         [eta_e] = self._extract(time, magnitude, error)
         return {"EtaE": eta_e}

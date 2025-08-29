@@ -60,6 +60,7 @@ class DeltamDeltat(Extractor):
     --------
     >>> fs = feets.FeatureSpace(only=["DeltamDeltat"])
     >>> features = fs.extract(**lc_normal)
+    >>> features[0]
     {'DeltamDeltat': {'dt_0_dm_0': np.int64(0),
       'dt_1_dm_0': np.int64(0),
        ...
@@ -85,6 +86,13 @@ class DeltamDeltat(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like
+        """
+
         def delta_calc(idx):
             t0 = time[idx]
             m0 = magnitude[idx]

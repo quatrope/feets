@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Percent amplitude extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -30,5 +37,12 @@ class PercentAmplitude(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [percent_amplitude] = self._extract(time, magnitude, error)
         return {"PercentAmplitude": percent_amplitude}

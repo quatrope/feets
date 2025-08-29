@@ -6,23 +6,53 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_dmdt
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from feets.extractors.ext_dmdt import DeltamDeltat
 
 import numpy as np
 
+import pytest
 
-def test_DeltamDeltat_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_dmdt.DeltamDeltat()
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 
-    # init the seed
-    random = np.random.default_rng(42)
+LC_LENGTH = 1000
+MAX_ITERS = 50
+RANDOM_SEED = 42
 
-    # excute the simulation
-    time = np.arange(0, 1000)
-    values = np.empty(50)
-    for idx in range(values.size):
-        lc = normal_light_curve(random=random, size=1000, data=["magnitude"])
-        deltam_deltat = extractor.extract(**lc, time=time)["DeltamDeltat"]
-        values[idx] = np.sum(list(deltam_deltat.values()))
-    np.testing.assert_allclose(values.mean(), 425.86)
+# =============================================================================
+# TESTS
+# =============================================================================
+
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_DeltamDeltat_extract(normal):
+    # init extractor
+    extractor = DeltamDeltat()
+
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
+
+    # simulate results
+    lcs = [
+        {
+            "time": np.arange(LC_LENGTH),
+            "magnitude": normal(random=random, size=LC_LENGTH),
+        }
+        for _ in range(MAX_ITERS)
+    ]
+    results = [extractor.extract(**lc) for lc in lcs]
+
+    # transform results into ndarray
+    values = np.array(
+        [np.sum(list(result["DeltamDeltat"].values())) for result in results]
+    )
+
+    # assert mean is close to expected value
+    expected = 425.86
+    np.testing.assert_allclose(values.mean(axis=0), expected)

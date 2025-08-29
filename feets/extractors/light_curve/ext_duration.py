@@ -6,12 +6,19 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Time duration extractor."""
+
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
 from light_curve import Duration as _Duration
+
 from .light_curve_extractor import LightCurveExtractor
 from ...libs import doctools
 
@@ -30,5 +37,12 @@ class Duration(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like, optional
+        error : array-like, optional
+        """
         [duration] = self._extract(time, magnitude, error)
         return {"Duration": duration}

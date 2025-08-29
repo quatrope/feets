@@ -7,6 +7,12 @@
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Small kurtosis extractor."""
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
@@ -30,5 +36,12 @@ class SmallKurtosis(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [kurtosis] = self._extract(time, magnitude, error)
         return {"SmallKurtosis": kurtosis}

@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Maximum slope extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -30,5 +37,12 @@ class MaxSlope(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like
+        error : array-like, optional
+        """
         [maximum_slope] = self._extract(time, magnitude, error)
         return {"MaxSlope": maximum_slope}

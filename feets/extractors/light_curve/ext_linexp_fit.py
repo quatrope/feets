@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Linear exponential fit extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -56,6 +63,13 @@ class LinexpFit(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, flux, flux_error):
+        """
+        Parameters
+        ----------
+        time : array-like
+        flux : array-like
+        flux_error : array-like
+        """
         [
             amplitude,
             reference_time,

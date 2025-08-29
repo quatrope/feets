@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-"""Amplitude extractor."""
+"""Median amplitude extractor."""
 
 
 # =============================================================================
@@ -32,21 +32,22 @@ from ..libs import doctools
 
 
 class MedianAmplitude(Extractor):
-    """Amplitude extractor.
+    """Median amplitude extractor.
 
-    **Amplitude**
+    **MedianAmplitude**
 
-    The amplitude is defined as the half of the difference between the median
+    This amplitude is defined as the half of the difference between the median
     of the maximum :math:`5%%` and the median of the minimum :math:`5%%`
     magnitudes. For a sequence of numbers from :math:`0` to :math:`1000` the
-    amplitude should be equal to :math:`475.5`.
+    amplitude should be equal to :math:`475.0`.
 
     Examples
     --------
-    Amplitude of increasing time series from :math:`0` to :math:`1000`:
-    >>> fs = feets.FeatureSpace(only=['Amplitude'])
+    Median amplitude of increasing time series from :math:`0` to :math:`1000`:
+    >>> fs = feets.FeatureSpace(only=['MedianAmplitude'])
     >>> features = fs.extract(**lc_incremental)
     >>> features[0]
+    {'MedianAmplitude': np.float64(475.0)}
 
     References
     ----------
@@ -61,6 +62,11 @@ class MedianAmplitude(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        """
         N = len(magnitude)
         sorted_mag = np.sort(magnitude)
 

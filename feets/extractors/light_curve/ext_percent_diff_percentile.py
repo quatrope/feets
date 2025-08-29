@@ -6,6 +6,14 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Percent difference magnitude percentile extractor."""
+
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -37,6 +45,13 @@ class PercentDiffPercentile(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [percent_diff_percentile] = self.lightcurve_ext(time, magnitude, error)
         return {"PercentDiffPercentile": percent_diff_percentile}
 

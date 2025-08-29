@@ -7,6 +7,12 @@
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Otsu split extractor."""
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
@@ -34,6 +40,13 @@ class OtsuSplit(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [
             otsu_mean_diff,
             otsu_std_lower,

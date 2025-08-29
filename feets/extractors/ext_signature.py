@@ -66,7 +66,15 @@ class Signature(Extractor):
         self.mag_bins = mag_bins
 
     @doctools.doc_inherit(Extractor.extract)
-    def extract(self, magnitude, time, Astropy_PeriodLS, MedianAmplitude):
+    def extract(self, magnitude, time, PeriodLS, MedianAmplitude):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like
+        PeriodLS : array-like
+        MedianAmplitude : float
+        """
         phase_bins, mag_bins = self.phase_bins, self.mag_bins
         bins = (phase_bins, mag_bins)
         labels = tuple(
@@ -82,8 +90,8 @@ class Signature(Extractor):
         # Shift time to the minimum value
         loc = np.argmin(lc_yaxis)
 
-        signatures = np.full(len(Astropy_PeriodLS), None, dtype=object)
-        for idx, period_ls in enumerate(Astropy_PeriodLS):
+        signatures = np.full(len(PeriodLS), None, dtype=object)
+        for idx, period_ls in enumerate(PeriodLS):
             lc_phases = np.remainder(time - time[loc], period_ls) / period_ls
 
             count = np.histogram2d(

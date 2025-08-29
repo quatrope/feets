@@ -6,109 +6,116 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_stetson
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from feets.extractors.ext_stetson import StetsonJ, StetsonKAC, StetsonL
 
 import numpy as np
 
 import pytest
 
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 
-def test_StetsonJ_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_stetson.StetsonJ()
+LC_LENGTH = 1000
+LC_LENGTH_SHORT = 100
+MAX_ITERS = 1000
+RANDOM_SEED = 42
 
-    # init the seed
-    random = np.random.default_rng(42)
-
-    # run the simulation
-    error_loc, error_scale = 1, 0.008
-    values = np.empty(1000)
-    for idx in range(values.size):
-        lc = normal_light_curve(
-            random=random,
-            size=1000,
-            data=[
-                "aligned_magnitude",
-                "aligned_magnitude2",
-                "aligned_error",
-                "aligned_error2",
-            ],
-            aligned_error_loc=error_loc,
-            aligned_error2_loc=error_loc,
-            aligned_error_scale=error_scale,
-            aligned_error2_scale=error_scale,
-        )
-        values[idx] = extractor.extract(**lc)["StetsonJ"]
-
-    np.testing.assert_allclose(values.mean(), 0.000389878261606318)
+# =============================================================================
+# TESTS
+# =============================================================================
 
 
-def test_StetsonK_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_stetson.StetsonK()
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_StetsonJ_extract(normal):
+    extractor = StetsonJ()
 
-    # init the seed
-    random = np.random.default_rng(42)
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
 
-    # run the simulation
-    error_loc, error_scale = 1, 0.008
-    values = np.empty(1000)
-    for idx in range(values.size):
-        lc = normal_light_curve(
-            random=random,
-            size=1000,
-            data=["magnitude", "error"],
-            error_loc=error_loc,
-            error_scale=error_scale,
-        )
-        values[idx] = extractor.extract(**lc)["StetsonK"]
+    # simulate results
+    lcs = [
+        {
+            "aligned_magnitude": normal(random=random, size=LC_LENGTH),
+            "aligned_magnitude2": normal(random=random, size=LC_LENGTH),
+            "aligned_error": normal(
+                random=random, size=LC_LENGTH, loc=1, scale=0.008
+            ),
+            "aligned_error2": normal(
+                random=random, size=LC_LENGTH, loc=1, scale=0.008
+            ),
+        }
+        for _ in range(MAX_ITERS)
+    ]
+    results = [extractor.extract(**lc) for lc in lcs]
 
-    np.testing.assert_allclose(values.mean(), 0.7978257009818837)
+    # transform results into ndarray
+    values = np.array([list(result.values()) for result in results])
 
+    # assert mean is close to expected value
+    expected = 0.000389878261606318  # StetsonJ
 
-@pytest.mark.slow
-def test_StetsonKAC_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_stetson.StetsonKAC()
-
-    # init the seed
-    random = np.random.default_rng(42)
-
-    # run the simulation
-    values = np.empty(1000)
-    for idx in range(values.size):
-        lc = normal_light_curve(random=random, size=10000, data=["magnitude"])
-        lc["time"] = np.arange(10000)
-        values[idx] = extractor.extract(**lc)["StetsonK_AC"]
-
-    np.testing.assert_allclose(values.mean(), 0.21042263044101692)
+    np.testing.assert_allclose(values.mean(axis=0), expected)
 
 
-def test_StetsonL_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_stetson.StetsonL()
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_StetsonKAC_extract(normal):
+    extractor = StetsonKAC()
 
-    # init the seed
-    random = np.random.default_rng(42)
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
 
-    # run the simulation
-    error_loc, error_scale = 1, 0.008
-    values = np.empty(1000)
-    for idx in range(values.size):
-        lc = normal_light_curve(
-            random=random,
-            size=1000,
-            data=[
-                "aligned_magnitude",
-                "aligned_magnitude2",
-                "aligned_error",
-                "aligned_error2",
-            ],
-            aligned_error_loc=error_loc,
-            aligned_error2_loc=error_loc,
-            aligned_error_scale=error_scale,
-            aligned_error2_scale=error_scale,
-        )
-        values[idx] = extractor.extract(**lc)["StetsonL"]
+    # simulate results
+    lcs = [
+        {
+            "time": np.arange(LC_LENGTH_SHORT),
+            "magnitude": normal(random=random, size=LC_LENGTH_SHORT),
+        }
+        for _ in range(MAX_ITERS)
+    ]
+    results = [extractor.extract(**lc) for lc in lcs]
 
-    np.testing.assert_allclose(values.mean(), 0.00030183305778540346)
+    # transform results into ndarray
+    values = np.array([list(result.values()) for result in results])
+
+    # assert mean is close to expected value
+    expected = 0.6583779  # StetsonK_AC
+
+    np.testing.assert_allclose(values.mean(axis=0), expected)
+
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_StetsonL_extract(normal):
+    extractor = StetsonL()
+
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
+
+    # simulate results
+    lcs = [
+        {
+            "aligned_magnitude": normal(random=random, size=LC_LENGTH),
+            "aligned_magnitude2": normal(random=random, size=LC_LENGTH),
+            "aligned_error": normal(
+                random=random, size=LC_LENGTH, loc=1, scale=0.008
+            ),
+            "aligned_error2": normal(
+                random=random, size=LC_LENGTH, loc=1, scale=0.008
+            ),
+        }
+        for _ in range(MAX_ITERS)
+    ]
+    results = [extractor.extract(**lc) for lc in lcs]
+
+    # transform results into ndarray
+    values = np.array([list(result.values()) for result in results])
+
+    # assert mean is close to expected value
+    expected = 0.00030183305778540346  # StetsonL
+
+    np.testing.assert_allclose(values.mean(axis=0), expected)

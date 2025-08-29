@@ -6,27 +6,52 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_eta_color
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from feets.extractors.ext_eta_color import EtaColor
 
 import numpy as np
 
+import pytest
 
-def test_EtaColor_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_eta_color.EtaColor()
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 
-    # init the seed
-    random = np.random.default_rng(42)
+LC_LENGTH = 1000
+MAX_ITERS = 1000
+RANDOM_SEED = 42
 
-    # excute the simulation
-    values = np.empty(1000)
-    for idx in range(values.size):
-        lc = normal_light_curve(
-            random=random,
-            size=1000,
-            data=["aligned_magnitude", "aligned_magnitude2"],
-        )
-        lc["aligned_time"] = np.arange(1000)
-        values[idx] = extractor.extract(**lc)["Eta_color"]
+# =============================================================================
+# TESTS
+# =============================================================================
 
-    np.testing.assert_allclose(values.mean(), 1.9941614810240644)
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_EtaColor_extract(normal):
+    # init extractor
+    extractor = EtaColor()
+
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
+
+    # simulate results
+    lcs = [
+        {
+            "aligned_time": np.arange(LC_LENGTH),
+            "aligned_magnitude": normal(random=random, size=LC_LENGTH),
+            "aligned_magnitude2": normal(random=random, size=LC_LENGTH),
+        }
+        for _ in range(MAX_ITERS)
+    ]
+    results = [extractor.extract(**lc) for lc in lcs]
+
+    # transform results into ndarray
+    values = np.array([list(result.values()) for result in results])
+
+    # assert mean is close to expected value
+    expected = 1.9941614810240644  # Eta_color
+    np.testing.assert_allclose(values.mean(axis=0), expected)

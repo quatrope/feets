@@ -53,6 +53,11 @@ class Gskew(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        """
         median_mag = np.median(magnitude)
         F_3_value = np.percentile(magnitude, 3)
         F_97_value = np.percentile(magnitude, 97)

@@ -11,7 +11,7 @@
 # IMPORTS
 # =============================================================================
 
-from feets.extractors.ext_gskew import Gskew
+from feets.extractors.ext_median_amplitude import MedianAmplitude
 
 import numpy as np
 
@@ -31,22 +31,16 @@ RANDOM_SEED = 42
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
-def test_Gskew_extract(normal):
-    extractor = Gskew()
-
-    # seed
-    random = np.random.default_rng(RANDOM_SEED)
+def test_MedianAmplitude_extract():
+    extractor = MedianAmplitude()
 
     # simulate results
-    lcs = [
-        {"magnitude": normal(random=random, size=LC_LENGTH)}
-        for _ in range(MAX_ITERS)
-    ]
+    lcs = [{"magnitude": np.arange(LC_LENGTH)} for _ in range(MAX_ITERS)]
     results = [extractor.extract(**lc) for lc in lcs]
 
     # transform results into ndarray
     values = np.array([list(result.values()) for result in results])
 
     # assert mean is close to expected value
-    expected = -0.0007054194429618122  # Gskew
+    expected = 475.0  # MedianAmplitude
     np.testing.assert_allclose(values.mean(axis=0), expected)

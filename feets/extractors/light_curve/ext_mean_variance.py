@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Mean variance extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -30,5 +37,12 @@ class MeanVariance(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [mean_variance] = self._extract(time, magnitude, error)
         return {"MeanVariance": mean_variance}

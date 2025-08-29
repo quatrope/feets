@@ -7,21 +7,27 @@
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Abstract class for `light_curve` compatible extractors."""
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
 import numpy as np
 
 from ..extractor import (
-    _ExtractorConf,
-    _is_abstract_method,
+    DATA_ERROR,
+    DATA_FLUX,
+    DATA_FLUX_ERROR,
+    DATA_MAGNITUDE,
+    DATA_TIME,
     Extractor,
     ExtractorBadDefinedError,
-    DATA_TIME,
-    DATA_MAGNITUDE,
-    DATA_FLUX,
-    DATA_ERROR,
-    DATA_FLUX_ERROR,
+    _ExtractorConf,
+    _is_abstract_method,
 )
 from ...libs import doctools
 
@@ -34,6 +40,18 @@ class LightCurveExtractor(Extractor):
     __abstractclass__ = True
 
     def __init_subclass__(cls):
+        """Initialize and validate a `LightCurveExtractor` subclass.
+
+        Upon creation of a `LightCurveExtractor` subclass, set the class
+        attributes and validate that the `extract()` method is implemented.
+
+        Raises
+        ------
+        ExtractorBadDefinedError
+            If the `LightCurveExtractor` subclass does not implement the
+            `extract()` method.
+
+        """
         cls.__abstractclass__ = False
         cls_name = cls.__qualname__
 
@@ -46,6 +64,15 @@ class LightCurveExtractor(Extractor):
             )
 
         cls._conf = _ExtractorConf.from_extractor_class(cls)
+
+        cls_init = cls.__init__
+
+        def __init__(self, **kwargs):
+            cls_init(self, **kwargs)
+            cls._init_kwargs = kwargs
+
+        cls.__init__ = __init__
+
         del cls.features
 
     # API =====================================================================

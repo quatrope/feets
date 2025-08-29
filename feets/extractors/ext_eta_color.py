@@ -56,6 +56,14 @@ class EtaColor(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, aligned_magnitude, aligned_time, aligned_magnitude2):
+        """
+        Parameters
+        ----------
+        aligned_magnitude : array-like
+        aligned_time : array-like
+        aligned_magnitude2 : array-like
+        """
+
         N = len(aligned_magnitude)
         B_Rdata = aligned_magnitude - aligned_magnitude2
 

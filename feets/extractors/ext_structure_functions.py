@@ -67,6 +67,12 @@ class StructureFunctions(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like
+        """
         Nsf, Np = 100, 100
         sf1, sf2, sf3 = np.zeros(Nsf), np.zeros(Nsf), np.zeros(Nsf)
         f = interp1d(time, magnitude)

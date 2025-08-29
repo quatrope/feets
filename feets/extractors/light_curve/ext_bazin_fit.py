@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Bazin fit extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -57,6 +64,13 @@ class BazinFit(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, flux, flux_error):
+        """
+        Parameters
+        ----------
+        time : array-like
+        flux : array-like
+        flux_error : array-like
+        """
         [
             amplitude,
             baseline,

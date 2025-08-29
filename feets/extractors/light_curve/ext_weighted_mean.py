@@ -7,6 +7,12 @@
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Weighted mean extractor."""
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
@@ -30,5 +36,12 @@ class WeightedMean(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        error : array-like
+        time : array-like, optional
+        """
         [weighted_mean] = self._extract(time, magnitude, error)
         return {"WeightedMean": weighted_mean}

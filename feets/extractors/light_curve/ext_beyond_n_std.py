@@ -8,6 +8,12 @@
 
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Beyond-N-standard-deviation extractor."""
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
@@ -33,6 +39,13 @@ class BeyondNStd(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [beyond_n_std] = self._extract(time, magnitude, error)
         return {"BeyondNStd": beyond_n_std}
 

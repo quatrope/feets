@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Linear fit extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -34,6 +41,13 @@ class LinearFit(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like
+        error : array-like
+        """
         [slope, slope_sigma, reduced_chi2] = self._extract(
             time, magnitude, error
         )

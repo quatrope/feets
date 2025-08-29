@@ -13,7 +13,6 @@
 
 """CAR extractor."""
 
-
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -29,7 +28,7 @@ from ..libs import doctools
 
 
 # =============================================================================
-# CONST
+# CONSTANTS
 # =============================================================================
 
 EPSILON = 1e-300
@@ -199,6 +198,13 @@ class CAR(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time, error):
+        """
+        Parameters
+        ----------
+        magnitude : array_like
+        time : array_like
+        error : array_like
+        """
         sigma, tau = self._calculate_CAR(
             time, magnitude, error, self.minimize_method
         )

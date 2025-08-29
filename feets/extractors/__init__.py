@@ -18,28 +18,6 @@
 # =============================================================================
 
 from . import registry
-from .extractor import (
-    DATAS,
-    Extractor,
-    ExtractorBadDefinedError,
-    ExtractorValidationError,
-    ExtractorWarning,
-)
-
-__all__ = [
-    "DATAS",
-    "ExtractorBadDefinedError",
-    "ExtractorValidationError",
-    "ExtractorWarning",
-    "Extractor",
-    "registry",
-]
-
-
-# =============================================================================
-# REGISTERS
-# =============================================================================
-
 from .ext_astropy_lomb_scargle import AstropyLombScargle
 from .ext_autocor_length import AutocorLength
 from .ext_car import CAR
@@ -58,7 +36,13 @@ from .ext_slotted_a_length import SlottedALength
 from .ext_stetson import StetsonJ, StetsonKAC, StetsonL
 from .ext_structure_functions import StructureFunctions
 from .ext_weighted_beyond_n_std import WeightedBeyondNStd
-
+from .extractor import (
+    DATAS,
+    Extractor,
+    ExtractorBadDefinedError,
+    ExtractorValidationError,
+    ExtractorWarning,
+)
 from .light_curve.ext_amplitude import Amplitude
 from .light_curve.ext_anderson_darling import AndersonDarling
 from .light_curve.ext_bazin_fit import BazinFit
@@ -95,6 +79,20 @@ from .light_curve.ext_time_std import TimeStd
 from .light_curve.ext_villar_fit import VillarFit
 from .light_curve.ext_weighted_mean import WeightedMean
 
+
+__all__ = [
+    "DATAS",
+    "ExtractorBadDefinedError",
+    "ExtractorValidationError",
+    "ExtractorWarning",
+    "Extractor",
+    "registry",
+]
+
+
+# =============================================================================
+# REGISTERS
+# =============================================================================
 
 extractors = [
     Amplitude,

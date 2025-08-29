@@ -21,41 +21,19 @@ TEST_DATASET_PATH = PATH / "data"
 
 
 @pytest.fixture(scope="session")
-def normal_light_curve():
-    def maker(*, data=None, size=100, random=None, **kwargs):
+def normal():
+    def maker(*, random=None, size=100, loc=0.0, scale=1.0):
         random = np.random.default_rng(random)
-
-        data = extractor.DATAS if data is None else data
-        diff = set(data).difference(extractor.DATAS)
-        if diff:
-            raise extractor.InvalidDataError(diff)
-
-        lc = {}
-        for data_name in data:
-            data_loc, data_scale = f"{data_name}_loc", f"{data_name}_scale"
-            loc, scale = kwargs.get(data_loc, 0.0), kwargs.get(data_scale, 1.0)
-            lc[data_name] = random.normal(loc=loc, scale=scale, size=size)
-        return lc
+        return random.normal(loc=loc, scale=scale, size=size)
 
     return maker
 
 
 @pytest.fixture(scope="session")
-def uniform_light_curve():
-    def maker(*, data=None, size=100, random=None, **kwargs):
+def uniform():
+    def maker(*, random=None, size=100, low=0.0, high=1.0):
         random = np.random.default_rng(random)
-
-        data = extractor.DATAS if data is None else data
-        diff = set(data).difference(extractor.DATAS)
-        if diff:
-            raise extractor.InvalidDataError(diff)
-
-        lc = {}
-        for data_name in data:
-            data_low, data_high = f"{data_name}_low", f"{data_name}_high"
-            low, high = kwargs.get(data_low, 0.0), kwargs.get(data_high, 1.0)
-            lc[data_name] = random.uniform(low=low, high=high, size=size)
-        return lc
+        return random.uniform(low=low, high=high, size=size)
 
     return maker
 
@@ -68,7 +46,7 @@ def periodic_light_curve():
         data = extractor.DATAS if data is None else data
         diff = set(data).difference(extractor.DATAS)
         if diff:
-            raise extractor.InvalidDataError(diff)
+            raise InvalidDataError(diff)
 
         lc = {}
         for data_name in data:
@@ -91,5 +69,26 @@ def periodic_light_curve():
                         )
             lc[data_name] = random.multivariate_normal(mean=mean, cov=cov)
         return lc
+
+    return maker
+
+
+@pytest.fixture(scope="session")
+def periodic():
+    def maker(*, random=None, size=100, mean=None, cov=None, period=10):
+        random = np.random.default_rng(random)
+
+        if mean is None:
+            mean = np.zeros(size)
+
+        if cov is None:
+            cov = np.zeros([size, size])
+            for i in np.arange(size):
+                for j in np.arange(size):
+                    cov[i, j] = np.exp(
+                        -(np.sin((np.pi / period) * (i - j)) ** 2)
+                    )
+
+        return random.multivariate_normal(mean=mean, cov=cov)
 
     return maker

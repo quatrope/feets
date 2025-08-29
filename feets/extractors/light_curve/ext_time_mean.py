@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Time mean extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -30,5 +37,12 @@ class TimeMean(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like, optional
+        error : array-like, optional
+        """
         [time_mean] = self._extract(time, magnitude, error)
         return {"TimeMean": time_mean}

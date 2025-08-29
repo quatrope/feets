@@ -69,6 +69,11 @@ class Con(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
+        """
+        Parameters
+        ----------
+        magnitude : array_like
+        """
         consecutive_star = self.consecutive_star
 
         N = len(magnitude)

@@ -100,6 +100,14 @@ class StetsonJ(Extractor):
         aligned_error,
         aligned_error2,
     ):
+        """
+        Parameters
+        ----------
+        aligned_magnitude : array-like
+        aligned_magnitude2 : array-like
+        aligned_error : array-like
+        aligned_error2 : array-like
+        """
 
         N = len(aligned_magnitude)
 
@@ -162,6 +170,12 @@ class StetsonKAC(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like
+        """
         autocor_vector = start_conditions(magnitude, time, self.T)[-1]
 
         N_autocor = len(autocor_vector)
@@ -215,6 +229,14 @@ class StetsonL(Extractor):
         aligned_error,
         aligned_error2,
     ):
+        """
+        Parameters
+        ----------
+        aligned_magnitude : array-like
+        aligned_magnitude2 : array-like
+        aligned_error : array-like
+        aligned_error2 : array-like
+        """
         magnitude, magnitude2 = aligned_magnitude, aligned_magnitude2
         error, error2 = aligned_error, aligned_error2
 

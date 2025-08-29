@@ -58,6 +58,11 @@ class PairSlopeTrend(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        """
         data_last = magnitude[-30:]
 
         pst = (

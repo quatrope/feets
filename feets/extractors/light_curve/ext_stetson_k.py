@@ -7,6 +7,12 @@
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Stetson K extractor."""
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
@@ -30,5 +36,12 @@ class StetsonK(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        error : array-like
+        time : array-like, optional
+        """
         [stetson_k] = self._extract(time, magnitude, error)
         return {"StetsonK": stetson_k}

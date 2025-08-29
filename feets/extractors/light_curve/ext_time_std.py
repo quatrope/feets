@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Time standard deviation extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -30,5 +37,12 @@ class TimeStd(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like, optional
+        error : array-like, optional
+        """
         [time_std] = self._extract(time, magnitude, error)
         return {"TimeStd": time_std}

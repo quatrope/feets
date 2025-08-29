@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Lomb-Scargle extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -45,6 +52,13 @@ class LightCurveLombScargle(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like
+        error : array-like, optional
+        """
         periodogram = self._extract(time, magnitude, error)
         transpose = np.reshape(periodogram, (-1, 2))
         [period, period_s_to_n] = np.transpose(transpose)

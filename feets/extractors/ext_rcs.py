@@ -69,6 +69,11 @@ class RCS(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        """
         sigma = np.std(magnitude)
         N = len(magnitude)
         m = np.mean(magnitude)

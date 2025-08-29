@@ -11,7 +11,7 @@
 # DOC
 # =============================================================================
 
-"""Beyond-one-standard-deviation extractor."""
+"""Weighted beyond-N-standard-deviations extractor."""
 
 
 # =============================================================================
@@ -63,6 +63,12 @@ class WeightedBeyondNStd(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, error):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        error : array-like
+        """
         n = len(magnitude)
 
         weighted_mean = np.average(magnitude, weights=1 / error**2)

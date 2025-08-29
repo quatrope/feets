@@ -11,7 +11,7 @@
 # IMPORTS
 # =============================================================================
 
-from feets.extractors.ext_gskew import Gskew
+from feets.extractors.ext_weighted_beyond_n_std import WeightedBeyondNStd
 
 import numpy as np
 
@@ -31,15 +31,18 @@ RANDOM_SEED = 42
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
-def test_Gskew_extract(normal):
-    extractor = Gskew()
+def test_WeightedBeyondNStd_extract(normal):
+    extractor = WeightedBeyondNStd()
 
     # seed
     random = np.random.default_rng(RANDOM_SEED)
 
     # simulate results
     lcs = [
-        {"magnitude": normal(random=random, size=LC_LENGTH)}
+        {
+            "magnitude": normal(random=random, size=1000),
+            "error": normal(random=random, size=1000, loc=1, scale=0.008),
+        }
         for _ in range(MAX_ITERS)
     ]
     results = [extractor.extract(**lc) for lc in lcs]
@@ -48,5 +51,6 @@ def test_Gskew_extract(normal):
     values = np.array([list(result.values()) for result in results])
 
     # assert mean is close to expected value
-    expected = -0.0007054194429618122  # Gskew
+    expected = 0.317288  # WeightedBeyond1Std
+
     np.testing.assert_allclose(values.mean(axis=0), expected)

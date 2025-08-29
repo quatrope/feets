@@ -6,6 +6,14 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Linear trend extractor."""
+
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -34,6 +42,13 @@ class LinearTrend(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude, error=None):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like
+        error : array-like, optional
+        """
         [linear_trend, linear_trend_sigma, reduced_chi2] = self._extract(
             time, magnitude, error
         )

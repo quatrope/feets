@@ -6,6 +6,12 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Cumulative sum (CUSUM) extractor."""
+
 
 # =============================================================================
 # IMPORTS
@@ -31,5 +37,12 @@ class Cusum(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [cusum] = self._extract(time, magnitude, error)
         return {"Cusum": cusum}

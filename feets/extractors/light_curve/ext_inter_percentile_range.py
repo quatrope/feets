@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Inter-percentile range extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -32,6 +39,13 @@ class InterPercentileRange(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [inter_percentile_range] = self._extract(time, magnitude, error)
         return {"InterPercentileRange": inter_percentile_range}
 

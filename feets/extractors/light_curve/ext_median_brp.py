@@ -6,10 +6,16 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Median buffer range percentage extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
-
 
 from light_curve import (
     MedianBufferRangePercentage as _MedianBufferRangePercentage,
@@ -35,6 +41,13 @@ class MedianBRP(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [median_brp] = self._extract(time, magnitude, error)
         return {"MedianBRP": median_brp}
 

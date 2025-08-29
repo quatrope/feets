@@ -30,7 +30,22 @@ from ..libs import doctools
 
 
 def slotted_autocorrelation(data, time, T, K, second_round=False, K1=100):
-    """Calculate slotted autocorrelation."""
+    """Calculate slotted autocorrelation.
+
+    Parameters
+    ----------
+    data : array-like
+    time : array-like
+    T : float
+    K : int
+    second_round : bool, default=False
+    K1 : int, default=100
+
+    Returns
+    -------
+    tuple
+        (normalized slotted autocorrelation, slots)
+    """
     slots, i = np.zeros((K, 1)), 1
 
     # make time start from 0
@@ -79,7 +94,19 @@ def slotted_autocorrelation(data, time, T, K, second_round=False, K1=100):
 
 
 def start_conditions(magnitude, time, T):
-    """Get starting conditions for the slotted autocorrelation calculation."""
+    """Get starting conditions for the slotted autocorrelation calculation.
+
+    Parameters
+    ----------
+    magnitude : array-like
+    time : array-like
+    T : float
+
+    Returns
+    -------
+    tuple
+        (T, K, slots, SAC2)
+    """
     N = len(time)
 
     if T is None:
@@ -148,6 +175,12 @@ class SlottedALength(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like
+        """
         T, K, slots, SAC2 = start_conditions(magnitude, time, self.T)
 
         k = next(

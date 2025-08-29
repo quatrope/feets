@@ -7,6 +7,12 @@
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Skew extractor."""
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
@@ -30,5 +36,12 @@ class Skew(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, time=None, error=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        time : array-like, optional
+        error : array-like, optional
+        """
         [skew] = self._extract(time, magnitude, error)
         return {"Skew": skew}

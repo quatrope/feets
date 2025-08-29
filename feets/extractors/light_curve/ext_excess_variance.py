@@ -8,6 +8,13 @@
 
 
 # =============================================================================
+# DOC
+# =============================================================================
+
+"""Excess variance extractor."""
+
+
+# =============================================================================
 # IMPORTS
 # =============================================================================
 
@@ -31,5 +38,12 @@ class ExcessVariance(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        error : array-like
+        time : array-like, optional
+        """
         [excess_variance] = self._extract(time, magnitude, error)
         return {"ExcessVariance": excess_variance}

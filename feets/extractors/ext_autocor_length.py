@@ -72,6 +72,11 @@ class AutocorLength(Extractor):
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude):
+        """
+        Parameters
+        ----------
+        magnitude : array_like
+        """
         nlags = self.nlags
 
         AC = stattools.acf(magnitude, nlags=nlags)

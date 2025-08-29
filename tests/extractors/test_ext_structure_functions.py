@@ -6,41 +6,55 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_structure_functions
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from feets.extractors.ext_structure_functions import StructureFunctions
 
 import numpy as np
 
+import pytest
 
-def test_StructureFunctions_extract(normal_light_curve):
-    # create the extractor
-    extractor = ext_structure_functions.StructureFunctions()
-    features = [
-        "StructureFunction_index_21",
-        "StructureFunction_index_31",
-        "StructureFunction_index_32",
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+
+LC_LENGTH = 1000
+MAX_ITERS = 1000
+RANDOM_SEED = 42
+
+# =============================================================================
+# TESTS
+# =============================================================================
+
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_StructureFunctions_extract(normal):
+    extractor = StructureFunctions()
+
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
+
+    # simulate results
+    lcs = [
+        {
+            "time": np.arange(LC_LENGTH),
+            "magnitude": normal(random=random, size=LC_LENGTH),
+        }
+        for _ in range(MAX_ITERS)
     ]
+    results = [extractor.extract(**lc) for lc in lcs]
 
-    # init the seed
-    random = np.random.default_rng(42)
+    # transform results into ndarray
+    values = np.array([list(result.values()) for result in results])
 
-    # excute the simulation
-    sims = 1000
-    size = 1000
-
-    time = np.arange(size)
-    values = np.empty([sims, 3])
-    for idx in range(sims):
-        lc = normal_light_curve(random=random, size=size, data=["magnitude"])
-        lc["time"] = time
-
-        results = extractor.extract(**lc)
-        for index, feature in enumerate(features):
-            values[idx, index] = results[feature]
-
-    # test
+    # assert mean is close to expected value
     expected = [
-        1.8438983006429244,
-        2.637129298119476,
-        1.525586514233299,
+        1.8438983006429244,  # StructureFunction_index_21
+        2.637129298119476,  # StructureFunction_index_31
+        1.525586514233299,  # StructureFunction_index_32
     ]
+
     np.testing.assert_allclose(values.mean(axis=0), expected)

@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Reduced chi-squared extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -30,5 +37,12 @@ class ReducedChi2(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, magnitude, error, time=None):
+        """
+        Parameters
+        ----------
+        magnitude : array-like
+        error : array-like
+        time : array-like, optional
+        """
         [chi2] = self._extract(time, magnitude, error)
         return {"ReducedChi2": chi2}

@@ -6,6 +6,13 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Maximum time interval extractor."""
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -30,5 +37,12 @@ class MaxTimeInterval(LightCurveExtractor):
 
     @doctools.doc_inherit(LightCurveExtractor.extract)
     def extract(self, time, magnitude=None, error=None):
+        """
+        Parameters
+        ----------
+        time : array-like
+        magnitude : array-like, optional
+        error : array-like, optional
+        """
         [maximum_time_interval] = self._extract(time, magnitude, error)
         return {"MaxTimeInterval": maximum_time_interval}

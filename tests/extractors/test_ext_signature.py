@@ -6,91 +6,117 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-from feets.extractors import ext_astropy_lomb_scargle, ext_median_amplitude, ext_signature
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+from feets.extractors.ext_astropy_lomb_scargle import AstropyLombScargle
+from feets.extractors.ext_median_amplitude import MedianAmplitude
+from feets.extractors.ext_signature import Signature
 
 import numpy as np
 
 import pytest
 
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 
-@pytest.mark.slow
+LC_LENGTH = 100
+MAX_ITERS = 100
+RANDOM_SEED = 42
+
+# =============================================================================
+# TESTS
+# =============================================================================
+
+
+def extract_MedianAmplitude(lc):
+    ext_median_amplitude = MedianAmplitude()
+    return ext_median_amplitude.extract(magnitude=lc["magnitude"])[
+        "MedianAmplitude"
+    ]
+
+
+def extract_PeriodLS(lc):
+    ext_astropy_lomb_scargle = AstropyLombScargle()
+    return ext_astropy_lomb_scargle.extract(
+        magnitude=lc["magnitude"], time=lc["time"]
+    )["PeriodLS"]
+
+
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
-def test_Signature_extract(periodic_light_curve):
-    # create the extractors
-    phase_bins = 6
-    mag_bins = 6
+def test_Signature_extract(periodic):
+    # init extractor
+    extractor = Signature(phase_bins=6, mag_bins=6)
 
-    extractor_sig = ext_signature.Signature(
-        phase_bins=phase_bins, mag_bins=mag_bins
-    )
-    extractor_ls = ext_astropy_lomb_scargle.AstropyLombScargle()
-    extractor_amp = ext_median_amplitude.MedianAmplitude()
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
 
-    labels = [
-        f"ph_{j}_mag_{i}" for i in range(mag_bins) for j in range(phase_bins)
+    # simulate results
+    lcs = [
+        {
+            "time": np.arange(LC_LENGTH),
+            "magnitude": periodic(random=random, size=LC_LENGTH, period=20),
+        }
+        for _ in range(MAX_ITERS)
     ]
 
-    # init the seed
-    random = np.random.default_rng(42)
-
-    # excute the simulation
-    sims = 100
-    size = 100
-
-    time = np.arange(size)
-    values = np.empty([sims, phase_bins * mag_bins])
-    for idx in range(sims):
-        lc = periodic_light_curve(
-            random=random, size=size, data=["magnitude"], magnitude_period=20
+    results = [
+        extractor.extract(
+            **lc,
+            MedianAmplitude=extract_MedianAmplitude(lc),
+            PeriodLS=extract_PeriodLS(lc),
         )
-
-        Amplitude = extractor_amp.extract(**lc)["Amplitude"]
-        PeriodLS = extractor_ls.extract(**lc, time=time)["PeriodLS"]
-
-        results = extractor_sig.extract(
-            **lc, time=time, Astropy_PeriodLS=PeriodLS, MedianAmplitude=Amplitude
-        )["Signature"]
-
-        np.testing.assert_(len(results) == 3)
-        for index, key in enumerate(labels):
-            values[idx, index] = results[0][key]
-
-    expected = [
-        2.071238109392945,
-        0.605183273905034,
-        0.24333596730297213,
-        0.09589404540593081,
-        0.010818366220838163,
-        0.0018183670960752788,
-        0.2290716162792312,
-        0.6062864999869148,
-        0.6722235824671547,
-        0.7046220542488407,
-        0.5048057372524497,
-        0.4013777017040398,
-        0.06727958113501273,
-        0.11815881097067889,
-        0.23420706778547973,
-        0.423337128676334,
-        0.6285534452762233,
-        1.40232316611256,
-        0.03454897450202003,
-        0.10337866297630369,
-        0.18895026706657636,
-        0.2506092723165407,
-        0.7175840089781574,
-        1.7167746306123846,
-        0.20852227534234732,
-        0.486706490984589,
-        0.5465103970930273,
-        0.5118751458287931,
-        0.5524339468804103,
-        0.7996196334751763,
-        1.9041271155713761,
-        0.6685079850958521,
-        0.28502781354816714,
-        0.12883394218816935,
-        0.029090165858995598,
-        0.010910202140423953,
+        for lc in lcs
     ]
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+
+    # transform results into ndarray
+    values = np.array(
+        [
+            [list(signature.values()) for signature in result["Signature"]]
+            for result in results
+        ]
+    )
+
+    # assert mean is close to expected value
+    expected = [
+        [2.071238109392945, 2.049606624235112, 2.081382834349009],
+        [0.6051832739050338, 0.5669886810904373, 0.6460404068156241],
+        [0.2433359673029722, 0.26129536112403795, 0.2087960952991411],
+        [0.09589404540593081, 0.11420072926392395, 0.09589404505199664],
+        [0.010818366220838163, 0.02899462246295698, 0.014451393242558523],
+        [0.001818367096075281, 0.0072734683140853575, 0.007273468314086442],
+        [0.2290716162792312, 0.17086720716041043, 0.20179611010141815],
+        [0.6062864999869149, 0.550224678774899, 0.5960130324858938],
+        [0.6722235824671547, 0.5775634202188563, 0.6613133809053577],
+        [0.7046220542488407, 0.5173715972332807, 0.6796200201136487],
+        [0.5048057372524497, 0.5232148732913509, 0.541167516142617],
+        [0.4013777017040398, 0.7646180907943845, 0.43226399116352066],
+        [0.06727958113501273, 0.03816346563549959, 0.0581877457424142],
+        [0.11815881097067887, 0.08537664308238012, 0.12597717601463812],
+        [0.23420706778547973, 0.20337739519191422, 0.24248053576046735],
+        [0.423337128676334, 0.26149605863742154, 0.39847998965682235],
+        [0.6285534452762233, 0.6324079382710782, 0.6513554811020783],
+        [1.4023231661125595, 1.6475713682659623, 1.400565127611126],
+        [0.03454897450202003, 0.05816364904053382, 0.041822442816111645],
+        [0.1033786629763037, 0.13610893088926057, 0.10156029589778223],
+        [0.1889502670665764, 0.21613212898156234, 0.18349516583102324],
+        [0.2506092723165407, 0.403358942023489, 0.2758296760011969],
+        [0.7175840089781577, 0.6973604262569535, 0.6957597296595938],
+        [1.7167746306123863, 1.506279551796583, 1.7221304779339883],
+        [0.20852227534234732, 0.26853950267333465, 0.23761614859868652],
+        [0.486706490984589, 0.542729924824424, 0.4813432283296414],
+        [0.5465103970930272, 0.639467047343689, 0.5602389654678723],
+        [0.511875145828793, 0.7064318395665193, 0.5395139141625723],
+        [0.5524339468804101, 0.554014732654453, 0.5070610497930405],
+        [0.7996196334751763, 0.40177422863393125, 0.7680465620705336],
+        [1.9041271155713761, 1.9294601549741839, 1.8979545854808197],
+        [0.6685079850958521, 0.7066834819288559, 0.6422875826803957],
+        [0.2850278135481671, 0.2725429731251919, 0.3169124151301474],
+        [0.12883394218816932, 0.11237008873221775, 0.12882467473509127],
+        [0.0290901658589956, 0.0072679077089647616, 0.035453428144800285],
+        [0.010910202140423953, 0.005451393862764684, 0.0054513937695372236],
+    ]
+    np.testing.assert_allclose(np.transpose(values.mean(axis=0)), expected)
