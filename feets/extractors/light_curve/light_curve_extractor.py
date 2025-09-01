@@ -16,15 +16,12 @@
 # IMPORTS
 # =============================================================================
 
-import abc
-from tkinter import E
-
 import numpy as np
 
 from ..extractor import (
     DATA_ERROR,
-    DATA_FLUX_ERROR,
     DATA_FLUX,
+    DATA_FLUX_ERROR,
     DATA_MAGNITUDE,
     DATA_TIME,
     Extractor,
@@ -48,6 +45,8 @@ DATAS = DATAS_TIME.union(DATAS_BRIGHTNESS, DATAS_ERROR)
 
 
 class LightCurveExtractor(Extractor):
+    """Abstract class for `light_curve` compatible extractors."""
+
     @doctools.doc_inherit(Extractor.__init_subclass__)
     def __init_subclass__(cls):
         super().__init_subclass__()

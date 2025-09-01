@@ -29,9 +29,49 @@ from ...libs import doctools
 
 
 class BeyondNStd(LightCurveExtractor):
+    r"""Beyond-N-standard-deviation extractor.
+
+    **BeyondNStd**
+
+    Fraction of observations beyond :math:`N\,\sigma_m` from the mean
+    magnitude :math:`\langle m \rangle`.
+
+    .. math::
+        \mathrm{beyond}~n\,\sigma_m = \frac{
+            \sum_i I_{|m - \langle m \rangle| > n\,\sigma_m}(m_i)
+        }{N}
+
+    where :math:`I` is the indicator function, :math:`N` is the number of
+    observations, :math:`\langle m \rangle` is the mean magnitude and
+    :math:`\sigma_m = \sqrt{\sum_i (m_i - \langle m \rangle)^2 / (N-1)}`
+    is the magnitude standard deviation.
+
+    Parameters
+    ----------
+    nstd : positive float, default=1
+        N, default is 1.0
+    transform : str or bool or None, optional
+        Transformer to apply to the feature values. If str, must be one of:
+          - 'default' - use default transformer for the feature, it same as
+            giving True. The default for this feature is 'identity'
+          - 'arcsinh' - Hyperbolic arcsine feature transformer
+          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+            value
+          - 'identity' - Identity feature transformer
+          - 'lg' - Decimal logarithm feature transformer
+          - 'ln1p' - :math:`ln(1+x)` feature transformer
+          - 'sqrt' - Square root feature transformer
+        If bool, must be True to use default transformer or False to disable.
+        If None, no transformation is applied.
+
+    See Also
+    --------
+    WeightedBeyondNStd
+    """
+
     features = ["BeyondNStd"]
 
-    def __init__(self, nstd=1, transform="identity"):
+    def __init__(self, nstd=1, transform=None):
         self.nstd = nstd
         self.transform = transform
 

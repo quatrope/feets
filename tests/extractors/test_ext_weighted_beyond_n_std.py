@@ -40,8 +40,8 @@ def test_WeightedBeyondNStd_extract(normal):
     # simulate results
     lcs = [
         {
-            "magnitude": normal(random=random, size=1000),
-            "error": normal(random=random, size=1000, loc=1, scale=0.008),
+            "magnitude": normal(random=random, size=LC_LENGTH),
+            "error": normal(random=random, size=LC_LENGTH, loc=1, scale=0.008),
         }
         for _ in range(MAX_ITERS)
     ]

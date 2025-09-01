@@ -29,9 +29,54 @@ from ...libs import doctools
 
 
 class EtaE(LightCurveExtractor):
+    r"""EtaE extractor.
+
+    **EtaE** (:math:`\eta^e`)
+
+    Modification of **Eta** for unevenly time series.
+
+    .. math::
+        \eta^e = \frac{(t_{N-1} - t_0)^2}{(N - 1)^3}
+        \frac{\sum_{i=0}^{N-2}
+        \left(\frac{m_{i+1} - m_i}{t_{i+1} - t_i}\right)^2}{\sigma_m^2}
+
+    where :math:`N` is the number of observations,
+    :math:`\sigma_m = \sqrt{\sum_i (m_i - \langle m \rangle)^2 / (N-1)}` is the
+    magnitude standard deviation.
+
+    Note that this definition is a bit different from [kim2014epoch]
+
+    Parameters
+    ----------
+    transform : str or bool or None, optional
+        Transformer to apply to the feature values. If str, must be one of:
+          - 'default' - use default transformer for the feature, it same as
+            giving True. The default for this feature is 'lg'
+          - 'arcsinh' - Hyperbolic arcsine feature transformer
+          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+            value
+          - 'identity' - Identity feature transformer
+          - 'lg' - Decimal logarithm feature transformer
+          - 'ln1p' - :math:`ln(1+x)` feature transformer
+          - 'sqrt' - Square root feature transformer
+        If bool, must be True to use default transformer or False to disable.
+        If None, no transformation is applied.
+
+    References
+    ----------
+    .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
+       Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
+       The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
+       Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
+
+    See Also
+    --------
+    Eta
+    """
+
     features = ["EtaE"]
 
-    def __init__(self, transform="identity"):
+    def __init__(self, transform=None):
         self.transform = transform
         self._extract = _EtaE(**self.params)
 

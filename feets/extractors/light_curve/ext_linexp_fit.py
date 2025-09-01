@@ -29,6 +29,77 @@ from ...libs import doctools
 
 
 class LinexpFit(LightCurveExtractor):
+    r"""Linexp function fit.
+
+    Four fit parameters and goodness of fit (reduced :math:`\chi^2`) of the
+    Linexp function developed for core-collapsed supernovae:
+
+    .. math::
+        f(t) = A \frac{(t-t_0)}{\tau} \times
+        \exp{\left(\frac{(t-t_0)}{\tau}\right)} + B.
+
+    Note, that the Linexp function is developed to be used with fluxes, not
+    magnitudes.
+
+    **LinexpFit_Amplitude** (:math:`A`)
+        Amplitude of the Linexp function
+
+    **LinexpFit_ReferenceTime** (:math:`t_0`)
+        Reference time of the Linexp fit
+
+    **LinexpFit_FallTime** (:math:`\tau`)
+        Fall time of the Linexp function
+
+    **LinexpFit_Baseline** (:math:`B`)
+        Baseline of the Linexp function
+
+    **LinexpFit_ReducedChi2** (reduced :math:`\chi^2`)
+        Linexp fit quality
+
+    Parameters
+    ----------
+    algorithm : str
+        Non-linear least-square algorithm, supported values are:
+        'mcmc', 'ceres', 'mcmc-ceres', 'lmsder', 'mcmc-lmsder'.
+    mcmc_niter : int, optional
+        Number of MCMC iterations, default is 128
+    ceres_niter : int, optional
+        Number of Ceres iterations, default is 10
+    ceres_loss_reg : float, optional
+        Ceres loss regularization, default is to use square norm as is, if set
+        to a number, the loss function is regularized to discriminate outlier
+        residuals larger than this value.
+        Default is None which means no regularization.
+    lmsder_niter : int, optional
+        Number of LMSDER iterations, default is 10
+    init : list or None, optional
+        Initial conditions, must be `None` or a `list` of `float`s or `None`s.
+        The length of the list must be 4, `None` values will be replaced
+        with some default values. It is supported by MCMC only
+    bounds : list of tuples or None, optional
+        Boundary conditions, must be `None` or a `list` of `tuple`s of `float`s
+        or `None`s. The length of the list must be 4, boundary conditions must
+        include initial conditions, `None` values will be replaced with some
+        broad defaults. It is supported by MCMC only
+    ln_prior : str or list of ln_prior.LnPrior1D or None, optional
+        Prior for MCMC, None means no prior. It is specified by a string
+        literal or a list of 5 `light_curve.ln_prior.LnPrior1D` objects, see
+        `light_curve.ln_prior` submodule for corresponding functions. Available
+        string literals are:
+         - 'no': no prior
+    transform : bool or None, optional
+        If `False` or `None` (default) output is not transformed. If `True` output
+        is transformed as following:
+          - Half-amplitude A is transformed as :math:`zp - 2.5 lg(2*A)`,
+            :math:`zp = 8.9`, so that the amplitude is assumed to be the
+            object peak flux in Jy.
+          - baseline flux is normalised by :math:`A: baseline -> baseline / A`
+          - reference time is removed
+          - goodness of fit is transformed as :math:`ln(reduced chi^2 + 1)` to
+            reduce its spread
+          - other parameters are not transformed
+    """
+
     features = [
         "LinexpFit_Amplitude",
         "LinexpFit_Baseline",

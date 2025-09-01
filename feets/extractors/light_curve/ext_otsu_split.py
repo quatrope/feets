@@ -28,6 +28,27 @@ from ...libs import doctools
 
 
 class OtsuSplit(LightCurveExtractor):
+    """Otsu threshholding algorithm.
+
+    Difference of subset means, standard deviation of the lower subset,
+    standard deviation of the upper subset and lower-to-all observation count
+    ratio for two subsets of magnitudes obtained by Otsu's method split.
+
+    Otsu's method is used to perform automatic thresholding. The algorithm
+    returns a single threshold that separate values into two classes. This
+    threshold is determined by minimizing intra-class intensity variance, or
+    equivalently, by maximizing inter-class variance.
+
+    The algorithm returns the minimum threshold which corresponds to the
+    absolute maximum of the inter-class variance.
+
+    References
+    ----------
+    .. [otsu1979glh] Otsu, N. (1979). A Threshold Selection Method from
+       Gray-Level Histograms. IEEE Transactions on Systems, Man and
+       Cybernetics, 9, 62--66. doi: 10.1109/TSMC.1979.4310076
+    """
+
     features = [
         "OtsuMeanDiff",
         "OtsuStdLower",

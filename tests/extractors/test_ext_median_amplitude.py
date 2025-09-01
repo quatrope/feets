@@ -22,7 +22,6 @@ import pytest
 # =============================================================================
 
 LC_LENGTH = 1000
-MAX_ITERS = 1000
 RANDOM_SEED = 42
 
 # =============================================================================
@@ -35,12 +34,12 @@ def test_MedianAmplitude_extract():
     extractor = MedianAmplitude()
 
     # simulate results
-    lcs = [{"magnitude": np.arange(LC_LENGTH)} for _ in range(MAX_ITERS)]
-    results = [extractor.extract(**lc) for lc in lcs]
+    lc = {"magnitude": np.arange(LC_LENGTH + 1)}
+    results = extractor.extract(**lc)
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # transform results into array
+    values = np.array(list(results.values()))
 
     # assert mean is close to expected value
-    expected = 475.0  # MedianAmplitude
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    expected = [475.0]  # MedianAmplitude
+    np.testing.assert_allclose(values, expected)

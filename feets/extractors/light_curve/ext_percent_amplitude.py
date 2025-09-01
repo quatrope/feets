@@ -29,9 +29,40 @@ from ...libs import doctools
 
 
 class PercentAmplitude(LightCurveExtractor):
+    r"""Maximum deviation of magnitude from its median.
+
+    .. math::
+        \max_i\left|m_i - \mathrm{Median}(m)\right|
+        = \max(\max(m) - \mathrm{Median}(m), \mathrm{Median}(m) - \min(m))
+
+    Parameters
+    ----------
+    transform : str or bool or None, optional
+        Transformer to apply to the feature values. If str, must be one of:
+          - 'default' - use default transformer for the feature, it same as
+            giving True. The default for this feature is 'identity'
+          - 'arcsinh' - Hyperbolic arcsine feature transformer
+          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+            value
+          - 'identity' - Identity feature transformer
+          - 'lg' - Decimal logarithm feature transformer
+          - 'ln1p' - :math:`ln(1+x)` feature transformer
+          - 'sqrt' - Square root feature transformer
+        If bool, must be True to use default transformer or False to disable.
+        If None, no transformation is applied.
+
+    References
+    ----------
+    .. [disanto2016feature] D'Isanto, A., Cavuoti, S., Brescia, M., Donalek,
+       C., Longo, G., Riccio, G., & Djorgovski, S. G. (2016). An analysis of
+       feature relevance in the classification of astronomical transients with
+       machine learning methods. Monthly Notices of the Royal Astronomical
+       Society, 457(3), 3119-3132.
+    """
+
     features = ["PercentAmplitude"]
 
-    def __init__(self, transform="identity"):
+    def __init__(self, transform=None):
         self.transform = transform
         self._extract = _PercentAmplitude(**self.params)
 

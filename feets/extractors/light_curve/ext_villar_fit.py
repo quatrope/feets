@@ -28,6 +28,103 @@ from ...libs import doctools
 
 
 class VillarFit(LightCurveExtractor):
+    r"""Villar function fit.
+
+    Seven fit parameters and goodness of fit (reduced :math:`\chi^2`) of
+    the Villar function developed for supernovae classification:
+
+    .. math::
+        f(t) = c + \frac{A}{1 + \exp{\frac{-(t-t_0)}{\tau_\mathrm{rise}}}}
+        \left\{
+          \begin{array}{ll}
+            1 - \frac{\nu (t - t_0)}{\gamma}, &t < t_0 + \gamma \\
+            (1 - \nu) \exp{\frac{-(t-t_0-\gamma)}{\tau_\mathrm{fall} }},
+            &t \geq t_0 + \gamma
+          \end{array}
+        \right.
+
+    where :math:`A, \gamma, \tau_\mathrm{rise}, \tau_\mathrm{fall} > 0`,
+    :math:`\nu \in [0; 1)`.
+
+    Here we introduce a new dimensionless parameter :math:`\nu` instead of
+    the plateau slope :math:`\beta` from the original paper:
+
+    .. math::
+        \nu \equiv -\beta \gamma / A
+
+    Note, that the Villar function is developed to be used with fluxes,
+    not magnitudes.
+
+    **VillarFit_Amplitude** (:math:`A`)
+        Half amplitude of the Villar function
+
+    **VillarFit_Baseline** (:math:`c`)
+        Baseline of the Villar function
+
+    **VillarFit_ReferenceTime** (:math:`t_0`)
+        Reference time of the Villar function
+
+    **VillarFit_RiseTime** (:math:`\tau_\mathrm{rise}`)
+        Rise time of the Villar function
+
+    **VillarFit_FallTime** (:math:`\tau_\mathrm{fall}`)
+        Decline time of the Villar function
+
+    **VillarFit_PlateauRelAmplitude** (:math:`\nu = -\beta \gamma / A`)
+        Relative plateau amplitude of the Villar function
+
+    **VillarFit_PlateauDuration** (:math:`\gamma`)
+        Plateau duration of the Villar function
+
+    **VillarFit_ReducedChi2** (reduced :math:`\chi^2`)
+        Villar fit quality
+
+    Parameters
+    ----------
+    algorithm : str
+        Non-linear least-square algorithm, supported values are:
+        'mcmc', 'ceres', 'mcmc-ceres', 'lmsder', 'mcmc-lmsder'.
+    mcmc_niter : int, optional
+        Number of MCMC iterations, default is 128
+    ceres_niter : int, optional
+        Number of Ceres iterations, default is 10
+    ceres_loss_reg : float, optional
+        Ceres loss regularization, default is to use square norm as is, if set
+        to a number, the loss function is regularized to discriminate outlier
+        residuals larger than this value.
+        Default is None which means no regularization.
+    lmsder_niter : int, optional
+        Number of LMSDER iterations, default is 10
+    init : list or None, optional
+        Initial conditions, must be `None` or a `list` of `float`s or `None`s.
+        The length of the list must be 7, `None` values will be replaced
+        with some default values. It is supported by MCMC only
+    bounds : list of tuples or None, optional
+        Boundary conditions, must be `None` or a `list` of `tuple`s of `float`s
+        or `None`s. The length of the list must be 7, boundary conditions must
+        include initial conditions, `None` values will be replaced with some
+        broad defaults. It is supported by MCMC only
+    ln_prior : str or list of ln_prior.LnPrior1D or None, optional
+        Prior for MCMC, None means no prior. It is specified by a string
+        literal or a list of 7 `light_curve.ln_prior.LnPrior1D` objects, see
+        `light_curve.ln_prior` submodule for corresponding functions. Available
+        string literals are:
+         - 'no': no prior
+         - 'hosseinzadeh2020': prior adopted from Hosseinzadeh et al. 2020, it
+           assumes that `t` is in days
+    transform : bool or None, optional
+        If `False` or `None` (default) output is not transformed. If `True` output
+        is transformed as following:
+         - Half-amplitude A is transformed as :math:`zp - 2.5 lg(2*A)`,
+           :math:`zp = 8.9`, so that the amplitude is assumed to be the object
+           peak flux in Jy.
+         - baseline flux is normalised by :math:`A: baseline -> baseline / A`
+         - reference time is removed
+         - goodness of fit is transformed as :math:`ln(reduced chi^2 + 1)` to
+           reduce its spread
+         - other parameters are not transformed
+    """
+
     features = [
         "VillarFit_Amplitude",
         "VillarFit_Baseline",

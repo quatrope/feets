@@ -176,6 +176,10 @@ class AstropyLombScargle(Extractor):
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
+
+    See Also
+    --------
+    LightCurveLombScargle
     """
 
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]

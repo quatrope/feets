@@ -32,7 +32,46 @@ from ...libs import doctools
 
 
 class LightCurveLombScargle(LightCurveExtractor):
-    features = ["LightCurve_PeriodLS", "Period_s_to_n"]
+    r"""Peaks of Lomb-Scargle periodogram.
+
+    Periodogram :math:`P(\omega)` is an estimate of spectral density of
+    unevenly time series.
+
+    The `peaks` argument corresponds to a number of the most significant
+    spectral density peaks to return.
+
+    For each peak its period and "signal to noise" ratio is returned:
+
+    .. math::
+        \mathrm{signal~to~noise~of~peak} =
+            \frac{P(\omega_\mathrm{peak}) - \langle P(\omega) \rangle}
+            {\sigma_{P(\omega)}}
+
+    Parameters
+    ----------
+    peaks : int or None, default=3
+        Number of peaks to find, default is 3.
+    resolution : float or None, default=10
+        Resolution of frequency grid, default is 10.
+    max_freq_factor : float or None, default=1
+        Multiplier for Nyquist frequency, default is 1.
+    nyquist : str or float or None, default='average'
+        Type of Nyquist frequency. Could be one of:
+
+        - 'average': "Average" Nyquist frequency.
+        - 'median': Nyquist frequency is defined by median time interval
+          between observations.
+        - float: Nyquist frequency is defined by given quantile of time
+          intervals between observations.
+
+        Default is 'average'.
+    fast : bool or None, default=True
+        Use "Fast" (approximate and FFT-based) or direct periodogram
+        algorithm, default is True.
+
+    """
+
+    features = ["Periodogram_Peaks", "Periodogram_S_to_N"]
 
     def __init__(
         self,

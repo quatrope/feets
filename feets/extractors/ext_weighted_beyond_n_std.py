@@ -30,19 +30,26 @@ from ..libs import doctools
 
 
 class WeightedBeyondNStd(Extractor):
-    """Beyond-one-standard-deviation extractor.
+    """Weighted beyond-N-standard-deviation extractor.
 
-    **Beyond1Std**
+    **WeightedBeyondNStd**
 
-    Percentage of points beyond one standard deviation from the weighted mean.
-    For a normal distribution, it should take a value close to :math:`0.32`.
+    Percentage of points beyond :math:`N` standard deviations from the weighted
+    mean.
+    For a normal distribution with :math:`N=1`, it should take a value close to
+    :math:`0.32`.
+
+    Parameters
+    ----------
+    nstd : int, default=1
+        Number of standard deviations. Default is 1.
 
     Examples
     --------
-    >>> fs = feets.FeatureSpace(only=['Beyond1Std'])
+    >>> fs = feets.FeatureSpace(only=['WeightedBeyondNStd'])
     >>> features = fs.extract(**lc_normal)
     >>> features[0]
-    {'Beyond1Std': 0.327}
+    {'WeightedBeyondNStd': 0.327}
 
     References
     ----------
@@ -51,6 +58,10 @@ class WeightedBeyondNStd(Extractor):
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
+    See Also
+    --------
+    BeyondNStd
     """
 
     features = ["WeightedBeyondNStd"]

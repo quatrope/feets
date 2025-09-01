@@ -56,6 +56,10 @@ class MedianAmplitude(Extractor):
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
+    See Also
+    --------
+    Amplitude
     """
 
     features = ["MedianAmplitude"]

@@ -11,4 +11,4 @@
 # DOCS
 # =============================================================================
 
-"""Feature extractor integrations with `light_curve`"""
+"""Feature extractor integrations with `light_curve`."""
