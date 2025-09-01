@@ -16,20 +16,31 @@
 # IMPORTS
 # =============================================================================
 
+import abc
+from tkinter import E
+
 import numpy as np
 
 from ..extractor import (
     DATA_ERROR,
-    DATA_FLUX,
     DATA_FLUX_ERROR,
+    DATA_FLUX,
     DATA_MAGNITUDE,
     DATA_TIME,
     Extractor,
-    ExtractorBadDefinedError,
-    _ExtractorConf,
-    _is_abstract_method,
 )
 from ...libs import doctools
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+
+DEFAULT_DTYPE = np.float64
+
+DATAS_TIME = {DATA_TIME}
+DATAS_BRIGHTNESS = {DATA_MAGNITUDE, DATA_FLUX}
+DATAS_ERROR = {DATA_ERROR, DATA_FLUX_ERROR}
+DATAS = DATAS_TIME.union(DATAS_BRIGHTNESS, DATAS_ERROR)
 
 # =============================================================================
 # LIGHT CURVE EXTRACTOR CLASS
@@ -37,82 +48,44 @@ from ...libs import doctools
 
 
 class LightCurveExtractor(Extractor):
-    __abstractclass__ = True
-
+    @doctools.doc_inherit(Extractor.__init_subclass__)
     def __init_subclass__(cls):
-        """Initialize and validate a `LightCurveExtractor` subclass.
-
-        Upon creation of a `LightCurveExtractor` subclass, set the class
-        attributes and validate that the `extract()` method is implemented.
-
-        Raises
-        ------
-        ExtractorBadDefinedError
-            If the `LightCurveExtractor` subclass does not implement the
-            `extract()` method.
-
-        """
-        cls.__abstractclass__ = False
-        cls_name = cls.__qualname__
-
-        if cls.is_abstract():
-            return
-
-        if _is_abstract_method(cls.extract):
-            raise ExtractorBadDefinedError(
-                f"'{cls_name}.extract()' method must be redefined"
-            )
-
-        cls._conf = _ExtractorConf.from_extractor_class(cls)
-
-        cls_init = cls.__init__
-
-        def __init__(self, **kwargs):
-            cls_init(self, **kwargs)
-            cls._init_kwargs = kwargs
-
-        cls.__init__ = __init__
-
-        del cls.features
+        super().__init_subclass__()
 
     # API =====================================================================
 
+    @classmethod
     @doctools.doc_inherit(Extractor.prepare_extract)
-    def prepare_extract(self, data, dependencies):
-        shape = len(
-            data.get(DATA_TIME)
-            or data.get(DATA_MAGNITUDE)
-            or data.get(DATA_FLUX)
-        )
-        dtype = np.float64
+    def prepare_extract(cls, data, dependencies):
+        # validate and select relevant data and dependencies
+        kwargs = super().prepare_extract(data, dependencies)
 
-        preprocessed_data = {
-            DATA_TIME: (
-                np.arange(shape, dtype=dtype)
-                if data.get(DATA_TIME) is None
-                else np.array(data.get(DATA_TIME), dtype=dtype)
-            ),
-            DATA_MAGNITUDE: (
-                np.zeros(shape, dtype=dtype)
-                if data.get(DATA_MAGNITUDE) is None
-                else np.array(data.get(DATA_MAGNITUDE), dtype=dtype)
-            ),
-            DATA_FLUX: (
-                np.zeros(shape, dtype=dtype)
-                if data.get(DATA_FLUX) is None
-                else np.array(data.get(DATA_FLUX), dtype=dtype)
-            ),
-            DATA_ERROR: (
-                np.ones(shape, dtype=dtype)
-                if data.get(DATA_ERROR) is None
-                else np.array(1 / data.get(DATA_ERROR) ** 2, dtype=dtype)
-            ),
-            DATA_FLUX_ERROR: (
-                np.ones(shape, dtype=dtype)
-                if data.get(DATA_FLUX_ERROR) is None
-                else np.array(1 / data.get(DATA_FLUX_ERROR) ** 2, dtype=dtype)
-            ),
-        }
+        shape = next((len(kwargs[k]) for k in kwargs if k in DATAS), 0)
+        processed_kwargs = {}
 
-        kwargs = super().prepare_extract(preprocessed_data, dependencies)
-        return kwargs
+        # select dependencies
+        for d in cls.get_dependencies():
+            processed_kwargs[d] = kwargs[d]
+
+        # select and format data
+        for d in cls.get_data():
+            if d in DATAS_TIME:
+                processed_kwargs[d] = (
+                    np.arange(shape, dtype=DEFAULT_DTYPE)
+                    if kwargs.get(d) is None
+                    else np.array(kwargs.get(d), dtype=DEFAULT_DTYPE)
+                )
+            if d in DATAS_BRIGHTNESS:
+                processed_kwargs[d] = (
+                    np.zeros(shape, dtype=DEFAULT_DTYPE)
+                    if kwargs.get(d) is None
+                    else np.array(kwargs.get(d), dtype=DEFAULT_DTYPE)
+                )
+            if d in DATAS_ERROR:
+                processed_kwargs[d] = (
+                    np.ones(shape, dtype=DEFAULT_DTYPE)
+                    if kwargs.get(d) is None
+                    else 1 / np.array(kwargs.get(d), dtype=DEFAULT_DTYPE) ** 2
+                )
+
+        return processed_kwargs

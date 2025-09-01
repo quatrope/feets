@@ -125,14 +125,6 @@ def feature_warning(msg):
 # =============================================================================
 
 
-def _is_abstract_class(cls):
-    return getattr(cls, "__abstractclass__", False)
-
-
-def _is_abstract_method(attr):
-    return getattr(attr, "__isabstractmethod__", False)
-
-
 def _iter_method_parameters(method):
     signature = inspect.signature(method)
     parameters = tuple(signature.parameters.values())[1:]
@@ -442,7 +434,7 @@ class Extractor(abc.ABC):
     }
     """
 
-    def __init_subclass__(cls):
+    def __init_subclass__(cls, **kwargs):
         """Initialize and validate an `Extractor` subclass.
 
         Upon creation of an `Extractor` subclass, set the class attributes
@@ -455,40 +447,22 @@ class Extractor(abc.ABC):
             method.
 
         """
-        cls_name = cls.__qualname__
-
-        if cls.is_abstract():
+        if inspect.isabstract(cls):
             return
-
-        if _is_abstract_method(cls.extract):
-            raise ExtractorBadDefinedError(
-                f"'{cls_name}.extract()' method must be redefined"
-            )
 
         cls._conf = _ExtractorConf.from_extractor_class(cls)
 
         cls_init = cls.__init__
 
         def __init__(self, **kwargs):
+            cls._params = kwargs
             cls_init(self, **kwargs)
-            cls._init_kwargs = kwargs
 
         cls.__init__ = __init__
 
         del cls.features
 
     # GETTERS =================================================================
-
-    @classmethod
-    def is_abstract(cls):
-        """Check if the class is abstract.
-
-        Returns
-        -------
-        bool
-            True if it's an abstract class, False otherwise.
-        """
-        return _is_abstract_class(cls)
 
     @classmethod
     def get_features(cls):
@@ -725,7 +699,7 @@ class Extractor(abc.ABC):
         Extractor, get_default_params
         """
         params = self.get_default_params()
-        params.update(self._init_kwargs)
+        params.update(self._params)
         return params
 
     def to_dict(self):
@@ -739,7 +713,6 @@ class Extractor(abc.ABC):
         """
         cls_name = type(self).__name__
         params = self.params
-        print(cls_name)
         return {cls_name: params}
 
     # MAGIC ===================================================================

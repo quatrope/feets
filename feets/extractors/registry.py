@@ -17,7 +17,9 @@
 # IMPORTS
 # =============================================================================
 
-from .extractor import DATAS, Extractor
+import inspect
+
+from .extractor import DATAS, Extractor, ExtractorBadDefinedError
 
 
 # =============================================================================
@@ -47,6 +49,15 @@ class RegistryValidationError(RegistryError):
     """An error occurred due to invalid parameters."""
 
     pass
+
+
+# ============================================================================
+# UTILS
+# ============================================================================
+
+
+def _is_abstract_method(method):
+    return getattr(method, "__isabstractmethod__", False)
 
 
 # =============================================================================
@@ -96,7 +107,8 @@ class ExtractorRegistry:
         self._features = set()
         self._extractors = set()
 
-    def validate_is_extractor(self, cls):
+    @staticmethod
+    def validate_is_extractor(cls):
         """Validate if a class is a valid feature extractor.
 
         It does so by checking if the class is a non-abstract subclass of
@@ -112,10 +124,17 @@ class ExtractorRegistry:
         TypeError
             If the class is not a valid feature extractor.
         """
-        if not issubclass(cls, Extractor) or cls.is_abstract():
+        cls_name = cls.__qualname__
+
+        if issubclass(cls, Extractor) and _is_abstract_method(cls.extract):
+            raise ExtractorBadDefinedError(
+                f"'{cls_name}.extract()' method must be redefined"
+            )
+
+        if not issubclass(cls, Extractor) or inspect.isabstract(cls):
             raise TypeError(
                 f"Only non-abstract subclasses of Extractor are allowed. "
-                f"Found: '{cls}'."
+                f"Found: '{cls_name}'."
             )
 
     def register_extractor(self, cls):

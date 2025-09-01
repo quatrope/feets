@@ -66,7 +66,7 @@ def test_extractor(TestExtractor):
 
 
 # =============================================================================
-# WARNINGS TESTS
+# WARNING TESTS
 # =============================================================================
 
 
@@ -91,11 +91,16 @@ def test_Extractor_init():
 
 
 def test_Extractor_init_subclass(TestExtractor):
+    with pytest.raises(AttributeError):
+        TestExtractor.features
+
+
+def test_Extractor_abstract_subclass():
     class AbstractExtractor(Extractor):
         __abstractclass__ = True
 
-    with pytest.raises(AttributeError):
-        TestExtractor.features
+    with pytest.raises(TypeError):
+        AbstractExtractor()
 
 
 def test_Extractor_no_features():
@@ -185,13 +190,6 @@ def test_Extractor_parameter_has_no_default():
                 pass
 
 
-def test_Extractor_no_extract_method():
-    with pytest.raises(ExtractorBadDefinedError):
-
-        class BadExtractor(Extractor):
-            features = ["test_feature"]
-
-
 def test_Extractor_extract_not_implemented():
     class BadExtractor(Extractor):
         features = ["test_feature"]
@@ -201,17 +199,6 @@ def test_Extractor_extract_not_implemented():
 
     with pytest.raises(NotImplementedError):
         BadExtractor().extract()
-
-
-def test_Extractor_is_abstract():
-    class AbstractExtractor(Extractor):
-        __abstractclass__ = True
-
-    np.testing.assert_equal(AbstractExtractor.is_abstract(), True)
-
-
-def test_Extractor_is_not_abstract(TestExtractor):
-    np.testing.assert_equal(TestExtractor.is_abstract(), False)
 
 
 def test_Extractor_get_features(TestExtractor):

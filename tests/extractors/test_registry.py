@@ -12,7 +12,7 @@
 # =============================================================================
 
 
-from feets.extractors.extractor import Extractor
+from feets.extractors.extractor import Extractor, ExtractorBadDefinedError
 from feets.extractors.registry import (
     EntityNotFoundError,
     ExtractorRegistry,
@@ -134,30 +134,28 @@ def registry(
 # =============================================================================
 
 
-def test_ExtractorRegistry_validate_is_extractor(
-    empty_registry, TestExtractor1
-):
-    empty_registry.validate_is_extractor(TestExtractor1)
+def test_ExtractorRegistry_validate_is_extractor_no_extract_method():
+    class BadExtractor(Extractor):
+        features = [FEATURE_1]
+
+    with pytest.raises(ExtractorBadDefinedError):
+        ExtractorRegistry.validate_is_extractor(BadExtractor)
 
 
-def test_ExtractorRegistry_validate_is_extractor_abstract_subclass(
-    empty_registry,
-):
+def test_ExtractorRegistry_validate_is_extractor_abstract_subclass():
     class AbstractExtractor(Extractor):
-        __abstractclass__ = True
+        pass
 
     with pytest.raises(TypeError):
-        empty_registry.validate_is_extractor(AbstractExtractor)
+        ExtractorRegistry.validate_is_extractor(AbstractExtractor)
 
 
-def test_ExtractorRegistry_validate_is_extractor_not_an_extractor(
-    empty_registry,
-):
+def test_ExtractorRegistry_validate_is_extractor_not_an_extractor():
     class NotAnExtractor:
         pass
 
     with pytest.raises(TypeError):
-        empty_registry.validate_is_extractor(NotAnExtractor)
+        ExtractorRegistry.validate_is_extractor(NotAnExtractor)
 
 
 def test_ExtractorRegistry_register_extractor(
