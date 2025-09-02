@@ -44,9 +44,10 @@ class OtsuSplit(LightCurveExtractor):
 
     References
     ----------
-    .. [otsu1979glh] Otsu, N. (1979). A Threshold Selection Method from
-       Gray-Level Histograms. IEEE Transactions on Systems, Man and
-       Cybernetics, 9, 62--66. doi: 10.1109/TSMC.1979.4310076
+    .. [otsu1979glh] Otsu, N. (1979).
+       A Threshold Selection Method from Gray-Level Histograms.
+       IEEE Transactions on Systems, Man and Cybernetics, 9, 62--66.
+       doi: 10.1109/TSMC.1979.4310076
     """
 
     features = [

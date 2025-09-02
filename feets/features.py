@@ -38,6 +38,7 @@ class Features(Sequence):
     performed on multiple light curves. It provides an interface to access
     the extracted features either by feature name or by light curve index.
 
+    Parameters
     ----------
     features : array_like of dict
         The results of the feature extraction for each of the light curves.

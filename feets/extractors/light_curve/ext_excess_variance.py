@@ -60,10 +60,9 @@ class ExcessVariance(LightCurveExtractor):
     References
     ----------
     .. [sanchez2017infrared] Sánchez, P., Lira, P., Cartier, R., Pérez, V.,
-       Miranda, N., Yovaniniz, C., ... & Marchesi, S. (2017). Near-infrared
-       variability of obscured and unobscured X-ray-selected AGNs in the COSMOS
-       field. The Astrophysical Journal, 849(2), 110.
-
+       Miranda, N., Yovaniniz, C., ... & Marchesi, S. (2017).
+       Near-infrared variability of obscured and unobscured X-ray-selected AGNs
+       in the COSMOS field. The Astrophysical Journal, 849(2), 110.
     """
 
     features = ["ExcessVariance"]

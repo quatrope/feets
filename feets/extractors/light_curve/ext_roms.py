@@ -56,8 +56,8 @@ class Roms(LightCurveExtractor):
     References
     ----------
     .. [enoch2003photometric] Enoch, M. L., Brown, M. E., & Burgasser, A. J.
-       (2003). Photometric variability at the L/T dwarf boundary. The
-       Astronomical Journal, 126(2), 1006.
+       (2003). Photometric variability at the L/T dwarf boundary.
+       The Astronomical Journal, 126(2), 1006.
     """
 
     features = ["Roms"]

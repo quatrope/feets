@@ -6,11 +6,17 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
+# =============================================================================
+# DOC
+# =============================================================================
+
+"""Functions for preprocessing light curve data vectors."""
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+from tkinter import N
 import numpy as np
 
 import pandas as pd
@@ -24,14 +30,34 @@ __all__ = ["remove_noise", "align"]
 
 
 def remove_noise(time, magnitude, error, error_limit=3, std_limit=5):
-    """Points within 'std_limit' standard deviations from the mean and with
-    errors greater than 'error_limit' times the error mean are
-    considered as noise and thus are eliminated.
+    """Removes noise from the light curve data vectors.
 
+    Points within `std_limit` standard deviations from the mean and with
+    errors greater than `error_limit` times the error mean are considered
+    as noise and thus are eliminated.
+
+    Parameters
+    ----------
+    time : array-like
+    magnitude : array-like
+    error : array-like
+    error_limit : float, default=3
+    std_limit : float, default=5
+
+    Returns
+    -------
+    time_clean : array-like
+    magnitude_clean : array-like
+    error_clean : array-like
     """
     data, mjd = magnitude, time
 
     data_len = len(mjd)
+    if data_len == 0:
+        return np.array([]), np.array([]), np.array([])
+    if data_len == 1:
+        return np.array([mjd[0]]), np.array([data[0]]), np.array([error[0]])
+
     error_mean = np.mean(error)
     error_tolerance = error_limit * (error_mean or 1)
     data_mean = np.mean(data)
@@ -56,22 +82,29 @@ def remove_noise(time, magnitude, error, error_limit=3, std_limit=5):
     return mjd_out, data_out, error_out
 
 
-def align(time, time2, magnitude, magnitude2, error, error2):
-    """Synchronizes the light-curves in the two different bands.
+def align(time, time2, magnitude, magnitude2, error=None, error2=None):
+    """Synchronizes two light curves in different bands.
+
+    Parameters
+    ----------
+    time : array-like
+    time2 : array-like
+    magnitude : array-like
+    magnitude2 : array-like
+    error : array-like, optional
+    error2 : array-like, optional
 
     Returns
     -------
-
-    aligned_time
-    aligned_magnitude
-    aligned_magnitude2
-    aligned_error
-    aligned_error2
-
+    aligned_time : array-like
+    aligned_magnitude : array-like
+    aligned_magnitude2 : array-like
+    aligned_error : array-like
+    aligned_error2 : array-like
     """
 
-    error = np.zeros(time.shape) if error is None else error
-    error2 = np.zeros(time2.shape) if error2 is None else error2
+    error = np.zeros(len(time)) if error is None else error
+    error2 = np.zeros(len(time2)) if error2 is None else error2
 
     # this asume that the first series is the short one
     sserie = pd.DataFrame({"mag": magnitude, "error": error}, index=time)

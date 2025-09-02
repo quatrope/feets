@@ -116,7 +116,6 @@ class BazinFit(LightCurveExtractor):
        Ruhlmann-Kleider, V., Aubourg, E., Le Guillou, L., ... & Walker, E. S.
        (2009). The core-collapse rate from the Supernova Legacy Survey.
        Astronomy & Astrophysics, 499(3), 653-660.
-
     """
 
     features = [

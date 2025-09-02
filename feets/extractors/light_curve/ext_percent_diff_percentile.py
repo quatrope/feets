@@ -60,10 +60,10 @@ class PercentDiffPercentile(LightCurveExtractor):
     References
     ----------
     .. [disanto2016feature] D'Isanto, A., Cavuoti, S., Brescia, M., Donalek,
-       C., Longo, G., Riccio, G., & Djorgovski, S. G. (2016). An analysis of
-       feature relevance in the classification of astronomical transients with
-       machine learning methods. Monthly Notices of the Royal Astronomical
-       Society, 457(3), 3119-3132.
+       C., Longo, G., Riccio, G., & Djorgovski, S. G. (2016).
+       An analysis of feature relevance in the classification of astronomical
+       transients with machine learning methods.
+       Monthly Notices of the Royal Astronomical Society, 457(3), 3119-3132.
     """
 
     features = ["PercentDiffPercentile"]

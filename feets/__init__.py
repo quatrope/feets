@@ -47,7 +47,6 @@ matching different features. In order to achieve this goal, the library should
 be run in every existent survey (MACHO, EROS, OGLE, Catalina, Pan-STARRS, etc)
 and future surveys (LSST) and the results should be ideally shared in the same
 open way as this library.
-
 """
 
 
