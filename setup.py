@@ -42,6 +42,7 @@ REQUIREMENTS = [
     "custom_inherit",
     "dask",
     "light-curve",
+    "attrs",
 ]
 
 

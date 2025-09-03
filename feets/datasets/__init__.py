@@ -11,13 +11,17 @@
 # DOCS
 # =============================================================================
 
-"""The :mod:`feets.datasets` module includes utilities to load datasets,
-including methods to load and fetch some example light curves.
+"""Utilities to load, fetch or generate datasets for some example light curves."""
 
-"""
-
-
+from .base import LightCurveDataset
 from .macho import available_MACHO_lc, load_MACHO, load_MACHO_example
+from .ogle3 import fetch_OGLE3, load_OGLE3_catalog
 
-
-__all__ = ["available_MACHO_lc", "load_MACHO", "load_MACHO_example"]
+__all__ = [
+    "available_MACHO_lc",
+    "LightCurveDataset",
+    "fetch_OGLE3",
+    "load_MACHO_example",
+    "load_MACHO",
+    "load_OGLE3_catalog",
+]

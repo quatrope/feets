@@ -410,7 +410,8 @@ class FeatureSpace:
 
         See Also
         --------
-        Features : Class to manage and manipulate feature extraction results.
+        Features :
+            Class to manage and manipulate feature extraction results.
         extract
 
         Examples

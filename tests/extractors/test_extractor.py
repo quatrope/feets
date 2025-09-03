@@ -368,10 +368,7 @@ def test_Extractor_to_dict(test_extractor):
 def test_Extractor_repr(test_extractor):
     np.testing.assert_equal(
         repr(test_extractor),
-        (
-            "<TestExtractor test_param_1=1 test_param_2=<MANY CONFIGURATIONS> "
-            "test_param_3=None>"
-        ),
+        ("TestExtractor(test_param_1=1, test_param_2=..., test_param_3=None)"),
     )
 
 

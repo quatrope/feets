@@ -724,14 +724,14 @@ class Extractor(abc.ABC):
 
         param_strs = [
             (
-                f" {pname}=<MANY CONFIGURATIONS>"
+                f"{pname}=..."
                 if len(repr(pvalue)) > 20
-                else f" {pname}={pvalue!r}"
+                else f"{pname}={pvalue!r}"
             )
             for pname, pvalue in params.items()
         ]
-        state_str = "".join(param_strs)
-        extractor_str = f"<{cls_name}" + state_str + ">"
+        state_str = ", ".join(param_strs)
+        extractor_str = f"{cls_name}({state_str})"
 
         return extractor_str
 

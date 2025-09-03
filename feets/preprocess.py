@@ -16,7 +16,6 @@
 # IMPORTS
 # =============================================================================
 
-from tkinter import N
 import numpy as np
 
 import pandas as pd
@@ -102,7 +101,6 @@ def align(time, time2, magnitude, magnitude2, error=None, error2=None):
     aligned_error : array-like
     aligned_error2 : array-like
     """
-
     error = np.zeros(len(time)) if error is None else error
     error2 = np.zeros(len(time2)) if error2 is None else error2
 

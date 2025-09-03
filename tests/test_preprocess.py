@@ -11,11 +11,9 @@
 # IMPORTS
 # =============================================================================
 
-from feets.preprocess import remove_noise, align
+from feets.preprocess import align, remove_noise
 
 import numpy as np
-
-import pytest
 
 # =============================================================================
 # TESTS

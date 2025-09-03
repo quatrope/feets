@@ -11,13 +11,11 @@
 # DOCS
 # =============================================================================
 
-"""IO code for read some macho lightcurves
+"""Utilities for accessing MACHO light curves.
 
 The files are gathered from the original FATS project tutorial:
 https://github.com/isadoranun/tsfeat
-
 """
-
 
 # =============================================================================
 # IMPORTS
@@ -29,7 +27,9 @@ import tarfile
 
 import numpy as np
 
-from ..libs import bunch
+from .base import LightCurveDataset
+from ..extractors.extractor import DATA_ERROR, DATA_MAGNITUDE, DATA_TIME
+from ..libs import doctools
 
 
 # =============================================================================
@@ -47,68 +47,110 @@ DATASET_DESCRIPTION = (
     "tutorial: https://github.com/isadoranun/tsfeat"
 )
 
+MACHO_EXAMPLE_ID = "lc_1.3444.614"
+
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
 
 
 def available_MACHO_lc():
-    """Retrieve a list with the available MACHO lightcurves"""
+    """List the available MACHO light curves.
+
+    Returns
+    -------
+    list
+        The list of available MACHO light curves.
+    """
     return [fp.rsplit(".", 2)[0] for fp in os.listdir(DATA_PATH)]
 
 
 def load_MACHO_example():
-    """lightcurve of 2 bands (R, B) from the MACHO survey.
-    The Id of the source is 1.3444.614
+    """Retrieve a light curve from the MACHO survey.
+
+    The returned light curve contains data from 2 bands: R, B.
+
+    Returns
+    -------
+    LightCurveDataset
+        Dataset with the retrieved light curve data vectors.
 
     Notes
     -----
-
     The files are gathered from the original FATS project tutorial:
     https://github.com/isadoranun/tsfeat
 
+    See Also
+    --------
+    available_MACHO_lc,
+    datasets.base.get_data_home
+
+    Examples
+    --------
+    >>> ds = load_MACHO_example()
+    >>> ds
+    LightCurveDataset(
+        _id='lc_1.3444.614', name='MACHO', bands=('R', 'B')
+    )
+    >>> ds.bands
+    ('R', 'B')
+    >>> ds.data.B
+    <LightCurve time[1235], magnitude[1235], error[1235]>
+    >>> ds.data.B.magnitude
+    array([-6.081, -6.041, -6.046, ..., -6.009, -5.985, -5.997], shape=(1235,))
     """
-    return load_MACHO("lc_1.3444.614")
+    return load_MACHO(MACHO_EXAMPLE_ID)
 
 
+@doctools.doc_inherit(load_MACHO_example)
 def load_MACHO(macho_id):
-    """lightcurve of 2 bands (R, B) from the MACHO survey.
+    """
+    Parameters
+    ----------
+    macho_id : str
+        The ID of the MACHO light curve to retrieve.
 
-    Notes
-    -----
-
-    The files are gathered from the original FATS project tutorial:
-    https://github.com/isadoranun/tsfeat
-
+    Examples
+    --------
+    >>> ds = load_MACHO('lc_1.3444.614')
+    >>> ds
+    LightCurveDataset(
+        _id='lc_1.3444.614', name='MACHO', bands=('R', 'B')
+    )
+    >>> ds.bands
+    ('R', 'B')
+    >>> ds.data.B
+    <LightCurve time[1235], magnitude[1235], error[1235]>
+    >>> ds.data.B.magnitude
+    array([-6.081, -6.041, -6.046, ..., -6.009, -5.985, -5.997], shape=(1235,))
     """
     # Read the data
     tarpath = DATA_PATH / f"{macho_id}.tar.bz2"
-    rpath = "{}.R.mjd".format(macho_id)
-    bpath = "{}.B.mjd".format(macho_id)
+
+    members = {
+        "R": {"path": f"{macho_id}.R.mjd"},
+        "B": {"path": f"{macho_id}.B.mjd"},
+    }
+
     with tarfile.open(tarpath, mode="r:bz2") as tf:
-        rlc = np.loadtxt(tf.extractfile(rpath))
-        blc = np.loadtxt(tf.extractfile(bpath))
+        for band, member in members.items():
+            members[band]["lc"] = np.loadtxt(tf.extractfile(member["path"]))
 
-    # split the R and B bands
-    r_band = bunch.Bunch(
-        "R", {"time": rlc[:, 0], "magnitude": rlc[:, 1], "error": rlc[:, 2]}
+    bands = []
+    data = {}
+    for band, member in members.items():
+        lc = member["lc"]
+        data[band] = {
+            DATA_TIME: lc[:, 0],
+            DATA_MAGNITUDE: lc[:, 1],
+            DATA_ERROR: lc[:, 2],
+        }
+        bands.append(band)
+
+    return LightCurveDataset(
+        id=macho_id,
+        name=DATASET_NAME,
+        description=DATASET_DESCRIPTION,
+        bands=bands,
+        data=data,
     )
-    b_band = bunch.Bunch(
-        "B", {"time": blc[:, 0], "magnitude": blc[:, 1], "error": blc[:, 2]}
-    )
-
-    # create the bands
-    data = bunch.Bunch("data", {"R": r_band, "B": b_band})
-
-    # the bunch data
-    lc = bunch.Bunch(
-        "lc",
-        {
-            "id": macho_id,
-            "ds_name": DATASET_NAME,
-            "description": DATASET_DESCRIPTION,
-            "data": data,
-        },
-    )
-
-    return lc
