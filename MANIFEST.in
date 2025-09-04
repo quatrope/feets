@@ -5,15 +5,18 @@ include setup.py
 
 recursive-include feets *.py
 recursive-include feets *.tar.bz2
+recursive-include feets *.txt.bz2
 
 exclude tox.ini
 exclude .header-template
 exclude requirements.txt
-exclude .readthedocs.yml
+exclude .readthedocs.yaml
+exclude requirements_dev.txt
 
 recursive-exclude tests *
 recursive-exclude assets *
 recursive-exclude draft *
 recursive-exclude tools *
 recursive-exclude res *
-recursive-exclude docs  *
+recursive-exclude docs *
+recursive-exclude benchmarks *

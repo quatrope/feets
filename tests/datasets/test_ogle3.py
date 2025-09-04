@@ -49,6 +49,7 @@ def test_load_OGLE3_catalog(mocker):
     BZ2File.assert_called_with(OGLE_CATALOG_PATH)
 
 
+@pytest.mark.slow
 def test_fetch_OGLE3(mocker):
     store_path = _get_OGLE3_data_home(None)
     cat = load_OGLE3_catalog()
@@ -85,6 +86,7 @@ def test_fetch_OGLE3(mocker):
     )
 
 
+@pytest.mark.slow
 def test_fetch_OGLE3_file_not_found(mocker):
     cat = load_OGLE3_catalog()
     oid = np.random.choice(cat.ID)
@@ -101,6 +103,7 @@ def test_fetch_OGLE3_file_not_found(mocker):
         fetch_OGLE3(oid, download_if_missing=False)
 
 
+@pytest.mark.slow
 def test_fetch_OGLE3_id_not_found():
     oid = "invalid_id"
 

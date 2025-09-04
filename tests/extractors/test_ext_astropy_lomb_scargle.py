@@ -29,6 +29,7 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
+@pytest.mark.slow
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_AstropyLombScargle_extract(periodic):
     # init extractor

@@ -30,6 +30,7 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
+@pytest.mark.slow
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_CAR_extract(periodic, normal):
     # init extractor

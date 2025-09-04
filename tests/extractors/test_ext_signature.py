@@ -46,6 +46,7 @@ def extract_PeriodLS(lc):
     )["PeriodLS"]
 
 
+@pytest.mark.slow
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_Signature_extract(periodic):
     # init extractor

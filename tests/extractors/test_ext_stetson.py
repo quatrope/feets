@@ -63,6 +63,7 @@ def test_StetsonJ_extract(normal):
     np.testing.assert_allclose(values.mean(axis=0), expected)
 
 
+@pytest.mark.slow
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_StetsonKAC_extract(normal):
     extractor = StetsonKAC()

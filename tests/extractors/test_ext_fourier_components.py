@@ -30,6 +30,7 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
+@pytest.mark.slow
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_FourierComponents_extract(normal):
     # init extractor
