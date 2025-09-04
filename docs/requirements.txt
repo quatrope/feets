@@ -9,3 +9,5 @@ numpydoc
 seaborn
 sphinx
 sphinx-autobuild
+mistune<2.0
+lxml_html_clean

@@ -16,7 +16,7 @@ editnb:
 	cd .. && jupyter notebook docs/source/tutorial.ipynb; cd -;
 
 autobuild:
-	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)"
+	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)" --watch ../feets/ --ignore "**/_dynamic/*"
 
 .PHONY: help Makefile
 

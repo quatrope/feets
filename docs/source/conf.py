@@ -157,3 +157,70 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+
+autosummary_generate = True
+
+
+# =============================================================================
+# INJECT README INTO THE RESTRUCTURED TEXT
+# =============================================================================
+
+import m2r2
+
+DYNAMIC_RST = {
+    # "README.md": "README.rst",
+    "CHANGELOG.md": "CHANGELOG.rst",
+}
+
+for md_name, rst_name in DYNAMIC_RST.items():
+    md_path = FEETS_PATH / md_name
+    with open(md_path) as fp:
+        readme_md = fp.read().split("<!-- BODY -->", 1)[-1]
+
+    rst_path = CURRENT_PATH / "_dynamic" / rst_name
+
+    with open(rst_path, "w") as fp:
+        fp.write(".. FILE AUTO GENERATED !! \n")
+        fp.write(m2r2.convert(readme_md))
+        print(f"{md_path} -> {rst_path} regenerated!")
+
+
+# =============================================================================
+# MAKE FEATURES CONF
+# =============================================================================
+
+import jinja2
+
+COSO = jinja2.Template(
+r"""
+{%for feature, data in features%}
+- [`{{feature}}`]({{data.path}})
+{%-endfor%}
+"""
+)
+
+
+def make_reatures_conf():
+    features_dict = {}
+    for feature in feets.extractor_registry.registered_features:
+        extractor = feets.extractor_registry.extractor_of(feature)
+
+        title = f"#{extractor.__module__}.{extractor.__qualname__}".replace(
+            "_", r"\_"
+        )
+        path = "api/extractors.html" + title
+
+        features_dict[feature] = {"path": path}
+
+    markdown = COSO.render({"features": sorted(features_dict.items())})
+
+    rst_path = CURRENT_PATH / "_dynamic" / "features.rst"
+
+    with open(rst_path, "w") as fp:
+        fp.write(".. FILE AUTO GENERATED !! \n")
+        fp.write(m2r2.convert(markdown))
+        print(f"{rst_path} regenerated!")
+
+
+make_reatures_conf()

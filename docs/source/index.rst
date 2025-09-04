@@ -125,8 +125,10 @@ Contents
 
     install
     tutorial.ipynb
+    features
     extractors_tutorial.ipynb
     api/modules.rst
+    changelog
 
 
 Indices and tables

@@ -63,4 +63,4 @@ target/
 # feets
 .ipynb_checkpoints*
 .pytest_cache
-*.jpkl
+*.jpkldocs/source/_dynamic/*.rst
