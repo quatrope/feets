@@ -1,0 +1,27 @@
+.
+
+tox
+ipdb
+pytest
+
+tqdm
+
+black
+
+flake8
+flake8-import-order
+flake8-black
+flake8-builtins
+
+pytest
+pytest-cov
+coverage
+pytest-cov
+pytest-mock
+
+pydocstyle
+toml
+
+jupyterlab
+
+-r docs/requirements.txt
