@@ -10,7 +10,7 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
 testpaths = ["tests"]
-addopts = "-m 'not slow' -p no:warnings"
+addopts = "-m 'not slow' -n auto -p no:warnings"
 
 # =============================================================================
 # PACKAGING
