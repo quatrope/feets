@@ -13,11 +13,18 @@ flake8-import-order
 flake8-black
 flake8-builtins
 
+pydocstyle
+tomli
+
+check-manifest
+
 pytest
 pytest-cov
 coverage
 pytest-cov
 pytest-mock
+
+https://github.com/quatrope/qafan/archive/refs/heads/master.zip
 
 pydocstyle
 toml

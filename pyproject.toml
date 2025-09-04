@@ -5,18 +5,6 @@ checks = ["all"]
 line-length = 79
 target-version = ['py310', 'py311', 'py312', 'py313']
 
-[tool.check-manifest]
-ignore = [
-    "tox.ini",
-    ".header-template",
-    "requirements.txt",
-    "tests",
-    "assets",
-    "draft",
-    "tools",
-    "res",
-]
-
 [tool.pytest.ini_options]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
