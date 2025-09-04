@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017-2024, Cabral, Juan
-# Copyright (c) 2024, QuatroPe; Clariá, Felipe
+# Copyright (c) 2025, QuatroPe; Clariá, Felipe
 # License: MIT
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
@@ -91,15 +91,14 @@ __version__ = importlib.metadata.version("feets")
 # MAIN
 # =============================================================================
 
-if os.getenv("FEETS_IN_SETUP") != "True":
-    from .core import *  # noqa
-    from . import datasets
-    from .datasets import *  # noqa
-    from .extractors import *  # noqa
-    from .preprocess import *  # noqa
-    from .runner import *  # noqa
-    from .features import *  # noqa
-    from .io import read_json, read_yaml
+from .core import *  # noqa
+from . import datasets
+from .datasets import *  # noqa
+from .extractors import *  # noqa
+from .preprocess import *  # noqa
+from .runner import *  # noqa
+from .features import *  # noqa
+from .io import read_json, read_yaml
 
 __all__ = [
     "datasets",

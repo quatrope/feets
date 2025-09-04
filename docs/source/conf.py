@@ -190,10 +190,10 @@ for md_name, rst_name in DYNAMIC_RST.items():
 # MAKE FEATURES CONF
 # =============================================================================
 
-import jinja2
+import jinja2  # noqa
 
-COSO = jinja2.Template(
-r"""
+FEATURES_LIST_TEMPLATE = jinja2.Template(
+    r"""
 {%for feature, data in features%}
 - [`{{feature}}`]({{data.path}})
 {%-endfor%}
@@ -202,6 +202,12 @@ r"""
 
 
 def make_reatures_conf():
+    """Generate the features.rst file.
+
+    The features.rst file is a list of all the features available in feets,
+    with links to their documentation.
+
+    """
     features_dict = {}
     for feature in feets.extractor_registry.registered_features:
         extractor = feets.extractor_registry.extractor_of(feature)
@@ -213,7 +219,9 @@ def make_reatures_conf():
 
         features_dict[feature] = {"path": path}
 
-    markdown = COSO.render({"features": sorted(features_dict.items())})
+    markdown = FEATURES_LIST_TEMPLATE.render(
+        {"features": sorted(features_dict.items())}
+    )
 
     rst_path = CURRENT_PATH / "_dynamic" / "features.rst"
 
