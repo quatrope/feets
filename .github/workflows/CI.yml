@@ -1,0 +1,16 @@
+# ==============================================================
+# CI with GitHub Actions
+# ==============================================================
+
+name: Build
+
+on:
+  - push
+  - pull_request
+
+env:
+  default-python: '3.11'
+
+jobs:
+  testing:
+    uses: quatrope/scikit-criteria/.github/workflows/tests.yml@2adc92cecfd7ee1c5dcea4632c7a52352db4d8bf
