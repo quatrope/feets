@@ -66,7 +66,7 @@ def _is_abstract_method(method):
 
 
 class ExtractorRegistry:
-    """Extractor registry for managing feature extractors.
+    """Extractor registry of available feature extractors.
 
     The `ExtractorRegistry` class is responsible for managing the available
     feature extractors. It ensures that all dependencies are met before
@@ -78,8 +78,8 @@ class ExtractorRegistry:
 
     See Also
     --------
-    `feets.Extractor` : Abstract base class for feature extractors.
-    `feets.FeatureSpace` :
+    feets.Extractor : Abstract base class for feature extractors.
+    feets.FeatureSpace :
         Class to select and extract features from a time series.
 
     Examples
@@ -306,7 +306,7 @@ class ExtractorRegistry:
         return {
             extractor
             for extractor in self._extractors
-            if extractor.get_data().issubset(data)
+            if extractor.get_required_data().issubset(data)
         }
 
     def extractors_from_features(self, features):

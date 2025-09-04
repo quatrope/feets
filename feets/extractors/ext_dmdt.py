@@ -25,6 +25,8 @@ import numpy as np
 from .extractor import Extractor
 from ..libs import doctools
 
+__all__ = ["DeltamDeltat"]
+
 # =============================================================================
 # CONSTANTS
 # =============================================================================
@@ -56,6 +58,13 @@ class DeltamDeltat(Extractor):
     dm_bins : array-like, optional
         The bins for the magnitude differences.
 
+    References
+    ----------
+    .. [astro-ph.IM] Mahabal, A. A., Sheth, K., Gieseke, F., Pai, A.,
+       Djorgovski, S. G., Drake, A. J., & Graham, M. J. (2017). Deep-learnt
+       classification of light curves. 2017 IEEE Symposium Series on
+       Computational Intelligence (SSCI), 1-8.
+
     Examples
     --------
     >>> fs = feets.FeatureSpace(only=["DeltamDeltat"])
@@ -65,13 +74,6 @@ class DeltamDeltat(Extractor):
       'dt_1_dm_0': np.int64(0),
        ...
      'dt_22_dm_23': np.int64(0)}}
-
-    References
-    ----------
-    .. [astro-ph.IM] Mahabal, A. A., Sheth, K., Gieseke, F., Pai, A.,
-       Djorgovski, S. G., Drake, A. J., & Graham, M. J. (2017). Deep-learnt
-       classification of light curves. 2017 IEEE Symposium Series on
-       Computational Intelligence (SSCI), 1-8.
     """
 
     features = ["DeltamDeltat"]

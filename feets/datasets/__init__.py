@@ -13,12 +13,13 @@
 
 """Utilities to load, fetch or generate datasets for some example light curves."""
 
-from .base import LightCurveDataset
+from .base import LightCurve, LightCurveDataset
 from .macho import available_MACHO_lc, load_MACHO, load_MACHO_example
 from .ogle3 import fetch_OGLE3, load_OGLE3_catalog
 
 __all__ = [
     "available_MACHO_lc",
+    "LightCurve",
     "LightCurveDataset",
     "fetch_OGLE3",
     "load_MACHO_example",

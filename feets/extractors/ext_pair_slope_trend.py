@@ -37,12 +37,6 @@ class PairSlopeTrend(Extractor):
     Considering the last :math:`30` (time-sorted) measurements of source
     magnitude, the fraction of increasing first differences minus the fraction
     of decreasing first differences.
-
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=['PairSlopeTrend'])
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
     {'PairSlopeTrend': -0.1}
 
     References
@@ -52,6 +46,12 @@ class PairSlopeTrend(Extractor):
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['PairSlopeTrend'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
     """
 
     features = ["PairSlopeTrend"]

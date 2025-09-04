@@ -82,11 +82,12 @@ from .light_curve.ext_weighted_mean import WeightedMean
 
 __all__ = [
     "DATAS",
+    "Extractor",
     "ExtractorBadDefinedError",
     "ExtractorValidationError",
     "ExtractorWarning",
-    "Extractor",
     "registry",
+    "extractor_registry",
 ]
 
 

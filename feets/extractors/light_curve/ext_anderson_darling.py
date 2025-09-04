@@ -32,7 +32,9 @@ class AndersonDarling(LightCurveExtractor):
     r"""Unbiased Anderson-Darling normality test statistic.
 
     **AndersonDarling** (:math:`A^2`)
+
     .. math::
+
         A^2 = & \left(1 + \frac{4}{N} - \frac{25}{N^2}\right) \cdot \\
               & \left(-N - \frac{1}{N} \sum_{i=0}^{N-1} (2i + 1)\ln\Phi_i +
               (2(N - i) - 1)\ln(1 - \Phi_i)\right)
@@ -43,21 +45,24 @@ class AndersonDarling(LightCurveExtractor):
     :math:`\sigma_m` is the magnitude standard deviation:
 
     .. math::
+
         \sigma_m = \sqrt{\frac{\sum_i (m_i - \langle m \rangle)^2}{N-1}}
 
     Parameters
     ----------
     transform : str or bool or None, optional
         Transformer to apply to the feature values. If str, must be one of:
-          - 'default' - use default transformer for the feature, it same as
-            giving True. The default for this feature is 'lg'
-          - 'arcsinh' - Hyperbolic arcsine feature transformer
-          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
-            value
-          - 'identity' - Identity feature transformer
-          - 'lg' - Decimal logarithm feature transformer
-          - 'ln1p' - :math:`ln(1+x)` feature transformer
-          - 'sqrt' - Square root feature transformer
+
+        - 'default' - use default transformer for the feature, it same as
+          giving True. The default for this feature is 'lg'
+        - 'arcsinh' - Hyperbolic arcsine feature transformer
+        - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+          value
+        - 'identity' - Identity feature transformer
+        - 'lg' - Decimal logarithm feature transformer
+        - 'ln1p' - :math:`ln(1+x)` feature transformer
+        - 'sqrt' - Square root feature transformer
+
         If bool, must be True to use default transformer or False to disable.
         If None, no transformation is applied.
 

@@ -39,19 +39,19 @@ class Q31(Extractor):
     :math:`Q_1` is a split between the lowest 25% and the highest 75% of data.
     :math:`Q_3` is a split between the lowest 75% and the highest 25% of data.
 
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=['Q31'])
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
-    {'Q31': np.float64(1.3329778116209337)}
-
     References
     ----------
     .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['Q31'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Q31': np.float64(1.3329778116209337)}
     """
 
     features = ["Q31"]
@@ -74,12 +74,6 @@ class Q31Color(Extractor):
 
     :math:`Q_{3-1}` applied to the difference between both bands of a light
     curve (B-R).
-
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=['Q31_color'])
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
     {'Q31_color': 1.9517477838539978}
 
     References
@@ -88,6 +82,12 @@ class Q31Color(Extractor):
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['Q31_color'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
     """
 
     features = ["Q31_color"]

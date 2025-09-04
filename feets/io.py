@@ -55,9 +55,9 @@ class CustomJSONEncoder(json.JSONEncoder):
     +----------------------------------------------------+---------------+
     | np.integer, np.floating, np.complexfloating        | number        |
     +----------------------------------------------------+---------------+
-    | np.True_                                           | true          |
+    | np.true                                            | true          |
     +----------------------------------------------------+---------------+
-    | np.False_                                          | false         |
+    | np.false                                           | false         |
     +----------------------------------------------------+---------------+
 
     Attributes
@@ -68,8 +68,8 @@ class CustomJSONEncoder(json.JSONEncoder):
 
     See Also
     --------
-    json.JSONEncoder : Extensible JSON encoder for Python data structures.
-
+    json.JSONEncoder :
+        Extensible JSON https://json.org encoder for Python data structures.
     """
 
     CONVERTERS = (
@@ -136,13 +136,6 @@ def none_open_or_buffer(path_or_buffer, mode):
     ------
     file-like object
         An open, ready-to-use file-like object.
-
-    See Also
-    --------
-    pathlib.Path : Object-oriented filesystem paths.
-    io.StringIO : In-memory text buffer.
-    open : Built-in function to open a file.
-
     """
     if path_or_buffer is None:
         yield io.StringIO()
@@ -184,12 +177,10 @@ def store_json(fspace, path_or_buffer=None, **kwargs):
 
     See Also
     --------
-    CustomJSONEncoder : Custom JSON encoder for `feets.FeatureSpace` objects.
-    read_json :
-        Deserialize a JSON formatted string or file to a `feets.FeatureSpace`.
-    store_yaml :
-        Serialize a `feets.FeatureSpace` to a YAML formatted string or file.
-    json.dump : Serialize a Python object as a JSON formatted stream.
+    feets.FeatureSpace :
+        Class to select and extract features from a time series.
+    read_json
+    json.dump
     """
     data = fspace.to_dict()
 
@@ -231,12 +222,10 @@ def store_yaml(fspace, path_or_buffer=None, **kwargs):
 
     See Also
     --------
-    CustomJSONEncoder : Custom JSON encoder for `feets.FeatureSpace` objects.
-    read_yaml :
-        Deserialize a YAML formatted string or file to a `feets.FeatureSpace`.
-    store_json :
-        Serialize a `feets.FeatureSpace` to a JSON formatted string or file.
-    json.dump : Serialize a Python object as a JSON formatted stream.
+    feets.FeatureSpace :
+        Class to select and extract features from a time series.
+    read_yaml
+    yaml.safe_dump
     """
     json_str = store_json(fspace, path_or_buffer=None, indent=None)
     data = json.loads(json_str)
@@ -263,11 +252,9 @@ def read_json(path_or_buffer):
 
     See Also
     --------
-    store_json :
-        Serialize a `feets.FeatureSpace` to a JSON formatted string or file.
-    read_yaml :
-        Deserialize a YAML formatted string or file to a `feets.FeatureSpace`.
-    json.load : Deserialize a JSON formatted stream to a Python object.
+    feets.FeatureSpace :
+        Class to select and extract features from a time series.
+    store_json
     """
     with none_open_or_buffer(path_or_buffer, "r") as fp:
         data = json.load(fp)
@@ -289,11 +276,9 @@ def read_yaml(path_or_buffer):
 
     See Also
     --------
-    store_yaml :
-        Serialize a `feets.FeatureSpace` to a YAML formatted string or file.
-    read_json :
-        Deserialize a JSON formatted string or file to a `feets.FeatureSpace`.
-    yaml.safe_load : Deserialize a YAML formatted stream to a Python object.
+    feets.FeatureSpace :
+        Class to select and extract features from a time series.
+    store_yaml
     """
     with none_open_or_buffer(path_or_buffer, "r") as fp:
         data = yaml.safe_load(fp)

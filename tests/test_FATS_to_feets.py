@@ -6,29 +6,18 @@
 # Full Text:
 #     https://github.com/quatrope/feets/blob/master/LICENSE
 
-
-# =============================================================================
-# DOC
-# =============================================================================
-
-"""FATS to feets compatibility testing"""
-
-
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-# import os
-
 import feets
+from feets.preprocess import align, remove_noise
 
 import numpy as np
 
 import pytest
 
 import tests.conftest as conftest
-
-# from .c import FeetsTestCase, DATA_PATH
 
 
 # =============================================================================
@@ -67,7 +56,7 @@ def FATS_MACHO_LC_remove_noise_result():
 
 
 @pytest.fixture
-def FATS_MACHO_LC_aligned():
+def FATS_MACHO_LC_remove_noise_aligned():
     path = conftest.TEST_DATASET_PATH / "FATS_aligned.npz"
     lc = {}
     with np.load(path) as npz:
@@ -81,116 +70,68 @@ def FATS_MACHO_LC_aligned():
     return lc
 
 
-@pytest.mark.skip
 def test_FATS2feets_remove_noise(MACHO_LC, FATS_MACHO_LC_remove_noise_result):
-    p_time, p_mag, p_error = feets.preprocess.remove_noise(
+    time_clean, magnitude_clean, error_clean = remove_noise(
         MACHO_LC["time"], MACHO_LC["magnitude"], MACHO_LC["error"]
     )
-    p_time2, p_mag2, p_error2 = feets.preprocess.remove_noise(
+    time2_clean, magnitude2_clean, error2_clean = remove_noise(
         MACHO_LC["time2"], MACHO_LC["magnitude2"], MACHO_LC["error2"]
     )
     np.testing.assert_array_equal(
-        p_time, FATS_MACHO_LC_remove_noise_result["time"]
+        time_clean, FATS_MACHO_LC_remove_noise_result["time"]
     )
     np.testing.assert_array_equal(
-        p_time2, FATS_MACHO_LC_remove_noise_result["time2"]
+        time2_clean, FATS_MACHO_LC_remove_noise_result["time2"]
     )
     np.testing.assert_array_equal(
-        p_mag, FATS_MACHO_LC_remove_noise_result["magnitude"]
+        magnitude_clean, FATS_MACHO_LC_remove_noise_result["magnitude"]
     )
     np.testing.assert_array_equal(
-        p_mag2, FATS_MACHO_LC_remove_noise_result["magnitude2"]
+        magnitude2_clean, FATS_MACHO_LC_remove_noise_result["magnitude2"]
     )
     np.testing.assert_array_equal(
-        p_error, FATS_MACHO_LC_remove_noise_result["error"]
+        error_clean, FATS_MACHO_LC_remove_noise_result["error"]
     )
     np.testing.assert_array_equal(
-        p_error2, FATS_MACHO_LC_remove_noise_result["error2"]
+        error2_clean, FATS_MACHO_LC_remove_noise_result["error2"]
     )
 
 
-@pytest.mark.skip
 def test_FATS2feets_align(MACHO_LC, FATS_MACHO_LC_remove_noise_aligned):
-    a_time, a_mag, a_mag2, a_error, a_error2 = feets.preprocess.align(
-        **MACHO_LC
+    time_clean, magnitude_clean, error_clean = remove_noise(
+        MACHO_LC["time"], MACHO_LC["magnitude"], MACHO_LC["error"]
+    )
+    time2_clean, magnitude2_clean, error2_clean = remove_noise(
+        MACHO_LC["time2"], MACHO_LC["magnitude2"], MACHO_LC["error2"]
+    )
+
+    (
+        aligned_time,
+        aligned_magnitude,
+        aligned_magnitude2,
+        aligned_error,
+        aligned_error2,
+    ) = align(
+        time=time_clean,
+        time2=time2_clean,
+        magnitude=magnitude_clean,
+        magnitude2=magnitude2_clean,
+        error=error_clean,
+        error2=error2_clean,
+    )
+
+    np.testing.assert_array_equal(
+        aligned_time, FATS_MACHO_LC_remove_noise_aligned["time"]
     )
     np.testing.assert_array_equal(
-        a_time, FATS_MACHO_LC_remove_noise_aligned["time"]
+        aligned_magnitude, FATS_MACHO_LC_remove_noise_aligned["magnitude"]
     )
     np.testing.assert_array_equal(
-        a_mag, FATS_MACHO_LC_remove_noise_aligned["magnitude"]
+        aligned_magnitude2, FATS_MACHO_LC_remove_noise_aligned["magnitude2"]
     )
     np.testing.assert_array_equal(
-        a_mag2, FATS_MACHO_LC_remove_noise_aligned["magnitude2"]
+        aligned_error, FATS_MACHO_LC_remove_noise_aligned["error"]
     )
     np.testing.assert_array_equal(
-        a_error, FATS_MACHO_LC_remove_noise_aligned["error"]
+        aligned_error2, FATS_MACHO_LC_remove_noise_aligned["error2"]
     )
-    np.testing.assert_array_equal(
-        a_error2, FATS_MACHO_LC_remove_noise_aligned["error2"]
-    )
-
-
-# NO implementemos ESTO AUN!
-# class FATSRegressionTestCase(FeetsTestCase):
-
-#     def setUp(self):
-#         # the paths
-#         self.lc_path = os.path.join(DATA_PATH, "FATS_aligned.npz")
-#         self.FATS_result_path = os.path.join(DATA_PATH, "FATS_result.npz")
-
-#         # recreate light curve
-#         with np.load(self.lc_path) as npz:
-#             self.lc = (
-#                 npz["time"],
-#                 npz["mag"],
-#                 npz["error"],
-#                 npz["mag2"],
-#                 npz["aligned_time"],
-#                 npz["aligned_mag"],
-#                 npz["aligned_mag2"],
-#                 npz["aligned_error"],
-#                 npz["aligned_error2"],
-#             )
-
-#         # recreate the FATS result
-#         with np.load(self.FATS_result_path) as npz:
-#             self.features = npz["features"]
-#             self.features = self.features.astype("U")
-#             self.FATS_result = dict(zip(self.features, npz["values"]))
-
-#         # creates an template for all error, messages
-#         self.err_template = "Feature '{feature}' missmatch."
-
-#     def exclude_value_feature_evaluation(self, feature):
-#         return "_harmonics_" in feature
-
-#     def assert_feature_params(self, feature):
-#         feature_params = {
-#             "PeriodLS": {"atol": 1e-04},
-#             "Period_fit": {"atol": 1e-40},
-#             "Psi_CS": {"atol": 1e-02},
-#             "Psi_eta": {"atol": 1e-01},
-#         }
-#         params = {"err_msg": self.err_template.format(feature=feature)}
-#         params.update(feature_params.get(feature, {}))
-#         return params
-
-#     def assertFATS(self, feets_result):
-#         for feature in self.features:
-#             if feature not in feets_result:
-#                 self.fail("Missing feature {}".format(feature))
-#             if self.exclude_value_feature_evaluation(feature):
-#                 continue
-#             feets_value = feets_result[feature]
-#             FATS_value = self.FATS_result[feature]
-#             params = self.assert_feature_params(feature)
-#             self.assertAllClose(feets_value, FATS_value, **params)
-
-
-# @pytest.mark.xfail
-# def test_FATS_to_feets_extract_one(self):
-#     fs = FeatureSpace(SlottedA_length={"T": None}, StetsonKAC={"T": None})
-#     result = fs.extract(*self.lc)
-#     feets_result = dict(zip(*result))
-#     self.assertFATS(feets_result)

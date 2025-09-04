@@ -48,13 +48,6 @@ class RCS(Extractor):
     :math:`R_{cs}` should take a value close to zero for any symmetric
     distribution.
 
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=['Rcs'])
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
-    {'Rcs': np.float64(0.04951776697391974)}
-
     References
     ----------
     .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
@@ -63,6 +56,13 @@ class RCS(Extractor):
        1620 quasi-stellar object candidates from MACHO Large Magellanic Cloud
        database. The Astrophysical Journal, 735(2), 68.
        Doi:10.1088/0004-637X/735/2/68.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['Rcs'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Rcs': np.float64(0.04951776697391974)}
     """
 
     features = ["Rcs"]

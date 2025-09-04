@@ -17,7 +17,6 @@
 # IMPORTS
 # =============================================================================
 
-
 from light_curve import PercentAmplitude as _PercentAmplitude
 
 from .light_curve_extractor import LightCurveExtractor
@@ -32,6 +31,7 @@ class PercentAmplitude(LightCurveExtractor):
     r"""Maximum deviation of magnitude from its median.
 
     .. math::
+
         \max_i\left|m_i - \mathrm{Median}(m)\right|
         = \max(\max(m) - \mathrm{Median}(m), \mathrm{Median}(m) - \min(m))
 
@@ -39,15 +39,17 @@ class PercentAmplitude(LightCurveExtractor):
     ----------
     transform : str or bool or None, optional
         Transformer to apply to the feature values. If str, must be one of:
-          - 'default' - use default transformer for the feature, it same as
-            giving True. The default for this feature is 'identity'
-          - 'arcsinh' - Hyperbolic arcsine feature transformer
-          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
-            value
-          - 'identity' - Identity feature transformer
-          - 'lg' - Decimal logarithm feature transformer
-          - 'ln1p' - :math:`ln(1+x)` feature transformer
-          - 'sqrt' - Square root feature transformer
+
+        - 'default' - use default transformer for the feature, it same as
+          giving True. The default for this feature is 'identity'
+        - 'arcsinh' - Hyperbolic arcsine feature transformer
+        - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+          value
+        - 'identity' - Identity feature transformer
+        - 'lg' - Decimal logarithm feature transformer
+        - 'ln1p' - :math:`ln(1+x)` feature transformer
+        - 'sqrt' - Square root feature transformer
+
         If bool, must be True to use default transformer or False to disable.
         If None, no transformation is applied.
 

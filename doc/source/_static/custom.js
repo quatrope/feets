@@ -1,28 +1,27 @@
-function setupContent(){
+function setupContent() {
     var $ulFeaturesList = $("<ul id='features-list-links'></ul>");
 
-    var $allPanels = $("div.panel-group#extractors div.panel, div.panel-collapse");
+    var $allPanels = $('div.panel-group#extractors div.panel, div.panel-collapse');
 
-    $("div.panel-group#extractors div.panel").each(function(idx, div){
+    $('div.panel-group#extractors div.panel').each(function (idx, div) {
         var $div = $(div);
-        var $a = $div.find("a.extractor-doc");
-        var $panel = $div.find("div.panel-collapse ");
-        var title = $div.find("span.extractor-name").text().trim();
-        var id = $div.find("div.panel-heading").attr("id");
+        var $a = $div.find('a.extractor-doc');
+        var $panel = $div.find('div.panel-collapse ');
+        var title = $div.find('span.extractor-name').text().trim();
+        var id = $div.find('div.panel-heading').attr('id');
 
-        $ulFeaturesList.append("<li><a href='#" + id + "'>" + title + "</a></li>");
-        $ulFeaturesList.find("a[href='#" + id + "']").click(function(){
-            $allPanels.not($panel).collapse("hide");
+        $ulFeaturesList.append("<li><a href='#" + id + "'>" + title + '</a></li>');
+        $ulFeaturesList.find("a[href='#" + id + "']").click(function () {
+            $allPanels.not($panel).collapse('hide');
             $panel.collapse('show');
-            window.location.hash = "#" + id;
+            window.location.hash = '#' + id;
         });
     });
 
-    var $liFeatures = $("ul.localtoc li").has("a[href='#The-Features']");
+    var $liFeatures = $('ul.localtoc li').has("a[href='#The-Features']");
     $liFeatures.append($ulFeaturesList);
 }
 
-$(document).ready(function(){
+$(document).ready(function () {
     //~ setupContent();
-
 });

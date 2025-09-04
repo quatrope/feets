@@ -80,7 +80,6 @@ class Features(Sequence):
     {'Std': np.float64(0.5), 'Mean': np.float64(1.5)}
     >>> results[1]
     {'Std': np.float64(1.0), 'Mean': np.float64(2.0)}
-
     """
 
     # CONSTRUCTOR =============================================================
@@ -202,7 +201,6 @@ class Features(Sequence):
         Light Curve
         0            0.5   1.5
         1            1.0   2.0
-
         """
         extractors_by_feature = self._extractors_by_feature()
 

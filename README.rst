@@ -29,7 +29,6 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
 .. image:: https://img.shields.io/badge/python-3.5+-blue.svg
    :target: https://badge.fury.io/py/feets
    :alt: Python 3.5+
-   
 
 Description
 -----------
@@ -104,6 +103,12 @@ Juan BC
 jbc.develop@gmail.com
 
 `IATE <http://iate.oac.uncor.edu/>`_ - `UNR <http://unr.edu.ar/>`_
+
+-
+
+Felipe Clariá
+
+felipe.claria@unc.edu.ar
 
 ----
 

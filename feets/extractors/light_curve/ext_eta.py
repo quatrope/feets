@@ -34,6 +34,7 @@ class Eta(LightCurveExtractor):
     **Eta** (:math:`\eta`)
 
     .. math::
+
         \eta = \frac1{(N - 1)\,\sigma_m^2} \sum_{i=0}^{N-2}(m_{i+1} - m_i)^2
 
     where :math:`N` is the number of observations,
@@ -44,15 +45,17 @@ class Eta(LightCurveExtractor):
     ----------
     transform : str or bool or None, optional
         Transformer to apply to the feature values. If str, must be one of:
-          - 'default' - use default transformer for the feature, it same as
-            giving True. The default for this feature is 'identity'
-          - 'arcsinh' - Hyperbolic arcsine feature transformer
-          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
-            value
-          - 'identity' - Identity feature transformer
-          - 'lg' - Decimal logarithm feature transformer
-          - 'ln1p' - :math:`ln(1+x)` feature transformer
-          - 'sqrt' - Square root feature transformer
+
+        - 'default' - use default transformer for the feature, it same as
+          giving True. The default for this feature is 'identity'
+        - 'arcsinh' - Hyperbolic arcsine feature transformer
+        - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+          value
+        - 'identity' - Identity feature transformer
+        - 'lg' - Decimal logarithm feature transformer
+        - 'ln1p' - :math:`ln(1+x)` feature transformer
+        - 'sqrt' - Square root feature transformer
+
         If bool, must be True to use default transformer or False to disable.
         If None, no transformation is applied.
 

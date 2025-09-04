@@ -26,12 +26,20 @@ from keyword import iskeyword
 
 import numpy as np
 
+__all__ = [
+    "DATAS",
+    "extractor_warning",
+    "Extractor",
+    "ExtractorBadDefinedError",
+    "ExtractorValidationError",
+    "ExtractorWarning",
+    "feature_warning",
+    "FeatureExtractionWarning",
+]
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
-
-MAX_VALUES_TO_REPR = 10
 
 DATA_MAGNITUDE = "magnitude"
 DATA_TIME = "time"
@@ -331,9 +339,10 @@ class Extractor(abc.ABC):
 
     See Also
     --------
-    extract, flatten_feature,
-    feets.FeatureSpace,
-    feets.extractors.extractor_registry
+    feets.FeatureSpace :
+        Class to select and extract features from a time series.
+    feets.extractor_registry :
+        Extractor registry of available feature extractors.
 
     Examples
     --------
@@ -493,7 +502,7 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        get_optional_data, get_required_data,
+        get_optional_data, get_required_data
         extract
         """
         return cls._conf.data
@@ -510,7 +519,7 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        get_data, get_required_data,
+        get_data, get_required_data
         extract
         """
         return cls._conf.optional
@@ -527,7 +536,7 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        get_data, get_optional_data,
+        get_data, get_optional_data
         extract
         """
         return cls._conf.required
@@ -561,7 +570,7 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        Extractor, params
+        params
         """
         return cls._conf.parameters
 
@@ -696,7 +705,7 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        Extractor, get_default_params
+        get_default_params
         """
         params = self.get_default_params()
         params.update(self._params)
@@ -761,7 +770,7 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        feets.Extractor
+        feets.Extractor : Abstract base class for feature extractors.
         """
         raise NotImplementedError()
 
@@ -785,6 +794,6 @@ class Extractor(abc.ABC):
 
         See Also
         --------
-        feets.Extractor
+        feets.Extractor : Abstract base class for feature extractors.
         """
         return _flatten_data(value, feature)

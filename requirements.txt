@@ -1,0 +1,11 @@
+black
+joblib
+jupyter
+matplotlib
+numpy
+pandas
+pytest
+pytest-mock
+seaborn
+tox
+tqdm

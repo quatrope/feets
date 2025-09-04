@@ -37,19 +37,19 @@ class EtaColor(Extractor):
     Variability index Eta_e (:math:`\eta^e`) calculated from the color
     light-curve.
 
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=["Eta_color"])
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
-    {'Eta_color': np.float64(0.0007871260219202687)}
-
     References
     ----------
     .. [kim2014epoch] Kim, D. W., Protopapas, P., Bailer-Jones, C. A.,
        Byun, Y. I., Chang, S. W., Marquette, J. B., & Shin, M. S. (2014).
        The EPOCH Project: I. Periodic Variable Stars in the EROS-2 LMC
        Database. arXiv preprint Doi:10.1051/0004-6361/201323252.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["Eta_color"])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Eta_color': np.float64(0.0007871260219202687)}
     """
 
     features = ["Eta_color"]

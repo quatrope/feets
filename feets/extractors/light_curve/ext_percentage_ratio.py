@@ -34,8 +34,8 @@ class PercentageRatio(LightCurveExtractor):
 
     .. math::
 
-    \mathrm{magnitude~}q\mathrm{~to~}n\mathrm{~ratio}
-      = \frac{Q(1-n) - Q(n)}{Q(1-d) - Q(d)}
+        \mathrm{magnitude~}q\mathrm{~to~}n\mathrm{~ratio}
+        = \frac{Q(1-n) - Q(n)}{Q(1-d) - Q(d)}
 
     where :math:`n` and :math:`d` denotes user defined percentage, :math:`Q` is
     the quantile function of magnitude distribution.
@@ -43,22 +43,24 @@ class PercentageRatio(LightCurveExtractor):
     Parameters
     ----------
     quantile_numerator: positive float, default=0.40
-        Numerator is inter-percentile range (:math:`100% * q`,
-        :math:`100% (1 - q)`). Default value is 0.40
+        Numerator is inter-percentile range
+        :math:`(100%% * q, 100%% (1 - q))`. Default value is 0.40
     quantile_denominator: positive float, default=0.05
-        Denominator is inter-percentile range (:math:`100% * q`,
-        :math:`100% (1 - q)`). Default value is 0.05
+        Denominator is inter-percentile range
+        :math:`(100%% * q, 100%% (1 - q))`. Default value is 0.05
     transform : str or bool or None, optional
         Transformer to apply to the feature values. If str, must be one of:
-          - 'default' - use default transformer for the feature, it same as
-            giving True. The default for this feature is 'identity'
-          - 'arcsinh' - Hyperbolic arcsine feature transformer
-          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
-            value
-          - 'identity' - Identity feature transformer
-          - 'lg' - Decimal logarithm feature transformer
-          - 'ln1p' - :math:`ln(1+x)` feature transformer
-          - 'sqrt' - Square root feature transformer
+
+        - 'default' - use default transformer for the feature, it same as
+          giving True. The default for this feature is 'identity'
+        - 'arcsinh' - Hyperbolic arcsine feature transformer
+        - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+          value
+        - 'identity' - Identity feature transformer
+        - 'lg' - Decimal logarithm feature transformer
+        - 'ln1p' - :math:`ln(1+x)` feature transformer
+        - 'sqrt' - Square root feature transformer
+
         If bool, must be True to use default transformer or False to disable.
         If None, no transformation is applied.
 

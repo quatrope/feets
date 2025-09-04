@@ -54,7 +54,7 @@ open way as this library.
 # CONSTANTS
 # =============================================================================
 
-__version__ = ("0", "4")
+__version__ = ("2", "0")
 
 NAME = "feets"
 
@@ -62,11 +62,11 @@ DOC = __doc__
 
 VERSION = ".".join(__version__)
 
-AUTHORS = "JuanBC"
+AUTHORS = "QuatroPe, Felipe Clariá"
 
-EMAIL = "jbc.develop@gmail.com"
+EMAIL = "jbc.develop@gmail.com, felipe.claria@unc.edu.ar"
 
-URL = "https://github.com/carpyncho/feets"
+URL = "https://github.com/quatrope/feets"
 
 LICENSE = "MIT"
 
@@ -85,10 +85,18 @@ import os  # noqa
 
 if os.getenv("FEETS_IN_SETUP") != "True":
     from .core import *  # noqa
-    from . import datasets  # noqa
+    from . import datasets
+    from .datasets import *  # noqa
     from .extractors import *  # noqa
-    from .io import read_json, read_yaml  # noqa
+    from .preprocess import *  # noqa
+    from .runner import *  # noqa
+    from .features import *  # noqa
+    from .io import read_json, read_yaml
 
-__all__ = ["datasets"]
+__all__ = [
+    "datasets",
+    "read_json",
+    "read_yaml",
+]
 
 del os

@@ -153,19 +153,19 @@ class SlottedALength(Extractor):
     T : int, optional, default: `1`
         :math:`tau` - slot size in days.
 
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=["SlottedALength"])
-    >>> features = fs.extract(**lc)
-    >>> features[0]
-    {'SlottedALength': np.int64(1)}
-
     References
     ----------
     .. [huijse2012information] Huijse, P., Estevez, P. A., Protopapas, P.,
        Zegers, P., & Principe, J. C. (2012). An information theoretic algorithm
        for finding periodicities in stellar light curves. IEEE Transactions on
        Signal Processing, 60(10), 5135-5145.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=["SlottedALength"])
+    >>> features = fs.extract(**lc)
+    >>> features[0]
+    {'SlottedALength': np.int64(1)}
     """
 
     features = ["SlottedALength"]

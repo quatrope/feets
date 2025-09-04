@@ -44,13 +44,6 @@ class WeightedBeyondNStd(Extractor):
     nstd : int, default=1
         Number of standard deviations. Default is 1.
 
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=['WeightedBeyondNStd'])
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
-    {'WeightedBeyondNStd': 0.327}
-
     References
     ----------
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
@@ -61,7 +54,14 @@ class WeightedBeyondNStd(Extractor):
 
     See Also
     --------
-    BeyondNStd
+    feets.extractors.BeyondNStd
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['WeightedBeyondNStd'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'WeightedBeyondNStd': 0.327}
     """
 
     features = ["WeightedBeyondNStd"]

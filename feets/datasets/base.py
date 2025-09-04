@@ -230,8 +230,8 @@ class LightCurveDataset(Mapping):
 
     See Also
     --------
-    LightCurve,
-    feets.libs.bunch.Bunch
+    feets.libs.bunch.Bunch : Container object exposing keys as attributes.
+    LightCurve
     """
 
     _id: str | None = attr.ib(converter=str)

@@ -18,7 +18,6 @@
 # IMPORTS
 # =============================================================================
 
-
 import numpy as np
 
 from scipy.interpolate import interp1d
@@ -38,6 +37,13 @@ class StructureFunctions(Extractor):
     The structure function of rotation measures (RMs) contains information
     on electron density and magnetic field fluctuations.
 
+    References
+    ----------
+    .. [simonetti1984small] Simonetti, J. H., Cordes, J. M., & Spangler, S. R.
+       (1984). Small-scale variations in the galactic magnetic field-The
+       rotation measure structure function and birefringence in interstellar
+       scintillations. The Astrophysical Journal, 284, 126-134.
+
     Examples
     --------
     >>> fs = feets.FeatureSpace(only=[
@@ -50,13 +56,6 @@ class StructureFunctions(Extractor):
     {'StructureFunction_index_21': np.float64(1.6029987396657115),
      'StructureFunction_index_31': np.float64(2.050072565193364),
      'StructureFunction_index_32': np.float64(1.4137753817054497)}
-
-    References
-    ----------
-    .. [simonetti1984small] Simonetti, J. H., Cordes, J. M., & Spangler, S. R.
-       (1984). Small-scale variations in the galactic magnetic field-The
-       rotation measure structure function and birefringence in interstellar
-       scintillations. The Astrophysical Journal, 284, 126-134.
     """
 
     features = [

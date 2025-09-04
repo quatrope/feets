@@ -8,6 +8,30 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
         :align: center
         :scale: 100 %
 
+.. image:: https://badge.fury.io/py/feets.svg
+    :target: https://badge.fury.io/py/feets
+    :alt: PyPi Version
+
+.. image:: https://img.shields.io/badge/ascl-1806.001-blue.svg?colorB=262255
+    :target: http://ascl.net/1806.001
+    :alt: ascl:1806.001
+
+.. image:: https://travis-ci.org/carpyncho/feets.svg?branch=master
+    :target: https://travis-ci.org/carpyncho/feets
+    :alt: Build Status
+
+.. image:: https://img.shields.io/badge/docs-passing-brightgreen.svg
+    :target: http://feets.readthedocs.io
+    :alt: ReadTheDocs.org
+
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+   :target: https://tldrlegal.com/license/mit-license
+   :alt: License
+
+.. image:: https://img.shields.io/badge/python-3.10+-blue.svg
+   :target: https://badge.fury.io/py/feets
+   :alt: Python 3.10+
+
 In time-domain astronomy, data gathered from the telescopes is usually
 represented in the form of light-curves. These are time series that show the
 brightness variation of an object through a period of time
@@ -43,10 +67,6 @@ open way as this library.
 Help & discussion mailing list
 ------------------------------
 
-.. ~ Our Google Groups mailing list is
-.. ~ `here <https://groups.google.com/forum/#!forum/scikit-criteria>`_.
-
-
 **You can contact me at:** jbc.develop@gmail.com (if you have a support
 question, try the mailing list first)
 
@@ -54,14 +74,14 @@ question, try the mailing list first)
 Code Repository & Issues
 ------------------------
 
-https://github.com/carpyncho/feets
+https://github.com/quatrope/feets
 
 
 License
 -------
 
 feets is under
-`The MIT License <https://raw.githubusercontent.com/carpyncho/feets/master/LICENSE>`__
+`The MIT License <https://raw.githubusercontent.com/quatrope/feets/master/LICENSE>`__
 
 A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 
@@ -72,16 +92,29 @@ Citation
 If you use feets in a scientific publication, we would appreciate
 citations to the following paper:
 
-    Cabral, Juan B.,
+    Cabral, J. B., Sánchez, B., Ramos, F., Gurovich, S., Granitto, P., & Vanderplas, J. (2018).
+    From FATS to feets: Further improvements to an astronomical feature extraction tool based on machine learning.
+    Astronomy and Computing.
+
 
 
 Bibtex entry::
 
-    WORKING ON IT
+    @article{cabral2018fats,
+      title={
+        From FATS to feets: Further improvements to
+        an astronomical feature extraction tool based on
+        machine learning},
+      author={
+        Cabral, JB and S{\'a}nchez, B and Ramos, F and
+        Gurovich, S and Granitto, P and Vanderplas, J},
+      journal={Astronomy and Computing},
+      year={2018},
+      publisher={Elsevier}
+    }
 
-**Full Publication:** FOO
 
-`Working paper <https://github.com/carpyncho/feets_paper>`_
+**Full Publication:** http://adsabs.harvard.edu/abs/2018arXiv180902154C
 
 
 Contents

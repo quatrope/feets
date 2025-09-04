@@ -33,27 +33,30 @@ class WeightedMean(LightCurveExtractor):
     **WeightedMean** (:math:`\bar{m}`)
 
     .. math::
-       \bar{m} = \frac{\sum_i m_i / \delta_i^2}{\sum_i 1 / \delta_i^2}.
+
+        \bar{m} = \frac{\sum_i m_i / \delta_i^2}{\sum_i 1 / \delta_i^2}.
 
     Parameters
     ----------
     transform : str or bool or None, optional
         Transformer to apply to the feature values. If str, must be one of:
-          - 'default' - use default transformer for the feature, it same as
-            giving True. The default for this feature is 'identity'
-          - 'arcsinh' - Hyperbolic arcsine feature transformer
-          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
-            value
-          - 'identity' - Identity feature transformer
-          - 'lg' - Decimal logarithm feature transformer
-          - 'ln1p' - :math:`ln(1+x)` feature transformer
-          - 'sqrt' - Square root feature transformer
+
+        - 'default' - use default transformer for the feature, it same as
+          giving True. The default for this feature is 'identity'
+        - 'arcsinh' - Hyperbolic arcsine feature transformer
+        - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+          value
+        - 'identity' - Identity feature transformer
+        - 'lg' - Decimal logarithm feature transformer
+        - 'ln1p' - :math:`ln(1+x)` feature transformer
+        - 'sqrt' - Square root feature transformer
+
         If bool, must be True to use default transformer or False to disable.
         If None, no transformation is applied.
 
     See Also
     --------
-    Mean
+    feets.extractors.Mean
     """
 
     features = ["WeightedMean"]

@@ -82,8 +82,7 @@ def load_MACHO_example():
 
     See Also
     --------
-    available_MACHO_lc,
-    datasets.base.get_data_home
+    available_MACHO_lc
 
     Examples
     --------

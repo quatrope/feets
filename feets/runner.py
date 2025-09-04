@@ -22,7 +22,7 @@ import copy
 import dask
 from dask.delayed import delayed
 
-__all__ = ["run"]
+__all__ = ["run", "DataRequiredError"]
 
 
 # =============================================================================
@@ -150,8 +150,10 @@ def run(
 
     See Also
     --------
-    feets.Extractor : Base class for feature extractors.
-    feets.FeatureSpace : Class for managing feature extraction and validation.
+    feets.Extractor : Abstract base class for feature extractors.
+    feets.FeatureSpace :
+        Class to select and extract features from a time series.
+    dask.compute
 
     Notes
     -----

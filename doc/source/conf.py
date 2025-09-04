@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
 
 # on_rtd is whether we are on readthedocs.org
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+on_rtd = os.environ.get("READTHEDOCS", True) == "True"
 
 
 # to retrieve scikit criteria metadata
@@ -69,8 +69,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "feets"
-copyright = "2017, JuanBC"
-author = "JuanBC"
+copyright = "2024-2025, QuatroPe, Felipe Clariá"
+author = "QuatroPe, Felipe Clariá"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -86,7 +86,7 @@ release = version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -114,10 +114,10 @@ html_theme = "alabaster"
 html_theme_options = {
     "logo": "logo_small.png",
     "logo_name": True,
-    "github_user": "carpyncho",
+    "github_user": "quatrope",
     "github_repo": "feets",
     "extra_nav_links": {
-        "feets Source Code": "https://github.com/carpyncho/feets"
+        "feets Source Code": "https://github.com/quatrope/feets"
     },
 }
 
@@ -155,7 +155,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "feets.tex", "feets Documentation", "JuanBC", "manual"),
+    (master_doc, "feets.tex", "feets Documentation", author, "manual"),
 ]
 
 
@@ -163,7 +163,9 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "feets", "feets Documentation", [author], 1)]
+man_pages = [
+    (master_doc, "feets", "feets Documentation", author.split(", "), 1)
+]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -178,14 +180,19 @@ texinfo_documents = [
         "feets Documentation",
         author,
         "feets",
-        "One line description of project.",
+        "feets: feATURE eXTRACTOR FOR tIME sERIES.",
         "Miscellaneous",
     ),
 ]
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-# intersphinx_mapping = {"https://docs.python.org/": None}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+}
 
 
 def setup(app):

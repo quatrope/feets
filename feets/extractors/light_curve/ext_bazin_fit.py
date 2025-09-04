@@ -35,12 +35,16 @@ class BazinFit(LightCurveExtractor):
     the Bazin function developed for core-collapsed supernovae:
 
     .. math::
-        f(t) = A \frac{ \mathrm{e}^{ -(t-t_0)/\tau_\\mathrm{fall} } }
-            { 1 + \mathrm{e}^{ -(t - t_0) / \tau_\\mathrm{rise} } } + B.
+
+        f(t) = A \frac{
+                \mathrm{e}^{ -(t-t_0)/\tau_\mathrm{fall} }
+            }{
+                1 + \mathrm{e}^{ -(t - t_0)/\tau_\mathrm{rise} }
+            } + B.
 
     Note, that the Bazin function is developed to be used with fluxes,
     not magnitudes. Also note a typo in the Eq. (1) of the original
-    paper[bazin2009supernova]_, the minus sign is missed in the "rise"
+    paper ([bazin2009supernova]_), the minus sign is missed in the "rise"
     exponent.
 
     **BazinFit_Amplitude** (:math:`A`)
@@ -97,18 +101,21 @@ class BazinFit(LightCurveExtractor):
         literal or a list of 5 `light_curve.ln_prior.LnPrior1D` objects, see
         `light_curve.ln_prior` submodule for corresponding functions. Available
         string literals are:
-         - 'no': no prior
-    transform : bool or None, optional
+
+        - 'no': no prior
+
+    transform : str or bool or None, optional
         If `False` or `None` (default) output is not transformed. If `True`
         output is transformed as following:
-          - Half-amplitude A is transformed as :math:`zp - 2.5 lg(2*A)`,
-            :math:`zp = 8.9`, so that the amplitude is assumed to be the object
-            peak flux in Jy.
-          - baseline flux is normalised by :math:`A: baseline -> baseline / A`
-          - reference time is removed
-          - goodness of fit is transformed as :math:`ln(reduced chi^2 + 1)` to
-            reduce its spread
-          - other parameters are not transformed
+
+        - Half-amplitude A is transformed as :math:`zp - 2.5 lg(2*A)`,
+          :math:`zp = 8.9`, so that the amplitude is assumed to be the object
+          peak flux in Jy.
+        - baseline flux is normalised by :math:`A: baseline -> baseline / A`
+        - reference time is removed
+        - goodness of fit is transformed as :math:`ln(reduced chi^2 + 1)` to
+          reduce its spread
+        - other parameters are not transformed
 
     References
     ----------

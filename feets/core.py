@@ -26,9 +26,6 @@ from .extractors.registry import RegistryError
 from .features import Features
 from .runner import run
 
-__all__ = ["Features", "FeatureSpace"]
-
-
 # =============================================================================
 # LOG
 # =============================================================================
@@ -87,6 +84,12 @@ class FeatureSpace:
     ValueError
         If an invalid combination of `data`, `only`, and `exclude` is provided.
 
+    See Also
+    --------
+    feets.Features : Class to manage and manipulate feature extraction results.
+    feets.Extractor : Abstract base class for feature extractors.
+    dask.compute : Compute several dask collections at once.
+
     Examples
     --------
     Using `data` filter to specify the available data vectors:
@@ -125,7 +128,6 @@ class FeatureSpace:
     >>> # `PeriodLS` and `Signature` extractors.
     >>> fs.extract(**lc)
     <Features feature_names={'Mean', 'Std', 'PeriodLS', 'Signature', ...}, length=1>
-
     """
 
     # CONSTRUCTOR =============================================================
@@ -208,7 +210,6 @@ class FeatureSpace:
         >>> # depend on 'magnitude'.
         >>> fs.extract(**lc1)
         Features(feature_names={'Mean', 'Std', ...}, length=1)
-
         """
         selected_data = set(DATAS)
         for lc in lcs:
@@ -251,7 +252,6 @@ class FeatureSpace:
         >>> # depend on 'magnitude'.
         >>> fs.extract(**lc)
         Features(feature_names={'Mean', 'Std', ...}, length=1)
-
         """
         return cls.from_lightcurves(lc)
 
@@ -410,16 +410,17 @@ class FeatureSpace:
 
         See Also
         --------
-        Features :
+        feets.Features :
             Class to manage and manipulate feature extraction results.
         extract
+
+
 
         Examples
         --------
         >>> fs = FeatureSpace(only=['Mean'])
         >>> fs.extract_many({'magnitude': [1, 2, 3]}, {'magnitude': [4, 5, 6]})
         Features(feature_names={'Mean'}, length=2)
-
         """
         features_by_lc = run(
             extractors=self._extractors,
@@ -447,7 +448,8 @@ class FeatureSpace:
 
         See Also
         --------
-        Features : Class to manage and manipulate feature extraction results.
+        feets.Features :
+            Class to manage and manipulate feature extraction results.
         extract_many
 
         Examples
@@ -455,6 +457,5 @@ class FeatureSpace:
         >>> fs = FeatureSpace(only=['Mean'])
         >>> fs.extract(magnitude=[1, 2, 3])
         Features(feature_names={'Mean'}, length=1)
-
         """
         return self.extract_many(lc)

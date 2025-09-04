@@ -27,6 +27,8 @@ import numpy as np
 from .extractor import Extractor
 from ..libs import doctools
 
+__all__ = ["AstropyLombScargle", "lscargle"]
+
 # =============================================================================
 # CONSTANTS
 # =============================================================================
@@ -148,21 +150,6 @@ class AstropyLombScargle(Extractor):
     nperiods : int, optional, default: `3`
         Number of periods to extract.
 
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=[
-    ...     "PeriodLS",
-    ...     "Period_fit",
-    ...     "Psi_CS",
-    ...     "Psi_eta",
-    ... ])
-    >>> features = fs.extract(**lc_periodic)
-    >>> features[0]
-    {'Psi_CS': array([0.23320451, 0.19688377, 0.23320451]),
-     'Psi_eta': array([0.11139146, 0.11139146, 0.11139146]),
-     'PeriodLS': array([0.02085484, 0.0204288 , 0.02001982]),
-     'Period_fit': array([6.30747594e-24, 4.58745915e-24, 3.32221561e-24])}
-
     References
     ----------
     .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
@@ -179,7 +166,22 @@ class AstropyLombScargle(Extractor):
 
     See Also
     --------
-    LightCurveLombScargle
+    feets.extractors.LightCurveLombScargle
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=[
+    ...     "PeriodLS",
+    ...     "Period_fit",
+    ...     "Psi_CS",
+    ...     "Psi_eta",
+    ... ])
+    >>> features = fs.extract(**lc_periodic)
+    >>> features[0]
+    {'Psi_CS': array([0.23320451, 0.19688377, 0.23320451]),
+     'Psi_eta': array([0.11139146, 0.11139146, 0.11139146]),
+     'PeriodLS': array([0.02085484, 0.0204288 , 0.02001982]),
+     'Period_fit': array([6.30747594e-24, 4.58745915e-24, 3.32221561e-24])}
     """
 
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]

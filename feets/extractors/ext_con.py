@@ -42,15 +42,6 @@ class Con(Extractor):
     For a normal distribution and by considering just one star, Con should
     take values close to :math:`0.045`.
 
-    Examples
-    --------
-    Con of a normal time series:
-
-    >>> fs = feets.FeatureSpace(only=["Con"], consecutive_star=1)
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
-    {'Con': 0.042}
-
     References
     ----------
     .. [kim2011quasi] Kim, D. W., Protopapas, P., Byun, Y. I., Alcock, C.,
@@ -60,6 +51,14 @@ class Con(Extractor):
        database. The Astrophysical Journal, 735(2), 68.
        Doi:10.1088/0004-637X/735/2/68.
 
+    Examples
+    --------
+    Con of a normal time series:
+
+    >>> fs = feets.FeatureSpace(only=["Con"], consecutive_star=1)
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'Con': 0.042}
     """
 
     features = ["Con"]

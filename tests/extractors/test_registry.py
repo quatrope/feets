@@ -11,7 +11,6 @@
 # IMPORTS
 # =============================================================================
 
-
 from feets.extractors.extractor import Extractor, ExtractorBadDefinedError
 from feets.extractors.registry import (
     EntityNotFoundError,

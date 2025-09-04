@@ -18,7 +18,6 @@
 # IMPORTS
 # =============================================================================
 
-
 from light_curve import (
     PercentDifferenceMagnitudePercentile as _PercentDifferenceMagnitudePercentile,
 )
@@ -36,6 +35,7 @@ class PercentDiffPercentile(LightCurveExtractor):
     r"""Ratio of p-th inter-percentile range to the median.
 
     .. math::
+
         p\mathrm{~percent~difference~magnitude~percentile}
             = \frac{Q(1-p) - Q(p)}{\mathrm{Median}(m)}.
 
@@ -45,16 +45,18 @@ class PercentDiffPercentile(LightCurveExtractor):
         Relative range size, default is 0.05
     transform : str or bool or None, optional
         Transformer to apply to the feature values. If str, must be one of:
-          - 'default' - use default transformer for the feature, it same as
-            giving True. The default for this feature is 'clipped_lg'
-          - 'arcsinh' - Hyperbolic arcsine feature transformer
-          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
-            value
-          - 'identity' - Identity feature transformer
-          - 'lg' - Decimal logarithm feature transformer
-          - 'ln1p' - :math:`ln(1+x)` feature transformer
-          - 'sqrt' - Square root feature transformer
-        If bool, must be True to use default transformer or False to disable.
+
+        - 'default' - use default transformer for the feature, it same as
+          giving True. The default for this feature is 'clipped_lg'
+        - 'arcsinh' - Hyperbolic arcsine feature transformer
+        - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+          value
+        - 'identity' - Identity feature transformer
+        - 'lg' - Decimal logarithm feature transformer
+        - 'ln1p' - :math:`ln(1+x)` feature transformer
+        - 'sqrt' - Square root feature transformer
+
+        f bool, must be True to use default transformer or False to disable.
         If None, no transformation is applied.
 
     References

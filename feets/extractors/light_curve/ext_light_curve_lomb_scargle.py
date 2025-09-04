@@ -17,7 +17,6 @@
 # IMPORTS
 # =============================================================================
 
-
 from light_curve import Periodogram as _Periodogram
 
 import numpy as np
@@ -43,6 +42,7 @@ class LightCurveLombScargle(LightCurveExtractor):
     For each peak its period and "signal to noise" ratio is returned:
 
     .. math::
+
         \mathrm{signal~to~noise~of~peak} =
             \frac{P(\omega_\mathrm{peak}) - \langle P(\omega) \rangle}
             {\sigma_{P(\omega)}}
@@ -103,6 +103,6 @@ class LightCurveLombScargle(LightCurveExtractor):
         [period, period_s_to_n] = np.transpose(transpose)
 
         return {
-            "LightCurve_PeriodLS": period,
-            "Period_s_to_n": period_s_to_n,
+            "Periodogram_Peaks": period,
+            "Periodogram_S_to_N": period_s_to_n,
         }

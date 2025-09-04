@@ -32,6 +32,7 @@ class InterPercentileRange(LightCurveExtractor):
     """Inter-percentile range.
 
     .. math::
+
         Q(1 - p) - Q(p)
 
     where :math:`Q(p)` is the :math:`p`-th quantile of the magnitude
@@ -44,19 +45,22 @@ class InterPercentileRange(LightCurveExtractor):
     Parameters
     ----------
     quantile : positive float, default=0.25
-        Range is (100% * quantile, 100% * (1 - quantile)). Default quantile is
-        0.25
+        Range is
+        :math:`(100%% * quantile, 100%% * (1 - quantile))`.
+        Default quantile is 0.25
     transform : str or bool or None, optional
         Transformer to apply to the feature values. If str, must be one of:
-          - 'default' - use default transformer for the feature, it same as
-            giving True. The default for this feature is 'identity'
-          - 'arcsinh' - Hyperbolic arcsine feature transformer
-          - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
-            value
-          - 'identity' - Identity feature transformer
-          - 'lg' - Decimal logarithm feature transformer
-          - 'ln1p' - :math:`ln(1+x)` feature transformer
-          - 'sqrt' - Square root feature transformer
+
+        - 'default' - use default transformer for the feature, it same as
+          giving True. The default for this feature is 'identity'
+        - 'arcsinh' - Hyperbolic arcsine feature transformer
+        - 'clipped_lg' - Decimal logarithm of a value clipped to a minimum
+          value
+        - 'identity' - Identity feature transformer
+        - 'lg' - Decimal logarithm feature transformer
+        - 'ln1p' - :math:`ln(1+x)` feature transformer
+        - 'sqrt' - Square root feature transformer
+
         If bool, must be True to use default transformer or False to disable.
         If None, no transformation is applied.
     """

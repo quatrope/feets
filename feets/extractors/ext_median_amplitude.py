@@ -41,14 +41,6 @@ class MedianAmplitude(Extractor):
     magnitudes. For a sequence of numbers from :math:`0` to :math:`1000` the
     amplitude should be equal to :math:`475.0`.
 
-    Examples
-    --------
-    Median amplitude of increasing time series from :math:`0` to :math:`1000`:
-    >>> fs = feets.FeatureSpace(only=['MedianAmplitude'])
-    >>> features = fs.extract(**lc_incremental)
-    >>> features[0]
-    {'MedianAmplitude': np.float64(475.0)}
-
     References
     ----------
     .. [richards2011machine] Richards, J. W., Starr, D. L., Butler, N. R.,
@@ -59,7 +51,16 @@ class MedianAmplitude(Extractor):
 
     See Also
     --------
-    Amplitude
+    feets.extractors.Amplitude
+
+    Examples
+    --------
+    Median amplitude of increasing magnitudes from :math:`0` to :math:`1000`:
+
+    >>> fs = feets.FeatureSpace(only=['MedianAmplitude'])
+    >>> features = fs.extract(**lc_incremental)
+    >>> features[0]
+    {'MedianAmplitude': np.float64(475.0)}
     """
 
     features = ["MedianAmplitude"]

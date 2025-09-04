@@ -160,6 +160,10 @@ def create_normal(
     LightCurveDataset
         Dataset with randomly generated light curve data vectors.
 
+    See Also
+    --------
+    create_random
+
     Examples
     --------
     >>> ds = create_normal(0, 1, 0, .0008, seed=42)
@@ -170,10 +174,6 @@ def create_normal(
     >>> ds.data.B.time
     array([  0.00000000e+00,   1.00010001e-04,   2.00020002e-04, ...,
                 9.99799980e-01,   9.99899990e-01,   1.00000000e+00])
-
-    See Also
-    --------
-    create_random
     """
     random = np.random.RandomState(seed)
     return create_random(
@@ -216,6 +216,10 @@ def create_uniform(
     LightCurveDataset
         Dataset with randomly generated light curve data vectors.
 
+    See Also
+    --------
+    create_random
+
     Examples
     --------
     >>> ds = synthetic.create_uniform(1, 2, 0, .0008, 42)
@@ -224,10 +228,6 @@ def create_uniform(
     >>> ds.data.B.magnitude
     array([ 1.37454012,  1.95071431,  1.73199394, ...,  1.94670792,
             1.39748799,  1.2171404 ])
-
-    See Also
-    --------
-    create_random
     """
     random = np.random.RandomState(seed)
     return create_random(

@@ -228,8 +228,8 @@ def fetch_OGLE3(
 
     See Also
     --------
-    load_OGLE3_catalog,
-    datasets.base.get_data_home,
+    datasets.base.get_data_home : Return the path of the feets data directory.
+    load_OGLE3_catalog
 
     Examples
     --------

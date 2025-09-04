@@ -46,13 +46,6 @@ class StetsonJ(Extractor):
     For a Gaussian magnitude distribution, :math:`J` should take a value close
     to zero.
 
-    Examples
-    --------
-    >>> fs = feets.FeatureSpace(only=['StetsonJ'])
-    >>> features = fs.extract(**lc_normal)
-    >>> features[0]
-    {'StetsonJ': np.float64(0.01823276018663087)}
-
     Notes
     -----
     This feature is based on the Welch/Stetson variability index :math:`I`
@@ -88,6 +81,13 @@ class StetsonJ(Extractor):
        Rischard, M. (2011). On machine-learned classification of variable stars
        with sparse and noisy time-series data.
        The Astrophysical Journal, 733(1), 10. Doi:10.1088/0004-637X/733/1/10.
+
+    Examples
+    --------
+    >>> fs = feets.FeatureSpace(only=['StetsonJ'])
+    >>> features = fs.extract(**lc_normal)
+    >>> features[0]
+    {'StetsonJ': np.float64(0.01823276018663087)}
     """
 
     features = ["StetsonJ"]
@@ -156,10 +156,10 @@ class StetsonKAC(Extractor):
 
     Examples
     --------
-    >>> fs = feets.FeatureSpace(only=['SlottedA_length','StetsonK_AC'])
+    >>> fs = feets.FeatureSpace(only=['SlottedALength','StetsonK_AC'])
     >>> features = fs.extract(**lc_normal)
     >>> features[0]
-    {'SlottedA_length': np.int64(1),
+    {'SlottedALength': np.int64(1),
      'StetsonK_AC': np.float64(0.6440898442951952)}
     """
 
