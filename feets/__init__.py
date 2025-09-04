@@ -49,39 +49,47 @@ and future surveys (LSST) and the results should be ideally shared in the same
 open way as this library.
 """
 
+# =============================================================================
+# IMPORTS
+# =============================================================================
+
+import importlib.metadata
+import os
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
 
-__version__ = ("0", "6", "dev0")
-
-NAME = "feets"
-
-DOC = __doc__
-
-VERSION = ".".join(__version__)
-
-AUTHORS = "QuatroPe; Clariá, Felipe"
-
-EMAIL = "jbc.develop@gmail.com, felipe.claria@unc.edu.ar"
-
-URL = "https://github.com/quatrope/feets"
-
-LICENSE = "MIT"
-
-KEYWORDS = (
-    "machine-learning",
-    "feature-extraction",
-    "timeseries",
-    "astronomy",
-)
-
 # =============================================================================
-# IMPORTS
+# METADATA
 # =============================================================================
 
-import os  # noqa
+__version__ = importlib.metadata.version("feets")
+
+# NAME = "feets"
+
+# DOC = __doc__
+
+# VERSION = __version__
+
+# AUTHORS = "QuatroPe; Clariá, Felipe"
+
+# EMAIL = "jbc.develop@gmail.com, felipe.claria@unc.edu.ar"
+
+# URL = "https://github.com/quatrope/feets"
+
+# LICENSE = "MIT"
+
+# KEYWORDS = (
+#     "machine-learning",
+#     "feature-extraction",
+#     "timeseries",
+#     "astronomy",
+# )
+
+# =============================================================================
+# MAIN
+# =============================================================================
 
 if os.getenv("FEETS_IN_SETUP") != "True":
     from .core import *  # noqa

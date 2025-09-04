@@ -1,4 +1,18 @@
-include *.md
-recursive-include feets/tests/data *.*
 include LICENSE
 include README.rst
+include pyproject.toml
+include setup.py
+
+recursive-include feets *
+
+exclude tox.ini
+exclude .header-template
+exclude requirements.txt
+exclude .readthedocs.yml
+
+recursive-exclude tests *
+recursive-exclude assets *
+recursive-exclude draft *
+recursive-exclude tools *
+recursive-exclude res   *
+recursive-exclude docs   *

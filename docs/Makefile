@@ -13,7 +13,7 @@ help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 editnb:
-	cd .. && jupyter notebook doc/source/tutorial.ipynb; cd -;
+	cd .. && jupyter notebook docs/source/tutorial.ipynb; cd -;
 
 autobuild:
 	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)"

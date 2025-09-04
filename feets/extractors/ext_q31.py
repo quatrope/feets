@@ -73,8 +73,7 @@ class Q31Color(Extractor):
     **Q31_color** (:math:`Q_{3-1|B-R}`)
 
     :math:`Q_{3-1}` applied to the difference between both bands of a light
-    curve (B-R).
-    {'Q31_color': 1.9517477838539978}
+    curve (B-R)
 
     References
     ----------
@@ -88,6 +87,7 @@ class Q31Color(Extractor):
     >>> fs = feets.FeatureSpace(only=['Q31_color'])
     >>> features = fs.extract(**lc_normal)
     >>> features[0]
+    {'Q31_color': 1.9517477838539978}
     """
 
     features = ["Q31_color"]

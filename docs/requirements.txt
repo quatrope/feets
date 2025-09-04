@@ -9,4 +9,3 @@ numpydoc
 seaborn
 sphinx
 sphinx-autobuild
-sphinx-bootstrap-theme

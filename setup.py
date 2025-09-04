@@ -15,73 +15,9 @@
 
 
 # =============================================================================
-# IMPORTS
+# IMPORTS and RUN
 # =============================================================================
 
-import os
+import setuptools
 
-os.environ["FEETS_IN_SETUP"] = "True"
-import feets  # noqa
-
-from setuptools import find_packages, setup  # noqa
-
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-REQUIREMENTS = [
-    "numpy>=2.3,<3",
-    "scipy>=1,<2",
-    "pytest",
-    "statsmodels",
-    "astropy>=6,<8",
-    "pandas>=2,<3",
-    "requests",
-    "joblib",
-    "custom_inherit",
-    "dask",
-    "light-curve",
-    "attrs",
-]
-
-
-# =============================================================================
-# FUNCTIONS
-# =============================================================================
-
-
-def do_setup():
-    setup(
-        name=feets.NAME,
-        version=feets.VERSION,
-        long_description=feets.DOC,
-        description=feets.DOC.splitlines()[0],
-        author=feets.AUTHORS,
-        author_email=feets.EMAIL,
-        url=feets.URL,
-        license=feets.LICENSE,
-        keywords=list(feets.KEYWORDS),
-        include_package_data=True,
-        classifiers=[
-            "Development Status :: 4 - Beta",
-            "Intended Audience :: Education",
-            "Intended Audience :: Science/Research",
-            "License :: OSI Approved :: MIT License",
-            "Operating System :: OS Independent",
-            "Programming Language :: Python",
-            "Programming Language :: Python :: 3",
-            "Programming Language :: Python :: 3.10",
-            "Programming Language :: Python :: 3.11",
-            "Programming Language :: Python :: 3.12",
-            "Programming Language :: Python :: 3.13",
-            "Programming Language :: Python :: Implementation :: CPython",
-            "Topic :: Scientific/Engineering",
-        ],
-        packages=[pkg for pkg in find_packages() if pkg.startswith("feets")],
-        install_requires=REQUIREMENTS,
-    )
-
-
-if __name__ == "__main__":
-    do_setup()
+setuptools.setup()

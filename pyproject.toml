@@ -1,12 +1,81 @@
+[tool.numpydoc_validation]
+checks = ["all"]
+
 [tool.black]
 line-length = 79
 target-version = ['py310', 'py311', 'py312', 'py313']
+
+[tool.check-manifest]
+ignore = [
+    "tox.ini",
+    ".header-template",
+    "requirements.txt",
+    "tests",
+    "assets",
+    "draft",
+    "tools",
+    "res",
+]
 
 [tool.pytest.ini_options]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
-testpaths = [
-    "tests",
+testpaths = ["tests"]
+addopts = "-m 'not slow' -n auto -p no:warnings"
+
+# =============================================================================
+# PACKAGING
+# =============================================================================
+
+[project]
+name = "feets"
+version = "1.0.0dev0"
+authors = [
+    { name = "Felipe Clariá Dambolena", email = "felipe.claria@unc.edu.ar" },
+    { name = "Juan B Cabral", email = "jbcabral@unc.edu.ar" }
 ]
-addopts = "-m 'not slow' --disable-warnings"
+readme = "README.rst"
+license = { file = "LICENSE" }
+description = "feets: feATURE eXTRACTOR FOR tIME sERIES."
+keywords = [
+    "machine-learning",
+    "feature-extraction",
+    "timeseries",
+    "astronomy",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering",
+]
+urls = { Homepage = "https://feets.readthedocs.io/", Repository = "https://github.com/quatrope/feets" }
+dependencies = [
+    "numpy>=2.2.6",
+    "scipy>=1.15.3",
+    "statsmodels>=0.14.5",
+    "astropy>=6.1.7",
+    "pandas>=2.3.2",
+    "requests>=2.32.5",
+    "joblib>=1.5.2",
+    "custom_inherit>=2.4.1",
+    "dask>=2025.7.0",
+    "light-curve>=0.10.4",
+    "attrs>=25.3.0",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["feets", "feets.*"]
+namespaces = false
