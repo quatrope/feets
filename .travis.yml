@@ -1,0 +1,25 @@
+language: python
+install:
+  - pip install tox
+script:
+  - tox -r
+matrix:
+    include:
+        - python: 3.10
+          env: TOXENV=py310
+        - python: 3.11
+          env: TOXENV=py311
+        - python: 3.12
+          env: TOXENV=py312
+        - python: 3.13
+          env: TOXENV=py313
+        - python: 3.13
+          env: TOXENV=style
+        - python: 3.13
+          env: TOXENV=check-testdir
+        - python: 3.13
+          env: TOXENV=check-headers
+        - python: 3.13
+          env: TOXENV=docstyle
+        - python: 3.13
+          env: TOXENV=coverage

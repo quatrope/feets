@@ -22,13 +22,9 @@ feets: feATURE eXTRACTOR FOR tIME sERIES
    :target: https://tldrlegal.com/license/mit-license
    :alt: License
 
-.. image:: https://img.shields.io/badge/python-2.7-blue.svg
+.. image:: https://img.shields.io/badge/python-3.10+-blue.svg
    :target: https://badge.fury.io/py/feets
-   :alt: Python 2.7
-
-.. image:: https://img.shields.io/badge/python-3.5+-blue.svg
-   :target: https://badge.fury.io/py/feets
-   :alt: Python 3.5+
+   :alt: Python 3.10+
 
 Description
 -----------

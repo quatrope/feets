@@ -54,7 +54,7 @@ open way as this library.
 # CONSTANTS
 # =============================================================================
 
-__version__ = ("2", "0")
+__version__ = ("0", "5")
 
 NAME = "feets"
 
@@ -62,7 +62,7 @@ DOC = __doc__
 
 VERSION = ".".join(__version__)
 
-AUTHORS = "QuatroPe, Felipe Clariá"
+AUTHORS = "QuatroPe; Clariá, Felipe"
 
 EMAIL = "jbc.develop@gmail.com, felipe.claria@unc.edu.ar"
 

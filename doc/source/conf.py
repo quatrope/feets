@@ -69,8 +69,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "feets"
-copyright = "2024-2025, QuatroPe, Felipe Clariá"
-author = "QuatroPe, Felipe Clariá"
+copyright = "2024, QuatroPe; Clariá, Felipe"
+author = "QuatroPe; Clariá, Felipe"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -164,7 +164,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, "feets", "feets Documentation", author.split(", "), 1)
+    (master_doc, "feets", "feets Documentation", author.split("; "), 1)
 ]
 
 
