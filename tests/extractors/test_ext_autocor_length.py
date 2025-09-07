@@ -55,7 +55,7 @@ def test_AutocorLength_extract(normal):
 
     # check means
     means = df.mean()[expected.index]
-    np.testing.assert_allclose(means, expected, rtol=1e-2)
+    np.testing.assert_allclose(means, expected)
 
 
 def test_AutocorLength_extract_long_correlation(periodic):

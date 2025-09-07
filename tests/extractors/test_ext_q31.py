@@ -55,7 +55,7 @@ def test_Q31_extract(normal):
 
     # check means
     means = df.mean()[expected.index]
-    np.testing.assert_allclose(means, expected, rtol=1e-2)
+    np.testing.assert_allclose(means, expected)
 
 
 def test_Q31Color_extract(normal):
@@ -86,4 +86,4 @@ def test_Q31Color_extract(normal):
 
     # check means
     means = df.mean()[expected.index]
-    np.testing.assert_allclose(means, expected, rtol=1e-2)
+    np.testing.assert_allclose(means, expected)

@@ -60,4 +60,4 @@ def test_VillarFit_extract():
     np.testing.assert_equal(set(series.index), set(expected.index))
 
     # check values
-    np.testing.assert_allclose(series[expected.index], expected, rtol=1e-2)
+    np.testing.assert_allclose(series[expected.index], expected)

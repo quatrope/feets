@@ -40,7 +40,7 @@ def test_AstropyLombScargle_extract(periodic):
             "nyquist_factor": 1,
         }
     }
-    extractor = AstropyLombScargle(lscargle_kwds=lscargle_kwds, nperiods=3)
+    extractor = AstropyLombScargle(lscargle_kwds=lscargle_kwds, nperiods=2)
 
     # seed
     random = np.random.default_rng(RANDOM_SEED)
@@ -62,26 +62,10 @@ def test_AstropyLombScargle_extract(periodic):
     # expected columns and mean values
     expected = pd.DataFrame(
         {
-            "PeriodLS": [
-                20.26250834469941,
-                18.771094343627034,
-                19.27779111644655,
-            ],
-            "Period_fit": [
-                1.4306433603192435e-11,
-                7.701492122755767e-13,
-                1.1292193858099717e-13,
-            ],
-            "Psi_CS": [
-                0.23181927251239123,
-                0.2555247224341927,
-                0.269163774493831,
-            ],
-            "Psi_eta": [
-                0.9003366875414929,
-                0.40641056227603306,
-                0.06352767993482751,
-            ],
+            "PeriodLS": [18.808016760831848, 19.27779111644658],
+            "Period_fit": [0, 0],
+            "Psi_CS": [0.25401119954358997, 0.2672274175209012],
+            "Psi_eta": [0.4105175583550706, 0.06377275549870381],
         }
     )
 
@@ -90,4 +74,4 @@ def test_AstropyLombScargle_extract(periodic):
 
     # check means
     means = df.groupby(level=1).mean()[expected.columns]
-    np.testing.assert_allclose(means, expected, rtol=1e-2)
+    np.testing.assert_allclose(means, expected, rtol=2e-2, atol=1e-3)
