@@ -86,7 +86,7 @@ html_theme = "alabaster"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-html_favicon = "favicon.ico"
+html_favicon = "_static/favicon.ico"
 
 html_comment = "Copyright (c) 2024, QuatroPe; Clariá, Felipe"
 
