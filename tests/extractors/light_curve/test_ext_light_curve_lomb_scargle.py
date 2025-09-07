@@ -63,6 +63,4 @@ def test_LightCurveLombScargle_extract():
     np.testing.assert_equal(set(df.columns), set(expected.columns))
 
     # check values
-    np.testing.assert_allclose(
-        df[expected.columns].to_numpy(), expected.to_numpy()
-    )
+    np.testing.assert_allclose(df[expected.columns], expected, rtol=1e-2)

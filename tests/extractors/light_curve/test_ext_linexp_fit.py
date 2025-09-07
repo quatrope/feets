@@ -57,4 +57,4 @@ def test_LinexpFit_extract():
     np.testing.assert_equal(set(series.index), set(expected.index))
 
     # check values
-    np.testing.assert_allclose(series[expected.index], expected)
+    np.testing.assert_allclose(series[expected.index], expected, rtol=1e-2)

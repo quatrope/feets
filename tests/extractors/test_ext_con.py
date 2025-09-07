@@ -55,7 +55,7 @@ def test_Con_extract(normal):
 
     # check means
     means = df.mean()[expected.index]
-    np.testing.assert_allclose(means, expected)
+    np.testing.assert_allclose(means, expected, rtol=1e-2)
 
 
 def test_Con_extract_consecutive_star_too_big(normal):

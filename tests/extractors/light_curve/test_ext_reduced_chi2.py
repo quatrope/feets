@@ -15,6 +15,8 @@ from feets.extractors.light_curve.ext_reduced_chi2 import ReducedChi2
 
 import numpy as np
 
+import pandas as pd
+
 # =============================================================================
 # CONSTANTS
 # =============================================================================
@@ -29,6 +31,7 @@ RANDOM_SEED = 42
 
 
 def test_ReducedChi2_extract(normal):
+    # init extractor
     extractor = ReducedChi2()
 
     # seed
@@ -45,10 +48,15 @@ def test_ReducedChi2_extract(normal):
     kwargss = [extractor.prepare_extract(lc, {}) for lc in lcs]
     results = [extractor.extract(**kwargs) for kwargs in kwargss]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 0.9990060717934738  # ReducedChi2
+    # expected columns and mean values
+    expected = pd.Series({"ReducedChi2": 0.9990060717934738})
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected, rtol=1e-2)

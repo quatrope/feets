@@ -23,7 +23,7 @@ import numpy as np
 
 from scipy.optimize import minimize
 
-from .extractor import Extractor, feature_warning
+from .extractor import Extractor
 from ..libs import doctools
 
 __all__ = ["CAR"]

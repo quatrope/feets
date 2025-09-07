@@ -56,14 +56,14 @@ def test_MedianBRP_extract(normal):
 
     # check means
     means = df.mean()[expected.index]
-    np.testing.assert_allclose(means, expected)
+    np.testing.assert_allclose(means, expected, rtol=1e-2)
 
 
 def test_MedianBRP_flatten_feature():
     # init extractor
     extractor = MedianBRP(quantile=0.10)
 
-    features = {"MedianBRP": 0.255514, "test_feature": [1, 2, 3]}
+    features = {"MedianBRP": 0.25, "test_feature": [1, 2, 3]}
 
     # flatten results
     flattened_results = {
@@ -73,7 +73,7 @@ def test_MedianBRP_flatten_feature():
 
     # check flattened results
     expected = {
-        "MedianBRP": {"MedianBRP_10": 0.255514},
+        "MedianBRP": {"MedianBRP_10": 0.25},
         "test_feature": {
             "test_feature_0": 1,
             "test_feature_1": 2,

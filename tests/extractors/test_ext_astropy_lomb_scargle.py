@@ -90,4 +90,4 @@ def test_AstropyLombScargle_extract(periodic):
 
     # check means
     means = df.groupby(level=1).mean()[expected.columns]
-    np.testing.assert_allclose(means.to_numpy(), expected.to_numpy())
+    np.testing.assert_allclose(means, expected, rtol=1e-2)

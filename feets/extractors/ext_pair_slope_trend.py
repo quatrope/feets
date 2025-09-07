@@ -37,7 +37,6 @@ class PairSlopeTrend(Extractor):
     Considering the last :math:`30` (time-sorted) measurements of source
     magnitude, the fraction of increasing first differences minus the fraction
     of decreasing first differences.
-    {'PairSlopeTrend': -0.1}
 
     References
     ----------
@@ -52,6 +51,7 @@ class PairSlopeTrend(Extractor):
     >>> fs = feets.FeatureSpace(only=['PairSlopeTrend'])
     >>> features = fs.extract(**lc_normal)
     >>> features[0]
+    {'PairSlopeTrend': -0.0021333333333333343}
     """
 
     features = ["PairSlopeTrend"]
