@@ -37,10 +37,15 @@ class Con(Extractor):
     Index introduced for the selection of variable stars from the OGLE
     database (Wozniak 2000). To calculate Con, we count the number of three
     consecutive data points that are brighter or fainter than :math:`2\sigma`
-    and normalize the number by :math:`N−2`.
+    and normalize the number by :math:`N-2`.
 
     For a normal distribution and by considering just one star, Con should
     take values close to :math:`0.045`.
+
+    Parameters
+    ----------
+    consecutive_star : int, optional (default=3)
+        Number of consecutive data points to consider.
 
     References
     ----------
@@ -77,7 +82,7 @@ class Con(Extractor):
 
         N = len(magnitude)
         if N < consecutive_star:
-            return 0
+            return {"Con": 0}
         sigma = np.std(magnitude)
         m = np.mean(magnitude)
         count = 0

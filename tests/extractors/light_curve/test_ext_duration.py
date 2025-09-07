@@ -15,7 +15,7 @@ from feets.extractors.light_curve.ext_duration import Duration
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -29,7 +29,6 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_Duration_extract():
     # init extractor
     extractor = Duration()
@@ -39,9 +38,14 @@ def test_Duration_extract():
     kwargs = extractor.prepare_extract(lc, {})
     results = extractor.extract(**kwargs)
 
-    # transform results into array
-    values = np.array(list(results.values()))
+    # values by feature
+    series = pd.Series(results)
 
-    # assert results are close to expected value
-    expected = [1000]  # Duration
-    np.testing.assert_allclose(values, expected)
+    # expected columns and mean values
+    expected = pd.Series({"Duration": 1000})
+
+    # check columns
+    np.testing.assert_equal(set(series.index), set(expected.index))
+
+    # check values
+    np.testing.assert_allclose(series[expected.index], expected)

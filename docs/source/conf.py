@@ -8,15 +8,15 @@ import os
 import sys
 import pathlib
 
-from pyparsing import html_comment
+import feets
+
+import m2r2
 
 # this path is pointing to project/docs/source
 CURRENT_PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 FEETS_PATH = CURRENT_PATH.parent.parent
 
 sys.path.insert(0, str(FEETS_PATH))
-
-import feets
 
 
 # -- Project information -----------------------------------------------------
@@ -88,7 +88,6 @@ html_css_files = []
 
 html_theme_options = dict(
     fixed_sidebar=True,
-    page_width="90%",
     description="feATURE eXTRACTOR FOR tIME sERIES.",
     extra_nav_links={"feets Source Code": "https://github.com/quatrope/feets"},
     github_repo="feets",
@@ -158,15 +157,12 @@ texinfo_documents = [
     ),
 ]
 
-
 autosummary_generate = True
 
 
 # =============================================================================
 # INJECT README INTO THE RESTRUCTURED TEXT
 # =============================================================================
-
-import m2r2
 
 DYNAMIC_RST = {
     # "README.md": "README.rst",
@@ -201,7 +197,7 @@ FEATURES_LIST_TEMPLATE = jinja2.Template(
 )
 
 
-def make_reatures_conf():
+def make_features_conf():
     """Generate the features.rst file.
 
     The features.rst file is a list of all the features available in feets,
@@ -231,4 +227,4 @@ def make_reatures_conf():
         print(f"{rst_path} regenerated!")
 
 
-make_reatures_conf()
+make_features_conf()

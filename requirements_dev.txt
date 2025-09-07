@@ -2,9 +2,6 @@
 
 tox
 ipdb
-pytest
-
-tqdm
 
 black
 
@@ -15,20 +12,19 @@ flake8-builtins
 
 pydocstyle
 tomli
+toml
 
 check-manifest
 
 pytest
 pytest-cov
-coverage
-pytest-cov
 pytest-mock
+pytest-xdist
+coverage
 
 https://github.com/quatrope/qafan/archive/refs/heads/master.zip
 
-pydocstyle
-toml
-
 jupyterlab
+tqdm
 
 -r docs/requirements.txt

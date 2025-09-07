@@ -15,6 +15,8 @@ from feets.extractors.ext_stetson import StetsonJ, StetsonKAC, StetsonL
 
 import numpy as np
 
+import pandas as pd
+
 import pytest
 
 # =============================================================================
@@ -31,8 +33,8 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_StetsonJ_extract(normal):
+    # init extractor
     extractor = StetsonJ()
 
     # seed
@@ -54,18 +56,23 @@ def test_StetsonJ_extract(normal):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 0.000389878261606318  # StetsonJ
+    # expected columns and mean values
+    expected = pd.Series({"StetsonJ": 0.000389878261606318})
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)
 
 
 @pytest.mark.slow
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_StetsonKAC_extract(normal):
+    # init extractor
     extractor = StetsonKAC()
 
     # seed
@@ -81,17 +88,22 @@ def test_StetsonKAC_extract(normal):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 0.6583779  # StetsonK_AC
+    # expected columns and mean values
+    expected = pd.Series({"StetsonK_AC": 0.6583779})
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_StetsonL_extract(normal):
+    # init extractor
     extractor = StetsonL()
 
     # seed
@@ -113,10 +125,15 @@ def test_StetsonL_extract(normal):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 0.00030183305778540346  # StetsonL
+    # expected columns and mean values
+    expected = pd.Series({"StetsonL": 0.00030183305778540346})
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)

@@ -50,39 +50,52 @@ def test_load_OGLE3_catalog(mocker):
 
 
 @pytest.mark.slow
-def test_fetch_OGLE3(mocker):
+@pytest.mark.parametrize(
+    ["read_data", "expected_time", "expected_magnitude", "expected_error"],
+    [
+        ([1, 10, 0.1], [1], [10], [0.1]),
+        (
+            [[1, 10, 0.1], [2, 20, 0.2], [3, 30, 0.3]],
+            [1, 2, 3],
+            [10, 20, 30],
+            [0.1, 0.2, 0.3],
+        ),
+    ],
+)
+def test_fetch_OGLE3(
+    mocker, read_data, expected_time, expected_magnitude, expected_error
+):
     store_path = _get_OGLE3_data_home(None)
-    cat = load_OGLE3_catalog()
-    oid = np.random.choice(cat.ID)
-
-    url_I = f"{OGLE_CATALOG_BASE_URL}/I/{oid[-2:]}/{oid}.dat"
-    url_V = f"{OGLE_CATALOG_BASE_URL}/V/{oid[-2:]}/{oid}.dat"
-
-    file_path_I = store_path / f"{oid}.I.dat"
-    file_path_V = store_path / f"{oid}.V.dat"
 
     fetch = mocker.patch("feets.datasets.base.fetch")
-    mocker.patch(
-        "numpy.loadtxt",
-        return_value=np.array([[1, 10, 0.1], [2, 20, 0.2], [3, 30, 0.3]]),
-    )
+    mocker.patch("numpy.loadtxt", return_value=np.array(read_data))
 
-    ds = fetch_OGLE3(oid)
+    ds = fetch_OGLE3("OGLE-BLG-LPV-232377")
 
-    np.testing.assert_equal(ds._id, oid)
-    np.testing.assert_equal(ds.bands, ["I", "V"])
+    np.testing.assert_equal(ds._id, "OGLE-BLG-LPV-232377")
+    np.testing.assert_equal(set(ds.bands), {"I", "V"})
 
-    np.testing.assert_equal(ds.data.I.time, np.array([1, 2, 3]))
-    np.testing.assert_equal(ds.data.I.magnitude, np.array([10, 20, 30]))
-    np.testing.assert_equal(ds.data.I.error, np.array([0.1, 0.2, 0.3]))
+    np.testing.assert_equal(ds.data.I.time, np.array(expected_time))
+    np.testing.assert_equal(ds.data.I.magnitude, np.array(expected_magnitude))
+    np.testing.assert_equal(ds.data.I.error, np.array(expected_error))
 
-    np.testing.assert_equal(ds.data.V.time, np.array([1, 2, 3]))
-    np.testing.assert_equal(ds.data.V.magnitude, np.array([10, 20, 30]))
-    np.testing.assert_equal(ds.data.V.error, np.array([0.1, 0.2, 0.3]))
+    np.testing.assert_equal(ds.data.V.time, np.array(expected_time))
+    np.testing.assert_equal(ds.data.V.magnitude, np.array(expected_magnitude))
+    np.testing.assert_equal(ds.data.V.error, np.array(expected_error))
 
     called_with = {call.args for call in fetch.mock_calls}
     np.testing.assert_equal(
-        called_with, {(url_I, file_path_I), (url_V, file_path_V)}
+        set(called_with),
+        {
+            (
+                f"{OGLE_CATALOG_BASE_URL}/I/77/OGLE-BLG-LPV-232377.dat",
+                store_path / "OGLE-BLG-LPV-232377.I.dat",
+            ),
+            (
+                f"{OGLE_CATALOG_BASE_URL}/V/77/OGLE-BLG-LPV-232377.dat",
+                store_path / "OGLE-BLG-LPV-232377.V.dat",
+            ),
+        },
     )
 
 
@@ -91,12 +104,10 @@ def test_fetch_OGLE3_file_not_found(mocker):
     cat = load_OGLE3_catalog()
     oid = np.random.choice(cat.ID)
 
+    mocker.patch("feets.datasets.base.fetch")
     mocker.patch(
         "numpy.loadtxt",
-        side_effect=[
-            np.array([[1, 2, 3], [10, 20, 30], [0.1, 0.1, 0.1]]),
-            FileNotFoundError,
-        ],
+        side_effect=FileNotFoundError,
     )
 
     with pytest.raises(FileNotFoundError):

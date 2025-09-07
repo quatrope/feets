@@ -15,7 +15,7 @@ from feets.extractors.light_curve.ext_beyond_n_std import BeyondNStd
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -30,8 +30,8 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_BeyondNStd_extract(normal):
+    # init extractor
     extractor = BeyondNStd(nstd=1)
 
     # seed
@@ -45,10 +45,39 @@ def test_BeyondNStd_extract(normal):
     kwargss = [extractor.prepare_extract(lc, {}) for lc in lcs]
     results = [extractor.extract(**kwargs) for kwargs in kwargss]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 0.317093  # BeyondNStd
+    # expected columns and mean values
+    expected = pd.Series({"BeyondNStd": 0.317093})
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)
+
+
+def test_BeyondNStd_flatten_feature():
+    # init extractor
+    extractor = BeyondNStd(nstd=1)
+
+    features = {"BeyondNStd": 0.317093, "test_feature": [1, 2, 3]}
+
+    # flatten results
+    flattened_results = {
+        feature: extractor.flatten_feature(feature, value)
+        for feature, value in features.items()
+    }
+
+    # check flattened results
+    expected = {
+        "BeyondNStd": {"Beyond1Std": 0.317093},
+        "test_feature": {
+            "test_feature_0": 1,
+            "test_feature_1": 2,
+            "test_feature_2": 3,
+        },
+    }
+    np.testing.assert_equal(flattened_results, expected)

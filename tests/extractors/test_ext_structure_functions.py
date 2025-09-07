@@ -15,7 +15,7 @@ from feets.extractors.ext_structure_functions import StructureFunctions
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -30,9 +30,8 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.slow
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_StructureFunctions_extract(normal):
+    # init extractor
     extractor = StructureFunctions()
 
     # seed
@@ -48,14 +47,42 @@ def test_StructureFunctions_extract(normal):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = [
-        1.8438983006429244,  # StructureFunction_index_21
-        2.637129298119476,  # StructureFunction_index_31
-        1.525586514233299,  # StructureFunction_index_32
-    ]
+    # expected columns and mean values
+    expected = pd.Series(
+        {
+            "StructureFunction_index_21": 1.8438983006429244,
+            "StructureFunction_index_31": 2.637129298119476,
+            "StructureFunction_index_32": 1.525586514233299,
+        }
+    )
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)
+
+
+def test_StructureFunctions_extract_zeros():
+    # init extractor
+    extractor = StructureFunctions()
+
+    # simulate results
+    lc = {
+        "time": np.arange(LC_LENGTH),
+        "magnitude": np.zeros(LC_LENGTH),
+    }
+    result = extractor.extract(**lc)
+
+    expected = {
+        "StructureFunction_index_21": np.nan,
+        "StructureFunction_index_31": np.nan,
+        "StructureFunction_index_32": np.nan,
+    }
+
+    # check values
+    np.testing.assert_equal(result, expected)

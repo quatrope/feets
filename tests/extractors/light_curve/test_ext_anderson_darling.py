@@ -15,7 +15,7 @@ from feets.extractors.light_curve.ext_anderson_darling import AndersonDarling
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -30,7 +30,6 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_AndersonDarling_extract(normal):
     # init extractor
     extractor = AndersonDarling()
@@ -46,9 +45,15 @@ def test_AndersonDarling_extract(normal):
     kwargss = [extractor.prepare_extract(lc, {}) for lc in lcs]
     results = [extractor.extract(**kwargs) for kwargs in kwargss]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 0.37753063  # AndersonDarling
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # expected columns and mean values
+    expected = pd.Series({"AndersonDarling": 0.37753063})
+
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)

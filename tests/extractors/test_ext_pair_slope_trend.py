@@ -15,7 +15,7 @@ from feets.extractors.ext_pair_slope_trend import PairSlopeTrend
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -30,8 +30,8 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_PairSlopeTrend_extract(normal):
+    # init extractor
     extractor = PairSlopeTrend()
 
     # seed
@@ -44,9 +44,15 @@ def test_PairSlopeTrend_extract(normal):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = -0.0021333333333333343  # PairSlopeTrend
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # expected columns and mean values
+    expected = pd.Series({"PairSlopeTrend": -0.0021333333333333343})
+
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)

@@ -15,8 +15,6 @@ from feets.extractors.light_curve.ext_reduced_chi2 import ReducedChi2
 
 import numpy as np
 
-import pytest
-
 # =============================================================================
 # CONSTANTS
 # =============================================================================
@@ -30,7 +28,6 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_ReducedChi2_extract(normal):
     extractor = ReducedChi2()
 

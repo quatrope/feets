@@ -2,6 +2,9 @@ docutils
 expectexception
 jinja2
 jupyter
+lxml_html_clean
+mistune<2.0
+m2r2
 matplotlib
 nbsphinx
 numpy
@@ -9,5 +12,3 @@ numpydoc
 seaborn
 sphinx
 sphinx-autobuild
-mistune<2.0
-lxml_html_clean

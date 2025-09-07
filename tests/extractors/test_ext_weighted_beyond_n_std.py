@@ -15,6 +15,8 @@ from feets.extractors.ext_weighted_beyond_n_std import WeightedBeyondNStd
 
 import numpy as np
 
+import pandas as pd
+
 import pytest
 
 # =============================================================================
@@ -30,9 +32,15 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+@pytest.mark.parametrize("nstd", [0, -1])
+def test_WeightedBeyondNStd_non_positive_integer(nstd):
+    with pytest.raises(ValueError):
+        WeightedBeyondNStd(nstd=nstd)
+
+
 def test_WeightedBeyondNStd_extract(normal):
-    extractor = WeightedBeyondNStd()
+    # init extractor
+    extractor = WeightedBeyondNStd(nstd=1)
 
     # seed
     random = np.random.default_rng(RANDOM_SEED)
@@ -47,10 +55,39 @@ def test_WeightedBeyondNStd_extract(normal):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 0.317288  # WeightedBeyond1Std
+    # expected columns and mean values
+    expected = pd.Series({"WeightedBeyondNStd": 0.317288})
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)
+
+
+def test_WeightedBeyondNStd_flatten_feature():
+    # init extractor
+    extractor = WeightedBeyondNStd(nstd=1)
+
+    features = {"WeightedBeyondNStd": 0.317288, "test_feature": [1, 2, 3]}
+
+    # flatten results
+    flattened_results = {
+        feature: extractor.flatten_feature(feature, value)
+        for feature, value in features.items()
+    }
+
+    # check flattened results
+    expected = {
+        "WeightedBeyondNStd": {"WeightedBeyond1Std": 0.317288},
+        "test_feature": {
+            "test_feature_0": 1,
+            "test_feature_1": 2,
+            "test_feature_2": 3,
+        },
+    }
+    np.testing.assert_equal(flattened_results, expected)

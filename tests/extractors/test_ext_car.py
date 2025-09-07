@@ -15,6 +15,8 @@ from feets.extractors.ext_car import CAR
 
 import numpy as np
 
+import pandas as pd
+
 import pytest
 
 # =============================================================================
@@ -31,7 +33,6 @@ RANDOM_SEED = 42
 
 
 @pytest.mark.slow
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_CAR_extract(periodic, normal):
     # init extractor
     extractor = CAR()
@@ -50,13 +51,21 @@ def test_CAR_extract(periodic, normal):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = [
-        0.008015313327483975,  # CAR_sigma
-        0.6475047826376705,  # CAR_tau
-        -0.11911673512729966,  # CAR_mean
-    ]
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # expected columns and mean values
+    expected = pd.Series(
+        {
+            "CAR_sigma": 0.008015313327483975,
+            "CAR_tau": 0.6475047826376705,
+            "CAR_mean": -0.11911673512729966,
+        }
+    )
+
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)

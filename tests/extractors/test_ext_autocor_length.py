@@ -15,7 +15,7 @@ from feets.extractors.ext_autocor_length import AutocorLength
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -30,10 +30,9 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_AutocorLength_extract(normal):
     # init extractor
-    extractor = AutocorLength()
+    extractor = AutocorLength(nlags=10)
 
     # seed
     random = np.random.default_rng(RANDOM_SEED)
@@ -45,9 +44,33 @@ def test_AutocorLength_extract(normal):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 1.0  # Autocor_length
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # expected columns and mean values
+    expected = pd.Series({"Autocor_length": 1})
+
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)
+
+
+def test_AutocorLength_extract_long_correlation(periodic):
+    # init extractor
+    extractor = AutocorLength(nlags=100)
+
+    # seed
+    random = np.random.default_rng(RANDOM_SEED)
+
+    # simulate results
+    lc = {
+        "magnitude": periodic(
+            random=random, size=LC_LENGTH, period=LC_LENGTH * 10
+        )
+    }
+    result = extractor.extract(**lc)
+
+    np.testing.assert_equal(result, {"Autocor_length": 220})

@@ -14,6 +14,8 @@ from feets.extractors.ext_astropy_lomb_scargle import AstropyLombScargle
 
 import numpy as np
 
+import pandas as pd
+
 import pytest
 
 # =============================================================================
@@ -30,7 +32,6 @@ RANDOM_SEED = 42
 
 
 @pytest.mark.slow
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_AstropyLombScargle_extract(periodic):
     # init extractor
     lscargle_kwds = {
@@ -39,7 +40,7 @@ def test_AstropyLombScargle_extract(periodic):
             "nyquist_factor": 1,
         }
     }
-    extractor = AstropyLombScargle(lscargle_kwds=lscargle_kwds)
+    extractor = AstropyLombScargle(lscargle_kwds=lscargle_kwds, nperiods=3)
 
     # seed
     random = np.random.default_rng(RANDOM_SEED)
@@ -54,22 +55,39 @@ def test_AstropyLombScargle_extract(periodic):
     ]
     results = [extractor.extract(**lc) for lc in lcs]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    dfs = [pd.DataFrame(result) for result in results]
+    df = pd.concat(dfs, keys=range(len(dfs)))
 
-    # assert mean is close to expected value
-    expected = [
-        [20.26250834469941, 18.771094343627034, 19.27779111644655],  # PeriodLS
-        [
-            1.4306433603192435e-11,
-            7.701492122755767e-13,
-            1.1292193858099717e-13,
-        ],  # Period_fit
-        [0.23181927251239123, 0.2555247224341927, 0.269163774493831],  # Psi_CS
-        [
-            0.9003366875414929,
-            0.40641056227603306,
-            0.06352767993482751,
-        ],  # Psi_eta
-    ]
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # expected columns and mean values
+    expected = pd.DataFrame(
+        {
+            "PeriodLS": [
+                20.26250834469941,
+                18.771094343627034,
+                19.27779111644655,
+            ],
+            "Period_fit": [
+                1.4306433603192435e-11,
+                7.701492122755767e-13,
+                1.1292193858099717e-13,
+            ],
+            "Psi_CS": [
+                0.23181927251239123,
+                0.2555247224341927,
+                0.269163774493831,
+            ],
+            "Psi_eta": [
+                0.9003366875414929,
+                0.40641056227603306,
+                0.06352767993482751,
+            ],
+        }
+    )
+
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.columns))
+
+    # check means
+    means = df.groupby(level=1).mean()[expected.columns]
+    np.testing.assert_allclose(means.to_numpy(), expected.to_numpy())

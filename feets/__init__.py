@@ -91,14 +91,14 @@ __version__ = importlib.metadata.version("feets")
 # MAIN
 # =============================================================================
 
-from .core import *  # noqa
 from . import datasets
+from .core import *  # noqa
 from .datasets import *  # noqa
 from .extractors import *  # noqa
-from .preprocess import *  # noqa
-from .runner import *  # noqa
 from .features import *  # noqa
 from .io import read_json, read_yaml
+from .preprocess import *  # noqa
+from .runner import *  # noqa
 
 __all__ = [
     "datasets",

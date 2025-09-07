@@ -38,6 +38,18 @@ URL = "http://fake.url/data.txt"
 DEST_FILE = "data.txt"
 
 # =============================================================================
+# FIXTURES
+# =============================================================================
+
+
+@pytest.fixture
+def mock_get(mocker):
+    return mocker.patch(
+        "feets.datasets.base.requests.get", return_value=mocker.Mock()
+    )
+
+
+# =============================================================================
 # TEST FUNCTIONS
 # =============================================================================
 
@@ -120,15 +132,11 @@ def test_clear_data_home(mocker):
     shutil.rmtree(tmpdirname)
 
 
-def test_fetch_download(mocker):
+def test_fetch_download(mock_get):
     content = b"some data"
 
-    mock_response = mocker.Mock()
-    mock_response.status_code = 200
-    mock_response.iter_content.return_value = [content]
-    mock_get = mocker.patch(
-        "feets.datasets.base.requests.get", return_value=mock_response
-    )
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.iter_content.return_value = [content]
 
     with tempfile.TemporaryDirectory() as tmpdir:
         dest = pathlib.Path(tmpdir) / DEST_FILE
@@ -143,9 +151,8 @@ def test_fetch_download(mocker):
         mock_get.assert_called_once_with(URL, stream=True)
 
 
-def test_fetch_cached(mocker):
+def test_fetch_cached(mock_get):
     initial_content = b"existing data"
-    mock_get = mocker.patch("feets.datasets.base.requests.get")
 
     with tempfile.TemporaryDirectory() as tmpdir:
         dest = pathlib.Path(tmpdir) / DEST_FILE
@@ -159,16 +166,12 @@ def test_fetch_cached(mocker):
         mock_get.assert_not_called()
 
 
-def test_fetch_force(mocker):
+def test_fetch_force(mock_get):
     initial_content = b"old data"
     new_content = b"new data"
 
-    mock_response = mocker.Mock()
-    mock_response.status_code = 200
-    mock_response.iter_content.return_value = [new_content]
-    mock_get = mocker.patch(
-        "feets.datasets.base.requests.get", return_value=mock_response
-    )
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.iter_content.return_value = [new_content]
 
     with tempfile.TemporaryDirectory() as tmpdir:
         dest = pathlib.Path(tmpdir) / DEST_FILE
@@ -182,12 +185,8 @@ def test_fetch_force(mocker):
         mock_get.assert_called_once_with(URL, stream=True)
 
 
-def test_fetch_http_error(mocker):
-    mock_response = mocker.Mock()
-    mock_response.status_code = 404
-    mock_get = mocker.patch(
-        "feets.datasets.base.requests.get", return_value=mock_response
-    )
+def test_fetch_http_error(mock_get):
+    mock_get.return_value.status_code = 404
 
     with tempfile.TemporaryDirectory() as tmpdir:
         dest = pathlib.Path(tmpdir) / "data.txt"
@@ -253,8 +252,13 @@ def test_LightCurve_getitem():
     np.testing.assert_array_equal(lc["magnitude"], magnitude)
     assert lc["error"] is None
 
+
+def test_LightCurve_getitem_invalid():
+    time = [1, 2, 3]
+    lc = LightCurve(time=time)
+
     with np.testing.assert_raises(KeyError):
-        _ = lc["invalid_data"]
+        lc["invalid_data"]
 
 
 def test_LightCurve_len():
@@ -405,6 +409,27 @@ def test_LightCurveDataset_getitem():
     np.testing.assert_array_equal(ds["bands"], bands)
     np.testing.assert_array_equal(ds["data"]["N"], lc)
     assert ds["metadata"] is None
+
+
+def test_LightCurveDataset_getitem_invalid():
+    lc = LightCurve(time=[1, 2, 3], magnitude=[10, 20, 30])
+
+    _id = "test_dataset"
+    name = "Test Dataset"
+    description = "A test dataset."
+    bands = ("N",)
+    data = {"N": lc}
+
+    ds = LightCurveDataset(
+        id=_id,
+        name=name,
+        description=description,
+        bands=bands,
+        data=data,
+    )
+
+    with np.testing.assert_raises(KeyError):
+        ds["invalid_data"]
 
 
 def test_LightCurveDataset_len():

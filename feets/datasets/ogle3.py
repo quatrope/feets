@@ -171,8 +171,17 @@ def _get_OGLE3_data_home(data_home_path):
 
 def _check_dim(lc):
     if lc.ndim == 1:
+        # lc consists of a single observation, reshape it to a 2D array
         lc.shape = 1, 3
     return lc
+
+
+def _get_path_by_band(ogle3_id, band, store_path):
+    return store_path / f"{ogle3_id}.{band}.dat"
+
+
+def _get_url_by_band(ogle3_id, band, store_path):
+    return f"{OGLE_CATALOG_BASE_URL}/{band}/{ogle3_id[-2:]}/{ogle3_id}.dat"
 
 
 def load_OGLE3_catalog():
@@ -270,34 +279,27 @@ def fetch_OGLE3(
     # retrieve the data dir for ogle
     store_path = _get_OGLE3_data_home(data_home)
 
-    # members of the two bands of ogle3
-    members = {
-        "I": {
-            "path": pathlib.Path(store_path / f"{ogle3_id}.I.dat"),
-            "url": f"{OGLE_CATALOG_BASE_URL}/I/{ogle3_id[-2:]}/{ogle3_id}.dat",
-        },
-        "V": {
-            "path": pathlib.Path(store_path / f"{ogle3_id}.V.dat"),
-            "url": f"{OGLE_CATALOG_BASE_URL}/V/{ogle3_id[-2:]}/{ogle3_id}.dat",
-        },
-    }
+    # the two bands of ogle3
+    bands = {"I", "V"}
 
-    # the url of the lightcurve
+    # download all necessary files
     if download_if_missing:
-        for member in members.values():
-            base.fetch(member["url"], member["path"])
+        for band in bands:
+            base.fetch(
+                _get_url_by_band(ogle3_id, band, store_path),
+                _get_path_by_band(ogle3_id, band, store_path),
+            )
 
-    bands = []
     data = {}
-    for band, member in members.items():
-        src = member["path"]
+    for band in bands:
+        src = _get_path_by_band(ogle3_id, band, store_path)
         lc = _check_dim(np.loadtxt(src))
+
         data[band] = {
             DATA_TIME: lc[:, 0],
             DATA_MAGNITUDE: lc[:, 1],
             DATA_ERROR: lc[:, 2],
         }
-        bands.append(band)
 
     return LightCurveDataset(
         id=ogle3_id,

@@ -15,7 +15,7 @@ from feets.extractors.light_curve.ext_max_time_interval import MaxTimeInterval
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -29,19 +29,23 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_MaxTimeInterval_extract():
     # init extractor
     extractor = MaxTimeInterval()
 
     # simulate results
-    lc = {"time": np.arange(LC_LENGTH)}
+    lc = {"time": np.arange(LC_LENGTH + 1)}
     kwargs = extractor.prepare_extract(lc, {})
     results = extractor.extract(**kwargs)
 
-    # transform results into array
-    values = np.array(list(results.values()))
+    # values by feature
+    series = pd.Series(results)
 
-    # assert results are close to expected value
-    expected = 1  # MaxTimeInterval
-    np.testing.assert_allclose(values, expected)
+    # expected columns and mean values
+    expected = pd.Series({"MaxTimeInterval": 1})
+
+    # check columns
+    np.testing.assert_equal(set(series.index), set(expected.index))
+
+    # check values
+    np.testing.assert_allclose(series[expected.index], expected)

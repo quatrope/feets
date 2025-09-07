@@ -15,7 +15,7 @@ from feets.extractors.light_curve.ext_percentage_ratio import PercentageRatio
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -30,9 +30,11 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_PercentageRatio_extract(normal):
-    extractor = PercentageRatio()
+    # init extractor
+    extractor = PercentageRatio(
+        quantile_numerator=0.4, quantile_denominator=0.05
+    )
 
     # seed
     random = np.random.default_rng(RANDOM_SEED)
@@ -45,9 +47,44 @@ def test_PercentageRatio_extract(normal):
     kwargss = [extractor.prepare_extract(lc, {}) for lc in lcs]
     results = [extractor.extract(**kwargs) for kwargs in kwargss]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 0.15397622762771568  # PercentageRatio_40_5
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # expected columns and mean values
+    expected = pd.Series({"PercentageRatio": 0.15397622762771568})
+
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)
+
+
+def test_PercentageRatio_flatten_feature(normal):
+    # init extractor
+    extractor = PercentageRatio(
+        quantile_numerator=0.4, quantile_denominator=0.05
+    )
+
+    features = {
+        "PercentageRatio": 0.15397622762771568,
+        "test_feature": [1, 2, 3],
+    }
+
+    # flatten results
+    flattened_results = {
+        feature: extractor.flatten_feature(feature, value)
+        for feature, value in features.items()
+    }
+
+    # check flattened results
+    expected = {
+        "PercentageRatio": {"PercentageRatio_40_5": 0.15397622762771568},
+        "test_feature": {
+            "test_feature_0": 1,
+            "test_feature_1": 2,
+            "test_feature_2": 3,
+        },
+    }
+    np.testing.assert_equal(flattened_results, expected)

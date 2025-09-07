@@ -15,7 +15,7 @@ from feets.extractors.light_curve.ext_linexp_fit import LinexpFit
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -29,8 +29,7 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
-def test_LinexpFit_extract(normal):
+def test_LinexpFit_extract():
     # init extractor
     extractor = LinexpFit(algorithm="mcmc")
 
@@ -40,16 +39,22 @@ def test_LinexpFit_extract(normal):
     flux_error = np.sqrt(flux)
     results = extractor.extract(time=time, flux=flux, flux_error=flux_error)
 
-    # transform results into array
-    values = np.array(list(results.values()))
+    # values by feature
+    series = pd.Series(results)
 
-    # assert results are close to expected value
-    expected = [
-        62.559756035926725,  # LinexpFit_Amplitude
-        -0.983590724517521,  # LinexpFit_Baseline
-        1.166120371901874,  # LinexpFit_ReferenceTime
-        24.53696765735986,  # LinexpFit_FallTime
-        3.5270992947607924,  # LinexpFit_ReducedChi2
-    ]
+    # expected columns and mean values
+    expected = pd.Series(
+        {
+            "LinexpFit_Amplitude": 62.559756035926725,
+            "LinexpFit_Baseline": -0.983590724517521,
+            "LinexpFit_ReferenceTime": 1.166120371901874,
+            "LinexpFit_FallTime": 24.53696765735986,
+            "LinexpFit_ReducedChi2": 3.5270992947607924,
+        }
+    )
 
-    np.testing.assert_allclose(values, expected)
+    # check columns
+    np.testing.assert_equal(set(series.index), set(expected.index))
+
+    # check values
+    np.testing.assert_allclose(series[expected.index], expected)

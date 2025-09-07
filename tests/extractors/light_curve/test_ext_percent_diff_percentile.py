@@ -17,7 +17,7 @@ from feets.extractors.light_curve.ext_percent_diff_percentile import (
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -32,9 +32,9 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_PercentDiffPercentile_extract(uniform):
-    extractor = PercentDiffPercentile()
+    # init extractor
+    extractor = PercentDiffPercentile(quantile=0.05)
 
     # seed
     random = np.random.default_rng(RANDOM_SEED)
@@ -47,10 +47,44 @@ def test_PercentDiffPercentile_extract(uniform):
     kwargss = [extractor.prepare_extract(lc, {}) for lc in lcs]
     results = [extractor.extract(**kwargs) for kwargs in kwargss]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert mean is close to expected value
-    expected = 1.8006518831938725  # PercentDiffPercentile_5
+    # expected columns and mean values
+    expected = pd.Series({"PercentDiffPercentile": 1.8006518831938725})
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)
+
+
+def test_PercentDiffPercentile_flatten_feature():
+    # init extractor
+    extractor = PercentDiffPercentile(quantile=0.05)
+
+    features = {
+        "PercentDiffPercentile": 1.8006518831938725,
+        "test_feature": [1, 2, 3],
+    }
+
+    # flatten results
+    flattened_results = {
+        feature: extractor.flatten_feature(feature, value)
+        for feature, value in features.items()
+    }
+
+    # check flattened results
+    expected = {
+        "PercentDiffPercentile": {
+            "PercentDiffPercentile_5": 1.8006518831938725
+        },
+        "test_feature": {
+            "test_feature_0": 1,
+            "test_feature_1": 2,
+            "test_feature_2": 3,
+        },
+    }
+    np.testing.assert_equal(flattened_results, expected)

@@ -15,7 +15,7 @@ from feets.extractors.light_curve.ext_amplitude import Amplitude
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -30,7 +30,6 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_Amplitude_extract():
     # init extractor
     extractor = Amplitude()
@@ -40,9 +39,14 @@ def test_Amplitude_extract():
     kwargs = extractor.prepare_extract(lc, {})
     results = extractor.extract(**kwargs)
 
-    # transform results into array
-    values = np.array(list(results.values()))
+    # values by feature
+    series = pd.Series(results)
 
-    # assert results are close to expected value
-    expected = [500]  # Amplitude
-    np.testing.assert_allclose(values, expected)
+    # expected columns and mean values
+    expected = pd.Series({"Amplitude": 500.0})
+
+    # check columns
+    np.testing.assert_equal(set(series.index), set(expected.index))
+
+    # check values
+    np.testing.assert_allclose(series[expected.index], expected)

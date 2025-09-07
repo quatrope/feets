@@ -93,23 +93,22 @@ def slotted_autocorrelation(data, time, T, K, second_round=False, K1=100):
     return prod / prod[0], np.int64(slots).flatten()
 
 
-def start_conditions(magnitude, time, T):
+def start_conditions(magnitude, time, T=None):
     """Get starting conditions for the slotted autocorrelation calculation.
 
     Parameters
     ----------
     magnitude : array-like
     time : array-like
-    T : float
+    T : float, optional
 
     Returns
     -------
     tuple
         (T, K, slots, SAC2)
     """
-    N = len(time)
-
     if T is None:
+        N = len(time)
         deltaT = time[1:] - time[:-1]
         sorted_deltaT = np.sort(deltaT)
         T = sorted_deltaT[int(N * 0.05) + 1]

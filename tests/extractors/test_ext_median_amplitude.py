@@ -15,7 +15,7 @@ from feets.extractors.ext_median_amplitude import MedianAmplitude
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -29,17 +29,22 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_MedianAmplitude_extract():
+    # init extractor
     extractor = MedianAmplitude()
 
     # simulate results
     lc = {"magnitude": np.arange(LC_LENGTH + 1)}
     results = extractor.extract(**lc)
 
-    # transform results into array
-    values = np.array(list(results.values()))
+    # values by feature
+    series = pd.Series(results)
 
-    # assert mean is close to expected value
-    expected = [475.0]  # MedianAmplitude
-    np.testing.assert_allclose(values, expected)
+    # expected columns and mean values
+    expected = pd.Series({"MedianAmplitude": 475.0})
+
+    # check columns
+    np.testing.assert_equal(set(series.index), set(expected.index))
+
+    # check values
+    np.testing.assert_allclose(series[expected.index], expected)

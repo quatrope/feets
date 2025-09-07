@@ -34,9 +34,6 @@ __all__ = ["CAR"]
 
 EPSILON = 1e-300
 
-CTE_NEG = -np.inf
-
-
 # =============================================================================
 # EXTRACTOR CLASS
 # =============================================================================
@@ -94,6 +91,12 @@ class CAR(Extractor):
     :math:`\sigma_C` and :math:`\tau` and calculate :math:`b` as the mean
     magnitude of the light-curve divided by :math:`\tau`.
 
+    Parameters
+    ----------
+    minimize_method : str, default="nelder-mead"
+        Method to use in the minimization. See `scipy.optimize.minimize`
+        documentation for more details.
+
     References
     ----------
     .. [brockwell2002introduction] Brockwell, P. J., & Davis, R. A. (2002).
@@ -104,6 +107,10 @@ class CAR(Extractor):
        method in EROS-2 and MACHO LMC data sets. Monthly Notices of the Royal
        Astronomical Society, 427(2), 1284-1297.
        Doi:10.1111/j.1365-2966.2012.22061.x.
+
+    See Also
+    --------
+    scipy.optimize.minimize
 
     Examples
     --------
@@ -168,10 +175,6 @@ class CAR(Extractor):
             )
 
             loglik = loglik + loglik_inter
-
-            if loglik <= CTE_NEG:
-                feature_warning("CAR log-likelihood to inf")
-                return -np.inf
 
         # the minus one is to perfor maximization using the minimize function
         return -loglik

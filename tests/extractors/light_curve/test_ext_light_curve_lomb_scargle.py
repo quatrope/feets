@@ -17,7 +17,7 @@ from feets.extractors.light_curve.ext_light_curve_lomb_scargle import (
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -31,8 +31,7 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
-def test_LightCurveLombScargle_extract(normal):
+def test_LightCurveLombScargle_extract():
     # init extractor
     extractor = LightCurveLombScargle(
         peaks=2,
@@ -47,15 +46,23 @@ def test_LightCurveLombScargle_extract(normal):
     magnitude = np.sin(2 * np.pi * time / 0.7) + 0.5 * np.cos(
         2 * np.pi * time / 3.3
     )
-    results = extractor.extract(time=time, magnitude=magnitude)
+    result = extractor.extract(time=time, magnitude=magnitude)
 
-    # transform results into array
-    values = np.array(list(results.values()))
+    # values by feature
+    df = pd.DataFrame(result)
 
-    # assert results are close to expected value
-    expected = [
-        [0.69896194, 3.31147541],  # Periodogram_Peaks
-        [11.5355674, 3.20085143],  # Periodogram_S_to_N
-    ]
+    # expected columns and mean values
+    expected = pd.DataFrame(
+        {
+            "Periodogram_Peaks": [0.69896194, 3.31147541],
+            "Periodogram_S_to_N": [11.5355674, 3.20085143],
+        }
+    )
 
-    np.testing.assert_allclose(values, expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.columns))
+
+    # check values
+    np.testing.assert_allclose(
+        df[expected.columns].to_numpy(), expected.to_numpy()
+    )

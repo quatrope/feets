@@ -15,7 +15,7 @@ from feets.extractors.light_curve.ext_linear_fit import LinearFit
 
 import numpy as np
 
-import pytest
+import pandas as pd
 
 # =============================================================================
 # CONSTANTS
@@ -30,7 +30,6 @@ RANDOM_SEED = 42
 # =============================================================================
 
 
-@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_LinearFit_extract(normal):
     # init extractor
     extractor = LinearFit()
@@ -50,14 +49,21 @@ def test_LinearFit_extract(normal):
     kwargss = [extractor.prepare_extract(lc, {}) for lc in lcs]
     results = [extractor.extract(**kwargs) for kwargs in kwargss]
 
-    # transform results into ndarray
-    values = np.array([list(result.values()) for result in results])
+    # values by feature
+    df = pd.DataFrame(results)
 
-    # assert results are close to expected value
-    expected = [
-        0.000007242744636577737,  # LinearFit_Slope
-        0.00010952101130705979,  # LinearFit_Sigma
-        0.998946109918393,  # LinearFit_ReducedChi2
-    ]
+    # expected columns and mean values
+    expected = pd.Series(
+        {
+            "LinearFit_Slope": 0.000007242744636577737,
+            "LinearFit_Sigma": 0.00010952101130705979,
+            "LinearFit_ReducedChi2": 0.998946109918393,
+        }
+    )
 
-    np.testing.assert_allclose(values.mean(axis=0), expected)
+    # check columns
+    np.testing.assert_equal(set(df.columns), set(expected.index))
+
+    # check means
+    means = df.mean()[expected.index]
+    np.testing.assert_allclose(means, expected)

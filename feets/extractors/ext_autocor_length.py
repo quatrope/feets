@@ -44,7 +44,7 @@ class AutocorLength(Extractor):
     frequency in a signal implied by its harmonic frequencies.
 
     For an observed series :math:`y_1, y_2,\dots,y_T` with sample mean
-    :math:`\bar{y}`, the sample lag :math:`-h` autocorrelation is given by:
+    :math:`\bar{y}`, the sample lag-:math:`h` autocorrelation is given by:
 
     .. math::
 
@@ -77,16 +77,11 @@ class AutocorLength(Extractor):
         ----------
         magnitude : array_like
         """
-        nlags = self.nlags
-
-        AC = stattools.acf(magnitude, nlags=nlags)
-        k = next(
-            (index for index, value in enumerate(AC) if value < np.exp(-1)),
-            None,
-        )
-
+        nlags = 0
+        k = None
         while k is None:
-            nlags = nlags + 100
+            print(k)
+            nlags = nlags + self.nlags
             AC = stattools.acf(magnitude, nlags=nlags)
             k = next(
                 (
