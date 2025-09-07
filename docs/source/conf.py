@@ -47,6 +47,10 @@ extensions = [
 
 nbsphinx_execute = "never"
 
+numpydoc_show_class_members = False
+
+autosummary_generate = True
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
@@ -81,6 +85,8 @@ html_theme = "alabaster"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+html_favicon = "favicon.ico"
 
 html_comment = "Copyright (c) 2024, QuatroPe; Clariá, Felipe"
 
@@ -157,8 +163,6 @@ texinfo_documents = [
     ),
 ]
 
-autosummary_generate = True
-
 
 # =============================================================================
 # INJECT README INTO THE RESTRUCTURED TEXT
@@ -191,7 +195,7 @@ import jinja2  # noqa
 FEATURES_LIST_TEMPLATE = jinja2.Template(
     r"""
 {%for feature, data in features%}
-- [`{{feature}}`]({{data.path}})
+- [{{feature}}](<{{data.path}}>)
 {%-endfor%}
 """
 )
@@ -204,19 +208,18 @@ def make_features_conf():
     with links to their documentation.
 
     """
-    features_dict = {}
+    feature_paths = {}
     for feature in feets.extractor_registry.registered_features:
         extractor = feets.extractor_registry.extractor_of(feature)
 
-        title = f"#{extractor.__module__}.{extractor.__qualname__}".replace(
-            "_", r"\_"
-        )
-        path = "api/extractors.html" + title
+        title = f"{extractor.__module__}.{extractor.__qualname__}"
 
-        features_dict[feature] = {"path": path}
+        path = f"/api/feets.extractors.html#{title}"
+
+        feature_paths[feature] = {"path": path}
 
     markdown = FEATURES_LIST_TEMPLATE.render(
-        {"features": sorted(features_dict.items())}
+        {"features": sorted(feature_paths.items())}
     )
 
     rst_path = CURRENT_PATH / "_dynamic" / "features.rst"

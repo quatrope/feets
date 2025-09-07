@@ -18,24 +18,59 @@
 # =============================================================================
 
 from . import registry
+from .ext_amplitude import Amplitude
+from .ext_anderson_darling import AndersonDarling
 from .ext_astropy_lomb_scargle import AstropyLombScargle
 from .ext_autocor_length import AutocorLength
+from .ext_bazin_fit import BazinFit
+from .ext_beyond_n_std import BeyondNStd
 from .ext_car import CAR
 from .ext_color import Color
 from .ext_con import Con
+from .ext_cusum import Cusum
 from .ext_dmdt import DeltamDeltat
+from .ext_duration import Duration
+from .ext_eta import Eta
 from .ext_eta_color import EtaColor
+from .ext_eta_e import EtaE
+from .ext_excess_variance import ExcessVariance
 from .ext_fourier_components import FourierComponents
 from .ext_gskew import Gskew
+from .ext_inter_percentile_range import InterPercentileRange
+from .ext_light_curve_lomb_scargle import LightCurveLombScargle
+from .ext_linear_fit import LinearFit
+from .ext_linear_trend import LinearTrend
+from .ext_linexp_fit import LinexpFit
+from .ext_max_slope import MaxSlope
+from .ext_max_time_interval import MaxTimeInterval
+from .ext_mean import Mean
+from .ext_mean_variance import MeanVariance
+from .ext_median_abs_dev import MedianAbsDev
 from .ext_median_amplitude import MedianAmplitude
+from .ext_median_brp import MedianBRP
+from .ext_min_time_interval import MinTimeInterval
+from .ext_otsu_split import OtsuSplit
 from .ext_pair_slope_trend import PairSlopeTrend
+from .ext_percent_amplitude import PercentAmplitude
+from .ext_percent_diff_percentile import PercentDiffPercentile
+from .ext_percentage_ratio import PercentageRatio
 from .ext_q31 import Q31, Q31Color
 from .ext_rcs import RCS
+from .ext_reduced_chi2 import ReducedChi2
+from .ext_roms import Roms
 from .ext_signature import Signature
+from .ext_skew import Skew
 from .ext_slotted_a_length import SlottedALength
+from .ext_small_kurtosis import SmallKurtosis
+from .ext_std import Std
 from .ext_stetson import StetsonJ, StetsonKAC, StetsonL
+from .ext_stetson_k import StetsonK
 from .ext_structure_functions import StructureFunctions
+from .ext_time_mean import TimeMean
+from .ext_time_std import TimeStd
+from .ext_villar_fit import VillarFit
 from .ext_weighted_beyond_n_std import WeightedBeyondNStd
+from .ext_weighted_mean import WeightedMean
 from .extractor import (
     DATAS,
     Extractor,
@@ -43,41 +78,6 @@ from .extractor import (
     ExtractorValidationError,
     ExtractorWarning,
 )
-from .light_curve.ext_amplitude import Amplitude
-from .light_curve.ext_anderson_darling import AndersonDarling
-from .light_curve.ext_bazin_fit import BazinFit
-from .light_curve.ext_beyond_n_std import BeyondNStd
-from .light_curve.ext_cusum import Cusum
-from .light_curve.ext_duration import Duration
-from .light_curve.ext_eta import Eta
-from .light_curve.ext_eta_e import EtaE
-from .light_curve.ext_excess_variance import ExcessVariance
-from .light_curve.ext_inter_percentile_range import InterPercentileRange
-from .light_curve.ext_light_curve_lomb_scargle import LightCurveLombScargle
-from .light_curve.ext_linear_fit import LinearFit
-from .light_curve.ext_linear_trend import LinearTrend
-from .light_curve.ext_linexp_fit import LinexpFit
-from .light_curve.ext_max_slope import MaxSlope
-from .light_curve.ext_max_time_interval import MaxTimeInterval
-from .light_curve.ext_mean import Mean
-from .light_curve.ext_mean_variance import MeanVariance
-from .light_curve.ext_median_abs_dev import MedianAbsDev
-from .light_curve.ext_median_brp import MedianBRP
-from .light_curve.ext_min_time_interval import MinTimeInterval
-from .light_curve.ext_otsu_split import OtsuSplit
-from .light_curve.ext_percent_amplitude import PercentAmplitude
-from .light_curve.ext_percent_diff_percentile import PercentDiffPercentile
-from .light_curve.ext_percentage_ratio import PercentageRatio
-from .light_curve.ext_reduced_chi2 import ReducedChi2
-from .light_curve.ext_roms import Roms
-from .light_curve.ext_skew import Skew
-from .light_curve.ext_small_kurtosis import SmallKurtosis
-from .light_curve.ext_std import Std
-from .light_curve.ext_stetson_k import StetsonK
-from .light_curve.ext_time_mean import TimeMean
-from .light_curve.ext_time_std import TimeStd
-from .light_curve.ext_villar_fit import VillarFit
-from .light_curve.ext_weighted_mean import WeightedMean
 
 
 __all__ = [

@@ -1,113 +1,113 @@
 .. FILE AUTO GENERATED !! 
 
 
-* `\ ``Amplitude`` <api/extractors.html#feets.extractors.light\_curve.ext\_amplitude.Amplitude>`_
-* `\ ``AndersonDarling`` <api/extractors.html#feets.extractors.light\_curve.ext\_anderson\_darling.AndersonDarling>`_
-* `\ ``Autocor_length`` <api/extractors.html#feets.extractors.ext\_autocor\_length.AutocorLength>`_
-* `\ ``BazinFit_Amplitude`` <api/extractors.html#feets.extractors.light\_curve.ext\_bazin\_fit.BazinFit>`_
-* `\ ``BazinFit_Baseline`` <api/extractors.html#feets.extractors.light\_curve.ext\_bazin\_fit.BazinFit>`_
-* `\ ``BazinFit_FallTime`` <api/extractors.html#feets.extractors.light\_curve.ext\_bazin\_fit.BazinFit>`_
-* `\ ``BazinFit_ReducedChi2`` <api/extractors.html#feets.extractors.light\_curve.ext\_bazin\_fit.BazinFit>`_
-* `\ ``BazinFit_ReferenceTime`` <api/extractors.html#feets.extractors.light\_curve.ext\_bazin\_fit.BazinFit>`_
-* `\ ``BazinFit_RiseTime`` <api/extractors.html#feets.extractors.light\_curve.ext\_bazin\_fit.BazinFit>`_
-* `\ ``BeyondNStd`` <api/extractors.html#feets.extractors.light\_curve.ext\_beyond\_n\_std.BeyondNStd>`_
-* `\ ``CAR_mean`` <api/extractors.html#feets.extractors.ext\_car.CAR>`_
-* `\ ``CAR_sigma`` <api/extractors.html#feets.extractors.ext\_car.CAR>`_
-* `\ ``CAR_tau`` <api/extractors.html#feets.extractors.ext\_car.CAR>`_
-* `\ ``Color`` <api/extractors.html#feets.extractors.ext\_color.Color>`_
-* `\ ``Con`` <api/extractors.html#feets.extractors.ext\_con.Con>`_
-* `\ ``Cusum`` <api/extractors.html#feets.extractors.light\_curve.ext\_cusum.Cusum>`_
-* `\ ``DeltamDeltat`` <api/extractors.html#feets.extractors.ext\_dmdt.DeltamDeltat>`_
-* `\ ``Duration`` <api/extractors.html#feets.extractors.light\_curve.ext\_duration.Duration>`_
-* `\ ``Eta`` <api/extractors.html#feets.extractors.light\_curve.ext\_eta.Eta>`_
-* `\ ``EtaE`` <api/extractors.html#feets.extractors.light\_curve.ext\_eta\_e.EtaE>`_
-* `\ ``Eta_color`` <api/extractors.html#feets.extractors.ext\_eta\_color.EtaColor>`_
-* `\ ``ExcessVariance`` <api/extractors.html#feets.extractors.light\_curve.ext\_excess\_variance.ExcessVariance>`_
-* `\ ``Freq1_harmonics_amplitude_0`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq1_harmonics_amplitude_1`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq1_harmonics_amplitude_2`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq1_harmonics_amplitude_3`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq1_harmonics_rel_phase_0`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq1_harmonics_rel_phase_1`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq1_harmonics_rel_phase_2`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq1_harmonics_rel_phase_3`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq2_harmonics_amplitude_0`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq2_harmonics_amplitude_1`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq2_harmonics_amplitude_2`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq2_harmonics_amplitude_3`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq2_harmonics_rel_phase_0`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq2_harmonics_rel_phase_1`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq2_harmonics_rel_phase_2`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq2_harmonics_rel_phase_3`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq3_harmonics_amplitude_0`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq3_harmonics_amplitude_1`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq3_harmonics_amplitude_2`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq3_harmonics_amplitude_3`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq3_harmonics_rel_phase_0`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq3_harmonics_rel_phase_1`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq3_harmonics_rel_phase_2`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Freq3_harmonics_rel_phase_3`` <api/extractors.html#feets.extractors.ext\_fourier\_components.FourierComponents>`_
-* `\ ``Gskew`` <api/extractors.html#feets.extractors.ext\_gskew.Gskew>`_
-* `\ ``InterPercentileRange`` <api/extractors.html#feets.extractors.light\_curve.ext\_inter\_percentile\_range.InterPercentileRange>`_
-* `\ ``LinearFit_ReducedChi2`` <api/extractors.html#feets.extractors.light\_curve.ext\_linear\_fit.LinearFit>`_
-* `\ ``LinearFit_Sigma`` <api/extractors.html#feets.extractors.light\_curve.ext\_linear\_fit.LinearFit>`_
-* `\ ``LinearFit_Slope`` <api/extractors.html#feets.extractors.light\_curve.ext\_linear\_fit.LinearFit>`_
-* `\ ``LinearTrend`` <api/extractors.html#feets.extractors.light\_curve.ext\_linear\_trend.LinearTrend>`_
-* `\ ``LinearTrend_ReducedChi2`` <api/extractors.html#feets.extractors.light\_curve.ext\_linear\_trend.LinearTrend>`_
-* `\ ``LinearTrend_Sigma`` <api/extractors.html#feets.extractors.light\_curve.ext\_linear\_trend.LinearTrend>`_
-* `\ ``LinexpFit_Amplitude`` <api/extractors.html#feets.extractors.light\_curve.ext\_linexp\_fit.LinexpFit>`_
-* `\ ``LinexpFit_Baseline`` <api/extractors.html#feets.extractors.light\_curve.ext\_linexp\_fit.LinexpFit>`_
-* `\ ``LinexpFit_FallTime`` <api/extractors.html#feets.extractors.light\_curve.ext\_linexp\_fit.LinexpFit>`_
-* `\ ``LinexpFit_ReducedChi2`` <api/extractors.html#feets.extractors.light\_curve.ext\_linexp\_fit.LinexpFit>`_
-* `\ ``LinexpFit_ReferenceTime`` <api/extractors.html#feets.extractors.light\_curve.ext\_linexp\_fit.LinexpFit>`_
-* `\ ``MaxSlope`` <api/extractors.html#feets.extractors.light\_curve.ext\_max\_slope.MaxSlope>`_
-* `\ ``MaxTimeInterval`` <api/extractors.html#feets.extractors.light\_curve.ext\_max\_time\_interval.MaxTimeInterval>`_
-* `\ ``Mean`` <api/extractors.html#feets.extractors.light\_curve.ext\_mean.Mean>`_
-* `\ ``MeanVariance`` <api/extractors.html#feets.extractors.light\_curve.ext\_mean\_variance.MeanVariance>`_
-* `\ ``MedianAbsDev`` <api/extractors.html#feets.extractors.light\_curve.ext\_median\_abs\_dev.MedianAbsDev>`_
-* `\ ``MedianAmplitude`` <api/extractors.html#feets.extractors.ext\_median\_amplitude.MedianAmplitude>`_
-* `\ ``MedianBRP`` <api/extractors.html#feets.extractors.light\_curve.ext\_median\_brp.MedianBRP>`_
-* `\ ``MinTimeInterval`` <api/extractors.html#feets.extractors.light\_curve.ext\_min\_time\_interval.MinTimeInterval>`_
-* `\ ``OtsuLowerToAllRatio`` <api/extractors.html#feets.extractors.light\_curve.ext\_otsu\_split.OtsuSplit>`_
-* `\ ``OtsuMeanDiff`` <api/extractors.html#feets.extractors.light\_curve.ext\_otsu\_split.OtsuSplit>`_
-* `\ ``OtsuStdLower`` <api/extractors.html#feets.extractors.light\_curve.ext\_otsu\_split.OtsuSplit>`_
-* `\ ``OtsuStdUpper`` <api/extractors.html#feets.extractors.light\_curve.ext\_otsu\_split.OtsuSplit>`_
-* `\ ``PairSlopeTrend`` <api/extractors.html#feets.extractors.ext\_pair\_slope\_trend.PairSlopeTrend>`_
-* `\ ``PercentAmplitude`` <api/extractors.html#feets.extractors.light\_curve.ext\_percent\_amplitude.PercentAmplitude>`_
-* `\ ``PercentDiffPercentile`` <api/extractors.html#feets.extractors.light\_curve.ext\_percent\_diff\_percentile.PercentDiffPercentile>`_
-* `\ ``PercentageRatio`` <api/extractors.html#feets.extractors.light\_curve.ext\_percentage\_ratio.PercentageRatio>`_
-* `\ ``PeriodLS`` <api/extractors.html#feets.extractors.ext\_astropy\_lomb\_scargle.AstropyLombScargle>`_
-* `\ ``Period_fit`` <api/extractors.html#feets.extractors.ext\_astropy\_lomb\_scargle.AstropyLombScargle>`_
-* `\ ``Periodogram_Peaks`` <api/extractors.html#feets.extractors.light\_curve.ext\_light\_curve\_lomb\_scargle.LightCurveLombScargle>`_
-* `\ ``Periodogram_S_to_N`` <api/extractors.html#feets.extractors.light\_curve.ext\_light\_curve\_lomb\_scargle.LightCurveLombScargle>`_
-* `\ ``Psi_CS`` <api/extractors.html#feets.extractors.ext\_astropy\_lomb\_scargle.AstropyLombScargle>`_
-* `\ ``Psi_eta`` <api/extractors.html#feets.extractors.ext\_astropy\_lomb\_scargle.AstropyLombScargle>`_
-* `\ ``Q31`` <api/extractors.html#feets.extractors.ext\_q31.Q31>`_
-* `\ ``Q31_color`` <api/extractors.html#feets.extractors.ext\_q31.Q31Color>`_
-* `\ ``Rcs`` <api/extractors.html#feets.extractors.ext\_rcs.RCS>`_
-* `\ ``ReducedChi2`` <api/extractors.html#feets.extractors.light\_curve.ext\_reduced\_chi2.ReducedChi2>`_
-* `\ ``Roms`` <api/extractors.html#feets.extractors.light\_curve.ext\_roms.Roms>`_
-* `\ ``Signature`` <api/extractors.html#feets.extractors.ext\_signature.Signature>`_
-* `\ ``Skew`` <api/extractors.html#feets.extractors.light\_curve.ext\_skew.Skew>`_
-* `\ ``SlottedALength`` <api/extractors.html#feets.extractors.ext\_slotted\_a\_length.SlottedALength>`_
-* `\ ``SmallKurtosis`` <api/extractors.html#feets.extractors.light\_curve.ext\_small\_kurtosis.SmallKurtosis>`_
-* `\ ``Std`` <api/extractors.html#feets.extractors.light\_curve.ext\_std.Std>`_
-* `\ ``StetsonJ`` <api/extractors.html#feets.extractors.ext\_stetson.StetsonJ>`_
-* `\ ``StetsonK`` <api/extractors.html#feets.extractors.light\_curve.ext\_stetson\_k.StetsonK>`_
-* `\ ``StetsonK_AC`` <api/extractors.html#feets.extractors.ext\_stetson.StetsonKAC>`_
-* `\ ``StetsonL`` <api/extractors.html#feets.extractors.ext\_stetson.StetsonL>`_
-* `\ ``StructureFunction_index_21`` <api/extractors.html#feets.extractors.ext\_structure\_functions.StructureFunctions>`_
-* `\ ``StructureFunction_index_31`` <api/extractors.html#feets.extractors.ext\_structure\_functions.StructureFunctions>`_
-* `\ ``StructureFunction_index_32`` <api/extractors.html#feets.extractors.ext\_structure\_functions.StructureFunctions>`_
-* `\ ``TimeMean`` <api/extractors.html#feets.extractors.light\_curve.ext\_time\_mean.TimeMean>`_
-* `\ ``TimeStd`` <api/extractors.html#feets.extractors.light\_curve.ext\_time\_std.TimeStd>`_
-* `\ ``VillarFit_Amplitude`` <api/extractors.html#feets.extractors.light\_curve.ext\_villar\_fit.VillarFit>`_
-* `\ ``VillarFit_Baseline`` <api/extractors.html#feets.extractors.light\_curve.ext\_villar\_fit.VillarFit>`_
-* `\ ``VillarFit_FallTime`` <api/extractors.html#feets.extractors.light\_curve.ext\_villar\_fit.VillarFit>`_
-* `\ ``VillarFit_PlateauDuration`` <api/extractors.html#feets.extractors.light\_curve.ext\_villar\_fit.VillarFit>`_
-* `\ ``VillarFit_PlateauRelAmplitude`` <api/extractors.html#feets.extractors.light\_curve.ext\_villar\_fit.VillarFit>`_
-* `\ ``VillarFit_ReducedChi2`` <api/extractors.html#feets.extractors.light\_curve.ext\_villar\_fit.VillarFit>`_
-* `\ ``VillarFit_ReferenceTime`` <api/extractors.html#feets.extractors.light\_curve.ext\_villar\_fit.VillarFit>`_
-* `\ ``VillarFit_RiseTime`` <api/extractors.html#feets.extractors.light\_curve.ext\_villar\_fit.VillarFit>`_
-* `\ ``WeightedBeyondNStd`` <api/extractors.html#feets.extractors.ext\_weighted\_beyond\_n\_std.WeightedBeyondNStd>`_
-* `\ ``WeightedMean`` <api/extractors.html#feets.extractors.light\_curve.ext\_weighted\_mean.WeightedMean>`_
+* `Amplitude </api/feets.extractors.html#feets.extractors.ext_amplitude.Amplitude>`_
+* `AndersonDarling </api/feets.extractors.html#feets.extractors.ext_anderson_darling.AndersonDarling>`_
+* `Autocor_length </api/feets.extractors.html#feets.extractors.ext_autocor_length.AutocorLength>`_
+* `BazinFit_Amplitude </api/feets.extractors.html#feets.extractors.ext_bazin_fit.BazinFit>`_
+* `BazinFit_Baseline </api/feets.extractors.html#feets.extractors.ext_bazin_fit.BazinFit>`_
+* `BazinFit_FallTime </api/feets.extractors.html#feets.extractors.ext_bazin_fit.BazinFit>`_
+* `BazinFit_ReducedChi2 </api/feets.extractors.html#feets.extractors.ext_bazin_fit.BazinFit>`_
+* `BazinFit_ReferenceTime </api/feets.extractors.html#feets.extractors.ext_bazin_fit.BazinFit>`_
+* `BazinFit_RiseTime </api/feets.extractors.html#feets.extractors.ext_bazin_fit.BazinFit>`_
+* `BeyondNStd </api/feets.extractors.html#feets.extractors.ext_beyond_n_std.BeyondNStd>`_
+* `CAR_mean </api/feets.extractors.html#feets.extractors.ext_car.CAR>`_
+* `CAR_sigma </api/feets.extractors.html#feets.extractors.ext_car.CAR>`_
+* `CAR_tau </api/feets.extractors.html#feets.extractors.ext_car.CAR>`_
+* `Color </api/feets.extractors.html#feets.extractors.ext_color.Color>`_
+* `Con </api/feets.extractors.html#feets.extractors.ext_con.Con>`_
+* `Cusum </api/feets.extractors.html#feets.extractors.ext_cusum.Cusum>`_
+* `DeltamDeltat </api/feets.extractors.html#feets.extractors.ext_dmdt.DeltamDeltat>`_
+* `Duration </api/feets.extractors.html#feets.extractors.ext_duration.Duration>`_
+* `Eta </api/feets.extractors.html#feets.extractors.ext_eta.Eta>`_
+* `EtaE </api/feets.extractors.html#feets.extractors.ext_eta_e.EtaE>`_
+* `Eta_color </api/feets.extractors.html#feets.extractors.ext_eta_color.EtaColor>`_
+* `ExcessVariance </api/feets.extractors.html#feets.extractors.ext_excess_variance.ExcessVariance>`_
+* `Freq1_harmonics_amplitude_0 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq1_harmonics_amplitude_1 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq1_harmonics_amplitude_2 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq1_harmonics_amplitude_3 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq1_harmonics_rel_phase_0 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq1_harmonics_rel_phase_1 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq1_harmonics_rel_phase_2 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq1_harmonics_rel_phase_3 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq2_harmonics_amplitude_0 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq2_harmonics_amplitude_1 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq2_harmonics_amplitude_2 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq2_harmonics_amplitude_3 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq2_harmonics_rel_phase_0 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq2_harmonics_rel_phase_1 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq2_harmonics_rel_phase_2 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq2_harmonics_rel_phase_3 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq3_harmonics_amplitude_0 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq3_harmonics_amplitude_1 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq3_harmonics_amplitude_2 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq3_harmonics_amplitude_3 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq3_harmonics_rel_phase_0 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq3_harmonics_rel_phase_1 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq3_harmonics_rel_phase_2 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Freq3_harmonics_rel_phase_3 </api/feets.extractors.html#feets.extractors.ext_fourier_components.FourierComponents>`_
+* `Gskew </api/feets.extractors.html#feets.extractors.ext_gskew.Gskew>`_
+* `InterPercentileRange </api/feets.extractors.html#feets.extractors.ext_inter_percentile_range.InterPercentileRange>`_
+* `LinearFit_ReducedChi2 </api/feets.extractors.html#feets.extractors.ext_linear_fit.LinearFit>`_
+* `LinearFit_Sigma </api/feets.extractors.html#feets.extractors.ext_linear_fit.LinearFit>`_
+* `LinearFit_Slope </api/feets.extractors.html#feets.extractors.ext_linear_fit.LinearFit>`_
+* `LinearTrend </api/feets.extractors.html#feets.extractors.ext_linear_trend.LinearTrend>`_
+* `LinearTrend_ReducedChi2 </api/feets.extractors.html#feets.extractors.ext_linear_trend.LinearTrend>`_
+* `LinearTrend_Sigma </api/feets.extractors.html#feets.extractors.ext_linear_trend.LinearTrend>`_
+* `LinexpFit_Amplitude </api/feets.extractors.html#feets.extractors.ext_linexp_fit.LinexpFit>`_
+* `LinexpFit_Baseline </api/feets.extractors.html#feets.extractors.ext_linexp_fit.LinexpFit>`_
+* `LinexpFit_FallTime </api/feets.extractors.html#feets.extractors.ext_linexp_fit.LinexpFit>`_
+* `LinexpFit_ReducedChi2 </api/feets.extractors.html#feets.extractors.ext_linexp_fit.LinexpFit>`_
+* `LinexpFit_ReferenceTime </api/feets.extractors.html#feets.extractors.ext_linexp_fit.LinexpFit>`_
+* `MaxSlope </api/feets.extractors.html#feets.extractors.ext_max_slope.MaxSlope>`_
+* `MaxTimeInterval </api/feets.extractors.html#feets.extractors.ext_max_time_interval.MaxTimeInterval>`_
+* `Mean </api/feets.extractors.html#feets.extractors.ext_mean.Mean>`_
+* `MeanVariance </api/feets.extractors.html#feets.extractors.ext_mean_variance.MeanVariance>`_
+* `MedianAbsDev </api/feets.extractors.html#feets.extractors.ext_median_abs_dev.MedianAbsDev>`_
+* `MedianAmplitude </api/feets.extractors.html#feets.extractors.ext_median_amplitude.MedianAmplitude>`_
+* `MedianBRP </api/feets.extractors.html#feets.extractors.ext_median_brp.MedianBRP>`_
+* `MinTimeInterval </api/feets.extractors.html#feets.extractors.ext_min_time_interval.MinTimeInterval>`_
+* `OtsuLowerToAllRatio </api/feets.extractors.html#feets.extractors.ext_otsu_split.OtsuSplit>`_
+* `OtsuMeanDiff </api/feets.extractors.html#feets.extractors.ext_otsu_split.OtsuSplit>`_
+* `OtsuStdLower </api/feets.extractors.html#feets.extractors.ext_otsu_split.OtsuSplit>`_
+* `OtsuStdUpper </api/feets.extractors.html#feets.extractors.ext_otsu_split.OtsuSplit>`_
+* `PairSlopeTrend </api/feets.extractors.html#feets.extractors.ext_pair_slope_trend.PairSlopeTrend>`_
+* `PercentAmplitude </api/feets.extractors.html#feets.extractors.ext_percent_amplitude.PercentAmplitude>`_
+* `PercentDiffPercentile </api/feets.extractors.html#feets.extractors.ext_percent_diff_percentile.PercentDiffPercentile>`_
+* `PercentageRatio </api/feets.extractors.html#feets.extractors.ext_percentage_ratio.PercentageRatio>`_
+* `PeriodLS </api/feets.extractors.html#feets.extractors.ext_astropy_lomb_scargle.AstropyLombScargle>`_
+* `Period_fit </api/feets.extractors.html#feets.extractors.ext_astropy_lomb_scargle.AstropyLombScargle>`_
+* `Periodogram_Peaks </api/feets.extractors.html#feets.extractors.ext_light_curve_lomb_scargle.LightCurveLombScargle>`_
+* `Periodogram_S_to_N </api/feets.extractors.html#feets.extractors.ext_light_curve_lomb_scargle.LightCurveLombScargle>`_
+* `Psi_CS </api/feets.extractors.html#feets.extractors.ext_astropy_lomb_scargle.AstropyLombScargle>`_
+* `Psi_eta </api/feets.extractors.html#feets.extractors.ext_astropy_lomb_scargle.AstropyLombScargle>`_
+* `Q31 </api/feets.extractors.html#feets.extractors.ext_q31.Q31>`_
+* `Q31_color </api/feets.extractors.html#feets.extractors.ext_q31.Q31Color>`_
+* `Rcs </api/feets.extractors.html#feets.extractors.ext_rcs.RCS>`_
+* `ReducedChi2 </api/feets.extractors.html#feets.extractors.ext_reduced_chi2.ReducedChi2>`_
+* `Roms </api/feets.extractors.html#feets.extractors.ext_roms.Roms>`_
+* `Signature </api/feets.extractors.html#feets.extractors.ext_signature.Signature>`_
+* `Skew </api/feets.extractors.html#feets.extractors.ext_skew.Skew>`_
+* `SlottedALength </api/feets.extractors.html#feets.extractors.ext_slotted_a_length.SlottedALength>`_
+* `SmallKurtosis </api/feets.extractors.html#feets.extractors.ext_small_kurtosis.SmallKurtosis>`_
+* `Std </api/feets.extractors.html#feets.extractors.ext_std.Std>`_
+* `StetsonJ </api/feets.extractors.html#feets.extractors.ext_stetson.StetsonJ>`_
+* `StetsonK </api/feets.extractors.html#feets.extractors.ext_stetson_k.StetsonK>`_
+* `StetsonK_AC </api/feets.extractors.html#feets.extractors.ext_stetson.StetsonKAC>`_
+* `StetsonL </api/feets.extractors.html#feets.extractors.ext_stetson.StetsonL>`_
+* `StructureFunction_index_21 </api/feets.extractors.html#feets.extractors.ext_structure_functions.StructureFunctions>`_
+* `StructureFunction_index_31 </api/feets.extractors.html#feets.extractors.ext_structure_functions.StructureFunctions>`_
+* `StructureFunction_index_32 </api/feets.extractors.html#feets.extractors.ext_structure_functions.StructureFunctions>`_
+* `TimeMean </api/feets.extractors.html#feets.extractors.ext_time_mean.TimeMean>`_
+* `TimeStd </api/feets.extractors.html#feets.extractors.ext_time_std.TimeStd>`_
+* `VillarFit_Amplitude </api/feets.extractors.html#feets.extractors.ext_villar_fit.VillarFit>`_
+* `VillarFit_Baseline </api/feets.extractors.html#feets.extractors.ext_villar_fit.VillarFit>`_
+* `VillarFit_FallTime </api/feets.extractors.html#feets.extractors.ext_villar_fit.VillarFit>`_
+* `VillarFit_PlateauDuration </api/feets.extractors.html#feets.extractors.ext_villar_fit.VillarFit>`_
+* `VillarFit_PlateauRelAmplitude </api/feets.extractors.html#feets.extractors.ext_villar_fit.VillarFit>`_
+* `VillarFit_ReducedChi2 </api/feets.extractors.html#feets.extractors.ext_villar_fit.VillarFit>`_
+* `VillarFit_ReferenceTime </api/feets.extractors.html#feets.extractors.ext_villar_fit.VillarFit>`_
+* `VillarFit_RiseTime </api/feets.extractors.html#feets.extractors.ext_villar_fit.VillarFit>`_
+* `WeightedBeyondNStd </api/feets.extractors.html#feets.extractors.ext_weighted_beyond_n_std.WeightedBeyondNStd>`_
+* `WeightedMean </api/feets.extractors.html#feets.extractors.ext_weighted_mean.WeightedMean>`_
