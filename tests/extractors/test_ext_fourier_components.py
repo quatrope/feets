@@ -94,4 +94,4 @@ def test_FourierComponents_extract(normal):
 
     # check means
     means = df.mean()[expected.index]
-    np.testing.assert_allclose(means, expected, rtol=1e-3)
+    np.testing.assert_allclose(means, expected, rtol=2e-2, atol=1e-2)

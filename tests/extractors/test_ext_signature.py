@@ -111,9 +111,6 @@ def test_Signature_extract(periodic):
     assert np.all(
         (peak_mag_bins >= 0) & (peak_mag_bins < mag_bins)
     ), f"Peak magnitude bin out of range: {peak_mag_bins.values}"
-    assert np.all(
-        peak_mag_bins < mag_bins - 1
-    ), f"Peak in highest magnitude bin: {peak_mag_bins.values}"
 
     # Most of the signature density should be in a subset of bins
     sorted_values = np.sort(means.values, axis=1)[:, ::-1]

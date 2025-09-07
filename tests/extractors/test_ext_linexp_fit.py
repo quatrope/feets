@@ -31,7 +31,12 @@ RANDOM_SEED = 42
 
 def test_LinexpFit_extract():
     # init extractor
-    extractor = LinexpFit(algorithm="mcmc")
+    extractor = LinexpFit(
+        algorithm="mcmc",
+        lmsder_niter=None,
+        ceres_loss_reg=None,
+        ceres_niter=None,
+    )
 
     # simulate results
     time = np.linspace(0, 10, LC_LENGTH)
