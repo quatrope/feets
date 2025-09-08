@@ -1,4 +1,4 @@
-![logo](res/logo_big.png)
+![logo](res/logo_medium.png)
 
 <!-- BODY -->
 
@@ -8,7 +8,7 @@
 [![ascl:1806.001](https://img.shields.io/badge/ascl-1806.001-blue.svg?colorB=262255)](http://ascl.net/1806.001)
 [![ReadTheDocs.org](https://img.shields.io/badge/docs-passing-brightgreen.svg)](http://feets.readthedocs.io)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://badge.fury.io/py/feets)
+[![Python 3.10 3.11 3.12 3.13](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue.svg)](https://badge.fury.io/py/feets)
 
 
 ## Description

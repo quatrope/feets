@@ -71,7 +71,7 @@ The extractor system has been fully redesigned for clarity, configurability, and
 
 -   **Added:** `run()` function for running instances of feature extractors in parallel with `dask`.
 
-## [0.5] 2021-03
+## [0.4] 2018-04
 
 Early prerelease version with experimental features.
 
