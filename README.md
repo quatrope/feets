@@ -1,4 +1,5 @@
-![logo](res/logo_medium.png)
+![logo](https://github.com/quatrope/feets/raw/master/res/logo_medium.png)
+
 
 <!-- BODY -->
 
