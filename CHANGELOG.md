@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2025-09
+
+Minor bug fixes and updates.
+
 ## [1.0] - 2025-09
 
 New major version of `feets`, with a full redesign and modernization.
