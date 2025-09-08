@@ -4,21 +4,21 @@
     "Mean"
   ],
   "required_data": [
-    "time",
-    "magnitude"
+    "magnitude",
+    "time"
   ],
   "dask_options": null,
   "extractors": [
-    {
-      "Mean": {
-        "transform": null
-      }
-    },
     {
       "AstropyLombScargle": {
         "lscargle_kwds": null,
         "fap_kwds": null,
         "nperiods": 2
+      }
+    },
+    {
+      "Mean": {
+        "transform": null
       }
     }
   ]
