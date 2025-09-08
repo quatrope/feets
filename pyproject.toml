@@ -19,7 +19,7 @@ addopts = "-m 'not slow' -n auto -p no:warnings"
 
 [project]
 name = "feets"
-version = "1.0.0"
+version = "1.0.1dev0"
 authors = [
     { name = "Felipe Clariá Dambolena", email = "felipe.claria@unc.edu.ar" },
     { name = "Juan B Cabral", email = "jbcabral@unc.edu.ar" }
