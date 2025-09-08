@@ -9,8 +9,8 @@ on:
   - pull_request
 
 env:
-  default-python: '3.11'
+  default-python: '3.13'
 
 jobs:
   testing:
-    uses: quatrope/scikit-criteria/.github/workflows/tests.yml@638ddd115072ed319204e177db0a37967c6b298c
+    uses: quatrope/feets/.github/workflows/tests.yml@a2dfe29002dfee2be7d6ec8b10953d28bbc8a403
