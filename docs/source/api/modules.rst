@@ -1,5 +1,5 @@
-feets
-=====
+API
+===
 
 .. toctree::
    :maxdepth: 4

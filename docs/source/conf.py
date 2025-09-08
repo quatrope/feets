@@ -169,7 +169,7 @@ texinfo_documents = [
 # =============================================================================
 
 DYNAMIC_RST = {
-    # "README.md": "README.rst",
+    "README.md": "README.rst",
     "CHANGELOG.md": "CHANGELOG.rst",
 }
 

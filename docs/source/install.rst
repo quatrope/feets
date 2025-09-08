@@ -6,7 +6,7 @@ Installing feets
 
 The easiest way to install feets is using ``pip`` ::
 
-    pip install -U feets
+    pip install feets
 
 
 If you have not installed NumPy or SciPy yet, you can also install these using
@@ -14,6 +14,7 @@ conda or pip. When using pip, please ensure that *binary wheels* are used,
 and NumPy and SciPy are not recompiled from source, which can happen when using
 particular configurations of operating system and hardware (such as Linux on
 a Raspberry Pi).
+
 Building numpy and scipy from source can be complex (especially on Windows) and
 requires careful configuration to ensure that they link against an optimized
 implementation of linear algebra routines.

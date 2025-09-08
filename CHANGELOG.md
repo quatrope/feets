@@ -1,123 +1,78 @@
 # Changelog
 
-<!-- BODY -->
-
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.0] - 2025-09
 
-### Added
-- Separate development dependencies into `requirements_dev.txt`.
-- Add `.travis.yml` for continuous integration.
-- Add extractors with flux parameters.
-- Add missing magnitude extractor from `light-curve`.
-- Initial support for `light-curve` objects.
-- Add `io` module for data persistence.
-- Add `custom_json` for serialization.
-- Add persistence methods in `FeatureSpace`.
-- Add `to_dict` methods for `FeatureSpace` and `Extractor`.
-- Add benchmarks for performance evaluation.
-- Add `from_lc` method in `FeatureSpace`.
-- Add `flatten_feature()` method to the `Extractor` abstract class.
-- Add `runner` module for parallel execution.
-- Add headers to source files.
-- Add extractor plan getter for `FeatureSpace`.
-- Add `Signature` and `DeltamDeltat` extractors.
-- Add basic skeleton of `FeatureSet`.
-- Add two new feature sets.
+New major version of `feets`, with a full redesign and modernization.
 
-### Changed
-- Re-enable `pytest-xdist` for parallel testing.
-- Decorate slow tests with `@pytest.mark.slow`.
-- Update `.readthedocs.yml` configuration.
-- Bump version for development.
-- Update license file.
-- Revamp `datasets` module.
-- Improve documentation and testing for various modules.
-- Refactor `FeatureSpace` to separate single and multiple lightcurve handling.
-- Extract `Features` class into its own module.
-- Setup style for Python 13.
-- Simplify `lightcurve` extractor API and rework parameter handling.
-- Validate required data before extraction.
-- Bump `astropy` to v7.
-- Move warnings out of `Extractor` class.
-- Update transform defaults and add multiple parametrization for extractors.
-- Rename and refactor `light-curve` extractors.
-- Refactor `Extractor` API and add new `LightCurveExtractor` class.
-- Extend documentation and rename `io` module.
-- Refactor `FeatureSpace` to use `dask.delayed`.
-- Refactor extractor registry.
-- Use `dask.delayed` instead of custom graph for parallel execution.
-- Use FAP implementation from `astropy`.
-- Update `LombScargle` extractor to return N periods.
-- Update various extractors.
-- Format code with `black`.
+Support for older versions of Python has been removed. `feets` now officially supports Python 3.10+.
 
-### Fixed
-- Fix data values being overridden by `light-curve` extractors.
-- Remove documentation warnings.
-- Revert renaming of `io` module.
-- Revert usage of chunks in runner and default to multiprocessing scheduler.
-- Fix parallel extract implementation.
-- Fix default init params for extractors.
-- Fix execution plan.
-- Fix various extractor issues.
-- Fix invalid escape sequence warnings.
-- Fix some `flake8` warnings.
-- Fix `StetsonJ` and `StetsonL` tests.
-- Fix `pyproject.toml` configuration.
-- Fix `numpy` and `astropy` imports.
-- Fix various merge conflicts.
-- Fix typos in documentation.
-- Fix `CAR` and `SlottedALength` extractors.
+### Highlights of this release
 
-### Removed
-- Remove duplicated files.
-- Remove `attrs` dependency.
-- Remove execution graph from repository.
-- Remove `travis` and `ez_setup`.
-- Remove `unicode_literals`.
-- Remove unnecessary `dict` declarations.
+#### Parallelized workflow & batch processing
 
-## [0.4] - 2023-10-27
+A new [Dask](https://www.dask.org/)-powered parallelized model has been introduced for feature extraction.
 
-### Added
-- Filter features by dependencies.
-- Add synthetic lightcurve generation.
-- Add `features` object.
-- Add `LombScargle` extractor.
-- Add `StructureFunction` feature.
-- Add `Gskew` feature.
-- Add regression tests.
-- Add test infrastructure.
+-   Dramatically reduces runtime for large datasets.
+-   Enables scalable batch processing of multiple light curves simultaneously using the new `FeatureSpace.extract_many()` method.
+-   Simplifies large-scale analyses and integration with machine learning pipelines by processing multiple datasets in a single call.
 
-### Changed
-- Improve API for feature extraction.
-- Improve documentation.
-- Improve testing.
-- Use `astropy` implementation of FAP.
-- Optimize FFT calculations.
-- Improve `sort_by_dependencies`.
-- Make `Extractor` parameters stricter.
-- Make API clearer.
-- Standardize `Extractor` representation.
-- Group extractors by file.
+#### Integration with `light-curve`
 
-### Fixed
-- Remove warnings in `CAR` extractor.
-- Fix `StructureFunctions` undefined error.
-- Fix `CAR` and `SlottedALength` extractors.
-- Fix JavaScript issues in documentation.
-- Fix `travis` configuration for Python 3.7.
-- Fix bug in `register_extractor` order.
-- Fix `Fourier` extractor.
-- Fix bug in `align_lc`.
-- Fix `FluxPercentile` features.
-- Fix `Color` extractor.
-- Fix `Signature` extractor.
+This release incorporates all extractors available in the [light-curve](https://github.com/light-curve/) library.
 
-### Removed
-- Remove support for Python 3.4.
-- Remove `multiprocess` in favor of `dask`.
-- Remove `numba` dependency.
-- Remove unused `FATS` code.
+-   Existing extractors in `feets` have been replaced by optimized implementations from `light-curve`, improving speed, numerical stability, and reliability.
+-   Additional extractors from `light-curve` have been added, expanding the feature set.
+-   New compatibility with `flux` and `flux_error` data vectors, allowing extractors to operate directly on flux-based inputs as well as magnitudes.
+
+#### Configuration persistence
+
+New functionality for saving and loading `FeatureSpace` configurations has been introduced.
+
+-   Configurations can now be exported and imported in **JSON** and **YAML** formats.
+-   Methods `FeatureSpace.to_json()` and `FeatureSpace.to_yaml()`, as well as functions `feets.read_json()` and `feets.read_yaml()`, enable reproducible workflows and easy sharing of feature extraction setups.
+-   This makes it straightforward to store, reuse, and distribute predefined extraction pipelines across projects.
+
+### Main changes to the API
+
+#### `feets.Extractor`
+
+The extractor system has been fully redesigned for clarity, configurability, and performance.
+
+-   **Removed:** the `data`, `dependencies`, and `params` attributes.
+-   **Changed:** the `fit()` method has been renamed to `extract()`.
+-   **Changed:** data requirements and feature dependencies are now inferred directly from the signature of the `extract()` method.
+-   **Changed:** extractor parameters are now defined in the `__init__()` constructor instead of a `params` dictionary.
+-   **Added:** `flatten_feature()` method for custom flattening of multi-value features.
+-   **Added:** compatibility with new data vectors (`flux`, `flux_error`).
+
+#### `feets.FeatureSpace`
+
+-   **Changed:** the `extract()` method now accepts light-curve data as keyword arguments (e.g., `extract(time=t, magnitude=m)`).
+-   **Added:** `extract_many()` method for batch feature extraction from multiple light curves.
+-   **Added:** `from_dict()`, `to_dict()`, `to_json()`, and `to_yaml()` methods for configuration persistence and reproducibility.
+-   **Added:** `from_lightcurve()` and `from_lightcurves()` for automatic feature selection based on the available data.
+
+#### `feets.features`
+
+-   **Added**: `Features` class for a structured representation of extracted features. Encapsulates feature values, names, and associated metadata in a single object, with support for easy conversion to dictionaries, `pandas.DataFrame`s, and other formats for downstream analysis.
+
+#### `feets.registry`
+
+-   **Added:** `ExtractorRegistry` class for registration, discovery, and ordering of extractors.
+-   **Added:** a central `extractor_registry` object that stores available extractors and features, ensuring correct execution order and dependency resolution.
+
+#### `feets.io`
+
+-   **Added:** `load_json()` and `load_yaml()` functions for reading existing `FeatureSpace` configurations.
+
+#### `feets.runner`
+
+-   **Added:** `run()` function for running instances of feature extractors in parallel with `dask`.
+
+## [0.5] 2021-03
+
+Early prerelease version with experimental features.
+
+APIs subject to change.
