@@ -9,7 +9,7 @@ on:
 
 jobs:
   testing:
-    uses: quatrope/feets/.github/workflows/tests.yml@11fa1c754967e497003da5664b8f531c0c999553
+    uses: quatrope/feets/.github/workflows/tests.yml@1.0.0
 
   deploy:
     needs: testing
