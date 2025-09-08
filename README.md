@@ -1,5 +1,6 @@
-![feets logo](res/logo_big.png)
+![logo](res/logo_big.png)
 
+<!-- BODY -->
 
 # feets: feATURE eXTRACTOR FOR tIME sERIES
 

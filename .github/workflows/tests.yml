@@ -24,7 +24,6 @@ jobs:
           - tox_env: check-manifest
           - tox_env: check-testdir
           - tox_env: check-headers
-          - tox_env: check-apidocsdir
           - tox_env: mkdocs
             pandoc: true
             os: ubuntu-22.04
