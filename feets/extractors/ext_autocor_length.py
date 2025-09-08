@@ -80,7 +80,6 @@ class AutocorLength(Extractor):
         nlags = 0
         k = None
         while k is None:
-            print(k)
             nlags = nlags + self.nlags
             AC = stattools.acf(magnitude, nlags=nlags)
             k = next(

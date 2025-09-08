@@ -207,7 +207,6 @@ class Features(Sequence):
         kwargs.setdefault("prefer", "processes")
         kwargs.setdefault("n_jobs", self._get_default_jobs())
 
-        print(joblib.Parallel)
         with joblib.Parallel(**kwargs) as P:
             features_as_serie = joblib.delayed(self._features_as_serie)
             all_series = P(

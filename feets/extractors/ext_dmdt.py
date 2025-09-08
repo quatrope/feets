@@ -85,7 +85,6 @@ class DeltamDeltat(Extractor):
         self.dm_bins = np.asarray(
             copy.deepcopy(DEFAULT_DM_BINS) if dm_bins is None else dm_bins
         )
-        print(self.dt_bins, self.dm_bins)
 
     @doctools.doc_inherit(Extractor.extract)
     def extract(self, magnitude, time):

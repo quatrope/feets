@@ -298,7 +298,6 @@ class ExtractorRegistry:
         """
         invalid_data = set(data).difference(DATAS)
         if invalid_data:
-            print(invalid_data)
             raise RegistryValidationError(
                 f"Invalid data vectors: {', '.join(map(repr, invalid_data))}"
             )

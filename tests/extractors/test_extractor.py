@@ -233,7 +233,6 @@ def test_Extractor_get_dependencies(TestExtractor):
 
 
 def test_Extractor_get_default_params(TestExtractor):
-    print(TestExtractor.get_default_params())
     np.testing.assert_equal(
         TestExtractor.get_default_params(),
         {"test_param_1": None, "test_param_2": None, "test_param_3": None},
